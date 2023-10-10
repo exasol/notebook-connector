@@ -3,7 +3,7 @@ import logging
 import os
 from dataclasses import dataclass
 from sqlcipher3 import dbapi2 as sqlcipher
-from typing import Optional, Union
+from typing import List, Optional, Union
 from inspect import cleandoc
 
 
@@ -13,7 +13,7 @@ _logger = logging.getLogger(__name__)
 @dataclass(frozen=True)
 class Table:
     name: str
-    columns: list[str]
+    columns: List[str]
 
 
 SECRETS_TABLE = Table("secrets", ["user", "password"])
@@ -105,7 +105,7 @@ class Secrets:
         finally:
             cur.close()
 
-    def _save_data(self, table: Table, key: str, data: list[str]) -> "Secrets":
+    def _save_data(self, table: Table, key: str, data: List[str]) -> "Secrets":
         def entry_exists(cur) -> None:
             res = cur.execute(
                 f"SELECT * FROM {table.name} WHERE key=?",
@@ -144,7 +144,7 @@ class Secrets:
             return self._save_data(SECRETS_TABLE, key, [data.user, data.password])
         raise Exception("Unsupported type of data: " + type(data).__name__)
 
-    def _data(self, table: Table, key: str) -> Optional[list[str]]:
+    def _data(self, table: Table, key: str) -> Optional[List[str]]:
         columns = ", ".join(table.columns)
         with self._cursor() as cur:
             res = cur.execute(
