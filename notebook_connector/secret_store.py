@@ -2,6 +2,7 @@ import contextlib
 import logging
 import os
 import pathlib
+from pathlib import Path
 from dataclasses import dataclass
 from sqlcipher3 import dbapi2 as sqlcipher
 from typing import List, Optional, Union
@@ -32,7 +33,7 @@ class InvalidPassword(Exception):
 
 
 class Secrets:
-    def __init__(self, db_file: str, master_password: str) -> None:
+    def __init__(self, db_file: Path, master_password: str) -> None:
         self.db_file = db_file
         self._master_password = master_password
         self._con = None
