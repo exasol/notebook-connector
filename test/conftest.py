@@ -1,6 +1,6 @@
 import pytest
 from pathlib import Path
-from notebook_connector.secret_store import Secrets
+from exasol.secret_store import Secrets
 
 
 @pytest.fixture
