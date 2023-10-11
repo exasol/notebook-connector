@@ -1,7 +1,7 @@
 import pytest
+import sqlite3
 from exasol.secret_store import InvalidPassword, Secrets
 from sqlcipher3 import dbapi2 as sqlcipher
-
 
 def test_no_database_file(secrets):
     assert not secrets.db_file.exists()
@@ -33,3 +33,19 @@ def test_wrong_password(sample_file):
     with pytest.raises(InvalidPassword) as ex:
         invalid.get("key")
     assert "master password is incorrect" in str(ex.value)
+
+
+def test_plain_access_fails(sample_file):
+    """
+    This test sets up a secret store, secured by a master password and
+    verifies that plain access to the secret store using sqlite3 without
+    encryption raises a DatabaseError.
+    """
+    secrets = Secrets(sample_file, "correct password")
+    secrets.save("key", "my value").close()
+    con = sqlite3.connect(sample_file)
+    cur = con.cursor()
+    with pytest.raises(sqlite3.DatabaseError) as ex:
+        res = cur.execute("SELECT * FROM sqlite_master")
+    cur.close()
+    assert str(ex.value) == "file is not a database"
