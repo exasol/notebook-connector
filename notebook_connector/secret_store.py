@@ -45,7 +45,7 @@ class Secrets:
 
     def connection(self) -> sqlcipher.Connection:
         if self._con is None:
-            db_file_found = pathlib.Path.exists(self.db_file)
+            db_file_found = self.db_file.exists()
             if not db_file_found:
                 _logger.info(f"Creating file {self.db_file}")
             self._con = sqlcipher.connect(self.db_file)
