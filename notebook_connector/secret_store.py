@@ -1,6 +1,7 @@
 import contextlib
 import logging
 import os
+import pathlib
 from dataclasses import dataclass
 from sqlcipher3 import dbapi2 as sqlcipher
 from typing import List, Optional, Union
@@ -43,7 +44,7 @@ class Secrets:
 
     def connection(self) -> sqlcipher.Connection:
         if self._con is None:
-            db_file_found = os.path.exists(self.db_file)
+            db_file_found = pathlib.Path.exists(self.db_file)
             if not db_file_found:
                 _logger.info(f"Creating file {self.db_file}")
             self._con = sqlcipher.connect(self.db_file)
