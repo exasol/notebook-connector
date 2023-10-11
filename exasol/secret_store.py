@@ -10,22 +10,7 @@ from inspect import cleandoc
 
 
 _logger = logging.getLogger(__name__)
-
-
-@dataclass(frozen=True)
-class Table:
-    name: str
-    columns: List[str]
-
-
-SECRETS_TABLE = Table("secrets", ["user", "password"])
-CONFIG_ITEMS_TABLE = Table("config_items", ["item"])
-
-
-@dataclass(frozen=True)
-class Credentials:
-    user: str
-    password: str
+TABLE_NAME = "secrets"
 
 
 class InvalidPassword(Exception):
@@ -57,15 +42,9 @@ class Secrets:
         if db_file_found:
             self._verify_access()
             return
-
-        def create_table(table: Table) -> None:
-            _logger.info(f'Creating table "{table.name}".')
-            columns = " ,".join(table.columns)
-            with self._cursor() as cur:
-                cur.execute(f"CREATE TABLE {table.name} (key, {columns})")
-
-        for table in (SECRETS_TABLE, CONFIG_ITEMS_TABLE):
-            create_table(table)
+        _logger.info(f'Creating table "{TABLE_NAME}".')
+        with self._cursor() as cur:
+            cur.execute(f"CREATE TABLE {TABLE_NAME} (key, value)")
 
     def _use_master_password(self) -> None:
         """
@@ -107,29 +86,23 @@ class Secrets:
         finally:
             cur.close()
 
-    def _save_data(self, table: Table, key: str, data: List[str]) -> "Secrets":
+    def save(self, key: str, value: str) -> "Secrets":
+        """key represents a system, service, or application"""
         def entry_exists(cur) -> None:
             res = cur.execute(
-                f"SELECT * FROM {table.name} WHERE key=?",
+                f"SELECT * FROM {TABLE_NAME} WHERE key=?",
                 [key])
             return res and res.fetchone()
 
         def update(cur) -> None:
-            columns = ", ".join(f"{c}=?" for c in table.columns)
             cur.execute(
-                f"UPDATE {table.name} SET {columns} WHERE key=?",
-                data + [key])
+                f"UPDATE {TABLE_NAME} SET value=? WHERE key=?",
+                [value, key])
 
         def insert(cur) -> None:
-            columns = ",".join(table.columns)
-            value_slots = ", ".join("?" for c in table.columns)
             cur.execute(
-                (
-                    f"INSERT INTO {table.name}"
-                    f" (key,{columns})"
-                    f" VALUES (?, {value_slots})"
-                ),
-                [key] + data)
+                f"INSERT INTO {TABLE_NAME} (key,value) VALUES (?, ?)",
+                [key, value])
 
         with self._cursor() as cur:
             if entry_exists(cur):
@@ -138,26 +111,10 @@ class Secrets:
                 insert(cur)
         return self
 
-    def save(self, key: str, data: Union[str, Credentials]) -> "Secrets":
-        """key represents a system, service, or application"""
-        if isinstance(data, str):
-            return self._save_data(CONFIG_ITEMS_TABLE, key, [data])
-        if isinstance(data, Credentials):
-            return self._save_data(SECRETS_TABLE, key, [data.user, data.password])
-        raise Exception("Unsupported type of data: " + type(data).__name__)
-
-    def _data(self, table: Table, key: str) -> Optional[List[str]]:
-        columns = ", ".join(table.columns)
+    def get(self, key: str) -> Optional[List[str]]:
         with self._cursor() as cur:
             res = cur.execute(
-                f"SELECT {columns} FROM {table.name} WHERE key=?",
+                f"SELECT value FROM {TABLE_NAME} WHERE key=?",
                 [key])
-            return res.fetchone() if res else None
-
-    def credentials(self, key: str) -> Optional[Credentials]:
-        row = self._data(SECRETS_TABLE, key)
-        return Credentials(row[0], row[1]) if row else None
-
-    def config(self, key: str) -> Optional[str]:
-        row = self._data(CONFIG_ITEMS_TABLE, key)
+            row = res.fetchone() if res else None
         return row[0] if row else None
