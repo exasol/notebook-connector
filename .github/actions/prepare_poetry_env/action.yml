@@ -16,4 +16,4 @@ runs:
         poetry-version: 1.4.0
     - name: Poetry install
       run: poetry install
-
+      shell: bash
