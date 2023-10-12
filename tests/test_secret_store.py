@@ -1,6 +1,6 @@
 import os
 import pytest
-from notebook_connector.secret_store import Credentials, InvalidPassword, Secrets
+from exasol.secret_store import Credentials, InvalidPassword, Secrets
 from sqlcipher3 import dbapi2 as sqlcipher
 
 
