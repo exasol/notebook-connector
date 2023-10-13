@@ -1,56 +1,51 @@
-import os
 import pytest
-from exasol.secret_store import Credentials, InvalidPassword, Secrets
+import sqlite3
+from exasol.secret_store import InvalidPassword, Secrets
 from sqlcipher3 import dbapi2 as sqlcipher
 
-
 def test_no_database_file(secrets):
-    assert not os.path.exists(secrets.db_file)
+    assert not secrets.db_file.exists()
 
 
-def test_database_file_from_credentials(secrets):
-    assert secrets.credentials("a") is None
-    assert os.path.exists(secrets.db_file)
+def test_database_file_created(secrets):
+    assert secrets.get("any_key") is None
+    assert secrets.db_file.exists()
 
 
-def test_database_file_from_config_item(secrets):
-    assert secrets.config("a") is None
-    assert os.path.exists(secrets.db_file)
+def test_value(secrets):
+    value = "my value"
+    secrets.save("key", value).close()
+    assert secrets.get("key") == value
 
 
-def test_credentials(secrets):
-    credentials = Credentials("user", "password")
-    secrets.save("key", credentials).close()
-    assert secrets.credentials("key") == credentials
-
-
-def test_config_item(secrets):
-    config_item = "some configuration"
-    secrets.save("key", config_item).close()
-    assert secrets.config("key") == config_item
-
-
-def test_update_credentials(secrets):
-    initial = Credentials("user", "password")
-    secrets.save("key", initial).close()
-    other = Credentials("other", "changed")
-    secrets.save("key", other)
-    secrets.close()
-    assert secrets.credentials("key") == other
-
-
-def test_update_config_item(secrets):
+def test_update(secrets):
     initial = "initial value"
     secrets.save("key", initial).close()
     other = "other value"
     secrets.save("key", other).close()
-    assert secrets.config("key") == other
+    assert secrets.get("key") == other
 
 
 def test_wrong_password(sample_file):
     secrets = Secrets(sample_file, "correct password")
-    secrets.save("key", Credentials("usr", "pass")).close()
+    secrets.save("key", "my value").close()
     invalid = Secrets(sample_file, "wrong password")
     with pytest.raises(InvalidPassword) as ex:
-        invalid.credentials("key")
+        invalid.get("key")
     assert "master password is incorrect" in str(ex.value)
+
+
+def test_plain_access_fails(sample_file):
+    """
+    This test sets up a secret store, secured by a master password and
+    verifies that plain access to the secret store using sqlite3 without
+    encryption raises a DatabaseError.
+    """
+    secrets = Secrets(sample_file, "correct password")
+    secrets.save("key", "my value").close()
+    con = sqlite3.connect(sample_file)
+    cur = con.cursor()
+    with pytest.raises(sqlite3.DatabaseError) as ex:
+        res = cur.execute("SELECT * FROM sqlite_master")
+    cur.close()
+    assert str(ex.value) == "file is not a database"
