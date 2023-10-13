@@ -31,8 +31,8 @@ jobs:
       - name: Copy Artifacts into Root Folder
         working-directory: ./artifacts
         run: |
-          cp .coverage/.coverage ../
-          cp .lint.txt/.lint.txt ../
+          if [ -f .coverage/.coverage ]; then cp .coverage/.coverage ../; fi
+          if [ -f .lint.txt/.lint.txt ]; then cp .lint.txt/.lint.txt ../; fi
 
       - name: Generate Report
         run: poetry run nox -s report -- -- --format json | tee metrics.json
