@@ -44,7 +44,7 @@ class Secrets:
             return
         _logger.info(f'Creating table "{TABLE_NAME}".')
         with self._cursor() as cur:
-            cur.execute(f"CREATE TABLE {TABLE_NAME} (key, value)")
+            cur.execute(f"CREATE TABLE {TABLE_NAME} (key TEXT, value TEXT PRIMARY KEY)")
 
     def _use_master_password(self) -> None:
         """
