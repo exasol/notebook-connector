@@ -7,7 +7,7 @@ from typing import Iterable
 class Config:
     root: Path = Path(__file__).parent
     doc: Path = Path(__file__).parent / "doc"
-    version_file: Path = Path(__file__).parent / "exasol" / "toolbox" / "version.py"
+    version_file: Path = Path(__file__).parent / "version.py"
     path_filters: Iterable[str] = ("dist", ".eggs", "venv")
 
 

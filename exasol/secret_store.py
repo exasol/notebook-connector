@@ -1,13 +1,13 @@
 import contextlib
 import logging
-import os
-import pathlib
-from pathlib import Path
-from dataclasses import dataclass
-from sqlcipher3 import dbapi2 as sqlcipher
-from typing import List, Optional, Union
 from inspect import cleandoc
+from pathlib import Path
+from typing import (
+    List,
+    Optional,
+)
 
+from sqlcipher3 import dbapi2 as sqlcipher  # type: ignore
 
 _logger = logging.getLogger(__name__)
 TABLE_NAME = "secrets"
@@ -28,12 +28,16 @@ class Secrets:
             self._con.close()
             self._con = None
 
-    def connection(self) -> sqlcipher.Connection:
+    def connection(
+        self,
+    ) -> sqlcipher.Connection:  # pylint: disable=E1101
         if self._con is None:
             db_file_found = self.db_file.exists()
             if not db_file_found:
-                _logger.info(f"Creating file {self.db_file}")
-            self._con = sqlcipher.connect(self.db_file)
+                _logger.info("Creating file %s", self.db_file)
+            # fmt: off
+            self._con = sqlcipher.connect(self.db_file)  # pylint: disable=E1101
+            # fmt: on
             self._use_master_password()
             self._initialize(db_file_found)
         return self._con
@@ -42,7 +46,7 @@ class Secrets:
         if db_file_found:
             self._verify_access()
             return
-        _logger.info(f'Creating table "{TABLE_NAME}".')
+        _logger.info('Creating table "%s".', TABLE_NAME)
         with self._cursor() as cur:
             cur.execute(f"CREATE TABLE {TABLE_NAME} (key TEXT, value TEXT PRIMARY KEY)")
 
@@ -60,22 +64,26 @@ class Secrets:
         try:
             with self._cursor() as cur:
                 cur.execute("SELECT * FROM sqlite_master")
-        except sqlcipher.DatabaseError as ex:
-            print(f'exception {ex}')
+        # fmt: off
+        except (sqlcipher.DatabaseError) as ex:  # pylint: disable=E1101
+            # fmt: on
+            print(f"exception {ex}")
             if str(ex) == "file is not a database":
                 raise InvalidPassword(
                     cleandoc(
-                    f"""
+                        f"""
                     Cannot access
                     database file {self.db_file}.
                     This also happens if master password is incorrect.
-                    """)
+                    """
+                    )
                 ) from ex
-            else:
-                raise ex
+            raise ex
 
     @contextlib.contextmanager
-    def _cursor(self) -> sqlcipher.Cursor:
+    def _cursor(
+        self,
+    ) -> sqlcipher.Cursor:  # pylint: disable=E1101
         cur = self.connection().cursor()
         try:
             yield cur
@@ -88,21 +96,18 @@ class Secrets:
 
     def save(self, key: str, value: str) -> "Secrets":
         """key represents a system, service, or application"""
-        def entry_exists(cur) -> None:
-            res = cur.execute(
-                f"SELECT * FROM {TABLE_NAME} WHERE key=?",
-                [key])
+
+        def entry_exists(cur) -> bool:
+            res = cur.execute(f"SELECT * FROM {TABLE_NAME} WHERE key=?", [key])
             return res and res.fetchone()
 
         def update(cur) -> None:
-            cur.execute(
-                f"UPDATE {TABLE_NAME} SET value=? WHERE key=?",
-                [value, key])
+            cur.execute(f"UPDATE {TABLE_NAME} SET value=? WHERE key=?", [value, key])
 
         def insert(cur) -> None:
             cur.execute(
-                f"INSERT INTO {TABLE_NAME} (key,value) VALUES (?, ?)",
-                [key, value])
+                f"INSERT INTO {TABLE_NAME} (key,value) VALUES (?, ?)", [key, value]
+            )
 
         with self._cursor() as cur:
             if entry_exists(cur):
@@ -113,8 +118,6 @@ class Secrets:
 
     def get(self, key: str) -> Optional[List[str]]:
         with self._cursor() as cur:
-            res = cur.execute(
-                f"SELECT value FROM {TABLE_NAME} WHERE key=?",
-                [key])
+            res = cur.execute(f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key])
             row = res.fetchone() if res else None
         return row[0] if row else None
