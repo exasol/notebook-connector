@@ -65,7 +65,7 @@ class Secrets:
             with self._cursor() as cur:
                 cur.execute("SELECT * FROM sqlite_master")
         # fmt: off
-        except (sqlcipher.DatabaseError) as ex:  # pylint: disable=E1101
+        except (sqlcipher.DatabaseError) as ex: # pylint: disable=E1101
             # fmt: on
             print(f"exception {ex}")
             if str(ex) == "file is not a database":
