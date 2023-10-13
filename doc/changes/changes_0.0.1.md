@@ -10,3 +10,4 @@ This release adds the initial implementation of the secret store
 * #4: Added python toolbox
 * #7: Refactored secret store to store simple key/value pairs
 * #5: Added test case to verify that plain access to secret store fails
+* #8: Updated exasol python toolbox to version 0.5.0
