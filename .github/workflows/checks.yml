@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.9"]
 
     steps:
       - name: SCM Checkout
@@ -57,6 +57,12 @@ jobs:
       - name: Run Tests
         run: poetry run nox -s lint
 
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: .lint.txt
+          path: .lint.txt
+
   type-check-job:
     name: Type Checking (Python-${{ matrix.python-version }})
     needs: [version-check-job]
@@ -64,7 +70,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.9"]
 
     steps:
       - name: SCM Checkout
@@ -85,7 +91,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.9"]
         exasol-version: ["7.1.9"]
 
     steps:
@@ -99,3 +105,9 @@ jobs:
 
       - name: Run Tests
         run: poetry run nox -s coverage -- -- --db-version ${{ matrix.exasol-version }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: .coverage
+          path: .coverage

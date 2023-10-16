@@ -33,7 +33,7 @@ jobs:
         run: |
           ls -Rla
           if [ -f .coverage/.coverage ]; then cp .coverage/.coverage ../; fi
-          if [ -f .lint.txt/.lint.txt ]; then cp .lint.txt/.lint.txt ../; fi
+          if [ -f .lint.txt/.lint.txt ]; then cp .lint.txt/.lint.txt ../  ; fi
 
       - name: Generate Report
         run: poetry run nox -s report -- -- --format json | tee metrics.json
