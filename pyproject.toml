@@ -1,14 +1,26 @@
 [tool.poetry]
 name = "notebook-connector"
-version = "0.0.1"
+version = "0.1.0"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to various other systems."
 packages = [ {include = "exasol"}, ]
-
+authors = [ "Christoph Kuhnke <christoph.kuhnke@exasol.com>" ]
+maintainers = [ "Christoph Kuhnke <christoph.kuhnke@exasol.com>" ]
+classifiers = [
+   "Programming Language :: Python :: 3",
+   "Development Status :: 3 - Alpha",
+   "Framework :: Jupyter :: JupyterLab :: 3",
+   "License :: OSI Approved :: MIT License",
+   "Topic :: Security :: Cryptography",
+]
+readme = "README.md"
 license = "MIT"
 
-authors = [
-    "Christoph Kuhnke <christoph.kuhnke@exasol.com>"
-]
+[tool.poetry.urls]
+"Homepage" = "https://github.io/exasol/notebook-connector"
+"Documentation" = "https://github.io/exasol/notebook-connector"
+"Source" = "https://github.io/exasol/notebook-connector"
+"Issues" = "https://github.io/exasol/notebook-connector/issues"
+
 
 [tool.poetry.dependencies]
 python = ">=3.8.0,<4.0"
