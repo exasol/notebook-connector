@@ -2,7 +2,7 @@
 
 ## Summary
 
-This release re-adds checks for python versions 3.10 and 3.11 and adds some details to the pypi releases.
+This release renamed the pypi release to exasol-notebook-connector, re-adds checks for python versions 3.10 and 3.11 and adds some details to the pypi releases.
 
 ## Changes
 
