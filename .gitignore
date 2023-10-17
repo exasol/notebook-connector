@@ -3,3 +3,7 @@
 dist
 __pycache__/
 /TAGS
+/.coverage
+/.lint.json
+/.lint.txt
+/.html-documentation/

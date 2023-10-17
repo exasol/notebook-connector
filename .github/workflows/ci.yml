@@ -3,33 +3,22 @@ name: CI
 on:
   push:
     branches-ignore:
+      - "github-pages/*"
+      - "gh-pages/*"
       - "main"
+      - "master"
+  pull_request:
+    types: [opened, reopened]
+  schedule:
+    # “At 00:00 on every 7th day-of-month from 1 through 31.” (https://crontab.guru)
+    - cron: "0 0 1/7 * *"
 
 jobs:
-  tests-job:
-    name: Tests (Python-${{ matrix.python-version }})
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9"]
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Poetry
-        run: |
-          pipx install poetry
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'poetry'
-          cache-dependency-path: poetry.lock
-      - uses: abatilo/actions-poetry@v2.1.4
-        with:
-          poetry-version: 1.2.2
+  ci-job:
+    name: Checks
+    uses: ./.github/workflows/checks.yml
 
-      - name: Install Project
-        run: poetry install
-
-      - name: Run Tests
-        run: poetry run pytest tests
+  metrics:
+    needs: [ ci-job ]
+    uses: ./.github/workflows/report.yml

@@ -1,7 +1,12 @@
-import pytest
 import sqlite3
-from exasol.secret_store import InvalidPassword, Secrets
-from sqlcipher3 import dbapi2 as sqlcipher
+
+import pytest
+
+from exasol.secret_store import (
+    InvalidPassword,
+    Secrets,
+)
+
 
 def test_no_database_file(secrets):
     assert not secrets.db_file.exists()
@@ -46,6 +51,6 @@ def test_plain_access_fails(sample_file):
     con = sqlite3.connect(sample_file)
     cur = con.cursor()
     with pytest.raises(sqlite3.DatabaseError) as ex:
-        res = cur.execute("SELECT * FROM sqlite_master")
+        cur.execute("SELECT * FROM sqlite_master")
     cur.close()
     assert str(ex.value) == "file is not a database"

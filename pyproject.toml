@@ -2,6 +2,7 @@
 name = "notebook-connector"
 version = "0.0.1"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to various other systems."
+packages = [ {include = "exasol"}, ]
 
 license = "MIT"
 
@@ -12,7 +13,7 @@ authors = [
 [tool.poetry.dependencies]
 python = ">=3.8.0,<4.0"
 sqlcipher3-binary = ">=0.5.0"
-exasol-toolbox = "^0.4.0"
+exasol-toolbox = "^0.5.0"
 
 
 [build-system]
@@ -56,18 +57,18 @@ force_grid_wrap = 2
 fail-under = 7.5
 output-format = "colorized,json:.lint.json,text:.lint.txt"
 
+[[tool.mypy.overrides]]
+module = [
+    "exasol.toolbox.nox.tasks",
+    "test.conftest.*",
+    "test.*",
+    ]
+ignore_errors = true
+ignore_missing_imports = true
+
 [tool.pylint.format]
 max-line-length = 88
 max-module-lines = 800
-
-
-[[tool.mypy.overrides]]
-module = [
-    "exasol.toolbox.sphinx.multiversion.*",
-    "test.unit.*",
-    "test.integration.*",
-]
-ignore_errors = true
 
 [tool.poetry.scripts]
 tbx = 'exasol.toolbox.tools.tbx:CLI'
