@@ -28,6 +28,8 @@ class Secrets:
             self._con.close()
             self._con = None
 
+    # disable error messages about unresolved types in type hints as
+    # sqlcipher is a c library and does not provide this information.
     def connection(
         self,
     ) -> sqlcipher.Connection:  # pylint: disable=E1101

@@ -43,7 +43,7 @@ fail_under = 15
 
 
 [tool.black]
-line-length = 88
+line-length = 120
 verbose = false
 include = "\\.pyi?$"
 
