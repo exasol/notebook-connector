@@ -54,3 +54,14 @@ def test_plain_access_fails(sample_file):
         cur.execute("SELECT * FROM sqlite_master")
     cur.close()
     assert str(ex.value) == "file is not a database"
+
+
+def test_access_key_as_attribute(secrets):
+    secrets.save("key", "value")
+    assert secrets.key == "value"
+
+
+def test_access_non_existing_key_as_attribute(secrets):
+    with pytest.raises(AttributeError) as ex:
+        secrets.non_existing_key
+    assert str(ex.value) == 'Unknown key "non_existing_key"'
