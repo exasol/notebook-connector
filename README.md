@@ -15,3 +15,23 @@ By that users of such notebook applications
 * need to enter their credentials and configuration items only once
 * can store them in a secure, encrypted, and persistent file based on SQLite and [coleifer/sqlcipher3](https://github.com/coleifer/sqlcipher3)
 * can use these credentials and configuration items in their notebook applications
+
+## Usage
+
+```python
+from exasol.secret_store import Secrets
+
+file = "password_db.sqlite"
+secrets = Secrets(file, "my secret password")
+key = "my key"
+secrets.save(key, "my value")
+value = secrets.get(key)
+```
+
+#### Constraints and Special Situations
+
+* If file does not exist then SecretStore will create it.
+* If password is wrong then SecretStore will throw an exception.
+* If file contains key from a session in the past then method `secrets.save()` will overwrite the value for this key.
+* If key is not contained in file then SecretStore returns `None`.
+* Saving multiple keys can be chained:`secrets.save("key-1", "A").save("key-2", "B")`
