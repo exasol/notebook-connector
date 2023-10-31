@@ -34,4 +34,4 @@ value = secrets.get(key)
 * If password is wrong then SecretStore will throw an exception.
 * If file contains key from a session in the past then method `secrets.save()` will overwrite the value for this key.
 * If key is not contained in file then SecretStore returns `None`.
-* Saving multiple keys can be chained:`secrets.save("key-1", "A").save("key-2", "B")`
+* Saving multiple keys can be chained: `secrets.save("key-1", "A").save("key-2", "B")`

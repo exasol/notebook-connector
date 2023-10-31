@@ -118,8 +118,14 @@ class Secrets:
                 insert(cur)
         return self
 
-    def get(self, key: str) -> Optional[List[str]]:
+    def get(self, key: str) -> Optional[str]:
         with self._cursor() as cur:
             res = cur.execute(f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key])
             row = res.fetchone() if res else None
         return row[0] if row else None
+
+    def __getattr__(self, key) -> str:
+        val = self.get(key)
+        if val is None:
+            raise AttributeError(f'Unknown key "{key}"')
+        return val
