@@ -24,7 +24,7 @@ from exasol.secret_store import Secrets
 file = "password_db.sqlite"
 secrets = Secrets(file, "my secret password")
 key = "my key"
-secrets.save(key, "my value").close()
+secrets.save(key, "my value")
 value = secrets.get(key)
 ```
 
@@ -34,3 +34,4 @@ value = secrets.get(key)
 * If password is wrong then SecretStore will throw an exception.
 * If file contains key from a session in the past then method `secrets.save()` will overwrite the value for this key.
 * If key is not contained in file then SecretStore returns `None`.
+* Saving multiple keys can be chained:`secrets.save("key-1", "A").save("key-2", "B")`
