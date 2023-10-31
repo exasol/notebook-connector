@@ -118,7 +118,7 @@ class Secrets:
                 insert(cur)
         return self
 
-    def get(self, key: str) -> Optional[List[str]]:
+    def get(self, key: str) -> Optional[str]:
         with self._cursor() as cur:
             res = cur.execute(f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key])
             row = res.fetchone() if res else None
