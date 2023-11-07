@@ -2,7 +2,7 @@
 
 ## Summary
 
-This release updates README file and includes a refactored Secrets class.
+This release updates the README file and includes a refactored Secrets class.
 
 ## Changes
 
