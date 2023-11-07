@@ -1,8 +1,8 @@
-# Exasol Notebook Connector 0.2.0, released t.b.d.
+# Exasol Notebook Connector 0.2.0, released 2023-11-07
 
 ## Summary
 
-This release updates README file.
+This release updates the README file and includes a refactored Secrets class.
 
 ## Changes
 
