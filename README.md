@@ -19,10 +19,11 @@ By that users of such notebook applications
 ## Usage
 
 ```python
+from pathlib import Path
 from exasol.secret_store import Secrets
 
 file = "password_db.sqlite"
-secrets = Secrets(file, "my secret password")
+secrets = Secrets(Path(file), "my secret password")
 key = "my key"
 secrets.save(key, "my value")
 value = secrets.get(key)

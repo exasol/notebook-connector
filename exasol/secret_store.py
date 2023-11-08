@@ -50,7 +50,7 @@ class Secrets:
             return
         _logger.info('Creating table "%s".', TABLE_NAME)
         with self._cursor() as cur:
-            cur.execute(f"CREATE TABLE {TABLE_NAME} (key TEXT, value TEXT PRIMARY KEY)")
+            cur.execute(f"CREATE TABLE {TABLE_NAME} (key TEXT PRIMARY KEY, value TEXT)")
 
     def _use_master_password(self) -> None:
         """
