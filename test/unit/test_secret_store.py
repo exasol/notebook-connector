@@ -23,6 +23,11 @@ def test_value(secrets):
     assert secrets.get("key") == value
 
 
+def test_default_value(secrets):
+    default_value = "my_value"
+    assert secrets.get("unknown_value", default_value) == default_value
+
+
 def test_update(secrets):
     initial = "initial value"
     secrets.save("key", initial).close()

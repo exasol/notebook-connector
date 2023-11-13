@@ -118,11 +118,11 @@ class Secrets:
                 insert(cur)
         return self
 
-    def get(self, key: str) -> Optional[str]:
+    def get(self, key: str, default_value: Optional[str] = None) -> Optional[str]:
         with self._cursor() as cur:
             res = cur.execute(f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key])
             row = res.fetchone() if res else None
-        return row[0] if row else None
+        return row[0] if row else default_value
 
     def __getattr__(self, key) -> str:
         val = self.get(key)
