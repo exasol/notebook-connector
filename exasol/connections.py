@@ -1,16 +1,11 @@
 import ssl
 from pathlib import Path
-from typing import (
-    Callable,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Optional
 
-import pyexasol
-import sqlalchemy
+import pyexasol     # type: ignore
+import sqlalchemy   # type: ignore
+import exasol.bucketfs as bfs   # type: ignore
 
-import exasol.bucketfs as bfs
 from exasol.secret_store import Secrets
 
 
@@ -36,7 +31,7 @@ def _extract_ssl_options(conf: Secrets) -> dict:
     Returns a dictionary in the winsocket-client format
     (see https://websocket-client.readthedocs.io/en/latest/faq.html#what-else-can-i-do-with-sslopts)
     """
-    sslopt = {}
+    sslopt: dict[str, object] = {}
 
     # Is server certificate validation required?
     certificate_validation = _optional_str_to_bool(conf.get("CERTIFICATE_VALIDATION"))
@@ -63,9 +58,10 @@ def _extract_ssl_options(conf: Secrets) -> dict:
             raise ValueError(f"Certificate file {client_certificate} doesn't exist.")
         sslopt["certfile"] = client_certificate
         private_key = conf.get("PRIVATE_KEY")
-        if not Path(private_key).is_file():
-            raise ValueError(f"Private key file {private_key} doesn't exist.")
-        sslopt["keyfile"] = private_key
+        if private_key is not None:
+            if not Path(private_key).is_file():
+                raise ValueError(f"Private key file {private_key} doesn't exist.")
+            sslopt["keyfile"] = private_key
 
     return sslopt
 
