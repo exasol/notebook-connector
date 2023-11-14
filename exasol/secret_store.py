@@ -50,7 +50,7 @@ class Secrets:
             return
         _logger.info('Creating table "%s".', TABLE_NAME)
         with self._cursor() as cur:
-            cur.execute(f"CREATE TABLE {TABLE_NAME} (key TEXT, value TEXT PRIMARY KEY)")
+            cur.execute(f"CREATE TABLE {TABLE_NAME} (key TEXT PRIMARY KEY, value TEXT)")
 
     def _use_master_password(self) -> None:
         """
@@ -118,11 +118,11 @@ class Secrets:
                 insert(cur)
         return self
 
-    def get(self, key: str) -> Optional[str]:
+    def get(self, key: str, default_value: Optional[str] = None) -> Optional[str]:
         with self._cursor() as cur:
             res = cur.execute(f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key])
             row = res.fetchone() if res else None
-        return row[0] if row else None
+        return row[0] if row else default_value
 
     def __getattr__(self, key) -> str:
         val = self.get(key)

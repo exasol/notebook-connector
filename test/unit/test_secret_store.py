@@ -23,6 +23,19 @@ def test_value(secrets):
     assert secrets.get("key") == value
 
 
+def test_dup_values(secrets):
+    # Here we test that it is possible to save the same value with different keys
+    value = "my value"
+    secrets.save("key1", value).save("key2", value).close()
+    assert secrets.get("key1") == value
+    assert secrets.get("key2") == value
+
+
+def test_default_value(secrets):
+    default_value = "my_value"
+    assert secrets.get("unknown_value", default_value) == default_value
+
+
 def test_update(secrets):
     initial = "initial value"
     secrets.save("key", initial).close()
