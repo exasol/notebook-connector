@@ -55,10 +55,11 @@ def test_open_pyexasol_connection(mock_connect, conf):
 @unittest.mock.patch("pyexasol.connect")
 def test_open_pyexasol_connection_kwargs(mock_connect, conf):
     open_pyexasol_connection(conf, connection_timeout=3, query_timeout=10)
+    dsn = f"{conf.EXTERNAL_HOST_NAME}:{conf.DB_PORT}"
     mock_connect.assert_called_once_with(
-        dsn="24.134.96.2:8888",
-        user="me",
-        password="let_me_in",
+        dsn=dsn,
+        user=conf.USER,
+        password=conf.PASSWORD,
         connection_timeout=3,
         query_timeout=10,
     )
