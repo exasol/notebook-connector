@@ -131,6 +131,6 @@ def test_open_sqlalchemy_connection_ssl(mock_create_engine, conf):
 def test_open_bucketfs_connection(mock_bfs_service, conf):
     open_bucketfs_connection(conf)
     mock_bfs_service.assert_called_once_with(
-        "http://24.134.96.2:6666",
+        f"http://{conf.EXTERNAL_HOST_NAME}:{conf.BUCKETFS_PORT}",
         {"my_bucket": {"username": "buck_user", "password": "buck_pwd"}},
     )
