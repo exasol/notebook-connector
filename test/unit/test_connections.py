@@ -30,7 +30,7 @@ def conf() -> Secrets:
     mock_conf.save = types.MethodType(mock_save, mock_conf)
     mock_conf.get = types.MethodType(mock_get, mock_conf)
     mock_conf.EXTERNAL_HOST_NAME = "24.134.96.2"
-    mock_conf.HOST_PORT = "8888"
+    mock_conf.DB_PORT = "8888"
     mock_conf.USER = "me"
     mock_conf.PASSWORD = "let_me_in"
     mock_conf.BUCKETFS_PORT = "6666"
