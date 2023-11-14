@@ -120,8 +120,9 @@ def test_open_sqlalchemy_connection_ssl(mock_create_engine, conf):
     conf.save("CERTIFICATE_VALIDATION", "False")
 
     open_sqlalchemy_connection(conf)
+    dsn = f"{conf.EXTERNAL_HOST_NAME}:{conf.DB_PORT}"
     mock_create_engine.assert_called_once_with(
-        "exa+websocket://me:let_me_in@24.134.96.2:8888"
+        f"exa+websocket://{conf.USER}:{conf.PASSWORD}@{dsn}/IDA"  
         "?ENCRYPTION=Yes&SSLCertificate=SSL_VERIFY_NONE"
     )
 
