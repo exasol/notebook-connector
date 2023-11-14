@@ -46,8 +46,9 @@ def test_open_pyexasol_connection(mock_connect, conf):
     conf.save("SCHEMA", "IDA")
 
     open_pyexasol_connection(conf)
+    dsn = f"{conf.EXTERNAL_HOST_NAME}:{conf.DB_PORT}"
     mock_connect.assert_called_once_with(
-        dsn="24.134.96.2:8888", user="me", password="let_me_in", schema="IDA"
+        dsn=dsn, user=conf.USER, password=conf.PASSWORD, schema="IDA"
     )
 
 
