@@ -78,10 +78,11 @@ def test_open_pyexasol_connection_ssl(mock_connect, conf):
         conf.save("PRIVATE_KEY", tmp_files[2].name)
 
         open_pyexasol_connection(conf)
+        dsn = f"{conf.EXTERNAL_HOST_NAME}:{conf.DB_PORT}"
         mock_connect.assert_called_once_with(
-            dsn="24.134.96.2:8888",
-            user="me",
-            password="let_me_in",
+            dsn=dsn,
+            user=conf.USER,
+            password=conf.PASSWORD,
             encryption=True,
             websocket_sslopt={
                 "cert_reqs": ssl.CERT_REQUIRED,
