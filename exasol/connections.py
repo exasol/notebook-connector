@@ -68,7 +68,7 @@ def _extract_ssl_options(conf: Secrets) -> dict:
 
 def get_external_host(conf: Secrets):
     """Constructs the host part of a DB URL using provided configuration parameters."""
-    return f"{conf.EXTERNAL_HOST_NAME}:{conf.HOST_PORT}"
+    return f"{conf.EXTERNAL_HOST_NAME}:{conf.DB_PORT}"
 
 
 def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
@@ -79,7 +79,7 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
     Parameters in kwargs override the correspondent values in the configuration.
 
     The configuration should provide the following parameters:
-    - Server address and port (EXTERNAL_HOST_NAME, HOST_PORT),
+    - Server address and port (EXTERNAL_HOST_NAME, DB_PORT),
     - Client security credentials (USER, PASSWORD).
     Optional parameters include:
     - Database schema (SCHEMA),
@@ -115,7 +115,7 @@ def open_sqlalchemy_connection(conf: Secrets):
     Creates an Exasol SQLAlchemy websocket engine using provided configuration parameters.
 
     The configuration should provide the following parameters:
-    - Server address and port (EXTERNAL_HOST_NAME, HOST_PORT),
+    - Server address and port (EXTERNAL_HOST_NAME, DB_PORT),
     - Client security credentials (USER, PASSWORD).
     Optional parameters include:
     - Database schema (SCHEMA),
