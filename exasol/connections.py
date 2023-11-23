@@ -2,10 +2,10 @@ import ssl
 from pathlib import Path
 from typing import Optional
 
-import pyexasol     # type: ignore
-import sqlalchemy   # type: ignore
-import exasol.bucketfs as bfs   # type: ignore
+import pyexasol  # type: ignore
+import sqlalchemy  # type: ignore
 
+import exasol.bucketfs as bfs  # type: ignore
 from exasol.secret_store import Secrets
 
 
@@ -42,7 +42,7 @@ def _extract_ssl_options(conf: Secrets) -> dict:
 
     # Is a bundle with trusted CAs provided?
     trusted_ca = conf.get("TRUSTED_CA")
-    if trusted_ca is not None:
+    if trusted_ca:
         trusted_ca_path = Path(trusted_ca)
         if trusted_ca_path.is_dir():
             sslopt["ca_cert_path"] = trusted_ca
@@ -53,12 +53,12 @@ def _extract_ssl_options(conf: Secrets) -> dict:
 
     # Is client's own certificate provided?
     client_certificate = conf.get("CLIENT_CERTIFICATE")
-    if client_certificate is not None:
+    if client_certificate:
         if not Path(client_certificate).is_file():
             raise ValueError(f"Certificate file {client_certificate} doesn't exist.")
         sslopt["certfile"] = client_certificate
         private_key = conf.get("PRIVATE_KEY")
-        if private_key is not None:
+        if private_key:
             if not Path(private_key).is_file():
                 raise ValueError(f"Private key file {private_key} doesn't exist.")
             sslopt["keyfile"] = private_key
@@ -82,7 +82,6 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
     - Server address and port (EXTERNAL_HOST_NAME, DB_PORT),
     - Client security credentials (USER, PASSWORD).
     Optional parameters include:
-    - Database schema (SCHEMA),
     - Secured comm flag (ENCRYPTION),
     - Some of the SSL options (CERTIFICATE_VALIDATION, TRUSTED_CA, CLIENT_CERTIFICATE).
     If the schema is not provided then it should be set explicitly in every SQL statement.
@@ -95,9 +94,6 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
         "password": conf.PASSWORD,
     }
 
-    schema = conf.get("SCHEMA")
-    if schema:
-        conn_params["schema"] = schema
     encryption = _optional_encryption(conf)
     if encryption is not None:
         conn_params["encryption"] = encryption
@@ -118,7 +114,6 @@ def open_sqlalchemy_connection(conf: Secrets):
     - Server address and port (EXTERNAL_HOST_NAME, DB_PORT),
     - Client security credentials (USER, PASSWORD).
     Optional parameters include:
-    - Database schema (SCHEMA),
     - Secured comm flag (ENCRYPTION).
     - Validation of the server's TLS/SSL certificate by the client (CERTIFICATE_VALIDATION).
     If the schema is not provided then it should be set explicitly in every SQL statement.
@@ -130,9 +125,6 @@ def open_sqlalchemy_connection(conf: Secrets):
     websocket_url = (
         f"exa+websocket://{conf.USER}:{conf.PASSWORD}@{get_external_host(conf)}"
     )
-    schema = conf.get("SCHEMA")
-    if schema:
-        websocket_url = f"{websocket_url}/{schema}"
 
     delimiter = "?"
     encryption = _optional_encryption(conf)

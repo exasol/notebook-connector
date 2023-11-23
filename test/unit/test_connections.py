@@ -48,11 +48,9 @@ def test_get_external_host(conf):
 
 @unittest.mock.patch("pyexasol.connect")
 def test_open_pyexasol_connection(mock_connect, conf):
-    conf.save("SCHEMA", "IDA")
-
     open_pyexasol_connection(conf)
     mock_connect.assert_called_once_with(
-        dsn=get_external_host(conf), user=conf.USER, password=conf.PASSWORD, schema="IDA"
+        dsn=get_external_host(conf), user=conf.USER, password=conf.PASSWORD
     )
 
 
@@ -107,11 +105,9 @@ def test_open_pyexasol_connection_error(mock_connect, conf):
 
 @unittest.mock.patch("sqlalchemy.create_engine")
 def test_open_sqlalchemy_connection(mock_create_engine, conf):
-    conf.save("SCHEMA", "IDA")
-
     open_sqlalchemy_connection(conf)
     mock_create_engine.assert_called_once_with(
-        f"exa+websocket://{conf.USER}:{conf.PASSWORD}@{get_external_host(conf)}/IDA"
+        f"exa+websocket://{conf.USER}:{conf.PASSWORD}@{get_external_host(conf)}"
     )
 
 
@@ -122,7 +118,7 @@ def test_open_sqlalchemy_connection_ssl(mock_create_engine, conf):
 
     open_sqlalchemy_connection(conf)
     mock_create_engine.assert_called_once_with(
-        f"exa+websocket://{conf.USER}:{conf.PASSWORD}@{get_external_host(conf)}"  
+        f"exa+websocket://{conf.USER}:{conf.PASSWORD}@{get_external_host(conf)}"
         "?ENCRYPTION=Yes&SSLCertificate=SSL_VERIFY_NONE"
     )
 
@@ -132,5 +128,10 @@ def test_open_bucketfs_connection(mock_bfs_service, conf):
     open_bucketfs_connection(conf)
     mock_bfs_service.assert_called_once_with(
         f"http://{conf.EXTERNAL_HOST_NAME}:{conf.BUCKETFS_PORT}",
-        {conf.BUCKETFS_BUCKET: {"username": conf.BUCKETFS_USER, "password": conf.BUCKETFS_PASSWORD}},
+        {
+            conf.BUCKETFS_BUCKET: {
+                "username": conf.BUCKETFS_USER,
+                "password": conf.BUCKETFS_PASSWORD,
+            }
+        },
     )
