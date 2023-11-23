@@ -1,4 +1,4 @@
-# Exasol Notebook Connector 0.2.1, released 2023-11-23
+# Exasol Notebook Connector 0.2.2, released 2023-11-23
 
 ## Summary
 
