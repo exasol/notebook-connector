@@ -4,7 +4,6 @@ from typing import Optional
 
 import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
-
 import exasol.bucketfs as bfs  # type: ignore
 from exasol.secret_store import Secrets
 
