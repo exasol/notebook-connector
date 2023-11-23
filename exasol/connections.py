@@ -73,6 +73,7 @@ def get_external_host(conf: Secrets):
 def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
     """
     Opens a pyexasol connection using provided configuration parameters.
+    Does NOT set the default schema, even if it is defined in the configuration.
 
     Any additional parameters can be passed to pyexasol via the kwargs.
     Parameters in kwargs override the correspondent values in the configuration.
@@ -108,6 +109,7 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
 def open_sqlalchemy_connection(conf: Secrets):
     """
     Creates an Exasol SQLAlchemy websocket engine using provided configuration parameters.
+    Does NOT set the default schema, even if it is defined in the configuration.
 
     The configuration should provide the following parameters:
     - Server address and port (EXTERNAL_HOST_NAME, DB_PORT),
