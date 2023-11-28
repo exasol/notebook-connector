@@ -1,6 +1,6 @@
 import ssl
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
 
 import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
@@ -97,7 +97,7 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
     For other optional parameters the default settings are as per the pyexasol interface.
     """
 
-    conn_params = {
+    conn_params: dict[str, Any] = {
         "dsn": get_external_host(conf),
         "user": conf.USER,
         "password": conf.PASSWORD,
