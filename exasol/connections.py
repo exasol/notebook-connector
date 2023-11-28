@@ -4,6 +4,7 @@ from typing import Optional
 
 import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
+
 import exasol.bucketfs as bfs  # type: ignore
 from exasol.secret_store import Secrets
 
@@ -65,9 +66,17 @@ def _extract_ssl_options(conf: Secrets) -> dict:
     return sslopt
 
 
-def get_external_host(conf: Secrets):
+def get_external_host(conf: Secrets) -> str:
     """Constructs the host part of a DB URL using provided configuration parameters."""
     return f"{conf.EXTERNAL_HOST_NAME}:{conf.DB_PORT}"
+
+
+def get_udf_bucket_path(conf: Secrets) -> str:
+    """
+    Builds the path of the BucketFS bucket specified in the configuration,
+    as it's seen in the udf's file system.
+    """
+    return f"/buckets/{conf.BUCKETFS_SERVICE}/{conf.BUCKETFS_BUCKET}"
 
 
 def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
@@ -158,7 +167,11 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.Bucket:
     """
 
     # Set up the connection parameters.
-    buckfs_url_prefix = "https" if _optional_encryption(conf) else "http"
+    # For now, just use the http. Once the exasol.bucketfs is capable of using the
+    # https without validating the server certificate choose between the http and
+    # https depending on the ENCRYPTION setting like in the code below:
+    # buckfs_url_prefix = "https" if _optional_encryption(conf) else "http"
+    buckfs_url_prefix = "http"
     buckfs_url = f"{buckfs_url_prefix}://{conf.EXTERNAL_HOST_NAME}:{conf.BUCKETFS_PORT}"
     buckfs_credentials = {
         conf.BUCKETFS_BUCKET: {
