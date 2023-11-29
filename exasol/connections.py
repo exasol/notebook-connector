@@ -1,6 +1,9 @@
 import ssl
 from pathlib import Path
-from typing import Optional, Any
+from typing import (
+    Any,
+    Optional,
+)
 
 import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
