@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 
 class Project(enum.Enum):
     """
-    Names of github projects to be retrieved.
+    Names of github projects to be retrieved. Values have to match github project names.
     """
     CLOUD_STORAGE_EXTENSION = "cloud-storage-extension"
     KAFKA_CONNECTOR_EXTENSION = "kafka-connector-extension"
