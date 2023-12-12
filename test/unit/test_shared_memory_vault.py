@@ -1,6 +1,7 @@
-from unittest import mock
-from exasol.shared_memory_vault import (compute_crc, encode, decode, write_to_sm, read_from_sm, clear_sm)
 from datetime import datetime
+from unittest import mock
+from exasol.shared_memory_vault import (compute_crc, encode, decode, write_to_sm,
+                                        read_from_sm, clear_sm)
 
 
 def test_compute_crc():
@@ -40,7 +41,8 @@ def test_write_read(mock_sm_factory):
     divisor = '100110100011'
     content = 'The truth will set you free.'
     dt = datetime(year=2023, month=12, day=12, hour=8, minute=39, second=45)
-    success = write_to_sm(content, creation_time=dt, crc_divisor=divisor, max_size=max_size)
+    success = write_to_sm(content, creation_time=dt, crc_divisor=divisor,
+                          max_size=max_size)
     assert success
     success, dt_out, content_out = read_from_sm(crc_divisor=divisor, max_size=max_size)
     assert success
@@ -84,9 +86,11 @@ def test_write_fail_insufficient_memory(mock_sm_factory):
     mock_sm.buf = bytearray(max_size)
     mock_sm_factory.return_value = mock_sm
     divisor = '100110100011'
-    content = 'If you want something said, ask a man; if you want something done, ask a woman.'
+    content = 'If you want something said, ask a man; ' \
+              'if you want something done, ask a woman.'
     dt = datetime(year=2023, month=12, day=12, hour=9, minute=19, second=10)
-    success = write_to_sm(content, creation_time=dt, crc_divisor=divisor, max_size=max_size)
+    success = write_to_sm(content, creation_time=dt, crc_divisor=divisor,
+                          max_size=max_size)
     assert not success
 
 
