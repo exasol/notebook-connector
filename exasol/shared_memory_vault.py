@@ -115,7 +115,7 @@ def _open_shared_memory(storage_name: str, max_size: int, must_exist: bool) -> O
     except FileNotFoundError:
         if must_exist:
             return None
-        return SharedMemory(name=storage_name, create=False, size=max_size)
+        return SharedMemory(name=storage_name, create=True, size=max_size)
 
 
 def write_to_sm(content: str, creation_time: Optional[datetime] = None, key: str = default_key,
