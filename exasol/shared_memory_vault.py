@@ -5,30 +5,30 @@ from datetime import datetime
 import struct
 
 
-default_key = '1001011001100101'
-default_max_size = 100
-default_storage_name = 'notebook_connector_vault'
+DEFAULT_CRC_DIVISOR = '1001011001100101'
+DEFAULT_MAX_SIZE = 100
+DEFAULT_STORAGE_NAME = 'notebook_connector_vault'
 
 
-def _xor(sequence: str, key: str) -> str:
-    return ''.join('0' if a == b else '1' for a, b in zip(sequence, key))
+def _xor(sequence: str, crc_divisor: str) -> str:
+    return ''.join('0' if a == b else '1' for a, b in zip(sequence, crc_divisor))
 
 
-def compute_crc(sequence: str, key: str) -> str:
+def compute_crc(sequence: str, crc_divisor: str) -> str:
     """
-    Computes a Cyclic Redundancy Check (CRC) code for a provided binary sequence using a provided key.
-    Check this wiki for details: https://en.wikipedia.org/wiki/Cyclic_redundancy_check
-    For example if the sequence is '11010011101100000' and the key is '011' the output crc code will
-    be '100'. Note that the n+1 bit long key, commonly used in literature, 1011 in the above example,
+    Computes a Cyclic Redundancy Check (CRC) code for a provided binary sequence using a provided
+    polynomial divisor. Check this wiki for details: https://en.wikipedia.org/wiki/Cyclic_redundancy_check
+    For example if the sequence is '11010011101100000' and the divisor is '011' the output crc code will
+    be '100'. Note that the n+1 bit long divisor, commonly used in literature, 1011 in the above example,
     is assumed to have the most significant bit (MSB) equal 1. Here the MSB is omitted.
     """
-    n = len(key)
+    n = len(crc_divisor)
     reminder = sequence[:n]
     for i in range(n, len(sequence)):
         starts_one = reminder[0] == '1'
         reminder = reminder[1:] + sequence[i]
         if starts_one:
-            reminder = _xor(reminder, key)
+            reminder = _xor(reminder, crc_divisor)
     return reminder
 
 
@@ -37,9 +37,9 @@ def _get_byte_size(n: int) -> int:
     return int(ceil(n.bit_length() / 8))
 
 
-def _get_key_size(key: str) -> int:
-    """Calculates the byte size of a CRC key"""
-    return int(ceil(len(key) / 8))
+def _get_divisor_size(crc_divisor: str) -> int:
+    """Calculates the byte size of a CRC divisor"""
+    return int(ceil(len(crc_divisor) / 8))
 
 
 def _bytes_to_bin(msg_bytes: bytes) -> str:
@@ -47,7 +47,7 @@ def _bytes_to_bin(msg_bytes: bytes) -> str:
     return ''.join(format(c, '08b') for c in msg_bytes)
 
 
-def encode(content: str, key: str, creation_time: datetime) -> (int, bytearray):
+def encode(content: str, crc_divisor: str, creation_time: datetime) -> (int, bytearray):
     """
     Creates a bytearray with encoded content and its creation datetime.
     Currently, the content is not being encrypted. It gets appended by the Cyclic Redundancy Check (CRC)
@@ -66,20 +66,20 @@ def encode(content: str, key: str, creation_time: datetime) -> (int, bytearray):
     bin_body = _bytes_to_bin(body)
 
     # Compute the CRC of the content right-padded with n zeros.
-    key_size = _get_key_size(key)
-    padding = '0' * len(key)
-    bin_cr = compute_crc(bin_body + padding, key)
+    divisor_size = _get_divisor_size(crc_divisor)
+    padding = '0' * len(crc_divisor)
+    bin_cr = compute_crc(bin_body + padding, crc_divisor)
     cr = int(bin_cr, 2)
 
     # Put together the content bytes and the CRC bytes.
-    cont_size = len(body) + key_size
+    cont_size = len(body) + divisor_size
     enc_content = bytearray(cont_size)
-    enc_content[:-key_size] = body
-    enc_content[-key_size:] = cr.to_bytes(key_size, byteorder='big', signed=False)
+    enc_content[:-divisor_size] = body
+    enc_content[-divisor_size:] = cr.to_bytes(divisor_size, byteorder='big', signed=False)
     return cont_size, enc_content
 
 
-def decode(enc_content: bytearray, key: str) -> (bool, datetime, str):
+def decode(enc_content: bytearray, crc_divisor: str) -> (bool, datetime, str):
     """
     Decodes and validates a content encoded in a bytearray.
     Returns the validity flag, the datetime of the content creation and the textual content.
@@ -88,18 +88,18 @@ def decode(enc_content: bytearray, key: str) -> (bool, datetime, str):
     """
 
     # Compute the CRC code of the content that should include its own CRC code.
-    key_size = _get_key_size(key)
-    bin_body = _bytes_to_bin(enc_content[:-key_size])
-    bin_cr = _bytes_to_bin(enc_content[-key_size:])[-len(key):]
-    bin_cr = compute_crc(bin_body + bin_cr, key)
+    divisor_size = _get_divisor_size(crc_divisor)
+    bin_body = _bytes_to_bin(enc_content[:-divisor_size])
+    bin_cr = _bytes_to_bin(enc_content[-divisor_size:])[-len(crc_divisor):]
+    bin_cr = compute_crc(bin_body + bin_cr, crc_divisor)
 
     # For a valid content the computed CRC should be zero.
     if int(bin_cr, 2) == 0:
-        key_size = _get_key_size(key)
+        divisor_size = _get_divisor_size(crc_divisor)
         # Decode the content creation timestamp.
         ts = struct.unpack('d', enc_content[:8])[0]
         # Decode the content.
-        content = enc_content[8:-key_size].decode('utf8')
+        content = enc_content[8:-divisor_size].decode('utf8')
         return True, datetime.fromtimestamp(ts), content
     return False, datetime.min, ''
 
@@ -118,8 +118,8 @@ def _open_shared_memory(storage_name: str, max_size: int, must_exist: bool) -> O
         return SharedMemory(name=storage_name, create=True, size=max_size)
 
 
-def write_to_sm(content: str, creation_time: Optional[datetime] = None, key: str = default_key,
-                max_size: int = default_max_size, storage_name: str = default_storage_name) -> bool:
+def write_to_sm(content: str, creation_time: Optional[datetime] = None, crc_divisor: str = DEFAULT_CRC_DIVISOR,
+                max_size: int = DEFAULT_MAX_SIZE, storage_name: str = DEFAULT_STORAGE_NAME) -> bool:
     """
     Saves a content and its creation time in a shared memory.
 
@@ -138,14 +138,14 @@ def write_to_sm(content: str, creation_time: Optional[datetime] = None, key: str
     content       - The content string to be stored into the stored to the shared memory
     creation_time - Time when the content was created, which will also be stored to the shared memory.
                     If not provided the current time will be used.
-    key           - A binary string used for computing the CRC.
+    crc_divisor   - A binary string used for computing the CRC.
     max_size      - Maximum size of the shared memory block in bytes.
     storage_name  - Name of the shared memory block.
     """
 
     # Encode the content and check if it fits into the shared memory block
     creation_time = creation_time or datetime.now()
-    cont_size, enc_content = encode(content, key, creation_time)
+    cont_size, enc_content = encode(content, crc_divisor, creation_time)
     size_size = _get_byte_size(max_size)
     total_size = cont_size + size_size
     if total_size > max_size:
@@ -162,8 +162,8 @@ def write_to_sm(content: str, creation_time: Optional[datetime] = None, key: str
     return True
 
 
-def read_from_sm(key: str = default_key, max_size: int = default_max_size,
-                 storage_name: str = default_storage_name) -> (bool, datetime, str):
+def read_from_sm(crc_divisor: str = DEFAULT_CRC_DIVISOR, max_size: int = DEFAULT_MAX_SIZE,
+                 storage_name: str = DEFAULT_STORAGE_NAME) -> (bool, datetime, str):
     """
     Reads from the shared memory a content and the time when it was created .
 
@@ -178,7 +178,7 @@ def read_from_sm(key: str = default_key, max_size: int = default_max_size,
     size is to be believed), or it has been deemed invalid the function returns (False, <any datetime>, '').
 
     Parameters:
-    key           - A binary string used for computing the CRC.
+    crc_divisor   - A binary string used for computing the CRC.
     max_size      - Maximum size of the shared memory block in bytes.
     storage_name  - Name of the shared memory block.
     """
@@ -196,12 +196,12 @@ def read_from_sm(key: str = default_key, max_size: int = default_max_size,
             return False, datetime.min, ''
         # Reade and decode the content.
         enc_content = bytearray(pwd_memory.buf[size_size:total_size])
-        return decode(enc_content, key)
+        return decode(enc_content, crc_divisor)
     finally:
         pwd_memory.close()
 
 
-def clear_sm(max_size: int = default_max_size, storage_name: str = default_storage_name,
+def clear_sm(max_size: int = DEFAULT_MAX_SIZE, storage_name: str = DEFAULT_STORAGE_NAME,
              delete_storage: bool = False) -> None:
     """
     Invalidates the content stored in shared memory by setting its length to zero and optionally
