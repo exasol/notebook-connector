@@ -10,22 +10,11 @@ import sqlalchemy  # type: ignore
 
 import exasol.bucketfs as bfs  # type: ignore
 from exasol.secret_store import Secrets
+from exasol.utils import optional_str_to_bool
 
 
-def _optional_str_to_bool(value: Optional[str]) -> Optional[bool]:
-    if value is None:
-        return None
-    value_l = value.lower()
-    if value_l in ["y", "yes", "true"]:
-        return True
-    elif value_l in ["n", "no", "false"]:
-        return False
-    else:
-        raise ValueError("Invalid boolean value " + value)
-
-
-def _optional_encryption(conf: Secrets) -> Optional[bool]:
-    return _optional_str_to_bool(conf.get("ENCRYPTION"))
+def _optional_encryption(conf: Secrets, key: str = "ENCRYPTION") -> Optional[bool]:
+    return optional_str_to_bool(conf.get(key))
 
 
 def _extract_ssl_options(conf: Secrets) -> dict:
@@ -37,7 +26,7 @@ def _extract_ssl_options(conf: Secrets) -> dict:
     sslopt: dict[str, object] = {}
 
     # Is server certificate validation required?
-    certificate_validation = _optional_str_to_bool(conf.get("CERTIFICATE_VALIDATION"))
+    certificate_validation = optional_str_to_bool(conf.get("CERTIFICATE_VALIDATION"))
     if certificate_validation is not None:
         sslopt["cert_reqs"] = (
             ssl.CERT_REQUIRED if certificate_validation else ssl.CERT_NONE
@@ -172,8 +161,8 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.Bucket:
     # Set up the connection parameters.
     # For now, just use the http. Once the exasol.bucketfs is capable of using the
     # https without validating the server certificate choose between the http and
-    # https depending on the ENCRYPTION setting like in the code below:
-    # buckfs_url_prefix = "https" if _optional_encryption(conf) else "http"
+    # https depending on the BUCKETFS_ENCRYPTION setting like in the code below:
+    # buckfs_url_prefix = "https" if _optional_encryption(conf, BUCKETFS_ENCRYPTION) else "http"
     buckfs_url_prefix = "http"
     buckfs_url = f"{buckfs_url_prefix}://{conf.EXTERNAL_HOST_NAME}:{conf.BUCKETFS_PORT}"
     buckfs_credentials = {

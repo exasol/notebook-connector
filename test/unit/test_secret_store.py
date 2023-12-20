@@ -78,3 +78,30 @@ def test_access_non_existing_key_as_attribute(secrets):
     with pytest.raises(AttributeError) as ex:
         secrets.non_existing_key
     assert str(ex.value) == 'Unknown key "non_existing_key"'
+
+
+@pytest.fixture
+def secrets_with_names(secrets):
+    secrets.save("electrician", "John")
+    secrets.save("musician", "Linda")
+    secrets.save("prime_minister", "Rishi")
+    return secrets
+
+
+def test_keys_iterator(secrets_with_names):
+    professions = list(secrets_with_names.keys())
+    assert professions == ["electrician", "musician", "prime_minister"]
+
+
+def test_values_iterator(secrets_with_names):
+    people = list(secrets_with_names.values())
+    assert people == ["John", "Linda", "Rishi"]
+
+
+def test_items_iterator(secrets_with_names):
+    people_and_prof = list(secrets_with_names.items())
+    assert people_and_prof == [
+        ("electrician", "John"),
+        ("musician", "Linda"),
+        ("prime_minister", "Rishi"),
+    ]

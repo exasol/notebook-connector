@@ -3,8 +3,9 @@ import logging
 from inspect import cleandoc
 from pathlib import Path
 from typing import (
-    List,
+    Iterable,
     Optional,
+    Tuple,
 )
 
 from sqlcipher3 import dbapi2 as sqlcipher  # type: ignore
@@ -129,3 +130,24 @@ class Secrets:
         if val is None:
             raise AttributeError(f'Unknown key "{key}"')
         return val
+
+    def keys(self) -> Iterable[str]:
+        """Iterator over keys akin to dict.keys()"""
+        with self._cursor() as cur:
+            res = cur.execute(f"SELECT key FROM {TABLE_NAME}")
+            for row in res:
+                yield row[0]
+
+    def values(self) -> Iterable[str]:
+        """Iterator over values akin to dict.values()"""
+        with self._cursor() as cur:
+            res = cur.execute(f"SELECT value FROM {TABLE_NAME}")
+            for row in res:
+                yield row[0]
+
+    def items(self) -> Iterable[Tuple[str, str]]:
+        """Iterator over keys and values akin to dict.items()"""
+        with self._cursor() as cur:
+            res = cur.execute(f"SELECT key, value FROM {TABLE_NAME}")
+            for row in res:
+                yield row[0], row[1]
