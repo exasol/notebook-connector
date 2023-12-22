@@ -29,15 +29,10 @@ sqlcipher3 = {version = ">=0.5.0", platform = "darwin"}
 sqlalchemy-exasol  = ">=4.6.0"
 pyexasol = ">=0.24.0"
 exasol-bucketfs = ">=0.6.0"
-torch = "2.0.1+cpu"
+torch = {url = "https://download.pytorch.org/whl/cpu/torch-2.0.1%2Bcpu-cp38-cp38-linux_x86_64.whl"}
 exasol-transformers-extension = {url = "https://github.com/exasol/transformers-extension/releases/download/0.7.0/exasol_transformers_extension-0.7.0.tar.gz"}
-# exasol-sagemaker-extension = {url = "https://github.com/exasol/sagemaker-extension/releases/download/0.6.0/exasol_sagemaker_extension-0.5.0.tar.gz"}
+exasol-sagemaker-extension = {url = "https://github.com/exasol/sagemaker-extension/releases/download/0.6.0/exasol_sagemaker_extension-0.6.0.tar.gz"}
 
-
-[[tool.poetry.source]]
-name = "torch-stable"
-url = "https://download.pytorch.org/whl/"
-priority = "supplemental"
 
 [build-system]
 requires = ["poetry_core>=1.0.0"]

@@ -1,51 +1,72 @@
-from typing import Optional
+from exasol_transformers_extension.utils.bucketfs_operations import (
+    create_bucketfs_location, get_model_path, upload_model_files_to_bucketfs)
 
-from exasol_transformers_extension.deployment.language_container_deployer import (
-    LanguageActivationLevel,
-)
-from exasol_transformers_extension.deployment.scripts_deployer import ScriptsDeployer
-from exasol_transformers_extension.deployment.te_language_container_deployer import (
-    TeLanguageContainerDeployer,
-)
+from exasol_transformers_extension.deployment.language_container_deployer import LanguageActivationLevel    # type: ignore
+from exasol_transformers_extension.deployment.scripts_deployer import ScriptsDeployer                       # type: ignore
+from exasol_transformers_extension.deployment.te_language_container_deployer import TeLanguageContainerDeployer     # type: ignore
 
 from exasol.connections import (
     get_external_host,
-    open_pyexasol_connection,
+    open_pyexasol_connection
 )
 from exasol.extension_wrapper_common import (
     encapsulate_bucketfs_credentials,
     encapsulate_huggingface_token,
-    str_to_bool,
+    str_to_bool
 )
 from exasol.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
-    get_activation_sql,
+    get_activation_sql
 )
 from exasol.secret_store import Secrets
 
 # Root directory in a bucket-fs bucket where all stuff of the Transformers
 # Extension, including its language container, will be uploaded.
 PATH_IN_BUCKET = "TE"
+
 LANGUAGE_ALIAS = "PYTHON3_TE"
+
 LATEST_KNOW_VERSION = "0.7.0"
+
 # Activation SQL for the Transformers Extension will be saved in the secret
 # store with this key.
 ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "te"
-# Name of the connection object with bucket-fs location and credentials
+
+# The name of the connection object with bucket-fs location and credentials
 # will be saved in the secret store with this key.
 BFS_CONNECTION_KEY = "TE_BFS_CONN"
-# Name of the connection object with bucket-fs location and credentials
+
+# The name of the connection object with bucket-fs location and credentials
 # will be prefixed with this string.
 BFS_CONNECTION_PREFIX = "TE_BFS"
-# Name of the connection object with a Huggingface token
-# will be saved in the secret store with this key.
+
+# Models will be uploaded into this directory in bucket-fs.
+BFS_MODELS_DIR = 'te_models'
+
+# The name of the models' directory in bucket-fs will be saved in the secret
+# store with this key.
+BFS_MODELS_DIR_KEY = "TE_MODELS_BFS_DIR"
+
+# The name of the connection object with a Huggingface token will be saved in
+# the secret store with this key.
 HF_CONNECTION_KEY = "TE_TOKEN_CONN"
-# Name of the connection object with a Huggingface token
-# will be prefixed with this string.
+
+# The name of the connection object with a Huggingface token will be prefixed
+# with this string.
 HF_CONNECTION_PREFIX = "TE_HF"
 
+# Models downloaded from the Huggingface archive to a local drive will be
+# cached in this directory.
+MODELS_CACHE_DIR = "models_cache"
 
-def deploy_language_container(conf: Secrets, version: str, language_alias: str) -> None:
+# The name of the models' cache directory will be saved in the secret store
+# with this key.
+MODELS_CACHE_DIR_KEY = "TE_MODELS_CACHE_DIR"
+
+
+def deploy_language_container(conf: Secrets,
+                              version: str,
+                              language_alias: str) -> None:
     """
     Calls the Transformers Extension's language container deployment API.
     Downloads the specified released version of the extension from the GitHub
@@ -98,7 +119,8 @@ def deploy_language_container(conf: Secrets, version: str, language_alias: str) 
     conf.save(ACTIVATION_KEY, activation_sql)
 
 
-def deploy_scripts(conf: Secrets, language_alias: str) -> None:
+def deploy_scripts(conf: Secrets,
+                   language_alias: str) -> None:
     """
     Deploys all the extension's scripts to the database.
 
@@ -120,11 +142,13 @@ def deploy_scripts(conf: Secrets, language_alias: str) -> None:
         scripts_deployer.deploy_scripts()
 
 
-def initialize_te_extension(
-    conf: Secrets,
-    version: str = LATEST_KNOW_VERSION,
-    language_alias: str = LANGUAGE_ALIAS,
-):
+def initialize_te_extension(conf: Secrets,
+                            version: str = LATEST_KNOW_VERSION,
+                            language_alias: str = LANGUAGE_ALIAS,
+                            run_deploy_container: bool = True,
+                            run_deploy_scripts: bool = True,
+                            run_encapsulate_bfs_credentials: bool = True,
+                            run_encapsulate_hf_token: bool = True) -> None:
     """
     Performs all necessary operations to get the Transformers Extension
     up and running. See the "Getting Started" and "Setup" sections of the
@@ -140,6 +164,16 @@ def initialize_te_extension(
         language_alias:
             The language alias of the extension's language container. Normally
             this parameter would only be used for testing.
+        run_deploy_container:
+            If set to False will skip the language container deployment.
+        run_deploy_scripts:
+            If set to False will skip the deployment of the UDF scripts.
+        run_encapsulate_bfs_credentials:
+            If set to False will skip the creation of the database connection
+            object encapsulating the bucket-fs credentials.
+        run_encapsulate_hf_token:
+            If set to False will skip the creation of the database connection
+            object encapsulating the Huggingface token.
     """
 
     # Make the connection object names
@@ -147,16 +181,56 @@ def initialize_te_extension(
     token = conf.get("HF_TOKEN")
     hf_conn_name = "_".join([HF_CONNECTION_PREFIX, conf.USER]) if token else ""
 
-    deploy_language_container(conf, version, language_alias)
+    if run_deploy_container:
+        deploy_language_container(conf, version, language_alias)
 
     # Create the required objects in the database
-    deploy_scripts(conf, language_alias)
-    encapsulate_bucketfs_credentials(
-        conf, path_in_bucket=PATH_IN_BUCKET, connection_name=bfs_conn_name
-    )
-    if token:
+    if run_deploy_scripts:
+        deploy_scripts(conf, language_alias)
+    if run_encapsulate_bfs_credentials:
+        encapsulate_bucketfs_credentials(
+            conf, path_in_bucket=PATH_IN_BUCKET, connection_name=bfs_conn_name
+        )
+    if token and run_encapsulate_hf_token:
         encapsulate_huggingface_token(conf, hf_conn_name)
 
     # Save the connection object names in the secret store.
     conf.save(BFS_CONNECTION_KEY, bfs_conn_name)
     conf.save(HF_CONNECTION_KEY, hf_conn_name)
+    # Save the directory names in the secret store
+    conf.save(BFS_MODELS_DIR_KEY, BFS_MODELS_DIR)
+    conf.save(MODELS_CACHE_DIR_KEY, MODELS_CACHE_DIR)
+
+
+def upload_model_from_cache(
+        conf: Secrets,
+        model_name: str,
+        cache_dir: str) -> None:
+    """
+    Uploads model previously downloaded and cached on a local drive. This,
+    for instance, could have been done with the following code.
+
+    from transformers import AutoTokenizer, AutoModel
+    AutoTokenizer.from_pretrained(model_name, cache_dir=cache_dir)
+    AutoModel.from_pretrained(model_name, cache_dir=cache_dir)
+
+    Parameters:
+        conf:
+            The secret store.
+        model_name:
+            Name of the model at the Huggingface archive.
+        cache_dir:
+            Directory on the local drive where the model was cached. This would
+            not normally be the same as MODELS_CACHE_DIR. Each model should
+            have its own cache directory, presumably within the MODELS_CACHE_DIR.
+    """
+
+    # Create bucketfs location
+    bucketfs_location = create_bucketfs_location(
+        conf.BUCKETFS_SERVICE, conf.get('BUCKETFS_HOST_NAME', conf.EXTERNAL_HOST_NAME),
+        int(conf.BUCKETFS_PORT), conf.BUCKETFS_ENCRYPTION.lower() == 'true',
+        conf.BUCKETFS_USER, conf.BUCKETFS_PASSWORD, conf.BUCKETFS_BUCKET, PATH_IN_BUCKET)
+
+    # Upload the downloaded model files into bucketfs
+    upload_path = get_model_path(conf.get(BFS_MODELS_DIR_KEY), model_name)
+    upload_model_files_to_bucketfs(cache_dir, upload_path, bucketfs_location)

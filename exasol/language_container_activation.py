@@ -1,3 +1,4 @@
+from typing import Dict
 import re
 
 from exasol.secret_store import Secrets
@@ -23,7 +24,7 @@ def get_activation_sql(conf: Secrets) -> str:
     RuntimeException will be raised.
     """
 
-    merged_langs = {}
+    merged_langs: Dict[str, str] = {}
     pattern = re.compile(
         r"\A\s*ALTER\s+SESSION\s+SET\s+SCRIPT_LANGUAGES" r"\s*=\s*'(.+?)'\s*;?\s*\Z",
         re.IGNORECASE,

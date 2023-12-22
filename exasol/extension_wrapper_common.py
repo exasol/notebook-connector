@@ -41,7 +41,7 @@ def encapsulate_bucketfs_credentials(
             Name for the connection object to be created.
     """
 
-    bfs_host = conf.get("BUCKETFS_HOST_NAME") or conf.get("EXTERNAL_HOST_NAME")
+    bfs_host = conf.get("BUCKETFS_HOST_NAME", conf.EXTERNAL_HOST_NAME)
     # For now, just use the http. Once the exasol.bucketfs is capable of using
     # the https without validating the server certificate choose between the
     # http and https depending on the BUCKETFS_ENCRYPTION setting, like this:
