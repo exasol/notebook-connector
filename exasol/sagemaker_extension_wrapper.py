@@ -1,4 +1,4 @@
-from exasol_sagemaker_extension.deployment.deploy_create_statements import DeployCreateStatements       # type: ignore
+from exasol_sagemaker_extension.deployment.deploy_create_statements import DeployCreateStatements   # type: ignore
 from exasol_sagemaker_extension.deployment.language_container_deployer import LanguageActivationLevel   # type: ignore
 from exasol_sagemaker_extension.deployment.sme_language_container_deployer import SmeLanguageContainerDeployer  # type: ignore
 
