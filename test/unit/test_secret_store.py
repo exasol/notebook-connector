@@ -78,3 +78,9 @@ def test_access_non_existing_key_as_attribute(secrets):
     with pytest.raises(AttributeError) as ex:
         secrets.non_existing_key
     assert str(ex.value) == 'Unknown key "non_existing_key"'
+
+
+def test_remove_key(secrets):
+    secrets.save("key", "value")
+    secrets.remove("key")
+    assert secrets.get("key") is None
