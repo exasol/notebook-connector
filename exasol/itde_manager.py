@@ -95,20 +95,9 @@ def take_itde_down(conf: Secrets) -> None:
     there no action is taken.
     """
 
-    container_name = conf.get(CONTAINER_NAME_KEY)
-    if container_name:
-        remove_docker_container([container_name])
-        conf.remove(CONTAINER_NAME_KEY)
-
-    volume_name = conf.get(VOLUME_NAME_KEY)
-    if volume_name:
-        remove_docker_volumes([volume_name])
-        conf.remove(VOLUME_NAME_KEY)
-
-    network_name = conf.get(NETWORK_NAME_KEY)
-    if network_name:
-        remove_docker_networks(iter([network_name]))
-        conf.remove(NETWORK_NAME_KEY)
+    remove_container(conf)
+    remove_volume(conf)
+    remove_network(conf)
 
     conf.remove(AILabConfig.db_host_name.value)
     conf.remove(AILabConfig.bfs_host_name.value)
@@ -123,3 +112,24 @@ def take_itde_down(conf: Secrets) -> None:
     conf.remove(AILabConfig.db_encryption.value)
     conf.remove(AILabConfig.bfs_encryption.value)
     conf.remove(AILabConfig.cert_vld.value)
+
+
+def remove_network(conf):
+    network_name = conf.get(NETWORK_NAME_KEY)
+    if network_name:
+        remove_docker_networks(iter([network_name]))
+        conf.remove(NETWORK_NAME_KEY)
+
+
+def remove_volume(conf):
+    volume_name = conf.get(VOLUME_NAME_KEY)
+    if volume_name:
+        remove_docker_volumes([volume_name])
+        conf.remove(VOLUME_NAME_KEY)
+
+
+def remove_container(conf):
+    container_name = conf.get(CONTAINER_NAME_KEY)
+    if container_name:
+        remove_docker_container([container_name])
+        conf.remove(CONTAINER_NAME_KEY)
