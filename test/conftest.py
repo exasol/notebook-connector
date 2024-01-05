@@ -11,5 +11,5 @@ def sample_file(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def secrets(sample_file) -> Path:  # pylint: disable=W0621
+def secrets(sample_file) -> Secrets:  # pylint: disable=W0621
     return Secrets(sample_file, master_password="abc")
