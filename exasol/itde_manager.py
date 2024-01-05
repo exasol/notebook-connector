@@ -37,8 +37,8 @@ def bring_itde_up(conf: Secrets) -> None:
     bucket-fs connection parameters, in the secret store.
     """
 
-    mem_size = f'{conf.get(AILabConfig.mem_size.value)} GiB'
-    disk_size = f'{conf.get(AILabConfig.disk_size.value)} GiB'
+    mem_size = f'{conf.get(AILabConfig.mem_size.value, "4")} GiB'
+    disk_size = f'{conf.get(AILabConfig.disk_size.value, "10")} GiB'
 
     env_info, _ = api.spawn_test_environment(
         environment_name=ENVIRONMENT_NAME,
