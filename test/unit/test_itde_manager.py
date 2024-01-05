@@ -15,16 +15,16 @@ from exasol_integration_test_docker_environment.lib.data.environment_info import
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
+from exasol.ai_lab_config import AILabConfig
 from exasol.itde_manager import (
+    CONTAINER_NAME_KEY,
     ENVIRONMENT_NAME,
     NAME_SERVER_ADDRESS,
-    CONTAINER_NAME_KEY,
     NETWORK_NAME_KEY,
     VOLUME_NAME_KEY,
     bring_itde_up,
     take_itde_down,
 )
-from exasol.ai_lab_config import AILabConfig
 
 TEST_CONTAINER_NAME = "the_new_container"
 TEST_VOLUME_NAME = "the_new_volume"
@@ -47,19 +47,19 @@ def env_info() -> EnvironmentInfo:
 
 @mock.patch("exasol_integration_test_docker_environment.lib.api.spawn_test_environment")
 def test_bring_itde_up(mock_spawn_env, secrets, env_info):
-
     mock_spawn_env.return_value = (env_info, None)
 
-    secrets.save(AILabConfig.mem_size.value, '4')
-    secrets.save(AILabConfig.disk_size.value, '10')
+    secrets.save(AILabConfig.mem_size.value, "4")
+    secrets.save(AILabConfig.disk_size.value, "10")
 
     bring_itde_up(secrets)
 
     mock_spawn_env.assert_called_once_with(
         environment_name=ENVIRONMENT_NAME,
         nameserver=(NAME_SERVER_ADDRESS,),
-        db_mem_size='4 GiB',
-        db_disk_size='10 GiB')
+        db_mem_size="4 GiB",
+        db_disk_size="10 GiB",
+    )
 
     assert secrets.get(CONTAINER_NAME_KEY) == TEST_CONTAINER_NAME
     assert secrets.get(VOLUME_NAME_KEY) == TEST_VOLUME_NAME
@@ -78,11 +78,16 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info):
     assert secrets.get(AILabConfig.bfs_password.value) == "write"
 
 
-@mock.patch("exasol_integration_test_docker_environment.lib.docker.container.utils.remove_docker_container")
-@mock.patch("exasol_integration_test_docker_environment.lib.docker.volumes.utils.remove_docker_volumes")
-@mock.patch("exasol_integration_test_docker_environment.lib.docker.networks.utils.remove_docker_networks")
+@mock.patch(
+    "exasol_integration_test_docker_environment.lib.docker.container.utils.remove_docker_container"
+)
+@mock.patch(
+    "exasol_integration_test_docker_environment.lib.docker.volumes.utils.remove_docker_volumes"
+)
+@mock.patch(
+    "exasol_integration_test_docker_environment.lib.docker.networks.utils.remove_docker_networks"
+)
 def test_take_itde_down(mock_util1, mock_util2, mock_util3, secrets):
-
     secrets.save(CONTAINER_NAME_KEY, TEST_CONTAINER_NAME)
     secrets.save(VOLUME_NAME_KEY, TEST_VOLUME_NAME)
     secrets.save(NETWORK_NAME_KEY, TEST_NETWORK_NAME)

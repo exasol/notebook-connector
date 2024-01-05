@@ -1,8 +1,16 @@
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker.container.utils import remove_docker_container  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker.networks.utils import remove_docker_networks  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes  # type: ignore
+from exasol_integration_test_docker_environment.lib.docker import (
+    ContextDockerClient,  # type: ignore
+)
+from exasol_integration_test_docker_environment.lib.docker.container.utils import (
+    remove_docker_container,  # type: ignore
+)
+from exasol_integration_test_docker_environment.lib.docker.networks.utils import (
+    remove_docker_networks,  # type: ignore
+)
+from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
+    remove_docker_volumes,  # type: ignore
+)
 
 from exasol.ai_lab_config import AILabConfig
 from exasol.secret_store import Secrets
@@ -43,7 +51,7 @@ def bring_itde_up(conf: Secrets) -> None:
         environment_name=ENVIRONMENT_NAME,
         nameserver=(NAME_SERVER_ADDRESS,),
         db_mem_size=mem_size,
-        db_disk_size=disk_size
+        db_disk_size=disk_size,
     )
 
     db_info = env_info.database_info
@@ -59,16 +67,16 @@ def bring_itde_up(conf: Secrets) -> None:
     conf.save(AILabConfig.bfs_port.value, str(db_info.ports.bucketfs))
 
     # Q. Can we draw any of the below constants from the ITDE configuration?
-    conf.save(AILabConfig.db_user.value, 'sys')
-    conf.save(AILabConfig.db_password.value, 'exasol')
-    conf.save(AILabConfig.bfs_user.value, 'w')
-    conf.save(AILabConfig.bfs_password.value, 'write')
-    conf.save(AILabConfig.bfs_service.value, 'bfsdefault')
-    conf.save(AILabConfig.bfs_bucket.value, 'default')
-    conf.save(AILabConfig.db_encryption.value, 'True')
+    conf.save(AILabConfig.db_user.value, "sys")
+    conf.save(AILabConfig.db_password.value, "exasol")
+    conf.save(AILabConfig.bfs_user.value, "w")
+    conf.save(AILabConfig.bfs_password.value, "write")
+    conf.save(AILabConfig.bfs_service.value, "bfsdefault")
+    conf.save(AILabConfig.bfs_bucket.value, "default")
+    conf.save(AILabConfig.db_encryption.value, "True")
     # The bucket-fs encryption is turned off temporarily.
-    conf.save(AILabConfig.bfs_encryption.value, 'False')
-    conf.save(AILabConfig.cert_vld.value, 'False')
+    conf.save(AILabConfig.bfs_encryption.value, "False")
+    conf.save(AILabConfig.cert_vld.value, "False")
 
 
 def is_itde_running(conf: Secrets) -> bool:

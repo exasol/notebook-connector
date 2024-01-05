@@ -1,14 +1,21 @@
-from exasol_integration_test_docker_environment.lib.docker.container.utils import \
-    remove_docker_container  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker.networks.utils import remove_docker_networks  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes  # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.container.utils import (
+    remove_docker_container,  # type: ignore
+)
+from exasol_integration_test_docker_environment.lib.docker.networks.utils import (
+    remove_docker_networks,  # type: ignore
+)
+from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
+    remove_docker_volumes,  # type: ignore
+)
 
 from exasol.ai_lab_config import AILabConfig
 from exasol.itde_manager import (
     CONTAINER_NAME_KEY,
     NETWORK_NAME_KEY,
     VOLUME_NAME_KEY,
-    bring_itde_up, is_itde_running, take_itde_down,
+    bring_itde_up,
+    is_itde_running,
+    take_itde_down,
 )
 
 DB_NETWORK_NAME = "db_network_DemoDb"
@@ -25,15 +32,17 @@ def remove_itde():
 
 
 def test_bring_itde_up(secrets):
-    secrets.save(AILabConfig.mem_size.value, '2')
-    secrets.save(AILabConfig.disk_size.value, '4')
+    secrets.save(AILabConfig.mem_size.value, "2")
+    secrets.save(AILabConfig.disk_size.value, "4")
 
     try:
         bring_itde_up(secrets)
         assert secrets.get(CONTAINER_NAME_KEY) == DB_CONTAINER_NAME
         assert secrets.get(VOLUME_NAME_KEY) == DB_VOLUME_NAME
         assert secrets.get(NETWORK_NAME_KEY) == DB_NETWORK_NAME
-        assert secrets.get(AILabConfig.db_host_name.value) == secrets.get(AILabConfig.bfs_host_name.value)
+        assert secrets.get(AILabConfig.db_host_name.value) == secrets.get(
+            AILabConfig.bfs_host_name.value
+        )
         assert secrets.get(AILabConfig.db_user.value) == "sys"
         assert secrets.get(AILabConfig.db_password.value) == "exasol"
         assert secrets.get(AILabConfig.db_encryption.value) == "True"
@@ -49,8 +58,8 @@ def test_bring_itde_up(secrets):
 
 
 def test_is_itde_running(secrets):
-    secrets.save(AILabConfig.mem_size.value, '2')
-    secrets.save(AILabConfig.disk_size.value, '4')
+    secrets.save(AILabConfig.mem_size.value, "2")
+    secrets.save(AILabConfig.disk_size.value, "4")
 
     try:
         bring_itde_up(secrets)
@@ -67,8 +76,8 @@ def test_is_not_itde_running(secrets):
 
 
 def test_take_itde_down(secrets):
-    secrets.save(AILabConfig.mem_size.value, '2')
-    secrets.save(AILabConfig.disk_size.value, '4')
+    secrets.save(AILabConfig.mem_size.value, "2")
+    secrets.save(AILabConfig.disk_size.value, "4")
 
     try:
         bring_itde_up(secrets)
@@ -93,8 +102,8 @@ def test_take_itde_down(secrets):
 
 
 def test_take_itde_down_is_not_itde_running(secrets):
-    secrets.save(AILabConfig.mem_size.value, '2')
-    secrets.save(AILabConfig.disk_size.value, '4')
+    secrets.save(AILabConfig.mem_size.value, "2")
+    secrets.save(AILabConfig.disk_size.value, "4")
     try:
         bring_itde_up(secrets)
         take_itde_down(secrets)
