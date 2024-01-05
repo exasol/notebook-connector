@@ -1,13 +1,12 @@
-from typing import Optional, List
-
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient   # type: ignore
-from exasol_integration_test_docker_environment.lib.docker.container.utils import remove_docker_container   # type: ignore
-from exasol_integration_test_docker_environment.lib.docker.networks.utils import remove_docker_networks   # type: ignore
-from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes   # type: ignore
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient  # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.container.utils import \
+    remove_docker_container  # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.networks.utils import remove_docker_networks  # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes  # type: ignore
 
-from exasol.secret_store import Secrets
 from exasol.ai_lab_config import AILabConfig
+from exasol.secret_store import Secrets
 
 ENVIRONMENT_NAME = "DemoDb"
 NAME_SERVER_ADDRESS = "8.8.8.8"
@@ -38,22 +37,12 @@ def bring_itde_up(conf: Secrets) -> None:
     bucket-fs connection parameters, in the secret store.
     """
 
-    def optional_list_to_int(c: Secrets, key: str) -> Optional[List]:
-        val = c.get(key)
-        if val:
-            return [int(v) for v in val.split(',')]
-        return None
-
-    db_port_fwd = optional_list_to_int(conf, AILabConfig.db_port_forward.value)
-    bfs_port_fwd = optional_list_to_int(conf, AILabConfig.bfs_port_forward.value)
     mem_size = f'{conf.get(AILabConfig.mem_size.value)} GiB'
     disk_size = f'{conf.get(AILabConfig.disk_size.value)} GiB'
 
     env_info, _ = api.spawn_test_environment(
         environment_name=ENVIRONMENT_NAME,
         nameserver=(NAME_SERVER_ADDRESS,),
-        database_port_forward=db_port_fwd,
-        bucketfs_port_forward=bfs_port_fwd,
         db_mem_size=mem_size,
         db_disk_size=disk_size
     )
@@ -65,8 +54,8 @@ def bring_itde_up(conf: Secrets) -> None:
     conf.save(VOLUME_NAME_KEY, container_info.volume_name)
     conf.save(NETWORK_NAME_KEY, env_info.network_info.network_name)
 
-    conf.save(AILabConfig.db_name.value, db_info.host)
-    conf.save(AILabConfig.bfs_name.value, db_info.host)
+    conf.save(AILabConfig.db_host_name.value, db_info.host)
+    conf.save(AILabConfig.bfs_host_name.value, db_info.host)
     conf.save(AILabConfig.db_port.value, str(db_info.ports.database))
     conf.save(AILabConfig.bfs_port.value, str(db_info.ports.bucketfs))
 
@@ -120,3 +109,17 @@ def take_itde_down(conf: Secrets) -> None:
     if network_name:
         remove_docker_networks(iter([network_name]))
         conf.remove(NETWORK_NAME_KEY)
+
+    conf.remove(AILabConfig.db_host_name.value)
+    conf.remove(AILabConfig.bfs_host_name.value)
+    conf.remove(AILabConfig.db_port.value)
+    conf.remove(AILabConfig.bfs_port.value)
+    conf.remove(AILabConfig.db_user.value)
+    conf.remove(AILabConfig.db_password.value)
+    conf.remove(AILabConfig.bfs_user.value)
+    conf.remove(AILabConfig.bfs_password.value)
+    conf.remove(AILabConfig.bfs_service.value)
+    conf.remove(AILabConfig.bfs_bucket.value)
+    conf.remove(AILabConfig.db_encryption.value)
+    conf.remove(AILabConfig.bfs_encryption.value)
+    conf.remove(AILabConfig.cert_vld.value)

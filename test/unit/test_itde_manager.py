@@ -50,8 +50,6 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info):
 
     mock_spawn_env.return_value = (env_info, None)
 
-    secrets.save(AILabConfig.db_port_forward.value, '345, 678')
-    secrets.save(AILabConfig.bfs_port_forward.value, '4445')
     secrets.save(AILabConfig.mem_size.value, '4')
     secrets.save(AILabConfig.disk_size.value, '10')
 
@@ -60,18 +58,24 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info):
     mock_spawn_env.assert_called_once_with(
         environment_name=ENVIRONMENT_NAME,
         nameserver=(NAME_SERVER_ADDRESS,),
-        database_port_forward=[345, 678],
-        bucketfs_port_forward=[4445],
         db_mem_size='4 GiB',
         db_disk_size='10 GiB')
 
     assert secrets.get(CONTAINER_NAME_KEY) == TEST_CONTAINER_NAME
     assert secrets.get(VOLUME_NAME_KEY) == TEST_VOLUME_NAME
     assert secrets.get(NETWORK_NAME_KEY) == TEST_NETWORK_NAME
-    assert secrets.get(AILabConfig.db_name.value) == TEST_DB_HOST
-    assert secrets.get(AILabConfig.bfs_name.value) == TEST_DB_HOST
+    assert secrets.get(AILabConfig.db_host_name.value) == TEST_DB_HOST
+    assert secrets.get(AILabConfig.bfs_host_name.value) == TEST_DB_HOST
     assert int(secrets.get(AILabConfig.db_port.value)) == TEST_DB_PORT
     assert int(secrets.get(AILabConfig.bfs_port.value)) == TEST_BFS_PORT
+    assert secrets.get(AILabConfig.db_user.value) == "sys"
+    assert secrets.get(AILabConfig.db_password.value) == "exasol"
+    assert secrets.get(AILabConfig.db_encryption.value) == "True"
+    assert secrets.get(AILabConfig.bfs_service.value) == "bfsdefault"
+    assert secrets.get(AILabConfig.bfs_bucket.value) == "default"
+    assert secrets.get(AILabConfig.bfs_encryption.value) == "False"
+    assert secrets.get(AILabConfig.bfs_user.value) == "w"
+    assert secrets.get(AILabConfig.bfs_password.value) == "write"
 
 
 @mock.patch("exasol_integration_test_docker_environment.lib.docker.container.utils.remove_docker_container")
@@ -88,3 +92,15 @@ def test_take_itde_down(mock_util1, mock_util2, mock_util3, secrets):
     assert secrets.get(CONTAINER_NAME_KEY) is None
     assert secrets.get(VOLUME_NAME_KEY) is None
     assert secrets.get(NETWORK_NAME_KEY) is None
+    assert secrets.get(AILabConfig.db_host_name.value) == None
+    assert secrets.get(AILabConfig.bfs_host_name.value) == None
+    assert secrets.get(AILabConfig.db_user.value) == None
+    assert secrets.get(AILabConfig.db_password.value) == None
+    assert secrets.get(AILabConfig.db_encryption.value) == None
+    assert secrets.get(AILabConfig.db_port.value) == None
+    assert secrets.get(AILabConfig.bfs_service.value) == None
+    assert secrets.get(AILabConfig.bfs_bucket.value) == None
+    assert secrets.get(AILabConfig.bfs_encryption.value) == None
+    assert secrets.get(AILabConfig.bfs_user.value) == None
+    assert secrets.get(AILabConfig.bfs_password.value) == None
+    assert secrets.get(AILabConfig.bfs_port.value) == None
