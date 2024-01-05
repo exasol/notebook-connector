@@ -92,15 +92,15 @@ def test_take_itde_down(mock_util1, mock_util2, mock_util3, secrets):
     assert secrets.get(CONTAINER_NAME_KEY) is None
     assert secrets.get(VOLUME_NAME_KEY) is None
     assert secrets.get(NETWORK_NAME_KEY) is None
-    assert secrets.get(AILabConfig.db_host_name.value) == None
-    assert secrets.get(AILabConfig.bfs_host_name.value) == None
-    assert secrets.get(AILabConfig.db_user.value) == None
-    assert secrets.get(AILabConfig.db_password.value) == None
-    assert secrets.get(AILabConfig.db_encryption.value) == None
-    assert secrets.get(AILabConfig.db_port.value) == None
-    assert secrets.get(AILabConfig.bfs_service.value) == None
-    assert secrets.get(AILabConfig.bfs_bucket.value) == None
-    assert secrets.get(AILabConfig.bfs_encryption.value) == None
-    assert secrets.get(AILabConfig.bfs_user.value) == None
-    assert secrets.get(AILabConfig.bfs_password.value) == None
-    assert secrets.get(AILabConfig.bfs_port.value) == None
+    assert secrets.get(AILabConfig.db_host_name.value) is None
+    assert secrets.get(AILabConfig.bfs_host_name.value) is None
+    assert secrets.get(AILabConfig.db_user.value) is None
+    assert secrets.get(AILabConfig.db_password.value) is None
+    assert secrets.get(AILabConfig.db_encryption.value) is None
+    assert secrets.get(AILabConfig.db_port.value) is None
+    assert secrets.get(AILabConfig.bfs_service.value) is None
+    assert secrets.get(AILabConfig.bfs_bucket.value) is None
+    assert secrets.get(AILabConfig.bfs_encryption.value) is None
+    assert secrets.get(AILabConfig.bfs_user.value) is None
+    assert secrets.get(AILabConfig.bfs_password.value) is None
+    assert secrets.get(AILabConfig.bfs_port.value) is None

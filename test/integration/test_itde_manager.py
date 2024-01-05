@@ -55,7 +55,7 @@ def test_is_itde_running(secrets):
     try:
         bring_itde_up(secrets)
         itde_running = is_itde_running(secrets)
-        assert itde_running == True
+        assert itde_running is True
     finally:
         remove_itde()
 
@@ -63,7 +63,7 @@ def test_is_itde_running(secrets):
 def test_is_not_itde_running(secrets):
     remove_itde()
     itde_running = is_itde_running(secrets)
-    assert itde_running == False
+    assert itde_running is False
 
 
 def test_take_itde_down(secrets):
@@ -73,21 +73,21 @@ def test_take_itde_down(secrets):
     try:
         bring_itde_up(secrets)
         take_itde_down(secrets)
-        assert secrets.get(CONTAINER_NAME_KEY) == None
-        assert secrets.get(VOLUME_NAME_KEY) == None
-        assert secrets.get(NETWORK_NAME_KEY) == None
-        assert secrets.get(AILabConfig.db_host_name.value) == None
-        assert secrets.get(AILabConfig.bfs_host_name.value) == None
-        assert secrets.get(AILabConfig.db_user.value) == None
-        assert secrets.get(AILabConfig.db_password.value) == None
-        assert secrets.get(AILabConfig.db_encryption.value) == None
-        assert secrets.get(AILabConfig.db_port.value) == None
-        assert secrets.get(AILabConfig.bfs_service.value) == None
-        assert secrets.get(AILabConfig.bfs_bucket.value) == None
-        assert secrets.get(AILabConfig.bfs_encryption.value) == None
-        assert secrets.get(AILabConfig.bfs_user.value) == None
-        assert secrets.get(AILabConfig.bfs_password.value) == None
-        assert secrets.get(AILabConfig.bfs_port.value) == None
+        assert secrets.get(CONTAINER_NAME_KEY) is None
+        assert secrets.get(VOLUME_NAME_KEY) is None
+        assert secrets.get(NETWORK_NAME_KEY) is None
+        assert secrets.get(AILabConfig.db_host_name.value) is None
+        assert secrets.get(AILabConfig.bfs_host_name.value) is None
+        assert secrets.get(AILabConfig.db_user.value) is None
+        assert secrets.get(AILabConfig.db_password.value) is None
+        assert secrets.get(AILabConfig.db_encryption.value) is None
+        assert secrets.get(AILabConfig.db_port.value) is None
+        assert secrets.get(AILabConfig.bfs_service.value) is None
+        assert secrets.get(AILabConfig.bfs_bucket.value) is None
+        assert secrets.get(AILabConfig.bfs_encryption.value) is None
+        assert secrets.get(AILabConfig.bfs_user.value) is None
+        assert secrets.get(AILabConfig.bfs_password.value) is None
+        assert secrets.get(AILabConfig.bfs_port.value) is None
     finally:
         remove_itde()
 
@@ -99,6 +99,6 @@ def test_take_itde_down_is_not_itde_running(secrets):
         bring_itde_up(secrets)
         take_itde_down(secrets)
         itde_running = is_itde_running(secrets)
-        assert itde_running == False
+        assert itde_running is False
     finally:
         remove_itde()
