@@ -28,12 +28,22 @@ def optional_str_to_bool(value: Optional[str]) -> Optional[bool]:
     Case-insensitive "n", "no", "false" => False
     Any other value cause a ValueError exception.
     """
-    if value is None:
+    if not value:
         return None
-    value_l = value.lower()
-    if value_l in ["y", "yes", "true"]:
-        return True
-    elif value_l in ["n", "no", "false"]:
-        return False
-    else:
-        raise ValueError("Invalid boolean value " + value)
+
+    mapping = {
+        'y': True,
+        'yes': True,
+        'true': True,
+        'n': False,
+        'no': False,
+        'false': False,
+    }
+    key = value.lower()
+
+    try:
+        result = mapping[key]
+    except KeyError as ex:
+        raise ValueError("Invalid boolean value " + value) from ex
+
+    return result
