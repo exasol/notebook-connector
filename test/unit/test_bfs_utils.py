@@ -2,7 +2,6 @@ import pytest
 from unittest import mock
 from typing import Generator
 import pathlib
-import exasol.bucketfs as bfs
 from exasol import bfs_utils
 
 
