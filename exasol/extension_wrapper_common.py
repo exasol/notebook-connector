@@ -87,3 +87,31 @@ def encapsulate_huggingface_token(conf: Secrets, connection_name: str) -> None:
     query_params = {"TOKEN": conf.HF_TOKEN}
     with open_pyexasol_connection(conf, compression=True) as conn:
         conn.execute(query=sql, query_params=query_params)
+
+
+def encapsulate_aws_credentials(conf: Secrets, connection_name: str) -> None:
+    """
+    Creates a connection object in the database encapsulating the address of
+    an AWS S3 bucket and AWS access credentials.
+
+    Parameters:
+        conf:
+            The secret store. The store must hold the S3 bucket parameters
+            (AWS_BUCKET, AWS_REGION) and AWS access credentials (AWS_ACCESS_KEY_ID,
+            AWS_SECRET_ACCESS_KEY), as well as the DB connection parameters.
+        connection_name:
+            Name for the connection object to be created.
+    """
+
+    sql = f"""
+    CREATE OR REPLACE  CONNECTION [{connection_name}]
+        TO 'https://{conf.AWS_BUCKET}.s3.{conf.AWS_REGION}.amazonaws.com/'
+        USER {{AWS_ACCESS_KEY_ID!s}}
+        IDENTIFIED BY {{AWS_SECRET_ACCESS_KEY!s}}
+    """
+    query_params = {
+        "AWS_ACCESS_KEY_ID": conf.AWS_ACCESS_KEY_ID,
+        "AWS_SECRET_ACCESS_KEY": conf.AWS_SECRET_ACCESS_KEY,
+    }
+    with open_pyexasol_connection(conf, compression=True) as conn:
+        conn.execute(query=sql, query_params=query_params)
