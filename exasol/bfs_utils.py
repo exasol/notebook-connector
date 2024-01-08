@@ -9,7 +9,8 @@ import exasol.bucketfs as bfs  # type: ignore
 _logger = logging.getLogger(__name__)
 
 
-def put_file(bucket: bfs.Bucket, file_path: pathlib.Path, skip_if_exists: bool = True) -> pathlib.Path:
+def put_file(bucket: bfs.Bucket, file_path: pathlib.Path,
+             skip_if_exists: bool = True) -> pathlib.Path:
     """
     Uploads given file into bucketfs
     :param bucket: bucket to use
@@ -21,9 +22,9 @@ def put_file(bucket: bfs.Bucket, file_path: pathlib.Path, skip_if_exists: bool =
         raise ValueError(f"Local file doesn't exist: {file_path}")
     local_name = file_path.name
     if skip_if_exists and local_name in list(bucket):
-        _logger.info(f"File {local_name} is already present in the bucketfs")
+        _logger.info("File %s is already present in the bucketfs", local_name)
     else:
-        _logger.info(f"Uploading file {local_name} to bucketfs")
-        with file_path.open("rb") as fd:
-            bucket.upload(local_name, fd)
+        _logger.info("Uploading file %s to bucketfs", local_name)
+        with file_path.open("rb") as file:
+            bucket.upload(local_name, file)
     return pathlib.Path("/buckets/bfsdefault/") / bucket.name / local_name

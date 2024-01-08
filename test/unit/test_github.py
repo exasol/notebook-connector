@@ -22,7 +22,7 @@ MOCKED_RELEASES_RESULT = {
 }
 
 
-def mocked_requests_get(*args, **kwargs):
+def mocked_requests_get(*args, **_):
     res = mock.create_autospec(requests.Response)
     res.status_code = 404
     url = args[0]
@@ -40,7 +40,7 @@ def mocked_requests_get(*args, **kwargs):
 
 
 @mock.patch("requests.get", side_effect=mocked_requests_get)
-def test_get_latest_version_and_jar_url(get_mock: mock.MagicMock):
+def test_get_latest_version_and_jar_url(_):
     res = github.get_latest_version_and_jar_url(github.Project.CLOUD_STORAGE_EXTENSION)
     assert res == ("2.7.8", CSE_MOCK_URL)
 
@@ -49,7 +49,7 @@ def test_get_latest_version_and_jar_url(get_mock: mock.MagicMock):
 
 
 @mock.patch("requests.get", side_effect=mocked_requests_get)
-def test_retrieve_jar(get_mock: mock.MagicMock, tmpdir, caplog):
+def test_retrieve_jar(_, tmpdir, caplog):
     # need this as retrieve_jar works with current directory in some cases
     os.chdir(tmpdir)
 
