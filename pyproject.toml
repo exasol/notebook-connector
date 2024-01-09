@@ -30,6 +30,8 @@ sqlalchemy-exasol  = ">=4.6.0"
 pyexasol = ">=0.24.0"
 exasol-bucketfs = ">=0.6.0"
 exasol-integration-test-docker-environment = ">=2.0.0"
+requests = "^2.31.0"
+types-requests = "^2.31.0.10"
 
 
 [build-system]
