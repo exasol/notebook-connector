@@ -129,3 +129,11 @@ class Secrets:
         if val is None:
             raise AttributeError(f'Unknown key "{key}"')
         return val
+
+    def remove(self, key: str) -> None:
+        """
+        Deletes entry with the specified key if it exists.
+        Doesn't raise any exception if the key doesn't exist.
+        """
+        with self._cursor() as cur:
+            cur.execute(f"DELETE FROM {TABLE_NAME} WHERE key=?", [key])
