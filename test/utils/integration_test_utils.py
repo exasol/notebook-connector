@@ -1,56 +1,37 @@
-import contextlib
-import re
 import textwrap
 from typing import Dict
+import pytest
 
 from pyexasol import ExaConnection
-from pytest_itde import config
 
 from exasol.language_container_activation import get_activation_sql
 from exasol.secret_store import Secrets
+from exasol.itde_manager import (
+    bring_itde_up,
+    take_itde_down
+)
+from exasol.ai_lab_config import AILabConfig
+from exasol.connections import open_pyexasol_connection
 
 
-def setup_test_configuration(
-    schema: str,
-    exasol_config: config.Exasol,
-    bucketfs_config: config.BucketFs,
-    secrets: Secrets,
-) -> None:
+@pytest.fixture(scope='session')
+def setup_itde(secrets) -> None:
     """
-    Creates the configuration in the secret store corresponding to the
-    test database.
+    Brings up the ITDE and takes it down when the tests are completed or failed.
+    Creates a schema and saves its name in the secret store.
     """
 
-    url_pattern = r"\A(?P<protocol>.+?)://(?P<host>.+?):(?P<port>\d+)"
-    url_parse = re.match(url_pattern, bucketfs_config.url)
-    secrets.save("EXTERNAL_HOST_NAME", exasol_config.host)
-    secrets.save("DB_PORT", str(exasol_config.port))
-    secrets.save("USER", exasol_config.username)
-    secrets.save("SCHEMA", schema)
-    secrets.save("PASSWORD", exasol_config.password)
-    secrets.save("BUCKETFS_HOST_NAME", url_parse.group("host"))
-    secrets.save("BUCKETFS_PORT", url_parse.group("port"))
-    secrets.save("BUCKETFS_USER", bucketfs_config.username)
-    secrets.save("BUCKETFS_PASSWORD", bucketfs_config.password)
-    secrets.save("BUCKETFS_SERVICE", "bfsdefault")
-    secrets.save("BUCKETFS_BUCKET", "default")
-    secrets.save("BUCKETFS_ENCRYPTION", str("https" in url_parse.group("protocol")))
-    secrets.save("ENCRYPTION", "True"),
-    secrets.save("CERTIFICATE_VALIDATION", "False")
+    bring_itde_up(secrets)
 
-
-@contextlib.contextmanager
-def create_schema_with_reverse(pyexasol_connection: ExaConnection, secrets: Secrets):
-    """
-    Creates the schema in a contextualized manner. Drops this schema on exit.
-    """
+    schema = 'INTEGRATION_TEST'
+    secrets.save(AILabConfig.db_schema.value, schema)
+    with open_pyexasol_connection(secrets) as pyexasol_connection:
+        pyexasol_connection.execute(f"CREATE SCHEMA {schema};")
 
     try:
-        pyexasol_connection.execute(f"DROP SCHEMA IF EXISTS {secrets.SCHEMA} CASCADE;")
-        pyexasol_connection.execute(f"CREATE SCHEMA {secrets.SCHEMA};")
         yield
     finally:
-        pyexasol_connection.execute(f"DROP SCHEMA IF EXISTS {secrets.SCHEMA} CASCADE;")
+        take_itde_down(secrets)
 
 
 def activate_languages(pyexasol_connection: ExaConnection, secrets: Secrets) -> None:
