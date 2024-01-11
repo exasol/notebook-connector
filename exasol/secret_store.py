@@ -151,3 +151,11 @@ class Secrets:
             res = cur.execute(f"SELECT key, value FROM {TABLE_NAME}")
             for row in res:
                 yield row[0], row[1]
+
+    def remove(self, key: str) -> None:
+        """
+        Deletes entry with the specified key if it exists.
+        Doesn't raise any exception if the key doesn't exist.
+        """
+        with self._cursor() as cur:
+            cur.execute(f"DELETE FROM {TABLE_NAME} WHERE key=?", [key])

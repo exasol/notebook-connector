@@ -105,3 +105,9 @@ def test_items_iterator(secrets_with_names):
         ("musician", "Linda"),
         ("prime_minister", "Rishi"),
     ]
+
+
+def test_remove_key(secrets):
+    secrets.save("key", "value")
+    secrets.remove("key")
+    assert secrets.get("key") is None
