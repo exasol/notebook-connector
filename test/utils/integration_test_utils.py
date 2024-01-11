@@ -14,7 +14,7 @@ from exasol.ai_lab_config import AILabConfig
 from exasol.connections import open_pyexasol_connection
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def setup_itde(secrets) -> None:
     """
     Brings up the ITDE and takes it down when the tests are completed or failed.
