@@ -29,7 +29,7 @@ PATH_IN_BUCKET = "TE"
 
 LANGUAGE_ALIAS = "PYTHON3_TE"
 
-LATEST_KNOW_VERSION = "0.7.0"
+LATEST_KNOWN_VERSION = "0.7.0"
 
 # Activation SQL for the Transformers Extension will be saved in the secret
 # store with this key.
@@ -137,7 +137,7 @@ def deploy_scripts(conf: Secrets,
     """
 
     with open_pyexasol_connection(conf, compression=True) as conn:
-        # First need to activate the language container at the session level.
+        # First need to activate the language container at the session level, otherwise the script creation fails.
         activation_sql = get_activation_sql(conf)
         conn.execute(activation_sql)
 
@@ -146,7 +146,7 @@ def deploy_scripts(conf: Secrets,
 
 
 def initialize_te_extension(conf: Secrets,
-                            version: str = LATEST_KNOW_VERSION,
+                            version: str = LATEST_KNOWN_VERSION,
                             language_alias: str = LANGUAGE_ALIAS,
                             run_deploy_container: bool = True,
                             run_deploy_scripts: bool = True,
@@ -223,9 +223,8 @@ def upload_model_from_cache(
         model_name:
             Name of the model at the Huggingface archive.
         cache_dir:
-            Directory on the local drive where the model was cached. This would
-            not normally be the same as MODELS_CACHE_DIR. Each model should
-            have its own cache directory, presumably within the MODELS_CACHE_DIR.
+            Directory on the local drive where the model was cached. Each model
+            should have its own cache directory.
     """
 
     # Create bucketfs location
@@ -237,3 +236,39 @@ def upload_model_from_cache(
     # Upload the downloaded model files into bucketfs
     upload_path = get_model_path(conf.get(BFS_MODELS_DIR_KEY), model_name)
     upload_model_files_to_bucketfs(cache_dir, upload_path, bucketfs_location)
+
+
+def upload_model(
+        conf: Secrets,
+        model_name: str,
+        cache_dir: str,
+        **kwargs) -> None:
+    """
+    Uploads model from the Huggingface hub or from the local cache in case it
+    has already been downloaded from the hub. The user token, if found in the
+    secret store will be passed to the Huggingface interface.
+
+    Parameters:
+        conf:
+            The secret store.
+        model_name:
+            Name of the model at the Huggingface archive.
+        cache_dir:
+            Directory on the local drive where the model is to be cached.
+            Each model should have its own cache directory.
+        kwargs:
+            Additional parameters to be passed to the `from_pretrained`
+            methods of the AutoTokenizer and AutoModel. The user token, if specified
+            here, will be used instead of the one in the secret store.
+    """
+    from transformers import AutoTokenizer, AutoModel
+
+    if 'token' not in kwargs:
+        token = conf.HF_TOKEN
+        if token:
+            kwargs['token'] = token
+
+    AutoTokenizer.from_pretrained(model_name, cache_dir=cache_dir, **kwargs)
+    AutoModel.from_pretrained(model_name, cache_dir=cache_dir, **kwargs)
+
+    upload_model_from_cache(conf, model_name, cache_dir)
