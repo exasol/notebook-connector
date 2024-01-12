@@ -29,7 +29,7 @@ PATH_IN_BUCKET = "TE"
 
 LANGUAGE_ALIAS = "PYTHON3_TE"
 
-LATEST_KNOW_VERSION = "0.7.0"
+LATEST_KNOWN_VERSION = "0.7.0"
 
 # Activation SQL for the Transformers Extension will be saved in the secret
 # store with this key.
@@ -146,7 +146,7 @@ def deploy_scripts(conf: Secrets,
 
 
 def initialize_te_extension(conf: Secrets,
-                            version: str = LATEST_KNOW_VERSION,
+                            version: str = LATEST_KNOWN_VERSION,
                             language_alias: str = LANGUAGE_ALIAS,
                             run_deploy_container: bool = True,
                             run_deploy_scripts: bool = True,
