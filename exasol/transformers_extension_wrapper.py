@@ -261,7 +261,7 @@ def upload_model(
             methods of the AutoTokenizer and AutoModel. The user token, if specified
             here, will be used instead of the one in the secret store.
     """
-    from transformers import AutoTokenizer, AutoModel
+    from transformers import AutoTokenizer, AutoModel   # type: ignore
 
     if 'token' not in kwargs:
         token = conf.HF_TOKEN
