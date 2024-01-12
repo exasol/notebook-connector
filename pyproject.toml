@@ -31,6 +31,7 @@ pyexasol = ">=0.24.0"
 exasol-bucketfs = ">=0.6.0"
 torch = {version="2.0.1+cpu", source = "torch"}
 exasol-transformers-extension = {url = "https://github.com/exasol/transformers-extension/releases/download/0.7.0/exasol_transformers_extension-0.7.0.tar.gz"}
+transformers = {extras = ["torch"], version = "^4.36.2"}
 exasol-integration-test-docker-environment = ">=2.0.0"
 requests = "^2.31.0"
 types-requests = "^2.31.0.10"
