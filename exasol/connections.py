@@ -11,9 +11,10 @@ import sqlalchemy  # type: ignore
 import exasol.bucketfs as bfs  # type: ignore
 from exasol.secret_store import Secrets
 from exasol.utils import optional_str_to_bool
+from exasol.ai_lab_config import AILabConfig as CKey
 
 
-def _optional_encryption(conf: Secrets, key: str = "ENCRYPTION") -> Optional[bool]:
+def _optional_encryption(conf: Secrets, key: CKey = CKey.db_encryption) -> Optional[bool]:
     return optional_str_to_bool(conf.get(key))
 
 
@@ -26,14 +27,14 @@ def _extract_ssl_options(conf: Secrets) -> dict:
     sslopt: dict[str, object] = {}
 
     # Is server certificate validation required?
-    certificate_validation = optional_str_to_bool(conf.get("CERTIFICATE_VALIDATION"))
+    certificate_validation = optional_str_to_bool(conf.get(CKey.cert_vld))
     if certificate_validation is not None:
         sslopt["cert_reqs"] = (
             ssl.CERT_REQUIRED if certificate_validation else ssl.CERT_NONE
         )
 
     # Is a bundle with trusted CAs provided?
-    trusted_ca = conf.get("TRUSTED_CA")
+    trusted_ca = conf.get(CKey.trusted_ca)
     if trusted_ca:
         trusted_ca_path = Path(trusted_ca)
         if trusted_ca_path.is_dir():
@@ -44,12 +45,12 @@ def _extract_ssl_options(conf: Secrets) -> dict:
             raise ValueError(f"Trusted CA location {trusted_ca} doesn't exist.")
 
     # Is client's own certificate provided?
-    client_certificate = conf.get("CLIENT_CERTIFICATE")
+    client_certificate = conf.get(CKey.client_cert)
     if client_certificate:
         if not Path(client_certificate).is_file():
             raise ValueError(f"Certificate file {client_certificate} doesn't exist.")
         sslopt["certfile"] = client_certificate
-        private_key = conf.get("PRIVATE_KEY")
+        private_key = conf.get(CKey.client_key)
         if private_key:
             if not Path(private_key).is_file():
                 raise ValueError(f"Private key file {private_key} doesn't exist.")
@@ -60,7 +61,7 @@ def _extract_ssl_options(conf: Secrets) -> dict:
 
 def get_external_host(conf: Secrets) -> str:
     """Constructs the host part of a DB URL using provided configuration parameters."""
-    return f"{conf.EXTERNAL_HOST_NAME}:{conf.DB_PORT}"
+    return f"{conf.get(CKey.db_host_name)}:{conf.get(CKey.db_port)}"
 
 
 def get_udf_bucket_path(conf: Secrets) -> str:
@@ -68,7 +69,7 @@ def get_udf_bucket_path(conf: Secrets) -> str:
     Builds the path of the BucketFS bucket specified in the configuration,
     as it's seen in the udf's file system.
     """
-    return f"/buckets/{conf.BUCKETFS_SERVICE}/{conf.BUCKETFS_BUCKET}"
+    return f"/buckets/{conf.get(CKey.bfs_service)}/{conf.get(CKey.bfs_bucket)}"
 
 
 def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
@@ -91,8 +92,8 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
 
     conn_params: dict[str, Any] = {
         "dsn": get_external_host(conf),
-        "user": conf.USER,
-        "password": conf.PASSWORD,
+        "user": conf.get(CKey.db_user),
+        "password": conf.get(CKey.db_password),
     }
 
     encryption = _optional_encryption(conf)
@@ -125,7 +126,7 @@ def open_sqlalchemy_connection(conf: Secrets):
     """
 
     websocket_url = (
-        f"exa+websocket://{conf.USER}:{conf.PASSWORD}@{get_external_host(conf)}"
+        f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}"
     )
 
     delimiter = "?"
@@ -164,14 +165,15 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.Bucket:
     # https depending on the ENCRYPTION setting like in the code below:
     # buckfs_url_prefix = "https" if _optional_encryption(conf) else "http"
     buckfs_url_prefix = "http"
-    buckfs_url = f"{buckfs_url_prefix}://{conf.EXTERNAL_HOST_NAME}:{conf.BUCKETFS_PORT}"
+    buckfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
+    buckfs_url = f"{buckfs_url_prefix}://{buckfs_host}:{conf.get(CKey.bfs_port)}"
     buckfs_credentials = {
-        conf.BUCKETFS_BUCKET: {
-            "username": conf.BUCKETFS_USER,
-            "password": conf.BUCKETFS_PASSWORD,
+        conf.get(CKey.bfs_bucket): {
+            "username": conf.get(CKey.bfs_user),
+            "password": conf.get(CKey.bfs_password),
         }
     }
 
     # Connect to the BucketFS service and navigate to the bucket of choice.
     bucketfs = bfs.Service(buckfs_url, buckfs_credentials)
-    return bucketfs[conf.BUCKETFS_BUCKET]
+    return bucketfs[conf.get(CKey.bfs_bucket)]

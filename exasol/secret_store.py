@@ -6,9 +6,12 @@ from typing import (
     Iterable,
     Optional,
     Tuple,
+    Union
 )
 
 from sqlcipher3 import dbapi2 as sqlcipher  # type: ignore
+
+from exasol.ai_lab_config import AILabConfig as CKey
 
 _logger = logging.getLogger(__name__)
 TABLE_NAME = "secrets"
@@ -97,8 +100,9 @@ class Secrets:
         finally:
             cur.close()
 
-    def save(self, key: str, value: str) -> "Secrets":
+    def save(self, key: Union[str, CKey], value: str) -> "Secrets":
         """key represents a system, service, or application"""
+        key = key.value if isinstance(key, CKey) else key
 
         def entry_exists(cur) -> bool:
             res = cur.execute(f"SELECT * FROM {TABLE_NAME} WHERE key=?", [key])
@@ -119,7 +123,10 @@ class Secrets:
                 insert(cur)
         return self
 
-    def get(self, key: str, default_value: Optional[str] = None) -> Optional[str]:
+    def get(self, key: Union[str, CKey], default_value: Optional[str] = None) -> Optional[str]:
+
+        key = key.value if isinstance(key, CKey) else key
+
         with self._cursor() as cur:
             res = cur.execute(f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key])
             row = res.fetchone() if res else None
@@ -152,10 +159,12 @@ class Secrets:
             for row in res:
                 yield row[0], row[1]
 
-    def remove(self, key: str) -> None:
+    def remove(self, key: Union[str, CKey]) -> None:
         """
         Deletes entry with the specified key if it exists.
         Doesn't raise any exception if the key doesn't exist.
         """
+        key = key.value if isinstance(key, CKey) else key
+
         with self._cursor() as cur:
             cur.execute(f"DELETE FROM {TABLE_NAME} WHERE key=?", [key])

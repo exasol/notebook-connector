@@ -10,9 +10,6 @@ from exasol_integration_test_docker_environment.lib.docker.volumes.utils import 
 
 from exasol.ai_lab_config import AILabConfig
 from exasol.itde_manager import (
-    CONTAINER_NAME_KEY,
-    NETWORK_NAME_KEY,
-    VOLUME_NAME_KEY,
     bring_itde_up,
     is_itde_running,
     take_itde_down,
@@ -37,9 +34,9 @@ def test_bring_itde_up(secrets):
 
     try:
         bring_itde_up(secrets)
-        assert secrets.get(CONTAINER_NAME_KEY) == DB_CONTAINER_NAME
-        assert secrets.get(VOLUME_NAME_KEY) == DB_VOLUME_NAME
-        assert secrets.get(NETWORK_NAME_KEY) == DB_NETWORK_NAME
+        assert secrets.get(AILabConfig.itde_container) == DB_CONTAINER_NAME
+        assert secrets.get(AILabConfig.itde_volume) == DB_VOLUME_NAME
+        assert secrets.get(AILabConfig.itde_network) == DB_NETWORK_NAME
         assert secrets.get(AILabConfig.db_host_name.value) == secrets.get(
             AILabConfig.bfs_host_name.value
         )
@@ -82,9 +79,9 @@ def test_take_itde_down(secrets):
     try:
         bring_itde_up(secrets)
         take_itde_down(secrets)
-        assert secrets.get(CONTAINER_NAME_KEY) is None
-        assert secrets.get(VOLUME_NAME_KEY) is None
-        assert secrets.get(NETWORK_NAME_KEY) is None
+        assert secrets.get(AILabConfig.itde_container) is None
+        assert secrets.get(AILabConfig.itde_volume) is None
+        assert secrets.get(AILabConfig.itde_network) is None
         assert secrets.get(AILabConfig.db_host_name.value) is None
         assert secrets.get(AILabConfig.bfs_host_name.value) is None
         assert secrets.get(AILabConfig.db_user.value) is None

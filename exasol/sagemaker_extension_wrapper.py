@@ -15,6 +15,7 @@ from exasol.language_container_activation import (
     get_activation_sql
 )
 from exasol.secret_store import Secrets
+from exasol.ai_lab_config import AILabConfig as CKey
 
 # Root directory in a bucket-fs bucket where all stuff of the Sagemaker
 # Extension, including its language container, will be uploaded.
@@ -25,10 +26,6 @@ LATEST_KNOW_VERSION = "0.6.0"
 # Activation SQL for the Sagemaker Extension will be saved in the secret
 # store with this key.
 ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "sme"
-
-# Name of the connection object with AWS credentials and S3 location
-# will be saved in the secret store with this key.
-AWS_CONNECTION_KEY = "SME_AWS_CONN"
 
 # Name of the connection object with AWS credentials and S3 location
 # will be prefixed with this string.
@@ -59,20 +56,20 @@ def deploy_language_container(conf: Secrets, version: str) -> None:
 
     deployer = SmeLanguageContainerDeployer.create(
         dsn=get_external_host(conf),
-        db_user=conf.USER,
-        db_password=conf.PASSWORD,
-        bucketfs_name=conf.BUCKETFS_SERVICE,
-        bucketfs_host=conf.get("BUCKETFS_HOST_NAME", conf.EXTERNAL_HOST_NAME),
-        bucketfs_port=int(conf.BUCKETFS_PORT),
-        bucketfs_user=conf.BUCKETFS_USER,
-        bucketfs_password=conf.BUCKETFS_PASSWORD,
-        bucketfs_use_https=str_to_bool(conf, "BUCKETFS_ENCRYPTION", True),
-        bucket=conf.BUCKETFS_BUCKET,
+        db_user=conf.get(CKey.db_user),
+        db_password=conf.get(CKey.db_password),
+        bucketfs_name=conf.get(CKey.bfs_service),
+        bucketfs_host=conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name)),
+        bucketfs_port=int(conf.get(CKey.bfs_port)),
+        bucketfs_user=conf.get(CKey.bfs_user),
+        bucketfs_password=conf.get(CKey.bfs_password),
+        bucketfs_use_https=str_to_bool(conf,  CKey.bfs_encryption, True),
+        bucket=conf.get(CKey.bfs_bucket),
         path_in_bucket=PATH_IN_BUCKET,
-        use_ssl_cert_validation=str_to_bool(conf, "CERTIFICATE_VALIDATION", True),
-        ssl_trusted_ca=conf.get("TRUSTED_CA"),
-        ssl_client_certificate=conf.get("CLIENT_CERTIFICATE"),
-        ssl_private_key=conf.get("PRIVATE_KEY"),
+        use_ssl_cert_validation=str_to_bool(conf, CKey.cert_vld, True),
+        ssl_trusted_ca=conf.get(CKey.trusted_ca),
+        ssl_client_certificate=conf.get(CKey.client_cert),
+        ssl_private_key=conf.get(CKey.client_key),
     )
 
     # Install the language container.
@@ -102,7 +99,7 @@ def deploy_scripts(conf: Secrets) -> None:
         conn.execute(activation_sql)
 
         scripts_deployer = DeployCreateStatements(
-            exasol_conn=conn, schema=conf.SCHEMA, to_print=False, develop=False
+            exasol_conn=conn, schema=conf.get(CKey.db_schema), to_print=False, develop=False
         )
         scripts_deployer.run()
 
@@ -134,7 +131,7 @@ def initialize_sme_extension(conf: Secrets,
     """
 
     # Make the connection object name
-    aws_conn_name = "_".join([AWS_CONNECTION_PREFIX, conf.USER])
+    aws_conn_name = "_".join([AWS_CONNECTION_PREFIX, conf.get(CKey.db_user)])
 
     if run_deploy_container:
         deploy_language_container(conf, version)
@@ -146,4 +143,4 @@ def initialize_sme_extension(conf: Secrets,
         encapsulate_aws_credentials(conf, aws_conn_name)
 
     # Save the connection object name in the secret store.
-    conf.save(AWS_CONNECTION_KEY, aws_conn_name)
+    conf.save(CKey.sme_aws_connection, aws_conn_name)

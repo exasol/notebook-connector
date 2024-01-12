@@ -1,9 +1,7 @@
-from exasol.sagemaker_extension_wrapper import (
-    AWS_CONNECTION_KEY,
-    initialize_sme_extension,
-)
+from exasol.sagemaker_extension_wrapper import initialize_sme_extension
 from exasol.connections import open_pyexasol_connection
 from exasol.secret_store import Secrets
+from exasol.ai_lab_config import AILabConfig as CKey
 from test.utils.integration_test_utils import (
     setup_itde,
     activate_languages,
@@ -19,10 +17,10 @@ def test_initialize_sme_extension(
 ):
     # Here are fake AWS credentials. Should be fine since we are only testing
     # the deployment.
-    secrets.save("AWS_BUCKET", "NoneExistent")
-    secrets.save("AWS_REGION", "neverland")
-    secrets.save("AWS_ACCESS_KEY_ID", "FAKEKEYIDDONTUSEIT")
-    secrets.save("AWS_SECRET_ACCESS_KEY", "FakeSecretAccessKeyDontTryToUseIt")
+    secrets.save(CKey.aws_bucket, "NoneExistent")
+    secrets.save(CKey.aws_region, "neverland")
+    secrets.save(CKey.aws_access_key_id, "FAKEKEYIDDONTUSEIT")
+    secrets.save(CKey.aws_secret_access_key, "FakeSecretAccessKeyDontTryToUseIt")
 
     # Run the extension deployment.
     initialize_sme_extension(secrets)
@@ -33,4 +31,4 @@ def test_initialize_sme_extension(
         script_counts = get_script_counts(pyexasol_connection, secrets)
         assert script_counts["SCRIPTING"] >= 4
         assert script_counts["UDF"] >= 5
-        assert_connection_exists(secrets.get(AWS_CONNECTION_KEY), pyexasol_connection)
+        assert_connection_exists(secrets.get(CKey.sme_aws_connection), pyexasol_connection)

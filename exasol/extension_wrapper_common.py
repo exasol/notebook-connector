@@ -1,9 +1,10 @@
 from exasol.connections import open_pyexasol_connection
 from exasol.secret_store import Secrets
 from exasol.utils import optional_str_to_bool
+from exasol.ai_lab_config import AILabConfig as CKey
 
 
-def str_to_bool(conf: Secrets, key: str, default_value: bool) -> bool:
+def str_to_bool(conf: Secrets, key: CKey, default_value: bool) -> bool:
     """
     Tries to read a binary (i.e. yes/no) value from the secret store. If found
     returns the correspondent boolean. Otherwise, returns the provided default
@@ -41,7 +42,7 @@ def encapsulate_bucketfs_credentials(
             Name for the connection object to be created.
     """
 
-    bfs_host = conf.get("BUCKETFS_HOST_NAME", conf.EXTERNAL_HOST_NAME)
+    bfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
     # For now, just use the http. Once the exasol.bucketfs is capable of using
     # the https without validating the server certificate choose between the
     # http and https depending on the BUCKETFS_ENCRYPTION setting, like this:
@@ -49,8 +50,8 @@ def encapsulate_bucketfs_credentials(
     # else "http"
     bfs_protocol = "http"
     bfs_dest = (
-        f"{bfs_protocol}://{bfs_host}:{conf.BUCKETFS_PORT}/"
-        f"{conf.BUCKETFS_BUCKET}/{path_in_bucket};{conf.BUCKETFS_SERVICE}"
+        f"{bfs_protocol}://{bfs_host}:{conf.get(CKey.bfs_port)}/"
+        f"{conf.get(CKey.bfs_bucket)}/{path_in_bucket};{conf.get(CKey.bfs_service)}"
     )
 
     sql = f"""
@@ -60,8 +61,8 @@ def encapsulate_bucketfs_credentials(
         IDENTIFIED BY {{BUCKETFS_PASSWORD!s}}
     """
     query_params = {
-        "BUCKETFS_USER": conf.BUCKETFS_USER,
-        "BUCKETFS_PASSWORD": conf.BUCKETFS_PASSWORD,
+        "BUCKETFS_USER": conf.get(CKey.bfs_user),
+        "BUCKETFS_PASSWORD": conf.get(CKey.bfs_password),
     }
     with open_pyexasol_connection(conf, compression=True) as conn:
         conn.execute(query=sql, query_params=query_params)
@@ -84,7 +85,7 @@ def encapsulate_huggingface_token(conf: Secrets, connection_name: str) -> None:
         TO ''
         IDENTIFIED BY {{TOKEN!s}}
     """
-    query_params = {"TOKEN": conf.HF_TOKEN}
+    query_params = {"TOKEN": conf.get(CKey.huggingface_token)}
     with open_pyexasol_connection(conf, compression=True) as conn:
         conn.execute(query=sql, query_params=query_params)
 
@@ -105,13 +106,13 @@ def encapsulate_aws_credentials(conf: Secrets, connection_name: str) -> None:
 
     sql = f"""
     CREATE OR REPLACE  CONNECTION [{connection_name}]
-        TO 'https://{conf.AWS_BUCKET}.s3.{conf.AWS_REGION}.amazonaws.com/'
-        USER {{AWS_ACCESS_KEY_ID!s}}
-        IDENTIFIED BY {{AWS_SECRET_ACCESS_KEY!s}}
+        TO 'https://{conf.get(CKey.aws_bucket)}.s3.{conf.get(CKey.aws_region)}.amazonaws.com/'
+        USER {{ACCESS_ID!s}}
+        IDENTIFIED BY {{SECRET_KEY!s}}
     """
     query_params = {
-        "AWS_ACCESS_KEY_ID": conf.AWS_ACCESS_KEY_ID,
-        "AWS_SECRET_ACCESS_KEY": conf.AWS_SECRET_ACCESS_KEY,
+        "ACCESS_ID": conf.get(CKey.aws_access_key_id),
+        "SECRET_KEY": conf.get(CKey.aws_secret_access_key),
     }
     with open_pyexasol_connection(conf, compression=True) as conn:
         conn.execute(query=sql, query_params=query_params)
