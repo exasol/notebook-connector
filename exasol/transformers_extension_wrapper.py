@@ -137,7 +137,7 @@ def deploy_scripts(conf: Secrets,
     """
 
     with open_pyexasol_connection(conf, compression=True) as conn:
-        # First need to activate the language container at the session level.
+        # First need to activate the language container at the session level, otherwise the script creation fails.
         activation_sql = get_activation_sql(conf)
         conn.execute(activation_sql)
 
