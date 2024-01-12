@@ -84,7 +84,7 @@ def deploy_language_container(conf: Secrets,
         db_password=conf.get(CKey.db_password),
         bucketfs_name=conf.get(CKey.bfs_service),
         bucketfs_host=conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name)),
-        bucketfs_port=int(conf.get(CKey.bfs_port)),
+        bucketfs_port=int(str(conf.get(CKey.bfs_port))),
         bucketfs_user=conf.get(CKey.bfs_user),
         bucketfs_password=conf.get(CKey.bfs_password),
         bucketfs_use_https=str_to_bool(conf, CKey.bfs_encryption, True),
@@ -165,7 +165,7 @@ def initialize_te_extension(conf: Secrets,
     """
 
     # Make the connection object names
-    db_user = conf.get(CKey.db_user)
+    db_user = str(conf.get(CKey.db_user))
     bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, db_user])
     token = conf.get(CKey.huggingface_token)
     hf_conn_name = "_".join([HF_CONNECTION_PREFIX, db_user]) if token else ""
@@ -217,7 +217,7 @@ def upload_model_from_cache(
     bfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
     bucketfs_location = create_bucketfs_location(
         conf.get(CKey.bfs_service), bfs_host,
-        int(conf.get(CKey.bfs_port)), conf.get(CKey.bfs_encryption).lower() == 'true',
+        int(str(conf.get(CKey.bfs_port))), str(conf.get(CKey.bfs_encryption)).lower() == 'true',
         conf.get(CKey.bfs_user), conf.get(CKey.bfs_password), conf.get(CKey.bfs_bucket),
         PATH_IN_BUCKET)
 
@@ -249,7 +249,7 @@ def upload_model(
             methods of the AutoTokenizer and AutoModel. The user token, if specified
             here, will be used instead of the one in the secret store.
     """
-    from transformers import AutoTokenizer, AutoModel
+    from transformers import AutoTokenizer, AutoModel   # type: ignore
 
     if 'token' not in kwargs:
         token = conf.get(CKey.huggingface_token)

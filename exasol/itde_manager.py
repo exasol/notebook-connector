@@ -82,7 +82,7 @@ def is_itde_running(conf: Secrets) -> bool:
     If the name cannot be found in the secret store the function returns False.
     """
 
-    container_name = conf.get(itde_container)
+    container_name = conf.get(AILabConfig.itde_container)
     if not container_name:
         return False
 

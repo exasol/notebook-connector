@@ -60,7 +60,7 @@ def deploy_language_container(conf: Secrets, version: str) -> None:
         db_password=conf.get(CKey.db_password),
         bucketfs_name=conf.get(CKey.bfs_service),
         bucketfs_host=conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name)),
-        bucketfs_port=int(conf.get(CKey.bfs_port)),
+        bucketfs_port=int(str(conf.get(CKey.bfs_port))),
         bucketfs_user=conf.get(CKey.bfs_user),
         bucketfs_password=conf.get(CKey.bfs_password),
         bucketfs_use_https=str_to_bool(conf,  CKey.bfs_encryption, True),
@@ -131,7 +131,7 @@ def initialize_sme_extension(conf: Secrets,
     """
 
     # Make the connection object name
-    aws_conn_name = "_".join([AWS_CONNECTION_PREFIX, conf.get(CKey.db_user)])
+    aws_conn_name = "_".join([AWS_CONNECTION_PREFIX, str(conf.get(CKey.db_user))])
 
     if run_deploy_container:
         deploy_language_container(conf, version)
