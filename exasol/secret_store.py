@@ -102,7 +102,7 @@ class Secrets:
 
     def save(self, key: Union[str, CKey], value: str) -> "Secrets":
         """key represents a system, service, or application"""
-        key = key.value if isinstance(key, CKey) else key
+        key = key.name if isinstance(key, CKey) else key
 
         def entry_exists(cur) -> bool:
             res = cur.execute(f"SELECT * FROM {TABLE_NAME} WHERE key=?", [key])
@@ -125,7 +125,7 @@ class Secrets:
 
     def get(self, key: Union[str, CKey], default_value: Optional[str] = None) -> Optional[str]:
 
-        key = key.value if isinstance(key, CKey) else key
+        key = key.name if isinstance(key, CKey) else key
 
         with self._cursor() as cur:
             res = cur.execute(f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key])
@@ -164,7 +164,7 @@ class Secrets:
         Deletes entry with the specified key if it exists.
         Doesn't raise any exception if the key doesn't exist.
         """
-        key = key.value if isinstance(key, CKey) else key
+        key = key.name if isinstance(key, CKey) else key
 
         with self._cursor() as cur:
             cur.execute(f"DELETE FROM {TABLE_NAME} WHERE key=?", [key])

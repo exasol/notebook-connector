@@ -24,7 +24,7 @@ def setup_itde(secrets) -> None:
     bring_itde_up(secrets)
 
     schema = 'INTEGRATION_TEST'
-    secrets.save(AILabConfig.db_schema.value, schema)
+    secrets.save(AILabConfig.db_schema, schema)
     with open_pyexasol_connection(secrets) as pyexasol_connection:
         pyexasol_connection.execute(f"CREATE SCHEMA {schema};")
 

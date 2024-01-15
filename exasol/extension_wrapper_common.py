@@ -32,9 +32,9 @@ def encapsulate_bucketfs_credentials(
     Parameters:
         conf:
             The secret store. The store must hold the bucket-fs service
-            parameters (BUCKETFS_HOST_NAME or EXTERNAL_HOST_NAME, BUCKETFS_PORT,
-            BUCKETFS_SERVICE), the access credentials (BUCKETFS_USER,
-            BUCKETFS_PASSWORD), and the bucket name (BUCKETFS_BUCKET), as well
+            parameters (bfs_host_name or db_host_name, bfs_port,
+            bfs_service), the access credentials (bfs_user,
+            bfs_password), and the bucket name (bfs_bucket), as well
             as the DB connection parameters.
         path_in_bucket:
             Path identifying a location in the bucket.
@@ -45,8 +45,8 @@ def encapsulate_bucketfs_credentials(
     bfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
     # For now, just use the http. Once the exasol.bucketfs is capable of using
     # the https without validating the server certificate choose between the
-    # http and https depending on the BUCKETFS_ENCRYPTION setting, like this:
-    # bfs_protocol = "https" if str_to_bool(conf, 'BUCKETFS_ENCRYPTION', True)
+    # http and https depending on the bfs_encryption setting, like this:
+    # bfs_protocol = "https" if str_to_bool(conf, CKey.bfs_encryption, True)
     # else "http"
     bfs_protocol = "http"
     bfs_dest = (
@@ -74,7 +74,7 @@ def encapsulate_huggingface_token(conf: Secrets, connection_name: str) -> None:
 
     Parameters:
         conf:
-            The secret store. The store must hold the Huggingface token (HF_TOKEN),
+            The secret store. The store must hold the Huggingface token (huggingface_token),
              as well as the DB connection parameters.
         connection_name:
             Name for the connection object to be created.
@@ -98,8 +98,8 @@ def encapsulate_aws_credentials(conf: Secrets, connection_name: str) -> None:
     Parameters:
         conf:
             The secret store. The store must hold the S3 bucket parameters
-            (AWS_BUCKET, AWS_REGION) and AWS access credentials (AWS_ACCESS_KEY_ID,
-            AWS_SECRET_ACCESS_KEY), as well as the DB connection parameters.
+            (aws_bucket, aws_region) and AWS access credentials (aws_access_key_id,
+            aws_secret_access_key), as well as the DB connection parameters.
         connection_name:
             Name for the connection object to be created.
     """

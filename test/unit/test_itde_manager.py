@@ -47,8 +47,8 @@ def env_info() -> EnvironmentInfo:
 def test_bring_itde_up(mock_spawn_env, secrets, env_info):
     mock_spawn_env.return_value = (env_info, None)
 
-    secrets.save(CKey.mem_size.value, "4")
-    secrets.save(CKey.disk_size.value, "10")
+    secrets.save(CKey.mem_size, "4")
+    secrets.save(CKey.disk_size, "10")
 
     bring_itde_up(secrets)
 
@@ -62,18 +62,18 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info):
     assert secrets.get(CKey.itde_container) == TEST_CONTAINER_NAME
     assert secrets.get(CKey.itde_volume) == TEST_VOLUME_NAME
     assert secrets.get(CKey.itde_network) == TEST_NETWORK_NAME
-    assert secrets.get(CKey.db_host_name.value) == TEST_DB_HOST
-    assert secrets.get(CKey.bfs_host_name.value) == TEST_DB_HOST
-    assert int(secrets.get(CKey.db_port.value)) == TEST_DB_PORT
-    assert int(secrets.get(CKey.bfs_port.value)) == TEST_BFS_PORT
-    assert secrets.get(CKey.db_user.value) == "sys"
-    assert secrets.get(CKey.db_password.value) == "exasol"
-    assert secrets.get(CKey.db_encryption.value) == "True"
-    assert secrets.get(CKey.bfs_service.value) == "bfsdefault"
-    assert secrets.get(CKey.bfs_bucket.value) == "default"
-    assert secrets.get(CKey.bfs_encryption.value) == "False"
-    assert secrets.get(CKey.bfs_user.value) == "w"
-    assert secrets.get(CKey.bfs_password.value) == "write"
+    assert secrets.get(CKey.db_host_name) == TEST_DB_HOST
+    assert secrets.get(CKey.bfs_host_name) == TEST_DB_HOST
+    assert int(secrets.get(CKey.db_port)) == TEST_DB_PORT
+    assert int(secrets.get(CKey.bfs_port)) == TEST_BFS_PORT
+    assert secrets.get(CKey.db_user) == "sys"
+    assert secrets.get(CKey.db_password) == "exasol"
+    assert secrets.get(CKey.db_encryption) == "True"
+    assert secrets.get(CKey.bfs_service) == "bfsdefault"
+    assert secrets.get(CKey.bfs_bucket) == "default"
+    assert secrets.get(CKey.bfs_encryption) == "False"
+    assert secrets.get(CKey.bfs_user) == "w"
+    assert secrets.get(CKey.bfs_password) == "write"
 
 
 @mock.patch(
@@ -95,15 +95,15 @@ def test_take_itde_down(mock_util1, mock_util2, mock_util3, secrets):
     assert secrets.get(CKey.itde_container) is None
     assert secrets.get(CKey.itde_volume) is None
     assert secrets.get(CKey.itde_network) is None
-    assert secrets.get(CKey.db_host_name.value) is None
-    assert secrets.get(CKey.bfs_host_name.value) is None
-    assert secrets.get(CKey.db_user.value) is None
-    assert secrets.get(CKey.db_password.value) is None
-    assert secrets.get(CKey.db_encryption.value) is None
-    assert secrets.get(CKey.db_port.value) is None
-    assert secrets.get(CKey.bfs_service.value) is None
-    assert secrets.get(CKey.bfs_bucket.value) is None
-    assert secrets.get(CKey.bfs_encryption.value) is None
-    assert secrets.get(CKey.bfs_user.value) is None
-    assert secrets.get(CKey.bfs_password.value) is None
-    assert secrets.get(CKey.bfs_port.value) is None
+    assert secrets.get(CKey.db_host_name) is None
+    assert secrets.get(CKey.bfs_host_name) is None
+    assert secrets.get(CKey.db_user) is None
+    assert secrets.get(CKey.db_password) is None
+    assert secrets.get(CKey.db_encryption) is None
+    assert secrets.get(CKey.db_port) is None
+    assert secrets.get(CKey.bfs_service) is None
+    assert secrets.get(CKey.bfs_bucket) is None
+    assert secrets.get(CKey.bfs_encryption) is None
+    assert secrets.get(CKey.bfs_user) is None
+    assert secrets.get(CKey.bfs_password) is None
+    assert secrets.get(CKey.bfs_port) is None
