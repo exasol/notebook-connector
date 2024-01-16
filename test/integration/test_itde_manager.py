@@ -37,9 +37,7 @@ def test_bring_itde_up(secrets):
         assert secrets.get(AILabConfig.itde_container) == DB_CONTAINER_NAME
         assert secrets.get(AILabConfig.itde_volume) == DB_VOLUME_NAME
         assert secrets.get(AILabConfig.itde_network) == DB_NETWORK_NAME
-        assert secrets.get(AILabConfig.db_host_name) == secrets.get(
-            AILabConfig.bfs_host_name
-        )
+        assert secrets.get(AILabConfig.db_host_name) == secrets.get(AILabConfig.bfs_host_name)
         assert secrets.get(AILabConfig.db_user) == "sys"
         assert secrets.get(AILabConfig.db_password) == "exasol"
         assert secrets.get(AILabConfig.db_encryption) == "True"

@@ -9,14 +9,12 @@ import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
 
 import exasol.bucketfs as bfs  # type: ignore
-from exasol.ai_lab_config import AILabConfig as CKey
 from exasol.secret_store import Secrets
 from exasol.utils import optional_str_to_bool
+from exasol.ai_lab_config import AILabConfig as CKey
 
 
-def _optional_encryption(
-    conf: Secrets, key: CKey = CKey.db_encryption
-) -> Optional[bool]:
+def _optional_encryption(conf: Secrets, key: CKey = CKey.db_encryption) -> Optional[bool]:
     return optional_str_to_bool(conf.get(key))
 
 
@@ -127,7 +125,9 @@ def open_sqlalchemy_connection(conf: Secrets):
     it is possible to set the client TLS/SSL certificate.
     """
 
-    websocket_url = f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}"
+    websocket_url = (
+        f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}"
+    )
 
     delimiter = "?"
     encryption = _optional_encryption(conf)

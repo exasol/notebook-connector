@@ -6,7 +6,7 @@ from typing import (
     Iterable,
     Optional,
     Tuple,
-    Union,
+    Union
 )
 
 from sqlcipher3 import dbapi2 as sqlcipher  # type: ignore
@@ -123,9 +123,8 @@ class Secrets:
                 insert(cur)
         return self
 
-    def get(
-        self, key: Union[str, CKey], default_value: Optional[str] = None
-    ) -> Optional[str]:
+    def get(self, key: Union[str, CKey], default_value: Optional[str] = None) -> Optional[str]:
+
         key = key.name if isinstance(key, CKey) else key
 
         with self._cursor() as cur:

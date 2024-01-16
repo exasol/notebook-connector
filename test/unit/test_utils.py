@@ -3,10 +3,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from exasol.utils import (
-    optional_str_to_bool,
-    upward_file_search,
-)
+from exasol.utils import upward_file_search, optional_str_to_bool
 
 
 def test_upward_file_search():
@@ -37,23 +34,20 @@ def test_upward_file_search_failure():
         os.chdir(current_dir)
 
 
-@pytest.mark.parametrize(
-    "v, expected",
-    [
-        (None, None),
-        ("y", True),
-        ("yes", True),
-        ("true", True),
-        ("Y", True),
-        ("YES", True),
-        ("TRUE", True),
-        ("n", False),
-        ("no", False),
-        ("false", False),
-        ("N", False),
-        ("NO", False),
-        ("FALSE", False),
-    ],
-)
+@pytest.mark.parametrize("v, expected", [
+    (None, None),
+    ('y', True),
+    ('yes', True),
+    ('true', True),
+    ('Y', True),
+    ('YES', True),
+    ('TRUE', True),
+    ('n', False),
+    ('no', False),
+    ('false', False),
+    ('N', False),
+    ('NO', False),
+    ('FALSE', False)
+])
 def test_optional_str_to_bool(v, expected):
     assert optional_str_to_bool(v) == expected

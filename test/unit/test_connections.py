@@ -8,7 +8,6 @@ from unittest.mock import create_autospec
 
 import pytest
 
-from exasol.ai_lab_config import AILabConfig as CKey
 from exasol.connections import (
     get_external_host,
     open_bucketfs_connection,
@@ -16,6 +15,7 @@ from exasol.connections import (
     open_sqlalchemy_connection,
 )
 from exasol.secret_store import Secrets
+from exasol.ai_lab_config import AILabConfig as CKey
 
 
 @pytest.fixture
@@ -44,19 +44,14 @@ def conf() -> Secrets:
 
 
 def test_get_external_host(conf):
-    assert (
-        get_external_host(conf)
-        == f"{conf.get(CKey.db_host_name)}:{conf.get(CKey.db_port)}"
-    )
+    assert get_external_host(conf) == f"{conf.get(CKey.db_host_name)}:{conf.get(CKey.db_port)}"
 
 
 @unittest.mock.patch("pyexasol.connect")
 def test_open_pyexasol_connection(mock_connect, conf):
     open_pyexasol_connection(conf)
     mock_connect.assert_called_once_with(
-        dsn=get_external_host(conf),
-        user=conf.get(CKey.db_user),
-        password=conf.get(CKey.db_password),
+        dsn=get_external_host(conf), user=conf.get(CKey.db_user), password=conf.get(CKey.db_password)
     )
 
 
