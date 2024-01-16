@@ -27,6 +27,7 @@ class AILabConfig(Enum):
     aws_region = auto()
     aws_access_key_id = auto()
     aws_secret_access_key = auto()
+    aws_role = auto()
     itde_container = auto()
     itde_volume = auto()
     itde_network = auto()
