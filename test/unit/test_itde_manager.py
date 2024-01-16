@@ -15,7 +15,6 @@ from exasol_integration_test_docker_environment.lib.data.environment_info import
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
-
 from exasol.ai_lab_config import AILabConfig as CKey
 from exasol.itde_manager import (
     ENVIRONMENT_NAME,
