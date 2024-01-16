@@ -6,6 +6,7 @@ from exasol.secret_store import (
     InvalidPassword,
     Secrets,
 )
+from exasol.ai_lab_config import AILabConfig as CKey
 
 
 def test_no_database_file(secrets):
@@ -21,6 +22,12 @@ def test_value(secrets):
     value = "my value"
     secrets.save("key", value).close()
     assert secrets.get("key") == value
+
+
+def test_db_user(secrets):
+    name = "Beethoven"
+    secrets.save(CKey.db_user, name).close()
+    assert secrets.get(CKey.db_user) == name
 
 
 def test_dup_values(secrets):
@@ -111,3 +118,9 @@ def test_remove_key(secrets):
     secrets.save("key", "value")
     secrets.remove("key")
     assert secrets.get("key") is None
+
+
+def test_remove_db_schema(secrets):
+    secrets.save(CKey.db_schema, "the_schema")
+    secrets.remove(CKey.db_schema)
+    assert secrets.get(CKey.db_schema) is None

@@ -22,6 +22,7 @@ from exasol.language_container_activation import (
     get_activation_sql
 )
 from exasol.secret_store import Secrets
+from exasol.ai_lab_config import AILabConfig as CKey
 
 # Root directory in a bucket-fs bucket where all stuff of the Transformers
 # Extension, including its language container, will be uploaded.
@@ -36,23 +37,11 @@ LATEST_KNOWN_VERSION = "0.7.0"
 ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "te"
 
 # The name of the connection object with bucket-fs location and credentials
-# will be saved in the secret store with this key.
-BFS_CONNECTION_KEY = "TE_BFS_CONN"
-
-# The name of the connection object with bucket-fs location and credentials
 # will be prefixed with this string.
 BFS_CONNECTION_PREFIX = "TE_BFS"
 
 # Models will be uploaded into this directory in bucket-fs.
 BFS_MODELS_DIR = 'te_models'
-
-# The name of the models' directory in bucket-fs will be saved in the secret
-# store with this key.
-BFS_MODELS_DIR_KEY = "TE_MODELS_BFS_DIR"
-
-# The name of the connection object with a Huggingface token will be saved in
-# the secret store with this key.
-HF_CONNECTION_KEY = "TE_TOKEN_CONN"
 
 # The name of the connection object with a Huggingface token will be prefixed
 # with this string.
@@ -61,10 +50,6 @@ HF_CONNECTION_PREFIX = "TE_HF"
 # Models downloaded from the Huggingface archive to a local drive will be
 # cached in this directory.
 MODELS_CACHE_DIR = "models_cache"
-
-# The name of the models' cache directory will be saved in the secret store
-# with this key.
-MODELS_CACHE_DIR_KEY = "TE_MODELS_CACHE_DIR"
 
 
 def deploy_language_container(conf: Secrets,
@@ -95,21 +80,21 @@ def deploy_language_container(conf: Secrets,
 
     deployer = TeLanguageContainerDeployer.create(
         dsn=get_external_host(conf),
-        db_user=conf.USER,
-        db_password=conf.PASSWORD,
-        bucketfs_name=conf.BUCKETFS_SERVICE,
-        bucketfs_host=conf.get("BUCKETFS_HOST_NAME", conf.EXTERNAL_HOST_NAME),
-        bucketfs_port=int(conf.BUCKETFS_PORT),
-        bucketfs_user=conf.BUCKETFS_USER,
-        bucketfs_password=conf.BUCKETFS_PASSWORD,
-        bucketfs_use_https=str_to_bool(conf, "BUCKETFS_ENCRYPTION", True),
-        bucket=conf.BUCKETFS_BUCKET,
+        db_user=conf.get(CKey.db_user),
+        db_password=conf.get(CKey.db_password),
+        bucketfs_name=conf.get(CKey.bfs_service),
+        bucketfs_host=conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name)),
+        bucketfs_port=int(str(conf.get(CKey.bfs_port))),
+        bucketfs_user=conf.get(CKey.bfs_user),
+        bucketfs_password=conf.get(CKey.bfs_password),
+        bucketfs_use_https=str_to_bool(conf, CKey.bfs_encryption, True),
+        bucket=conf.get(CKey.bfs_bucket),
         path_in_bucket=PATH_IN_BUCKET,
         language_alias=language_alias,
-        use_ssl_cert_validation=str_to_bool(conf, "CERTIFICATE_VALIDATION", True),
-        ssl_trusted_ca=conf.get("TRUSTED_CA"),
-        ssl_client_certificate=conf.get("CLIENT_CERTIFICATE"),
-        ssl_private_key=conf.get("PRIVATE_KEY"),
+        use_ssl_cert_validation=str_to_bool(conf, CKey.cert_vld, True),
+        ssl_trusted_ca=conf.get(CKey.trusted_ca),
+        ssl_client_certificate=conf.get(CKey.client_cert),
+        ssl_private_key=conf.get(CKey.client_key)
     )
 
     # Install the language container.
@@ -141,7 +126,7 @@ def deploy_scripts(conf: Secrets,
         activation_sql = get_activation_sql(conf)
         conn.execute(activation_sql)
 
-        scripts_deployer = ScriptsDeployer(language_alias, conf.SCHEMA, conn)
+        scripts_deployer = ScriptsDeployer(language_alias, conf.get(CKey.db_schema), conn)
         scripts_deployer.deploy_scripts()
 
 
@@ -180,9 +165,10 @@ def initialize_te_extension(conf: Secrets,
     """
 
     # Make the connection object names
-    bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, conf.USER])
-    token = conf.get("HF_TOKEN")
-    hf_conn_name = "_".join([HF_CONNECTION_PREFIX, conf.USER]) if token else ""
+    db_user = str(conf.get(CKey.db_user))
+    bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, db_user])
+    token = conf.get(CKey.huggingface_token)
+    hf_conn_name = "_".join([HF_CONNECTION_PREFIX, db_user]) if token else ""
 
     if run_deploy_container:
         deploy_language_container(conf, version, language_alias)
@@ -198,11 +184,11 @@ def initialize_te_extension(conf: Secrets,
         encapsulate_huggingface_token(conf, hf_conn_name)
 
     # Save the connection object names in the secret store.
-    conf.save(BFS_CONNECTION_KEY, bfs_conn_name)
-    conf.save(HF_CONNECTION_KEY, hf_conn_name)
+    conf.save(CKey.te_bfs_connection, bfs_conn_name)
+    conf.save(CKey.te_hf_connection, hf_conn_name)
     # Save the directory names in the secret store
-    conf.save(BFS_MODELS_DIR_KEY, BFS_MODELS_DIR)
-    conf.save(MODELS_CACHE_DIR_KEY, MODELS_CACHE_DIR)
+    conf.save(CKey.te_models_bfs_dir, BFS_MODELS_DIR)
+    conf.save(CKey.te_models_cache_dir, MODELS_CACHE_DIR)
 
 
 def upload_model_from_cache(
@@ -228,13 +214,15 @@ def upload_model_from_cache(
     """
 
     # Create bucketfs location
+    bfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
     bucketfs_location = create_bucketfs_location(
-        conf.BUCKETFS_SERVICE, conf.get('BUCKETFS_HOST_NAME', conf.EXTERNAL_HOST_NAME),
-        int(conf.BUCKETFS_PORT), conf.BUCKETFS_ENCRYPTION.lower() == 'true',
-        conf.BUCKETFS_USER, conf.BUCKETFS_PASSWORD, conf.BUCKETFS_BUCKET, PATH_IN_BUCKET)
+        conf.get(CKey.bfs_service), bfs_host,
+        int(str(conf.get(CKey.bfs_port))), str(conf.get(CKey.bfs_encryption)).lower() == 'true',
+        conf.get(CKey.bfs_user), conf.get(CKey.bfs_password), conf.get(CKey.bfs_bucket),
+        PATH_IN_BUCKET)
 
     # Upload the downloaded model files into bucketfs
-    upload_path = get_model_path(conf.get(BFS_MODELS_DIR_KEY), model_name)
+    upload_path = get_model_path(conf.get(CKey.te_models_bfs_dir), model_name)
     upload_model_files_to_bucketfs(cache_dir, upload_path, bucketfs_location)
 
 
@@ -264,7 +252,7 @@ def upload_model(
     from transformers import AutoTokenizer, AutoModel   # type: ignore
 
     if 'token' not in kwargs:
-        token = conf.HF_TOKEN
+        token = conf.get(CKey.huggingface_token)
         if token:
             kwargs['token'] = token
 

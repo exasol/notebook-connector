@@ -18,10 +18,6 @@ from exasol.secret_store import Secrets
 ENVIRONMENT_NAME = "DemoDb"
 NAME_SERVER_ADDRESS = "8.8.8.8"
 
-CONTAINER_NAME_KEY = "ITDE_CONTAINER_NAME"
-VOLUME_NAME_KEY = "ITDE_VOLUME_NAME"
-NETWORK_NAME_KEY = "ITDE_NETWORK_NAME"
-
 
 def bring_itde_up(conf: Secrets) -> None:
     """
@@ -44,8 +40,8 @@ def bring_itde_up(conf: Secrets) -> None:
     bucket-fs connection parameters, in the secret store.
     """
 
-    mem_size = f'{conf.get(AILabConfig.mem_size.value, "4")} GiB'
-    disk_size = f'{conf.get(AILabConfig.disk_size.value, "10")} GiB'
+    mem_size = f'{conf.get(AILabConfig.mem_size, "4")} GiB'
+    disk_size = f'{conf.get(AILabConfig.disk_size, "10")} GiB'
 
     env_info, _ = api.spawn_test_environment(
         environment_name=ENVIRONMENT_NAME,
@@ -57,26 +53,26 @@ def bring_itde_up(conf: Secrets) -> None:
     db_info = env_info.database_info
     container_info = db_info.container_info
 
-    conf.save(CONTAINER_NAME_KEY, container_info.container_name)
-    conf.save(VOLUME_NAME_KEY, container_info.volume_name)
-    conf.save(NETWORK_NAME_KEY, env_info.network_info.network_name)
+    conf.save(AILabConfig.itde_container, container_info.container_name)
+    conf.save(AILabConfig.itde_volume, container_info.volume_name)
+    conf.save(AILabConfig.itde_network, env_info.network_info.network_name)
 
-    conf.save(AILabConfig.db_host_name.value, db_info.host)
-    conf.save(AILabConfig.bfs_host_name.value, db_info.host)
-    conf.save(AILabConfig.db_port.value, str(db_info.ports.database))
-    conf.save(AILabConfig.bfs_port.value, str(db_info.ports.bucketfs))
+    conf.save(AILabConfig.db_host_name, db_info.host)
+    conf.save(AILabConfig.bfs_host_name, db_info.host)
+    conf.save(AILabConfig.db_port, str(db_info.ports.database))
+    conf.save(AILabConfig.bfs_port, str(db_info.ports.bucketfs))
 
     # Q. Can we draw any of the below constants from the ITDE configuration?
-    conf.save(AILabConfig.db_user.value, "sys")
-    conf.save(AILabConfig.db_password.value, "exasol")
-    conf.save(AILabConfig.bfs_user.value, "w")
-    conf.save(AILabConfig.bfs_password.value, "write")
-    conf.save(AILabConfig.bfs_service.value, "bfsdefault")
-    conf.save(AILabConfig.bfs_bucket.value, "default")
-    conf.save(AILabConfig.db_encryption.value, "True")
+    conf.save(AILabConfig.db_user, "sys")
+    conf.save(AILabConfig.db_password, "exasol")
+    conf.save(AILabConfig.bfs_user, "w")
+    conf.save(AILabConfig.bfs_password, "write")
+    conf.save(AILabConfig.bfs_service, "bfsdefault")
+    conf.save(AILabConfig.bfs_bucket, "default")
+    conf.save(AILabConfig.db_encryption, "True")
     # The bucket-fs encryption is turned off temporarily.
-    conf.save(AILabConfig.bfs_encryption.value, "False")
-    conf.save(AILabConfig.cert_vld.value, "False")
+    conf.save(AILabConfig.bfs_encryption, "False")
+    conf.save(AILabConfig.cert_vld, "False")
 
 
 def is_itde_running(conf: Secrets) -> bool:
@@ -86,7 +82,7 @@ def is_itde_running(conf: Secrets) -> bool:
     If the name cannot be found in the secret store the function returns False.
     """
 
-    container_name = conf.get(CONTAINER_NAME_KEY)
+    container_name = conf.get(AILabConfig.itde_container)
     if not container_name:
         return False
 
@@ -106,37 +102,37 @@ def take_itde_down(conf: Secrets) -> None:
     remove_volume(conf)
     remove_network(conf)
 
-    conf.remove(AILabConfig.db_host_name.value)
-    conf.remove(AILabConfig.bfs_host_name.value)
-    conf.remove(AILabConfig.db_port.value)
-    conf.remove(AILabConfig.bfs_port.value)
-    conf.remove(AILabConfig.db_user.value)
-    conf.remove(AILabConfig.db_password.value)
-    conf.remove(AILabConfig.bfs_user.value)
-    conf.remove(AILabConfig.bfs_password.value)
-    conf.remove(AILabConfig.bfs_service.value)
-    conf.remove(AILabConfig.bfs_bucket.value)
-    conf.remove(AILabConfig.db_encryption.value)
-    conf.remove(AILabConfig.bfs_encryption.value)
-    conf.remove(AILabConfig.cert_vld.value)
+    conf.remove(AILabConfig.db_host_name)
+    conf.remove(AILabConfig.bfs_host_name)
+    conf.remove(AILabConfig.db_port)
+    conf.remove(AILabConfig.bfs_port)
+    conf.remove(AILabConfig.db_user)
+    conf.remove(AILabConfig.db_password)
+    conf.remove(AILabConfig.bfs_user)
+    conf.remove(AILabConfig.bfs_password)
+    conf.remove(AILabConfig.bfs_service)
+    conf.remove(AILabConfig.bfs_bucket)
+    conf.remove(AILabConfig.db_encryption)
+    conf.remove(AILabConfig.bfs_encryption)
+    conf.remove(AILabConfig.cert_vld)
 
 
 def remove_network(conf):
-    network_name = conf.get(NETWORK_NAME_KEY)
+    network_name = conf.get(AILabConfig.itde_network)
     if network_name:
         remove_docker_networks(iter([network_name]))
-        conf.remove(NETWORK_NAME_KEY)
+        conf.remove(AILabConfig.itde_network)
 
 
 def remove_volume(conf):
-    volume_name = conf.get(VOLUME_NAME_KEY)
+    volume_name = conf.get(AILabConfig.itde_volume)
     if volume_name:
         remove_docker_volumes([volume_name])
-        conf.remove(VOLUME_NAME_KEY)
+        conf.remove(AILabConfig.itde_volume)
 
 
 def remove_container(conf):
-    container_name = conf.get(CONTAINER_NAME_KEY)
+    container_name = conf.get(AILabConfig.itde_container)
     if container_name:
         remove_docker_container([container_name])
-        conf.remove(CONTAINER_NAME_KEY)
+        conf.remove(AILabConfig.itde_container)

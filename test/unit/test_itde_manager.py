@@ -15,13 +15,11 @@ from exasol_integration_test_docker_environment.lib.data.environment_info import
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
-from exasol.ai_lab_config import AILabConfig
+
+from exasol.ai_lab_config import AILabConfig as CKey
 from exasol.itde_manager import (
-    CONTAINER_NAME_KEY,
     ENVIRONMENT_NAME,
     NAME_SERVER_ADDRESS,
-    NETWORK_NAME_KEY,
-    VOLUME_NAME_KEY,
     bring_itde_up,
     take_itde_down,
 )
@@ -49,8 +47,8 @@ def env_info() -> EnvironmentInfo:
 def test_bring_itde_up(mock_spawn_env, secrets, env_info):
     mock_spawn_env.return_value = (env_info, None)
 
-    secrets.save(AILabConfig.mem_size.value, "4")
-    secrets.save(AILabConfig.disk_size.value, "10")
+    secrets.save(CKey.mem_size, "4")
+    secrets.save(CKey.disk_size, "10")
 
     bring_itde_up(secrets)
 
@@ -61,21 +59,21 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info):
         db_disk_size="10 GiB",
     )
 
-    assert secrets.get(CONTAINER_NAME_KEY) == TEST_CONTAINER_NAME
-    assert secrets.get(VOLUME_NAME_KEY) == TEST_VOLUME_NAME
-    assert secrets.get(NETWORK_NAME_KEY) == TEST_NETWORK_NAME
-    assert secrets.get(AILabConfig.db_host_name.value) == TEST_DB_HOST
-    assert secrets.get(AILabConfig.bfs_host_name.value) == TEST_DB_HOST
-    assert int(secrets.get(AILabConfig.db_port.value)) == TEST_DB_PORT
-    assert int(secrets.get(AILabConfig.bfs_port.value)) == TEST_BFS_PORT
-    assert secrets.get(AILabConfig.db_user.value) == "sys"
-    assert secrets.get(AILabConfig.db_password.value) == "exasol"
-    assert secrets.get(AILabConfig.db_encryption.value) == "True"
-    assert secrets.get(AILabConfig.bfs_service.value) == "bfsdefault"
-    assert secrets.get(AILabConfig.bfs_bucket.value) == "default"
-    assert secrets.get(AILabConfig.bfs_encryption.value) == "False"
-    assert secrets.get(AILabConfig.bfs_user.value) == "w"
-    assert secrets.get(AILabConfig.bfs_password.value) == "write"
+    assert secrets.get(CKey.itde_container) == TEST_CONTAINER_NAME
+    assert secrets.get(CKey.itde_volume) == TEST_VOLUME_NAME
+    assert secrets.get(CKey.itde_network) == TEST_NETWORK_NAME
+    assert secrets.get(CKey.db_host_name) == TEST_DB_HOST
+    assert secrets.get(CKey.bfs_host_name) == TEST_DB_HOST
+    assert int(secrets.get(CKey.db_port)) == TEST_DB_PORT
+    assert int(secrets.get(CKey.bfs_port)) == TEST_BFS_PORT
+    assert secrets.get(CKey.db_user) == "sys"
+    assert secrets.get(CKey.db_password) == "exasol"
+    assert secrets.get(CKey.db_encryption) == "True"
+    assert secrets.get(CKey.bfs_service) == "bfsdefault"
+    assert secrets.get(CKey.bfs_bucket) == "default"
+    assert secrets.get(CKey.bfs_encryption) == "False"
+    assert secrets.get(CKey.bfs_user) == "w"
+    assert secrets.get(CKey.bfs_password) == "write"
 
 
 @mock.patch(
@@ -88,24 +86,24 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info):
     "exasol_integration_test_docker_environment.lib.docker.networks.utils.remove_docker_networks"
 )
 def test_take_itde_down(mock_util1, mock_util2, mock_util3, secrets):
-    secrets.save(CONTAINER_NAME_KEY, TEST_CONTAINER_NAME)
-    secrets.save(VOLUME_NAME_KEY, TEST_VOLUME_NAME)
-    secrets.save(NETWORK_NAME_KEY, TEST_NETWORK_NAME)
+    secrets.save(CKey.itde_container, TEST_CONTAINER_NAME)
+    secrets.save(CKey.itde_volume, TEST_VOLUME_NAME)
+    secrets.save(CKey.itde_network, TEST_NETWORK_NAME)
 
     take_itde_down(secrets)
 
-    assert secrets.get(CONTAINER_NAME_KEY) is None
-    assert secrets.get(VOLUME_NAME_KEY) is None
-    assert secrets.get(NETWORK_NAME_KEY) is None
-    assert secrets.get(AILabConfig.db_host_name.value) is None
-    assert secrets.get(AILabConfig.bfs_host_name.value) is None
-    assert secrets.get(AILabConfig.db_user.value) is None
-    assert secrets.get(AILabConfig.db_password.value) is None
-    assert secrets.get(AILabConfig.db_encryption.value) is None
-    assert secrets.get(AILabConfig.db_port.value) is None
-    assert secrets.get(AILabConfig.bfs_service.value) is None
-    assert secrets.get(AILabConfig.bfs_bucket.value) is None
-    assert secrets.get(AILabConfig.bfs_encryption.value) is None
-    assert secrets.get(AILabConfig.bfs_user.value) is None
-    assert secrets.get(AILabConfig.bfs_password.value) is None
-    assert secrets.get(AILabConfig.bfs_port.value) is None
+    assert secrets.get(CKey.itde_container) is None
+    assert secrets.get(CKey.itde_volume) is None
+    assert secrets.get(CKey.itde_network) is None
+    assert secrets.get(CKey.db_host_name) is None
+    assert secrets.get(CKey.bfs_host_name) is None
+    assert secrets.get(CKey.db_user) is None
+    assert secrets.get(CKey.db_password) is None
+    assert secrets.get(CKey.db_encryption) is None
+    assert secrets.get(CKey.db_port) is None
+    assert secrets.get(CKey.bfs_service) is None
+    assert secrets.get(CKey.bfs_bucket) is None
+    assert secrets.get(CKey.bfs_encryption) is None
+    assert secrets.get(CKey.bfs_user) is None
+    assert secrets.get(CKey.bfs_password) is None
+    assert secrets.get(CKey.bfs_port) is None

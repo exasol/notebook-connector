@@ -10,9 +10,6 @@ from exasol_integration_test_docker_environment.lib.docker.volumes.utils import 
 
 from exasol.ai_lab_config import AILabConfig
 from exasol.itde_manager import (
-    CONTAINER_NAME_KEY,
-    NETWORK_NAME_KEY,
-    VOLUME_NAME_KEY,
     bring_itde_up,
     is_itde_running,
     take_itde_down,
@@ -32,34 +29,32 @@ def remove_itde():
 
 
 def test_bring_itde_up(secrets):
-    secrets.save(AILabConfig.mem_size.value, "2")
-    secrets.save(AILabConfig.disk_size.value, "4")
+    secrets.save(AILabConfig.mem_size, "2")
+    secrets.save(AILabConfig.disk_size, "4")
 
     try:
         bring_itde_up(secrets)
-        assert secrets.get(CONTAINER_NAME_KEY) == DB_CONTAINER_NAME
-        assert secrets.get(VOLUME_NAME_KEY) == DB_VOLUME_NAME
-        assert secrets.get(NETWORK_NAME_KEY) == DB_NETWORK_NAME
-        assert secrets.get(AILabConfig.db_host_name.value) == secrets.get(
-            AILabConfig.bfs_host_name.value
-        )
-        assert secrets.get(AILabConfig.db_user.value) == "sys"
-        assert secrets.get(AILabConfig.db_password.value) == "exasol"
-        assert secrets.get(AILabConfig.db_encryption.value) == "True"
-        assert secrets.get(AILabConfig.db_port.value) == "8563"
-        assert secrets.get(AILabConfig.bfs_service.value) == "bfsdefault"
-        assert secrets.get(AILabConfig.bfs_bucket.value) == "default"
-        assert secrets.get(AILabConfig.bfs_encryption.value) == "False"
-        assert secrets.get(AILabConfig.bfs_user.value) == "w"
-        assert secrets.get(AILabConfig.bfs_password.value) == "write"
-        assert secrets.get(AILabConfig.bfs_port.value) == "2580"
+        assert secrets.get(AILabConfig.itde_container) == DB_CONTAINER_NAME
+        assert secrets.get(AILabConfig.itde_volume) == DB_VOLUME_NAME
+        assert secrets.get(AILabConfig.itde_network) == DB_NETWORK_NAME
+        assert secrets.get(AILabConfig.db_host_name) == secrets.get(AILabConfig.bfs_host_name)
+        assert secrets.get(AILabConfig.db_user) == "sys"
+        assert secrets.get(AILabConfig.db_password) == "exasol"
+        assert secrets.get(AILabConfig.db_encryption) == "True"
+        assert secrets.get(AILabConfig.db_port) == "8563"
+        assert secrets.get(AILabConfig.bfs_service) == "bfsdefault"
+        assert secrets.get(AILabConfig.bfs_bucket) == "default"
+        assert secrets.get(AILabConfig.bfs_encryption) == "False"
+        assert secrets.get(AILabConfig.bfs_user) == "w"
+        assert secrets.get(AILabConfig.bfs_password) == "write"
+        assert secrets.get(AILabConfig.bfs_port) == "2580"
     finally:
         remove_itde()
 
 
 def test_is_itde_running(secrets):
-    secrets.save(AILabConfig.mem_size.value, "2")
-    secrets.save(AILabConfig.disk_size.value, "4")
+    secrets.save(AILabConfig.mem_size, "2")
+    secrets.save(AILabConfig.disk_size, "4")
 
     try:
         bring_itde_up(secrets)
@@ -76,34 +71,34 @@ def test_is_not_itde_running(secrets):
 
 
 def test_take_itde_down(secrets):
-    secrets.save(AILabConfig.mem_size.value, "2")
-    secrets.save(AILabConfig.disk_size.value, "4")
+    secrets.save(AILabConfig.mem_size, "2")
+    secrets.save(AILabConfig.disk_size, "4")
 
     try:
         bring_itde_up(secrets)
         take_itde_down(secrets)
-        assert secrets.get(CONTAINER_NAME_KEY) is None
-        assert secrets.get(VOLUME_NAME_KEY) is None
-        assert secrets.get(NETWORK_NAME_KEY) is None
-        assert secrets.get(AILabConfig.db_host_name.value) is None
-        assert secrets.get(AILabConfig.bfs_host_name.value) is None
-        assert secrets.get(AILabConfig.db_user.value) is None
-        assert secrets.get(AILabConfig.db_password.value) is None
-        assert secrets.get(AILabConfig.db_encryption.value) is None
-        assert secrets.get(AILabConfig.db_port.value) is None
-        assert secrets.get(AILabConfig.bfs_service.value) is None
-        assert secrets.get(AILabConfig.bfs_bucket.value) is None
-        assert secrets.get(AILabConfig.bfs_encryption.value) is None
-        assert secrets.get(AILabConfig.bfs_user.value) is None
-        assert secrets.get(AILabConfig.bfs_password.value) is None
-        assert secrets.get(AILabConfig.bfs_port.value) is None
+        assert secrets.get(AILabConfig.itde_container) is None
+        assert secrets.get(AILabConfig.itde_volume) is None
+        assert secrets.get(AILabConfig.itde_network) is None
+        assert secrets.get(AILabConfig.db_host_name) is None
+        assert secrets.get(AILabConfig.bfs_host_name) is None
+        assert secrets.get(AILabConfig.db_user) is None
+        assert secrets.get(AILabConfig.db_password) is None
+        assert secrets.get(AILabConfig.db_encryption) is None
+        assert secrets.get(AILabConfig.db_port) is None
+        assert secrets.get(AILabConfig.bfs_service) is None
+        assert secrets.get(AILabConfig.bfs_bucket) is None
+        assert secrets.get(AILabConfig.bfs_encryption) is None
+        assert secrets.get(AILabConfig.bfs_user) is None
+        assert secrets.get(AILabConfig.bfs_password) is None
+        assert secrets.get(AILabConfig.bfs_port) is None
     finally:
         remove_itde()
 
 
 def test_take_itde_down_is_not_itde_running(secrets):
-    secrets.save(AILabConfig.mem_size.value, "2")
-    secrets.save(AILabConfig.disk_size.value, "4")
+    secrets.save(AILabConfig.mem_size, "2")
+    secrets.save(AILabConfig.disk_size, "4")
     try:
         bring_itde_up(secrets)
         take_itde_down(secrets)
