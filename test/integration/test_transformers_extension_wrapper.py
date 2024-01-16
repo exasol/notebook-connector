@@ -2,11 +2,8 @@ from _pytest.fixtures import FixtureRequest
 
 from exasol.connections import open_pyexasol_connection
 from exasol.secret_store import Secrets
-from exasol.transformers_extension_wrapper import (
-    BFS_CONNECTION_KEY,
-    HF_CONNECTION_KEY,
-    initialize_te_extension,
-)
+from exasol.ai_lab_config import AILabConfig as CKey
+from exasol.transformers_extension_wrapper import initialize_te_extension
 from test.utils.integration_test_utils import (
     setup_itde,
     activate_languages,
@@ -23,7 +20,7 @@ def test_initialize_te_extension(
 ):
     test_name: str = request.node.name
     language_alias = f"PYTHON3_TE_{test_name.upper()}"
-    secrets.save("HF_TOKEN", "abc")
+    secrets.save(CKey.huggingface_token, "abc")
 
     with open_pyexasol_connection(secrets) as pyexasol_connection:
 
@@ -34,5 +31,5 @@ def test_initialize_te_extension(
         assert_run_empty_udf(language_alias, pyexasol_connection, secrets)
         script_counts = get_script_counts(pyexasol_connection, secrets)
         assert script_counts["UDF"] > 5
-        assert_connection_exists(secrets.get(BFS_CONNECTION_KEY), pyexasol_connection)
-        assert_connection_exists(secrets.get(HF_CONNECTION_KEY), pyexasol_connection)
+        assert_connection_exists(secrets.get(CKey.te_bfs_connection), pyexasol_connection)
+        assert_connection_exists(secrets.get(CKey.te_hf_connection), pyexasol_connection)

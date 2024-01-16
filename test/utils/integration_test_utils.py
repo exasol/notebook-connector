@@ -24,7 +24,7 @@ def setup_itde(secrets) -> None:
     bring_itde_up(secrets)
 
     schema = 'INTEGRATION_TEST'
-    secrets.save(AILabConfig.db_schema.value, schema)
+    secrets.save(AILabConfig.db_schema, schema)
     with open_pyexasol_connection(secrets) as pyexasol_connection:
         pyexasol_connection.execute(f"CREATE SCHEMA {schema};")
 
@@ -55,7 +55,7 @@ def assert_run_empty_udf(
     pyexasol_connection.execute(
         textwrap.dedent(
             f"""
-        CREATE OR REPLACE {language_alias} SCALAR SCRIPT {secrets.SCHEMA}."TEST_UDF"()
+        CREATE OR REPLACE {language_alias} SCALAR SCRIPT {secrets.get(AILabConfig.db_schema)}."TEST_UDF"()
         RETURNS BOOLEAN AS
         def run(ctx):
             return True
@@ -64,7 +64,7 @@ def assert_run_empty_udf(
         )
     )
     result = pyexasol_connection.execute(
-        f'SELECT {secrets.SCHEMA}."TEST_UDF"()'
+        f'SELECT {secrets.get(AILabConfig.db_schema)}."TEST_UDF"()'
     ).fetchall()
     assert result[0][0]
 
@@ -79,7 +79,7 @@ def get_script_counts(
     result = pyexasol_connection.execute(
         f"""
             SELECT SCRIPT_TYPE, COUNT(*) FROM SYS.EXA_ALL_SCRIPTS
-            WHERE SCRIPT_SCHEMA='{secrets.SCHEMA.upper()}' GROUP BY SCRIPT_TYPE;
+            WHERE SCRIPT_SCHEMA='{secrets.get(AILabConfig.db_schema).upper()}' GROUP BY SCRIPT_TYPE;
         """
     ).fetchall()
     return dict(result)
