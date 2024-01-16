@@ -1,5 +1,5 @@
-from typing import Dict
 import re
+from typing import Dict
 
 from exasol.secret_store import Secrets
 

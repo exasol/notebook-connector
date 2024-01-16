@@ -1,17 +1,17 @@
 import textwrap
 from typing import Dict
-import pytest
 
+import pytest
 from pyexasol import ExaConnection
 
-from exasol.language_container_activation import get_activation_sql
-from exasol.secret_store import Secrets
-from exasol.itde_manager import (
-    bring_itde_up,
-    take_itde_down
-)
 from exasol.ai_lab_config import AILabConfig
 from exasol.connections import open_pyexasol_connection
+from exasol.itde_manager import (
+    bring_itde_up,
+    take_itde_down,
+)
+from exasol.language_container_activation import get_activation_sql
+from exasol.secret_store import Secrets
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def setup_itde(secrets) -> None:
 
     bring_itde_up(secrets)
 
-    schema = 'INTEGRATION_TEST'
+    schema = "INTEGRATION_TEST"
     secrets.save(AILabConfig.db_schema, schema)
     with open_pyexasol_connection(secrets) as pyexasol_connection:
         pyexasol_connection.execute(f"CREATE SCHEMA {schema};")

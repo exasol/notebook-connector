@@ -1,21 +1,27 @@
-from exasol_sagemaker_extension.deployment.deploy_create_statements import DeployCreateStatements   # type: ignore
-from exasol_sagemaker_extension.deployment.language_container_deployer import LanguageActivationLevel   # type: ignore
-from exasol_sagemaker_extension.deployment.sme_language_container_deployer import SmeLanguageContainerDeployer  # type: ignore
+from exasol_sagemaker_extension.deployment.deploy_create_statements import (
+    DeployCreateStatements,  # type: ignore
+)
+from exasol_sagemaker_extension.deployment.language_container_deployer import (
+    LanguageActivationLevel,  # type: ignore
+)
+from exasol_sagemaker_extension.deployment.sme_language_container_deployer import (
+    SmeLanguageContainerDeployer,  # type: ignore
+)
 
+from exasol.ai_lab_config import AILabConfig as CKey
 from exasol.connections import (
     get_external_host,
     open_pyexasol_connection,
 )
 from exasol.extension_wrapper_common import (
     encapsulate_aws_credentials,
-    str_to_bool
+    str_to_bool,
 )
 from exasol.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
-    get_activation_sql
+    get_activation_sql,
 )
 from exasol.secret_store import Secrets
-from exasol.ai_lab_config import AILabConfig as CKey
 
 # Root directory in a bucket-fs bucket where all stuff of the Sagemaker
 # Extension, including its language container, will be uploaded.
@@ -63,7 +69,7 @@ def deploy_language_container(conf: Secrets, version: str) -> None:
         bucketfs_port=int(str(conf.get(CKey.bfs_port))),
         bucketfs_user=conf.get(CKey.bfs_user),
         bucketfs_password=conf.get(CKey.bfs_password),
-        bucketfs_use_https=str_to_bool(conf,  CKey.bfs_encryption, True),
+        bucketfs_use_https=str_to_bool(conf, CKey.bfs_encryption, True),
         bucket=conf.get(CKey.bfs_bucket),
         path_in_bucket=PATH_IN_BUCKET,
         use_ssl_cert_validation=str_to_bool(conf, CKey.cert_vld, True),
@@ -99,16 +105,21 @@ def deploy_scripts(conf: Secrets) -> None:
         conn.execute(activation_sql)
 
         scripts_deployer = DeployCreateStatements(
-            exasol_conn=conn, schema=conf.get(CKey.db_schema), to_print=False, develop=False
+            exasol_conn=conn,
+            schema=conf.get(CKey.db_schema),
+            to_print=False,
+            develop=False,
         )
         scripts_deployer.run()
 
 
-def initialize_sme_extension(conf: Secrets,
-                             version: str = LATEST_KNOWN_VERSION,
-                             run_deploy_container: bool = True,
-                             run_deploy_scripts: bool = True,
-                             run_encapsulate_aws_credentials: bool = True) -> None:
+def initialize_sme_extension(
+    conf: Secrets,
+    version: str = LATEST_KNOWN_VERSION,
+    run_deploy_container: bool = True,
+    run_deploy_scripts: bool = True,
+    run_encapsulate_aws_credentials: bool = True,
+) -> None:
     """
     Performs all necessary operations to get the Sagemaker Extension
     up and running. See the "Getting Started" and "Setup" sections of the

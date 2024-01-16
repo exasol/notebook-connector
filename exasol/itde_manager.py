@@ -1,14 +1,14 @@
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker import ( # type: ignore
+from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
     ContextDockerClient,
 )
-from exasol_integration_test_docker_environment.lib.docker.container.utils import ( # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.container.utils import (  # type: ignore
     remove_docker_container,
 )
-from exasol_integration_test_docker_environment.lib.docker.networks.utils import ( # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.networks.utils import (  # type: ignore
     remove_docker_networks,
 )
-from exasol_integration_test_docker_environment.lib.docker.volumes.utils import ( # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (  # type: ignore
     remove_docker_volumes,
 )
 

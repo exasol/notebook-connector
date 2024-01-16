@@ -1,28 +1,40 @@
-from exasol_transformers_extension.utils.bucketfs_operations import get_model_path  # type: ignore
-from exasol_transformers_extension.utils.bucketfs_operations import upload_model_files_to_bucketfs  # type: ignore
-from exasol_transformers_extension.utils.bucketfs_operations import create_bucketfs_location    # type: ignore
+from exasol_transformers_extension.deployment.language_container_deployer import (
+    LanguageActivationLevel,  # type: ignore
+)
+from exasol_transformers_extension.deployment.scripts_deployer import (
+    ScriptsDeployer,  # type: ignore
+)
+from exasol_transformers_extension.deployment.te_language_container_deployer import (
+    TeLanguageContainerDeployer,  # type: ignore
+)
+from exasol_transformers_extension.utils.bucketfs_operations import (
+    create_bucketfs_location,  # type: ignore
+)
+from exasol_transformers_extension.utils.bucketfs_operations import (
+    get_model_path,  # type: ignore
+)
+from exasol_transformers_extension.utils.bucketfs_operations import (
+    upload_model_files_to_bucketfs,  # type: ignore
+)
 
-from exasol_transformers_extension.deployment.language_container_deployer import LanguageActivationLevel    # type: ignore
-from exasol_transformers_extension.deployment.scripts_deployer import ScriptsDeployer   # type: ignore
-from exasol_transformers_extension.deployment.te_language_container_deployer import TeLanguageContainerDeployer     # type: ignore
-
-# TODO: Disable this mypy "missing imports" nonsense.
-
+from exasol.ai_lab_config import AILabConfig as CKey
 from exasol.connections import (
     get_external_host,
-    open_pyexasol_connection
+    open_pyexasol_connection,
 )
 from exasol.extension_wrapper_common import (
     encapsulate_bucketfs_credentials,
     encapsulate_huggingface_token,
-    str_to_bool
+    str_to_bool,
 )
 from exasol.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
-    get_activation_sql
+    get_activation_sql,
 )
 from exasol.secret_store import Secrets
-from exasol.ai_lab_config import AILabConfig as CKey
+
+# TODO: Disable this mypy "missing imports" nonsense.
+
 
 # Root directory in a bucket-fs bucket where all stuff of the Transformers
 # Extension, including its language container, will be uploaded.
@@ -41,7 +53,7 @@ ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "te"
 BFS_CONNECTION_PREFIX = "TE_BFS"
 
 # Models will be uploaded into this directory in bucket-fs.
-BFS_MODELS_DIR = 'te_models'
+BFS_MODELS_DIR = "te_models"
 
 # The name of the connection object with a Huggingface token will be prefixed
 # with this string.
@@ -52,9 +64,7 @@ HF_CONNECTION_PREFIX = "TE_HF"
 MODELS_CACHE_DIR = "models_cache"
 
 
-def deploy_language_container(conf: Secrets,
-                              version: str,
-                              language_alias: str) -> None:
+def deploy_language_container(conf: Secrets, version: str, language_alias: str) -> None:
     """
     Calls the Transformers Extension's language container deployment API.
     Downloads the specified released version of the extension from the GitHub
@@ -94,7 +104,7 @@ def deploy_language_container(conf: Secrets,
         use_ssl_cert_validation=str_to_bool(conf, CKey.cert_vld, True),
         ssl_trusted_ca=conf.get(CKey.trusted_ca),
         ssl_client_certificate=conf.get(CKey.client_cert),
-        ssl_private_key=conf.get(CKey.client_key)
+        ssl_private_key=conf.get(CKey.client_key),
     )
 
     # Install the language container.
@@ -107,8 +117,7 @@ def deploy_language_container(conf: Secrets,
     conf.save(ACTIVATION_KEY, activation_sql)
 
 
-def deploy_scripts(conf: Secrets,
-                   language_alias: str) -> None:
+def deploy_scripts(conf: Secrets, language_alias: str) -> None:
     """
     Deploys all the extension's scripts to the database.
 
@@ -126,17 +135,21 @@ def deploy_scripts(conf: Secrets,
         activation_sql = get_activation_sql(conf)
         conn.execute(activation_sql)
 
-        scripts_deployer = ScriptsDeployer(language_alias, conf.get(CKey.db_schema), conn)
+        scripts_deployer = ScriptsDeployer(
+            language_alias, conf.get(CKey.db_schema), conn
+        )
         scripts_deployer.deploy_scripts()
 
 
-def initialize_te_extension(conf: Secrets,
-                            version: str = LATEST_KNOWN_VERSION,
-                            language_alias: str = LANGUAGE_ALIAS,
-                            run_deploy_container: bool = True,
-                            run_deploy_scripts: bool = True,
-                            run_encapsulate_bfs_credentials: bool = True,
-                            run_encapsulate_hf_token: bool = True) -> None:
+def initialize_te_extension(
+    conf: Secrets,
+    version: str = LATEST_KNOWN_VERSION,
+    language_alias: str = LANGUAGE_ALIAS,
+    run_deploy_container: bool = True,
+    run_deploy_scripts: bool = True,
+    run_encapsulate_bfs_credentials: bool = True,
+    run_encapsulate_hf_token: bool = True,
+) -> None:
     """
     Performs all necessary operations to get the Transformers Extension
     up and running. See the "Getting Started" and "Setup" sections of the
@@ -191,10 +204,7 @@ def initialize_te_extension(conf: Secrets,
     conf.save(CKey.te_models_cache_dir, MODELS_CACHE_DIR)
 
 
-def upload_model_from_cache(
-        conf: Secrets,
-        model_name: str,
-        cache_dir: str) -> None:
+def upload_model_from_cache(conf: Secrets, model_name: str, cache_dir: str) -> None:
     """
     Uploads model previously downloaded and cached on a local drive. This,
     for instance, could have been done with the following code.
@@ -216,21 +226,22 @@ def upload_model_from_cache(
     # Create bucketfs location
     bfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
     bucketfs_location = create_bucketfs_location(
-        conf.get(CKey.bfs_service), bfs_host,
-        int(str(conf.get(CKey.bfs_port))), str(conf.get(CKey.bfs_encryption)).lower() == 'true',
-        conf.get(CKey.bfs_user), conf.get(CKey.bfs_password), conf.get(CKey.bfs_bucket),
-        PATH_IN_BUCKET)
+        conf.get(CKey.bfs_service),
+        bfs_host,
+        int(str(conf.get(CKey.bfs_port))),
+        str(conf.get(CKey.bfs_encryption)).lower() == "true",
+        conf.get(CKey.bfs_user),
+        conf.get(CKey.bfs_password),
+        conf.get(CKey.bfs_bucket),
+        PATH_IN_BUCKET,
+    )
 
     # Upload the downloaded model files into bucketfs
     upload_path = get_model_path(conf.get(CKey.te_models_bfs_dir), model_name)
     upload_model_files_to_bucketfs(cache_dir, upload_path, bucketfs_location)
 
 
-def upload_model(
-        conf: Secrets,
-        model_name: str,
-        cache_dir: str,
-        **kwargs) -> None:
+def upload_model(conf: Secrets, model_name: str, cache_dir: str, **kwargs) -> None:
     """
     Uploads model from the Huggingface hub or from the local cache in case it
     has already been downloaded from the hub. The user token, if found in the
@@ -249,12 +260,15 @@ def upload_model(
             methods of the AutoTokenizer and AutoModel. The user token, if specified
             here, will be used instead of the one in the secret store.
     """
-    from transformers import AutoTokenizer, AutoModel   # type: ignore
+    from transformers import (  # type: ignore
+        AutoModel,
+        AutoTokenizer,
+    )
 
-    if 'token' not in kwargs:
+    if "token" not in kwargs:
         token = conf.get(CKey.huggingface_token)
         if token:
-            kwargs['token'] = token
+            kwargs["token"] = token
 
     AutoTokenizer.from_pretrained(model_name, cache_dir=cache_dir, **kwargs)
     AutoModel.from_pretrained(model_name, cache_dir=cache_dir, **kwargs)
