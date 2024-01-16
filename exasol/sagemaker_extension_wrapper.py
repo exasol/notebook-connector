@@ -108,7 +108,7 @@ def deploy_scripts(conf: Secrets) -> None:
 
 
 def initialize_sme_extension(conf: Secrets,
-                             version: str = LATEST_KNOW_VERSION,
+                             version: str = LATEST_KNOWN_VERSION,
                              run_deploy_container: bool = True,
                              run_deploy_scripts: bool = True,
                              run_encapsulate_aws_credentials: bool = True) -> None:
