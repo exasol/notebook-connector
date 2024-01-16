@@ -15,6 +15,7 @@ from exasol.connections import (
     open_sqlalchemy_connection,
 )
 from exasol.secret_store import Secrets
+from exasol.ai_lab_config import AILabConfig as CKey
 
 
 @pytest.fixture
@@ -30,27 +31,27 @@ def conf() -> Secrets:
     mock_conf._params = {}
     mock_conf.save = types.MethodType(mock_save, mock_conf)
     mock_conf.get = types.MethodType(mock_get, mock_conf)
-    mock_conf.EXTERNAL_HOST_NAME = "24.134.96.2"
-    mock_conf.DB_PORT = "8888"
-    mock_conf.USER = "me"
-    mock_conf.PASSWORD = "let_me_in"
-    mock_conf.BUCKETFS_PORT = "6666"
-    mock_conf.BUCKETFS_USER = "buck_user"
-    mock_conf.BUCKETFS_PASSWORD = "buck_pwd"
-    mock_conf.BUCKETFS_BUCKET = "my_bucket"
+    mock_conf.save(CKey.db_host_name, "24.134.96.2")
+    mock_conf.save(CKey.db_port, "8888")
+    mock_conf.save(CKey.db_user, "me")
+    mock_conf.save(CKey.db_password, "let_me_in")
+    mock_conf.save(CKey.bfs_port, "6666")
+    mock_conf.save(CKey.bfs_user, "buck_user")
+    mock_conf.save(CKey.bfs_password, "buck_pwd")
+    mock_conf.save(CKey.bfs_bucket, "my_bucket")
 
     return mock_conf
 
 
 def test_get_external_host(conf):
-    assert get_external_host(conf) == f"{conf.EXTERNAL_HOST_NAME}:{conf.DB_PORT}"
+    assert get_external_host(conf) == f"{conf.get(CKey.db_host_name)}:{conf.get(CKey.db_port)}"
 
 
 @unittest.mock.patch("pyexasol.connect")
 def test_open_pyexasol_connection(mock_connect, conf):
     open_pyexasol_connection(conf)
     mock_connect.assert_called_once_with(
-        dsn=get_external_host(conf), user=conf.USER, password=conf.PASSWORD
+        dsn=get_external_host(conf), user=conf.get(CKey.db_user), password=conf.get(CKey.db_password)
     )
 
 
@@ -59,8 +60,8 @@ def test_open_pyexasol_connection_kwargs(mock_connect, conf):
     open_pyexasol_connection(conf, connection_timeout=3, query_timeout=10)
     mock_connect.assert_called_once_with(
         dsn=get_external_host(conf),
-        user=conf.USER,
-        password=conf.PASSWORD,
+        user=conf.get(CKey.db_user),
+        password=conf.get(CKey.db_password),
         connection_timeout=3,
         query_timeout=10,
     )
@@ -72,17 +73,17 @@ def test_open_pyexasol_connection_ssl(mock_connect, conf):
         tmp_files = [
             stack.enter_context(tempfile.NamedTemporaryFile()) for _ in range(3)
         ]
-        conf.save("ENCRYPTION", "True")
-        conf.save("CERTIFICATE_VALIDATION", "Yes")
-        conf.save("TRUSTED_CA", tmp_files[0].name)
-        conf.save("CLIENT_CERTIFICATE", tmp_files[1].name)
-        conf.save("PRIVATE_KEY", tmp_files[2].name)
+        conf.save(CKey.db_encryption, "True")
+        conf.save(CKey.cert_vld, "Yes")
+        conf.save(CKey.trusted_ca, tmp_files[0].name)
+        conf.save(CKey.client_cert, tmp_files[1].name)
+        conf.save(CKey.client_key, tmp_files[2].name)
 
         open_pyexasol_connection(conf)
         mock_connect.assert_called_once_with(
             dsn=get_external_host(conf),
-            user=conf.USER,
-            password=conf.PASSWORD,
+            user=conf.get(CKey.db_user),
+            password=conf.get(CKey.db_password),
             encryption=True,
             websocket_sslopt={
                 "cert_reqs": ssl.CERT_REQUIRED,
@@ -95,9 +96,9 @@ def test_open_pyexasol_connection_ssl(mock_connect, conf):
 
 @unittest.mock.patch("pyexasol.connect")
 def test_open_pyexasol_connection_error(mock_connect, conf):
-    conf.save("ENCRYPTION", "True")
-    conf.save("CERTIFICATE_VALIDATION", "Yes")
-    conf.save("TRUSTED_CA", "# non % existent & file")
+    conf.save(CKey.db_encryption, "True")
+    conf.save(CKey.cert_vld, "Yes")
+    conf.save(CKey.trusted_ca, "# non % existent & file")
 
     with pytest.raises(ValueError):
         open_pyexasol_connection(conf)
@@ -107,18 +108,18 @@ def test_open_pyexasol_connection_error(mock_connect, conf):
 def test_open_sqlalchemy_connection(mock_create_engine, conf):
     open_sqlalchemy_connection(conf)
     mock_create_engine.assert_called_once_with(
-        f"exa+websocket://{conf.USER}:{conf.PASSWORD}@{get_external_host(conf)}"
+        f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}"
     )
 
 
 @unittest.mock.patch("sqlalchemy.create_engine")
 def test_open_sqlalchemy_connection_ssl(mock_create_engine, conf):
-    conf.save("ENCRYPTION", "True")
-    conf.save("CERTIFICATE_VALIDATION", "False")
+    conf.save(CKey.db_encryption, "True")
+    conf.save(CKey.cert_vld, "False")
 
     open_sqlalchemy_connection(conf)
     mock_create_engine.assert_called_once_with(
-        f"exa+websocket://{conf.USER}:{conf.PASSWORD}@{get_external_host(conf)}"
+        f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}"
         "?ENCRYPTION=Yes&SSLCertificate=SSL_VERIFY_NONE"
     )
 
@@ -127,11 +128,11 @@ def test_open_sqlalchemy_connection_ssl(mock_create_engine, conf):
 def test_open_bucketfs_connection(mock_bfs_service, conf):
     open_bucketfs_connection(conf)
     mock_bfs_service.assert_called_once_with(
-        f"http://{conf.EXTERNAL_HOST_NAME}:{conf.BUCKETFS_PORT}",
+        f"http://{conf.get(CKey.db_host_name)}:{conf.get(CKey.bfs_port)}",
         {
-            conf.BUCKETFS_BUCKET: {
-                "username": conf.BUCKETFS_USER,
-                "password": conf.BUCKETFS_PASSWORD,
+            conf.get(CKey.bfs_bucket): {
+                "username": conf.get(CKey.bfs_user),
+                "password": conf.get(CKey.bfs_password),
             }
         },
     )
