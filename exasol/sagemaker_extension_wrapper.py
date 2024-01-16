@@ -21,7 +21,7 @@ from exasol.ai_lab_config import AILabConfig as CKey
 # Extension, including its language container, will be uploaded.
 PATH_IN_BUCKET = "SME"
 
-LATEST_KNOW_VERSION = "0.6.0"
+LATEST_KNOWN_VERSION = "0.6.0"
 
 # Activation SQL for the Sagemaker Extension will be saved in the secret
 # store with this key.
@@ -105,7 +105,7 @@ def deploy_scripts(conf: Secrets) -> None:
 
 
 def initialize_sme_extension(conf: Secrets,
-                             version: str = LATEST_KNOW_VERSION,
+                             version: str = LATEST_KNOWN_VERSION,
                              run_deploy_container: bool = True,
                              run_deploy_scripts: bool = True,
                              run_encapsulate_aws_credentials: bool = True) -> None:
