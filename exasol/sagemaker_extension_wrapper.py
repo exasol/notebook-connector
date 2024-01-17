@@ -17,7 +17,7 @@ from exasol.language_container_activation import (
 from exasol.secret_store import Secrets
 from exasol.ai_lab_config import AILabConfig as CKey
 
-# Root directory in a bucket-fs bucket where all stuff of the Sagemaker
+# Root directory in a BucketFS bucket where all stuff of the Sagemaker
 # Extension, including its language container, will be uploaded.
 PATH_IN_BUCKET = "SME"
 
@@ -49,7 +49,7 @@ def deploy_language_container(conf: Secrets, version: str) -> None:
     Parameters:
         conf:
             The secret store. The store must contain the DB connection parameters
-            and the parameters of the bucket-fs service.
+            and the parameters of the BucketFS service.
         version:
             Sagemaker Extension version.
     """
@@ -117,7 +117,7 @@ def initialize_sme_extension(conf: Secrets,
     Parameters:
         conf:
             The secret store. The store should contain all the required
-            parameters for accessing the database, bucket-fs and AWS.
+            parameters for accessing the database, BucketFS and AWS.
         version:
             Sagemaker Extension version. If not specified the hardcoded
             latest known version will be used.

@@ -12,3 +12,4 @@ This release adds the extension wrappers and makes full use of the configuration
 * #56: [Transformers extension wrapper](https://github.com/exasol/notebook-connector/pull/56)
 * #47: [Create a Sagemaker Extension wrapper](https://github.com/exasol/notebook-connector/issues/47)
 * #60: [Start using the AILabConfig internally](https://github.com/exasol/notebook-connector/issues/60)
+* #65: [Renamed "bucket-fs" to "BucketFS" in docstrings](https://github.com/exasol/notebook-connector/issues/65)

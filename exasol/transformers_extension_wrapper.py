@@ -24,7 +24,7 @@ from exasol.language_container_activation import (
 from exasol.secret_store import Secrets
 from exasol.ai_lab_config import AILabConfig as CKey
 
-# Root directory in a bucket-fs bucket where all stuff of the Transformers
+# Root directory in a BucketFS bucket where all stuff of the Transformers
 # Extension, including its language container, will be uploaded.
 PATH_IN_BUCKET = "TE"
 
@@ -36,11 +36,11 @@ LATEST_KNOWN_VERSION = "0.7.0"
 # store with this key.
 ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "te"
 
-# The name of the connection object with bucket-fs location and credentials
+# The name of the connection object with BucketFS location and credentials
 # will be prefixed with this string.
 BFS_CONNECTION_PREFIX = "TE_BFS"
 
-# Models will be uploaded into this directory in bucket-fs.
+# Models will be uploaded into this directory in BucketFS.
 BFS_MODELS_DIR = 'te_models'
 
 # The name of the connection object with a Huggingface token will be prefixed
@@ -71,7 +71,7 @@ def deploy_language_container(conf: Secrets,
     Parameters:
         conf:
             The secret store. The store must contain the DB connection parameters
-            and the parameters of the bucket-fs service.
+            and the parameters of the BucketFS service.
         version:
             Transformers Extension version.
         language_alias:
@@ -145,7 +145,7 @@ def initialize_te_extension(conf: Secrets,
     Parameters:
         conf:
             The secret store. The store should contain all the required
-            parameters for accessing the database and bucket-fs.
+            parameters for accessing the database and BucketFS.
         version:
             Transformers Extension version. If not specified the hardcoded
             latest known version will be used.
@@ -158,7 +158,7 @@ def initialize_te_extension(conf: Secrets,
             If set to False will skip the deployment of the UDF scripts.
         run_encapsulate_bfs_credentials:
             If set to False will skip the creation of the database connection
-            object encapsulating the bucket-fs credentials.
+            object encapsulating the BucketFS credentials.
         run_encapsulate_hf_token:
             If set to False will skip the creation of the database connection
             object encapsulating the Huggingface token.
