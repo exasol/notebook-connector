@@ -25,7 +25,7 @@ def bring_itde_up(conf: Secrets) -> None:
     and Google name server address. Additionally, can set the following
     parameters with values collected from the secret store:
     - database port forwarding,
-    - bucket-fs port forwarding,
+    - BucketFS port forwarding,
     - database memory size (the value is assumed to be the number of gigabytes),
     - database disk size (the value is assumed to be the number of gigabytes).
 
@@ -37,7 +37,7 @@ def bring_itde_up(conf: Secrets) -> None:
     takes down the environment.
 
     The function saves the main AI-Lab configuration parameters, such as the DB and
-    bucket-fs connection parameters, in the secret store.
+    BucketFS connection parameters, in the secret store.
     """
 
     mem_size = f'{conf.get(AILabConfig.mem_size, "4")} GiB'
@@ -70,7 +70,7 @@ def bring_itde_up(conf: Secrets) -> None:
     conf.save(AILabConfig.bfs_service, "bfsdefault")
     conf.save(AILabConfig.bfs_bucket, "default")
     conf.save(AILabConfig.db_encryption, "True")
-    # The bucket-fs encryption is turned off temporarily.
+    # The BucketFS encryption is turned off temporarily.
     conf.save(AILabConfig.bfs_encryption, "False")
     conf.save(AILabConfig.cert_vld, "False")
 

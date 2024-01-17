@@ -27,11 +27,11 @@ def encapsulate_bucketfs_credentials(
 ) -> None:
     """
     Creates a connection object in the database encapsulating
-    a location in the bucket-fs and bucket-fs access credentials.
+    a location in the BucketFS and BucketFS access credentials.
 
     Parameters:
         conf:
-            The secret store. The store must hold the bucket-fs service
+            The secret store. The store must hold the BucketFS service
             parameters (bfs_host_name or db_host_name, bfs_port,
             bfs_service), the access credentials (bfs_user,
             bfs_password), and the bucket name (bfs_bucket), as well
