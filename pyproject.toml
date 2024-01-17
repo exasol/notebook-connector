@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "exasol-notebook-connector"
-version = "0.2.5"
+version = "0.2.6"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [ {include = "exasol"}, ]
 authors = [ "Christoph Kuhnke <christoph.kuhnke@exasol.com>" ]
@@ -29,9 +29,13 @@ sqlcipher3 = {version = ">=0.5.0", platform = "darwin"}
 sqlalchemy-exasol  = ">=4.6.0"
 pyexasol = ">=0.24.0"
 exasol-bucketfs = ">=0.6.0"
+torch = {version="2.0.1+cpu", source = "torch"}
+exasol-transformers-extension = {url = "https://github.com/exasol/transformers-extension/releases/download/0.7.0/exasol_transformers_extension-0.7.0.tar.gz"}
+transformers = {extras = ["torch"], version = "^4.36.2"}
+exasol-sagemaker-extension = {url = "https://github.com/exasol/sagemaker-extension/releases/download/0.6.0/exasol_sagemaker_extension-0.6.0.tar.gz"}
 exasol-integration-test-docker-environment = ">=2.0.0"
 requests = "^2.31.0"
-types-requests = "^2.31.0.10"
+types-requests = "^2.31.0.6"
 
 
 [build-system]
@@ -43,6 +47,13 @@ build-backend = "poetry.core.masonry.api"
 pytest = "^7.1.1"
 pytest-mock = "^3.7.0"
 exasol-toolbox = "^0.5.0"
+
+
+[[tool.poetry.source]]
+name = "torch"
+url = "https://download.pytorch.org/whl/cpu"
+secondary = true
+
 
 [tool.pytest.ini_options]
 minversion = "6.0"

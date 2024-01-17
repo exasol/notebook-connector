@@ -10,22 +10,12 @@ import sqlalchemy  # type: ignore
 
 import exasol.bucketfs as bfs  # type: ignore
 from exasol.secret_store import Secrets
+from exasol.utils import optional_str_to_bool
+from exasol.ai_lab_config import AILabConfig as CKey
 
 
-def _optional_str_to_bool(value: Optional[str]) -> Optional[bool]:
-    if value is None:
-        return None
-    value_l = value.lower()
-    if value_l in ["y", "yes", "true"]:
-        return True
-    elif value_l in ["n", "no", "false"]:
-        return False
-    else:
-        raise ValueError("Invalid boolean value " + value)
-
-
-def _optional_encryption(conf: Secrets) -> Optional[bool]:
-    return _optional_str_to_bool(conf.get("ENCRYPTION"))
+def _optional_encryption(conf: Secrets, key: CKey = CKey.db_encryption) -> Optional[bool]:
+    return optional_str_to_bool(conf.get(key))
 
 
 def _extract_ssl_options(conf: Secrets) -> dict:
@@ -37,14 +27,14 @@ def _extract_ssl_options(conf: Secrets) -> dict:
     sslopt: dict[str, object] = {}
 
     # Is server certificate validation required?
-    certificate_validation = _optional_str_to_bool(conf.get("CERTIFICATE_VALIDATION"))
+    certificate_validation = optional_str_to_bool(conf.get(CKey.cert_vld))
     if certificate_validation is not None:
         sslopt["cert_reqs"] = (
             ssl.CERT_REQUIRED if certificate_validation else ssl.CERT_NONE
         )
 
     # Is a bundle with trusted CAs provided?
-    trusted_ca = conf.get("TRUSTED_CA")
+    trusted_ca = conf.get(CKey.trusted_ca)
     if trusted_ca:
         trusted_ca_path = Path(trusted_ca)
         if trusted_ca_path.is_dir():
@@ -55,12 +45,12 @@ def _extract_ssl_options(conf: Secrets) -> dict:
             raise ValueError(f"Trusted CA location {trusted_ca} doesn't exist.")
 
     # Is client's own certificate provided?
-    client_certificate = conf.get("CLIENT_CERTIFICATE")
+    client_certificate = conf.get(CKey.client_cert)
     if client_certificate:
         if not Path(client_certificate).is_file():
             raise ValueError(f"Certificate file {client_certificate} doesn't exist.")
         sslopt["certfile"] = client_certificate
-        private_key = conf.get("PRIVATE_KEY")
+        private_key = conf.get(CKey.client_key)
         if private_key:
             if not Path(private_key).is_file():
                 raise ValueError(f"Private key file {private_key} doesn't exist.")
@@ -71,7 +61,7 @@ def _extract_ssl_options(conf: Secrets) -> dict:
 
 def get_external_host(conf: Secrets) -> str:
     """Constructs the host part of a DB URL using provided configuration parameters."""
-    return f"{conf.EXTERNAL_HOST_NAME}:{conf.DB_PORT}"
+    return f"{conf.get(CKey.db_host_name)}:{conf.get(CKey.db_port)}"
 
 
 def get_udf_bucket_path(conf: Secrets) -> str:
@@ -79,7 +69,7 @@ def get_udf_bucket_path(conf: Secrets) -> str:
     Builds the path of the BucketFS bucket specified in the configuration,
     as it's seen in the udf's file system.
     """
-    return f"/buckets/{conf.BUCKETFS_SERVICE}/{conf.BUCKETFS_BUCKET}"
+    return f"/buckets/{conf.get(CKey.bfs_service)}/{conf.get(CKey.bfs_bucket)}"
 
 
 def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
@@ -91,19 +81,19 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
     Parameters in kwargs override the correspondent values in the configuration.
 
     The configuration should provide the following parameters:
-    - Server address and port (EXTERNAL_HOST_NAME, DB_PORT),
-    - Client security credentials (USER, PASSWORD).
+    - Server address and port (db_host_name, db_port),
+    - Client security credentials (db_user, db_password).
     Optional parameters include:
-    - Secured comm flag (ENCRYPTION),
-    - Some of the SSL options (CERTIFICATE_VALIDATION, TRUSTED_CA, CLIENT_CERTIFICATE).
+    - Secured comm flag (db_encryption),
+    - Some of the SSL options (cert_vld, trusted_ca, client_cert).
     If the schema is not provided then it should be set explicitly in every SQL statement.
     For other optional parameters the default settings are as per the pyexasol interface.
     """
 
     conn_params: dict[str, Any] = {
         "dsn": get_external_host(conf),
-        "user": conf.USER,
-        "password": conf.PASSWORD,
+        "user": conf.get(CKey.db_user),
+        "password": conf.get(CKey.db_password),
     }
 
     encryption = _optional_encryption(conf)
@@ -124,11 +114,11 @@ def open_sqlalchemy_connection(conf: Secrets):
     Does NOT set the default schema, even if it is defined in the configuration.
 
     The configuration should provide the following parameters:
-    - Server address and port (EXTERNAL_HOST_NAME, DB_PORT),
-    - Client security credentials (USER, PASSWORD).
+    - Server address and port (db_host_name, db_port),
+    - Client security credentials (db_user, db_password).
     Optional parameters include:
-    - Secured comm flag (ENCRYPTION).
-    - Validation of the server's TLS/SSL certificate by the client (CERTIFICATE_VALIDATION).
+    - Secured comm flag (db_encryption).
+    - Validation of the server's TLS/SSL certificate by the client (cert_vld).
     If the schema is not provided then it should be set explicitly in every SQL statement.
     For other optional parameters the default settings are as per the Exasol SQLAlchemy interface.
     Currently, it's not possible to use a bundle of trusted CAs other than the default. Neither
@@ -136,7 +126,7 @@ def open_sqlalchemy_connection(conf: Secrets):
     """
 
     websocket_url = (
-        f"exa+websocket://{conf.USER}:{conf.PASSWORD}@{get_external_host(conf)}"
+        f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}"
     )
 
     delimiter = "?"
@@ -160,11 +150,11 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.Bucket:
     Returns the Bucket object for the bucket selected in the configuration.
 
     The configuration should provide the following parameters;
-    - Host name and port of the BucketFS service (EXTERNAL_HOST_NAME, BUCKETFS_PORT),
-    - Client security credentials (BUCKETFS_USER, BUCKETFS_PASSWORD).
-    - Bucket name (BUCKETFS_BUCKET)
+    - Host name and port of the BucketFS service (bfs_host_name or db_host_name, bfs_port),
+    - Client security credentials (bfs_user, bfs_password).
+    - Bucket name (bfs_bucket)
     Optional parameters include:
-    - Secured comm flag (ENCRYPTION), defaults to False.
+    - Secured comm flag (bfs_encryption), defaults to False.
     Currently, it's not possible to set any of the TLS/SSL parameters. If secured comm
     is selected it automatically sets the certificate validation on.
     """
@@ -172,17 +162,18 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.Bucket:
     # Set up the connection parameters.
     # For now, just use the http. Once the exasol.bucketfs is capable of using the
     # https without validating the server certificate choose between the http and
-    # https depending on the ENCRYPTION setting like in the code below:
-    # buckfs_url_prefix = "https" if _optional_encryption(conf) else "http"
+    # https depending on the bfs_encryption setting like in the code below:
+    # buckfs_url_prefix = "https" if _optional_encryption(conf, CKey.bfs_encryption) else "http"
     buckfs_url_prefix = "http"
-    buckfs_url = f"{buckfs_url_prefix}://{conf.EXTERNAL_HOST_NAME}:{conf.BUCKETFS_PORT}"
+    buckfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
+    buckfs_url = f"{buckfs_url_prefix}://{buckfs_host}:{conf.get(CKey.bfs_port)}"
     buckfs_credentials = {
-        conf.BUCKETFS_BUCKET: {
-            "username": conf.BUCKETFS_USER,
-            "password": conf.BUCKETFS_PASSWORD,
+        conf.get(CKey.bfs_bucket): {
+            "username": conf.get(CKey.bfs_user),
+            "password": conf.get(CKey.bfs_password),
         }
     }
 
     # Connect to the BucketFS service and navigate to the bucket of choice.
     bucketfs = bfs.Service(buckfs_url, buckfs_credentials)
-    return bucketfs[conf.BUCKETFS_BUCKET]
+    return bucketfs[conf.get(CKey.bfs_bucket)]
