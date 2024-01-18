@@ -2,7 +2,6 @@ from exasol_transformers_extension.utils.bucketfs_operations import get_model_pa
 from exasol_transformers_extension.utils.bucketfs_operations import upload_model_files_to_bucketfs  # type: ignore
 from exasol_transformers_extension.utils.bucketfs_operations import create_bucketfs_location    # type: ignore
 
-from exasol_transformers_extension.deployment.language_container_deployer import LanguageActivationLevel    # type: ignore
 from exasol_transformers_extension.deployment.scripts_deployer import ScriptsDeployer   # type: ignore
 from exasol_transformers_extension.deployment.te_language_container_deployer import TeLanguageContainerDeployer     # type: ignore
 
@@ -101,10 +100,8 @@ def deploy_language_container(conf: Secrets,
     deployer.download_from_github_and_run(version, False)
 
     # Save the activation SQL in the secret store.
-    activation_sql = deployer.generate_activation_command(
-        deployer.SLC_NAME, LanguageActivationLevel.Session
-    )
-    conf.save(ACTIVATION_KEY, activation_sql)
+    language_def = deployer.get_language_definition(deployer.SLC_NAME)
+    conf.save(ACTIVATION_KEY, language_def)
 
 
 def deploy_scripts(conf: Secrets,

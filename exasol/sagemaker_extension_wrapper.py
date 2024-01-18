@@ -1,5 +1,4 @@
 from exasol_sagemaker_extension.deployment.deploy_create_statements import DeployCreateStatements   # type: ignore
-from exasol_sagemaker_extension.deployment.language_container_deployer import LanguageActivationLevel   # type: ignore
 from exasol_sagemaker_extension.deployment.sme_language_container_deployer import SmeLanguageContainerDeployer  # type: ignore
 
 from exasol.connections import (
@@ -76,10 +75,8 @@ def deploy_language_container(conf: Secrets, version: str) -> None:
     deployer.download_from_github_and_run(version, False)
 
     # Save the activation SQL in the secret store.
-    activation_sql = deployer.generate_activation_command(
-        deployer.SLC_NAME, LanguageActivationLevel.Session
-    )
-    conf.save(ACTIVATION_KEY, activation_sql)
+    language_def = deployer.get_language_definition(deployer.SLC_NAME)
+    conf.save(ACTIVATION_KEY, language_def)
 
 
 def deploy_scripts(conf: Secrets) -> None:
