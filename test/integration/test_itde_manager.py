@@ -145,7 +145,8 @@ def test_take_itde_down_is_not_itde_running(secrets):
     try:
         bring_itde_up(secrets)
         take_itde_down(secrets)
-        itde_running = is_itde_running(secrets)
-        assert itde_running is False
+        itde_exists, itde_running = is_itde_running(secrets)
+        assert not itde_exists
+        assert not itde_running
     finally:
         remove_itde()
