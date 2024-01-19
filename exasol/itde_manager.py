@@ -79,8 +79,8 @@ def bring_itde_up(conf: Secrets) -> None:
 
 def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
     """
-    Checks if the ITDE container exists and running. Returns the two boolean flags -
-    (exists, running).
+    Checks if the ITDE container exists and if it is running. Returns the two boolean
+    flags - (exists, running).
     The name of the container is taken from the provided secret store.
     If the name cannot be found in the secret store the function returns False, False.
     """

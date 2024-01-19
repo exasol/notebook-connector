@@ -13,4 +13,6 @@ This release adds the extension wrappers and makes full use of the configuration
 * #47: [Create a Sagemaker Extension wrapper](https://github.com/exasol/notebook-connector/issues/47)
 * #60: [Start using the AILabConfig internally](https://github.com/exasol/notebook-connector/issues/60)
 * #65: [Renamed "bucket-fs" to "BucketFS" in docstrings](https://github.com/exasol/notebook-connector/issues/65)
-* #70: [Improve/fix the itde_manager](https://github.com/exasol/notebook-connector/issues/70)
+* #70: [Improve the itde_manager](https://github.com/exasol/notebook-connector/issues/70)
+  * Do more elaborate check of the docker container status. Return two flags - exists and running.
+  * Add a new function - `start_itde` that re-starts an existing docker container.
