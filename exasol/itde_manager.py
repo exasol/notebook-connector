@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
 from exasol_integration_test_docker_environment.lib.docker import ( # type: ignore
     ContextDockerClient,
@@ -75,19 +77,48 @@ def bring_itde_up(conf: Secrets) -> None:
     conf.save(AILabConfig.cert_vld, "False")
 
 
-def is_itde_running(conf: Secrets) -> bool:
+def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
     """
-    Checks if the ITDE container is running.
+    Checks if the ITDE container exists and if it is running. Returns the two boolean
+    flags - (exists, running).
     The name of the container is taken from the provided secret store.
-    If the name cannot be found in the secret store the function returns False.
+    If the name cannot be found in the secret store the function returns False, False.
     """
 
+    # Try to get the name of the container from the secret store.
     container_name = conf.get(AILabConfig.itde_container)
     if not container_name:
-        return False
+        return False, False
 
+    # Check the existence and the status of the container using the Docker API.
     with ContextDockerClient() as docker_client:
-        return bool(docker_client.containers.list(filters={"name": container_name}))
+        if docker_client.containers.list(all=True, filters={"name": container_name}):
+            container = docker_client.containers.get(container_name)
+            return True, container.status == 'running'
+        return False, False
+
+
+def start_itde(conf: Secrets) -> None:
+    """
+    Starts an existing ITDE container. If the container is already running the function
+    takes no effect. For this function to work the container must exist. If it doesn't
+    the docker.errors.NotFound exception will be raised. Use the is_itde_running
+    function to check if the container exists.
+
+    The name of the container is taken from the provided secret store, where it must
+    exist. Otherwise, a RuntimeError will be raised.
+    """
+
+    # The name of the container should be in the secret store.
+    container_name = conf.get(AILabConfig.itde_container)
+    if not container_name:
+        raise RuntimeError('Unable to find the name of the Docker container.')
+
+    # Start the container using the Docker API, unless it's already running.
+    with ContextDockerClient() as docker_client:
+        container = docker_client.containers.get(container_name)
+        if container.status != 'running':
+            container.start()
 
 
 def take_itde_down(conf: Secrets) -> None:
