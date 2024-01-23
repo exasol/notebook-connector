@@ -26,7 +26,7 @@ def test_get_requested_languages(secrets):
     secrets.save(ACTIVATION_KEY_PREFIX + '_3','lang3=url3')
 
     lang_definitions = get_requested_languages(secrets)
-    expected_definitions = {'lang1': 'url1', 'lang3': 'url3'}
+    expected_definitions = {'LANG1': 'url1', 'LANG3': 'url3'}
     assert lang_definitions == expected_definitions
 
 

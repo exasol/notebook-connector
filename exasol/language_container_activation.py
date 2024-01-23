@@ -49,8 +49,9 @@ def get_requested_languages(conf: Secrets) -> Dict[str, str]:
     for key, value in conf.items():
         if key.startswith(ACTIVATION_KEY_PREFIX):
             alias, lang_url = value.split("=", maxsplit=1)
+            alias = alias.upper()
             if alias in result:
-                if result[alias].casefold() != lang_url.casefold():
+                if result[alias] != lang_url:
                     error = (
                         "Unable to merge multiple language definitions. "
                         f"Found incompatible definitions for the language alias {alias}."
