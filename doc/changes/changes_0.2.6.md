@@ -2,7 +2,10 @@
 
 ## Summary
 
-This release adds the extension wrappers and makes full use of the configuration enumeration.
+This release 
+* adds the extension wrappers
+* adds the ITDE manager
+* makes full use of the configuration enumeration.
 
 ## Changes
 
