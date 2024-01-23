@@ -745,12 +745,12 @@ simplejson = ">=3.16.0"
 
 [[package]]
 name = "exasol-sagemaker-extension"
-version = "0.6.0"
+version = "0.7.0"
 description = "Exasol SageMaker Integration"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "exasol_sagemaker_extension-0.6.0.tar.gz", hash = "sha256:710382f29bd0e538ef7912c95cb5b7f8efee5a8be70d495dda23e22f33be8522"},
+    {file = "exasol_sagemaker_extension-0.7.0.tar.gz", hash = "sha256:43c422ac777b00f79732a296e2f147ad43b11cb8da207933212ccd25574493ea"},
 ]
 
 [package.dependencies]
@@ -766,7 +766,7 @@ typeguard = ">=2.11.1,<3.0.0"
 
 [package.source]
 type = "url"
-url = "https://github.com/exasol/sagemaker-extension/releases/download/0.6.0/exasol_sagemaker_extension-0.6.0.tar.gz"
+url = "https://github.com/exasol/sagemaker-extension/releases/download/0.7.0/exasol_sagemaker_extension-0.7.0.tar.gz"
 
 [[package]]
 name = "exasol-toolbox"
@@ -798,12 +798,12 @@ typer = {version = ">=0.7.0", extras = ["all"]}
 
 [[package]]
 name = "exasol-transformers-extension"
-version = "0.7.0"
+version = "0.8.0"
 description = "An Exasol extension to use state-of-the-art pretrained machine learning models via the transformers api."
 optional = false
 python-versions = ">=3.8.0,<4.0.0"
 files = [
-    {file = "exasol_transformers_extension-0.7.0.tar.gz", hash = "sha256:8a4bfde3cef35a890e52dbd7d86dc5e7ee348d6f3a4b1e62f008745181c539af"},
+    {file = "exasol_transformers_extension-0.8.0.tar.gz", hash = "sha256:191dcd4a700091a2510caec643e00b30c2db96ba768e505e6be41d7b983c2711"},
 ]
 
 [package.dependencies]
@@ -815,12 +815,12 @@ pandas = ">=1.4.2,<2.0.0"
 pyexasol = ">=0.25.0,<0.26.0"
 tenacity = ">=8.2.2,<9.0.0"
 torch = "2.0.1+cpu"
-transformers = {version = ">=4.31.0,<5.0.0", extras = ["torch"]}
+transformers = {version = ">=4.36.2,<5.0.0", extras = ["torch"]}
 typeguard = ">=2.11.1,<3.0.0"
 
 [package.source]
 type = "url"
-url = "https://github.com/exasol/transformers-extension/releases/download/0.7.0/exasol_transformers_extension-0.7.0.tar.gz"
+url = "https://github.com/exasol/transformers-extension/releases/download/0.8.0/exasol_transformers_extension-0.8.0.tar.gz"
 
 [[package]]
 name = "exceptiongroup"
@@ -1253,13 +1253,13 @@ testing-libs = ["simplejson", "ujson"]
 
 [[package]]
 name = "jsonschema"
-version = "4.20.0"
+version = "4.21.0"
 description = "An implementation of JSON Schema validation for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jsonschema-4.20.0-py3-none-any.whl", hash = "sha256:ed6231f0429ecf966f5bc8dfef245998220549cbbcf140f913b7464c52c3b6b3"},
-    {file = "jsonschema-4.20.0.tar.gz", hash = "sha256:4f614fd46d8d61258610998997743ec5492a648b33cf478c1ddc23ed4598a5fa"},
+    {file = "jsonschema-4.21.0-py3-none-any.whl", hash = "sha256:70a09719d375c0a2874571b363c8a24be7df8071b80c9aa76bc4551e7297c63c"},
+    {file = "jsonschema-4.21.0.tar.gz", hash = "sha256:3ba18e27f7491ea4a1b22edce00fb820eec968d397feb3f9cb61d5894bb38167"},
 ]
 
 [package.dependencies]
@@ -3274,17 +3274,17 @@ files = [
 
 [[package]]
 name = "sqlcipher3-binary"
-version = "0.5.2"
+version = "0.5.2.post2"
 description = "DB-API 2.0 interface for SQLCipher 3.x"
 optional = false
 python-versions = "*"
 files = [
-    {file = "sqlcipher3_binary-0.5.2-cp310-cp310-manylinux_2_24_x86_64.whl", hash = "sha256:2f38bfffa0b6c23898c2542216d37c494df95ec1587711ebad3c055efe7d4643"},
-    {file = "sqlcipher3_binary-0.5.2-cp311-cp311-manylinux_2_24_x86_64.whl", hash = "sha256:a41f18f77e6988a812ed099c7afda835a6ce3697baed440c2f775c6633aea33a"},
-    {file = "sqlcipher3_binary-0.5.2-cp36-cp36m-manylinux_2_24_x86_64.whl", hash = "sha256:df1abf166a9e1b42ba53eaecd539efaf408abb986867be4f72c366a8e267af72"},
-    {file = "sqlcipher3_binary-0.5.2-cp37-cp37m-manylinux_2_24_x86_64.whl", hash = "sha256:217845d0fa6c88962ebc2e415a49e85cda694d8d79f2a8907b94c946b40892c3"},
-    {file = "sqlcipher3_binary-0.5.2-cp38-cp38-manylinux_2_24_x86_64.whl", hash = "sha256:18f83b12770bb90a8fcceb9a33a8abb2c4b65aee5c3e22493bbf4d8cfa6da0ff"},
-    {file = "sqlcipher3_binary-0.5.2-cp39-cp39-manylinux_2_24_x86_64.whl", hash = "sha256:419b45efbbffaebe55a4ce8abb9e561606e87229e81bd524a739a047863b51ad"},
+    {file = "sqlcipher3_binary-0.5.2.post2-cp310-cp310-manylinux_2_24_x86_64.whl", hash = "sha256:4894ec59eb23eb8ebfc6b9b2e5f562349456c844c555a6c18ea76b96193e9cae"},
+    {file = "sqlcipher3_binary-0.5.2.post2-cp311-cp311-manylinux_2_24_x86_64.whl", hash = "sha256:53259f7b6cac84e389233c6a8eec9e6e522b86bc3356578d8b8347ff9706a989"},
+    {file = "sqlcipher3_binary-0.5.2.post2-cp36-cp36m-manylinux_2_24_x86_64.whl", hash = "sha256:be208865d131fe5ef884bc7c51f6d8844f079d73cbf94a9e0e1a1a6b2d12c626"},
+    {file = "sqlcipher3_binary-0.5.2.post2-cp37-cp37m-manylinux_2_24_x86_64.whl", hash = "sha256:56f09ed15ca34290b20232a258cfd7429f0b8cc81df8a4e4b5c4dfb863cfc63e"},
+    {file = "sqlcipher3_binary-0.5.2.post2-cp38-cp38-manylinux_2_24_x86_64.whl", hash = "sha256:edcec3736be9530a5f086184e54d5bea2b9f905a3e913af9c9d8eabdb3accd1f"},
+    {file = "sqlcipher3_binary-0.5.2.post2-cp39-cp39-manylinux_2_24_x86_64.whl", hash = "sha256:4b6ca137af435a1e2c1dbc392604424982888d6a95f11b34add790defb0b24fb"},
 ]
 
 [[package]]
@@ -3851,4 +3851,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.0,<4.0"
-content-hash = "f9a7b0eb8764fa49e7297e8e34bc4b731e33e684294e71835558e040faa1baaa"
+content-hash = "9eea6816a3e6f06c42fe94a3282d096429c4e7e70dcba00ba613a24ea884d4d4"

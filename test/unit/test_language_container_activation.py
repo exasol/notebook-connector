@@ -1,70 +1,51 @@
-import re
-
+from unittest.mock import patch, MagicMock
 import pytest
 
 from exasol.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
     get_activation_sql,
+    get_requested_languages,
+    get_registered_languages,
 )
 
 
-def test_get_activation_sql(secrets):
-    secrets.save(
-        ACTIVATION_KEY_PREFIX + "_lang1",
-        "ALTER SESSION SET SCRIPT_LANGUAGES='"
-        "R=builtin_r JAVA=builtin_java PYTHON3=builtin_python3 "
-        "FIRST_LANG=localzmq+protobuf:///bfs_path1?"
-        "lang=python#/buckets/bfs_path1/exaudf/exaudfclient_py3';",
-    )
+def test_get_registered_languages(secrets):
 
-    secrets.save("some_other_key", "some_other_value")
+    with patch('exasol.language_container_activation.get_registered_languages_string',
+               MagicMock(return_value='R=builtin_r JAVA=builtin_java')):
 
-    secrets.save(
-        ACTIVATION_KEY_PREFIX + "_lang2",
-        "ALTER SESSION SET SCRIPT_LANGUAGES='"
-        "R=builtin_r JAVA=builtin_java PYTHON3=builtin_python3 "
-        "SECOND_LANG=localzmq+protobuf:///bfs_path2?"
-        "lang=python#/buckets/bfs_path2/exaudf/exaudfclient_py3';",
-    )
-
-    sql = get_activation_sql(secrets)
-    match = re.match(
-        r"\A\s*ALTER\s+SESSION\s+SET\s+SCRIPT_LANGUAGES\s*=\s*'(.+?)'\s*;?\s*\Z",
-        sql,
-        re.IGNORECASE,
-    )
-    assert match is not None
-    lang_defs = set(match.group(1).split())
-    expected_lang_defs = {
-        "R=builtin_r",
-        "JAVA=builtin_java",
-        "PYTHON3=builtin_python3",
-        "FIRST_LANG=localzmq+protobuf:///bfs_path1?"
-        "lang=python#/buckets/bfs_path1/exaudf/exaudfclient_py3",
-        "SECOND_LANG=localzmq+protobuf:///bfs_path2?"
-        "lang=python#/buckets/bfs_path2/exaudf/exaudfclient_py3",
-    }
-    assert lang_defs == expected_lang_defs
+        lang_definitions = get_registered_languages(secrets)
+        expected_definitions = {'R': 'builtin_r', 'JAVA': 'builtin_java'}
+        assert  lang_definitions == expected_definitions
 
 
-def test_get_activation_sql_failure(secrets):
-    secrets.save(
-        ACTIVATION_KEY_PREFIX + "_lang1",
-        "ALTER SESSION SET SCRIPT_LANGUAGES='"
-        "R=builtin_r JAVA=builtin_java PYTHON3=builtin_python3 "
-        "LANG_ABC=localzmq+protobuf:///bfs_path1?"
-        "lang=python#/buckets/bfs_path1/exaudf/exaudfclient_py3';",
-    )
+def test_get_requested_languages(secrets):
 
-    secrets.save("some_other_key", "some_other_value")
+    secrets.save(ACTIVATION_KEY_PREFIX + '_1','lang1=url1')
+    secrets.save(ACTIVATION_KEY_PREFIX + '_2','lang1=url1')
+    secrets.save(ACTIVATION_KEY_PREFIX + '_3','lang3=url3')
 
-    secrets.save(
-        ACTIVATION_KEY_PREFIX + "_lang2",
-        "ALTER SESSION SET SCRIPT_LANGUAGES='"
-        "R=builtin_r JAVA=builtin_java PYTHON3=builtin_python3 "
-        "LANG_ABC=localzmq+protobuf:///bfs_path2?"
-        "lang=python#/buckets/bfs_path2/exaudf/exaudfclient_py3';",
-    )
+    lang_definitions = get_requested_languages(secrets)
+    expected_definitions = {'LANG1': 'url1', 'LANG3': 'url3'}
+    assert lang_definitions == expected_definitions
+
+
+def test_get_requested_languages_ambiguous(secrets):
+
+    secrets.save(ACTIVATION_KEY_PREFIX + '_1','lang1=url1')
+    secrets.save(ACTIVATION_KEY_PREFIX + '_2','lang1=url2')
+    secrets.save(ACTIVATION_KEY_PREFIX + '_3','lang3=url3')
 
     with pytest.raises(RuntimeError):
-        get_activation_sql(secrets)
+        get_requested_languages(secrets)
+
+
+def test_get_activation_sql(secrets):
+
+    with patch('exasol.language_container_activation.get_registered_languages',
+               MagicMock(return_value={'lang1': 'url1', 'lang2': 'url2'})):
+        with patch('exasol.language_container_activation.get_requested_languages',
+                   MagicMock(return_value={'lang2': 'url22', 'lang3': 'url33'})):
+            act_sql = get_activation_sql(secrets)
+            expected_sql = "ALTER SESSION SET SCRIPT_LANGUAGES='lang1=url1 lang2=url22 lang3=url33';"
+            assert act_sql == expected_sql
