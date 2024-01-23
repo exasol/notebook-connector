@@ -1,8 +1,8 @@
-# Exasol Notebook Connector 0.2.6, released T.B.C.
+# Exasol Notebook Connector 0.2.6, released 2024-01-23
 
 ## Summary
 
-This release adds the extension wrappers and makes full use of the configuration enumeration.
+This release adds the extension wrappers, the ITDE manager and makes full use of the configuration enumeration.
 
 ## Changes
 
