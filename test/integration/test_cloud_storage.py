@@ -13,7 +13,6 @@ def test_cloud_storage_setup_scripts(
     secrets: Secrets,
     setup_itde
 ):
-    language_alias = f"PYTHON3_TE_CLOUD_{request.node.name.upper()}"
     local_jar_path = retrieve_jar(Project.CLOUD_STORAGE_EXTENSION)
     bucket = open_bucketfs_connection(secrets)
     bfs_jar_path = put_file(bucket, local_jar_path)
