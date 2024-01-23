@@ -1,3 +1,6 @@
+from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
+    ContextDockerClient,
+)
 from exasol_integration_test_docker_environment.lib.docker.container.utils import (
     remove_docker_container,  # type: ignore
 )
@@ -9,9 +12,11 @@ from exasol_integration_test_docker_environment.lib.docker.volumes.utils import 
 )
 
 from exasol.ai_lab_config import AILabConfig
+from exasol.secret_store import Secrets
 from exasol.itde_manager import (
     bring_itde_up,
     is_itde_running,
+    start_itde,
     take_itde_down,
 )
 
@@ -26,6 +31,13 @@ def remove_itde():
     remove_docker_container([DB_CONTAINER_NAME])
     remove_docker_networks([DB_NETWORK_NAME])
     remove_docker_volumes([DB_VOLUME_NAME])
+
+
+def stop_itde(conf: Secrets):
+    container_name = conf.get(AILabConfig.itde_container)
+    with ContextDockerClient() as docker_client:
+        container = docker_client.containers.get(container_name)
+        container.stop()
 
 
 def test_bring_itde_up(secrets):
@@ -52,22 +64,53 @@ def test_bring_itde_up(secrets):
         remove_itde()
 
 
-def test_is_itde_running(secrets):
+def test_itde_exists_and_running(secrets):
     secrets.save(AILabConfig.mem_size, "2")
     secrets.save(AILabConfig.disk_size, "4")
 
     try:
         bring_itde_up(secrets)
-        itde_running = is_itde_running(secrets)
-        assert itde_running is True
+        itde_exists, itde_running = is_itde_running(secrets)
+        assert itde_exists
+        assert itde_running
     finally:
         remove_itde()
 
 
-def test_is_not_itde_running(secrets):
+def test_itde_neither_exists_nor_running(secrets):
     remove_itde()
-    itde_running = is_itde_running(secrets)
-    assert itde_running is False
+    itde_exists, itde_running = is_itde_running(secrets)
+    assert not itde_exists
+    assert not itde_running
+
+
+def test_itde_exists_not_running(secrets):
+    secrets.save(AILabConfig.mem_size, "2")
+    secrets.save(AILabConfig.disk_size, "4")
+
+    try:
+        bring_itde_up(secrets)
+        stop_itde(secrets)
+        itde_exists, itde_running = is_itde_running(secrets)
+        assert itde_exists
+        assert not itde_running
+    finally:
+        remove_itde()
+
+
+def test_itde_start(secrets):
+    secrets.save(AILabConfig.mem_size, "2")
+    secrets.save(AILabConfig.disk_size, "4")
+
+    try:
+        bring_itde_up(secrets)
+        stop_itde(secrets)
+        start_itde(secrets)
+        itde_exists, itde_running = is_itde_running(secrets)
+        assert itde_exists
+        assert itde_running
+    finally:
+        remove_itde()
 
 
 def test_take_itde_down(secrets):
@@ -102,7 +145,8 @@ def test_take_itde_down_is_not_itde_running(secrets):
     try:
         bring_itde_up(secrets)
         take_itde_down(secrets)
-        itde_running = is_itde_running(secrets)
-        assert itde_running is False
+        itde_exists, itde_running = is_itde_running(secrets)
+        assert not itde_exists
+        assert not itde_running
     finally:
         remove_itde()
