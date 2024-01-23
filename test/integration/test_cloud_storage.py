@@ -1,4 +1,3 @@
-from _pytest.fixtures import FixtureRequest
 from exasol.secret_store import Secrets
 from exasol.github import retrieve_jar, Project
 from exasol.connections import open_bucketfs_connection, open_pyexasol_connection
@@ -9,7 +8,6 @@ from test.utils.integration_test_utils import setup_itde, get_script_counts
 
 
 def test_cloud_storage_setup_scripts(
-    request: FixtureRequest,
     secrets: Secrets,
     setup_itde
 ):
