@@ -1,4 +1,4 @@
-# Exasol Notebook Connector 0.2.6, released T.B.C.
+# Exasol Notebook Connector 0.2.6, released 2024-01-23
 
 ## Summary
 
