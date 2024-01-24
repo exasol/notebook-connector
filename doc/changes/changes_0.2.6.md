@@ -17,3 +17,4 @@ This release adds the extension wrappers, the ITDE manager and makes full use of
 * #70: [Improve the itde_manager](https://github.com/exasol/notebook-connector/issues/70)
   * Do more elaborate check of the docker container status. Return two flags - exists and running.
   * Add a new function - `start_itde` that re-starts an existing docker container.
+* #63: [Integration tests for cloud-storage-extension code](https://github.com/exasol/notebook-connector/issues/63)
