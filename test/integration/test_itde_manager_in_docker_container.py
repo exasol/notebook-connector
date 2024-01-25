@@ -24,7 +24,8 @@ from exasol_integration_test_docker_environment.lib.test_environment.docker_cont
 
 from exasol.utils import upward_file_search
 
-TEST_CONTAINER = "itde_manager_test_container"
+# Name of a Docker container used by the tests in this file to manage  ITDE.
+TEST_CONTAINER = "itde_manager_container"
 
 DB_NETWORK_NAME = "db_network_DemoDb"
 
@@ -61,12 +62,15 @@ def docker_image(dockerfile) -> Image:
             client.images.remove(image)
         except Exception as e:
             logging.root.warning(
-                "Failed removing image %s with exeception %s", image, e
+                "Failed removing image %s with exception %s", image, e
             )
 
 
 @pytest.fixture
 def wheel_path() -> Path:
+    """
+    Build the current project (NC) in a subprocess and return the path to the generated wheel file.
+    """
     output_bytes = subprocess.check_output(["poetry", "build"])
     wheel_name = find_wheel_name(output_bytes)
     project_root_dir = Path(upward_file_search("pyproject.toml")).parent
@@ -83,12 +87,16 @@ def find_wheel_name(output_bytes: bytes) -> str:
             if word.endswith(".whl"):
                 wheel_name = word
     if not wheel_name:
-        raise RuntimeError(f"Did not find the wheel name in output:\n {output} ")
+        raise RuntimeError(f"Did not find the wheel name in poetry output:\n {output} ")
     return wheel_name
 
 
 @pytest.fixture
-def function_source_code():
+def itde_startup_impl():
+    """
+    This fixture returns the source code for starting up ITDE.
+    The source code needs to appended to the wheel file inside the Docker container called TEST_CONTAINER.
+    """
     def run_test():
         from pathlib import Path
 
@@ -114,7 +122,13 @@ def function_source_code():
 
 
 @pytest.fixture
-def docker_container(wheel_path, function_source_code, docker_image):
+def docker_container(wheel_path, itde_startup_impl, docker_image):
+    """
+    Create a Docker container named TEST_CONTAINER to manage an instance of ITDE.
+    Copy the wheel file resulting from building the current project NC into the container.
+    Append a script to the wheel file inside the container and execute it.
+    The script then will bring up the ITDE, running in yet another Docker container.
+    """
     with ContextDockerClient() as client:
         container = client.containers.run(
             docker_image.id,
