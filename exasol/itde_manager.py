@@ -1,8 +1,8 @@
 from typing import Tuple
 
-import docker
+import docker # type: ignore
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
-from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo
+from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo # type: ignore
 from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
     ContextDockerClient,
 )
