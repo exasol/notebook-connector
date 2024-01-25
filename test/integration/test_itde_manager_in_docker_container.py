@@ -9,11 +9,18 @@ import dill
 import pytest
 from docker.models.images import Image
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol_integration_test_docker_environment.lib.docker.container.utils import \
-    remove_docker_container  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker.networks.utils import remove_docker_networks  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker.volumes.utils import remove_docker_volumes  # type: ignore
-from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import DockerContainerCopy
+from exasol_integration_test_docker_environment.lib.docker.container.utils import (
+    remove_docker_container,  # type: ignore
+)
+from exasol_integration_test_docker_environment.lib.docker.networks.utils import (
+    remove_docker_networks,  # type: ignore
+)
+from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
+    remove_docker_volumes,  # type: ignore
+)
+from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import (
+    DockerContainerCopy,
+)
 
 from exasol.utils import upward_file_search
 
@@ -53,7 +60,9 @@ def docker_image(dockerfile) -> Image:
         try:
             client.images.remove(image)
         except Exception as e:
-            logging.root.warning("Failed removing image %s with exeception %s", image, e)
+            logging.root.warning(
+                "Failed removing image %s with exeception %s", image, e
+            )
 
 
 @pytest.fixture
@@ -81,15 +90,16 @@ def find_wheel_name(output_bytes: bytes) -> str:
 @pytest.fixture
 def function_source_code():
     def run_test():
-        from exasol.itde_manager import bring_itde_up
-        from exasol.secret_store import Secrets
         from pathlib import Path
+
         from exasol.ai_lab_config import AILabConfig
         from exasol.connections import open_pyexasol_connection
+        from exasol.itde_manager import bring_itde_up
+        from exasol.secret_store import Secrets
 
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
-        secrets.save(AILabConfig.mem_size.value, '2')
-        secrets.save(AILabConfig.disk_size.value, '4')
+        secrets.save(AILabConfig.mem_size.value, "2")
+        secrets.save(AILabConfig.disk_size.value, "4")
 
         bring_itde_up(secrets)
 
@@ -112,19 +122,18 @@ def docker_container(wheel_path, function_source_code, docker_image):
             command="sleep infinity",
             detach=True,
             volumes={
-                "/var/run/docker.sock": {
-                    "bind": "/var/run/docker.sock",
-                    "mode": "rw"
-                },
-            }
+                "/var/run/docker.sock": {"bind": "/var/run/docker.sock", "mode": "rw"},
+            },
         )
         try:
             copy = DockerContainerCopy(container)
             copy.add_file(str(wheel_path), wheel_path.name)
             copy.add_string_to_file("test.py", function_source_code)
             copy.copy("/tmp")
-            exit_code, output = container.exec_run(f"python3 -m pip install /tmp/{wheel_path.name} "
-                                                   f"--extra-index-url https://download.pytorch.org/whl/cpu")
+            exit_code, output = container.exec_run(
+                f"python3 -m pip install /tmp/{wheel_path.name} "
+                f"--extra-index-url https://download.pytorch.org/whl/cpu"
+            )
             assert exit_code == 0, output
             yield container
         finally:

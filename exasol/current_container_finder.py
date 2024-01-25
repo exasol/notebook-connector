@@ -1,8 +1,13 @@
-from typing import List, Dict, Any, Optional
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+)
 
-import docker
+import docker # type: ignore
 import ifaddr
-from docker.models.containers import Container
+from docker.models.containers import Container # type: ignore
 
 
 class IPRetriever:
@@ -13,11 +18,11 @@ class IPRetriever:
 
 
 class CurrentContainerFinder:
-
-    def __init__(self,
-                 docker_client: docker.DockerClient,
-                 ip_retriever: IPRetriever = IPRetriever(),
-                 ):
+    def __init__(
+        self,
+        docker_client: docker.DockerClient,
+        ip_retriever: IPRetriever = IPRetriever(),
+    ):
         self._ip_retriever = ip_retriever
         self._docker_client = docker_client
 
@@ -35,9 +40,13 @@ class CurrentContainerFinder:
         elif len(current_container_candidates) == 0:
             return None
         else:
-            raise RuntimeError(f"Multiple potential current containers found: {current_container_candidates}")
+            raise RuntimeError(
+                f"Multiple potential current containers found: {current_container_candidates}"
+            )
 
-    def retrieve_networks_of_container(self, container: docker.models.containers.Container) -> List[Dict[str, Any]]:
+    def retrieve_networks_of_container(
+        self, container: docker.models.containers.Container
+    ) -> List[Dict[str, Any]]:
         container.reload()
         network_settings = container.attrs["NetworkSettings"]
         networks = network_settings["Networks"].values()
