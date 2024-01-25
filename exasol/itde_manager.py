@@ -1,8 +1,8 @@
 from typing import Tuple
 
-import docker # type: ignore
+import docker  # type: ignore
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
-from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo # type: ignore
+from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo  # type: ignore
 from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
     ContextDockerClient,
 )
@@ -17,7 +17,7 @@ from exasol_integration_test_docker_environment.lib.docker.volumes.utils import 
 )
 
 from exasol.ai_lab_config import AILabConfig
-from exasol.current_container_finder import CurrentContainerFinder
+from exasol.container_by_ip import ContainerByIp, IPRetriever
 from exasol.secret_store import Secrets
 
 ENVIRONMENT_NAME = "DemoDb"
@@ -84,10 +84,11 @@ def bring_itde_up(conf: Secrets) -> None:
 
 def _add_current_container_to_db_network(container_info: ContainerInfo):
     network_name = container_info.network_info.network_name
-    docker_client = docker.from_env()
-    container = CurrentContainerFinder(docker_client).current_container()
-    if container is not None:
-        docker_client.networks.get(network_name).connect(container)
+    with ContextDockerClient() as docker_client:
+        ip_addresses = [ip.ip for ip in IPRetriever().ips()]
+        container = ContainerByIp(docker_client).find(ip_addresses)
+        if container is not None:
+            docker_client.networks.get(network_name).connect(container)
 
 
 def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
