@@ -29,15 +29,15 @@ class CurrentContainerFinder:
     def current_container(self) -> Optional[Container]:
         ips = self._ip_retriever.ips()
         ip_addresses = {ip.ip for ip in ips}
-        current_container_candidates = {
+        candidates = {
             container
             for container in self._docker_client.containers.list()
             for network in self.retrieve_networks_of_container(container)
             if network["IPAddress"] in ip_addresses
         }
-        if len(current_container_candidates) == 1:
+        if len(candidates) == 1:
             return next(iter(current_container_candidates))
-        elif len(current_container_candidates) == 0:
+        elif len(candidates) == 0:
             return None
         else:
             raise RuntimeError(
