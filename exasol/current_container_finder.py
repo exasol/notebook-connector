@@ -36,12 +36,12 @@ class CurrentContainerFinder:
             if network["IPAddress"] in ip_addresses
         }
         if len(candidates) == 1:
-            return next(iter(current_container_candidates))
+            return next(iter(candidates))
         elif len(candidates) == 0:
             return None
         else:
             raise RuntimeError(
-                f"Multiple potential current containers found: {current_container_candidates}"
+                f"Multiple potential current containers found: {candidates}"
             )
 
     def retrieve_networks_of_container(
