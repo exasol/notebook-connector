@@ -68,8 +68,12 @@ class TestSetup:
         )
 
 
-def test_ips_in_ips_of_single_container():
+def test_single_container():
+    """
+    Verify finding a single container with all ip addresses exposed by its networks being contained in the given whitelist.
+    """
     test_setup = TestSetup(
+        # each container is defined by a dict specifying its networks.
         containers=[
             {"test1": "192.168.0.1", "test2": "192.168.1.1"},
             {"test1": "192.168.2.1", "test2": "192.168.3.1"},
@@ -87,7 +91,7 @@ def test_ips_in_ips_of_single_container():
     )
 
 
-def test_ips_not_in_container_ips():
+def test_no_matching_container():
     test_setup = TestSetup(
         containers=[
             {"test1": "192.168.0.1", "test2": "192.168.1.1"},
@@ -103,7 +107,7 @@ def test_ips_not_in_container_ips():
     assert result == None
 
 
-def test_ips_in_ips_of_multiple_container():
+def test_multiple_containers_matching():
     test_setup = TestSetup(
         containers=[
             {"test1": "192.168.0.1", "test2": "192.168.1.1"},
