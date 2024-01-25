@@ -30,8 +30,12 @@ def create_ip_retriever_mock(ip_addresses: List[str]) -> Union[MagicMock, IPRetr
     return ip_retriever_mock
 
 
+from typing import NewType
+Network = NewType("Network", Dict[str, str])
+
+
 def create_docker_client_mock(
-    containers: List[Dict[str, str]]
+    containers: List[Network]
 ) -> Union[docker.DockerClient, MagicMock]:
     docker_client_mock: Union[MagicMock, docker.DockerClient] = create_autospec(
         docker.DockerClient
