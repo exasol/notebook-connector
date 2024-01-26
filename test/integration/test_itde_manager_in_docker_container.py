@@ -148,7 +148,7 @@ def docker_container(wheel_path, itde_startup_impl, docker_image):
         try:
             copy = DockerContainerCopy(container)
             copy.add_file(str(wheel_path), wheel_path.name)
-            copy.add_string_to_file("test.py", function_source_code)
+            copy.add_string_to_file("test.py", itde_startup_impl)
             copy.copy("/tmp")
             exit_code, output = container.exec_run(
                 f"python3 -m pip install /tmp/{wheel_path.name} "
