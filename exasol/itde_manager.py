@@ -85,7 +85,8 @@ def bring_itde_up(conf: Secrets) -> None:
 def _add_current_container_to_db_network(container_info: ContainerInfo):
     network_name = container_info.network_info.network_name
     with ContextDockerClient() as docker_client:
-        ip_addresses = [ip.ip for ip in IPRetriever().ips()]
+        ip_addresses = [ip.ip for ip in IPRetriever().ips()
+                        if ip.is_IPv4 and isinstance(ip.ip, str)]
         container = ContainerByIp(docker_client).find(ip_addresses)
         if container is not None:
             docker_client.networks.get(network_name).connect(container)
