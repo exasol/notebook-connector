@@ -99,6 +99,6 @@ def test_multiple_containers_matching():
     ip_addresses = ["192.168.4.1", "192.168.5.1", "192.168.0.1", "192.168.2.1"]
 
     with pytest.raises(
-            RuntimeError, match="Multiple potential current containers found: "
+            RuntimeError, match="Found multiple matching containers: "
     ):
         test_setup.container_by_ip.find(ip_addresses)
