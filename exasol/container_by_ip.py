@@ -52,4 +52,4 @@ class ContainerByIp:
                 return f'{container.id[:12]} "{container.name}"'
 
             pretty = ", ".join(format(c) for c in candidates)
-            raise RuntimeError(f"Multiple potential current containers found: {pretty}")
+            raise RuntimeError(f"Found multiple matching containers: {pretty}")
