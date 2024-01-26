@@ -97,12 +97,14 @@ def itde_startup_impl():
     This fixture returns the source code for starting up ITDE.
     The source code needs to appended to the wheel file inside the Docker container called TEST_CONTAINER.
     """
+
     def run_test():
         from pathlib import Path
 
         from exasol.ai_lab_config import AILabConfig
         from exasol.connections import open_pyexasol_connection
         from exasol.itde_manager import bring_itde_up
+        from exasol.itde_manager import take_itde_down
         from exasol.secret_store import Secrets
 
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
@@ -110,11 +112,15 @@ def itde_startup_impl():
         secrets.save(AILabConfig.disk_size.value, "4")
 
         bring_itde_up(secrets)
-
-        con = open_pyexasol_connection(secrets)
-        result = con.execute("select 1").fetchmany()
-        con.close()
-        assert result[0][0] == 1
+        try:
+            con = open_pyexasol_connection(secrets)
+            try:
+                result = con.execute("select 1").fetchmany()
+                assert result[0][0] == 1
+            finally:
+                con.close()
+        finally:
+            take_itde_down(secrets)
 
     function_source_code = textwrap.dedent(dill.source.getsource(run_test))
     source_code = f"{function_source_code}\nrun_test()"
