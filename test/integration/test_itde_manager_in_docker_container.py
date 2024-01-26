@@ -41,7 +41,7 @@ def remove_itde():
 
 
 @pytest.fixture
-def dockerfile() -> str:
+def dockerfile_content() -> str:
     return cleandoc(
         """
         FROM ubuntu:20.04
@@ -54,9 +54,9 @@ def dockerfile() -> str:
 
 
 @pytest.fixture
-def docker_image(dockerfile) -> Image:
+def docker_image(dockerfile_content) -> Image:
     with ContextDockerClient() as client:
-        image, _ = client.images.build(fileobj=io.BytesIO(dockerfile.encode("UTF-8")))
+        image, _ = client.images.build(fileobj=io.BytesIO(dockerfile_content.encode("UTF-8")))
         yield image
         try:
             client.images.remove(image)
