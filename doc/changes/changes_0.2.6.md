@@ -17,3 +17,4 @@ This release adds the extension wrappers and makes full use of the configuration
 * #70: [Improve the itde_manager](https://github.com/exasol/notebook-connector/issues/70)
   * Do more elaborate check of the docker container status. Return two flags - exists and running.
   * Add a new function - `start_itde` that re-starts an existing docker container.
+* #75: Connect the current docker container with the ITDE docker network in bring_itde_up
