@@ -1,20 +1,23 @@
 from typing import Tuple
 
+import docker  # type: ignore
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker import ( # type: ignore
+from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo  # type: ignore
+from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
     ContextDockerClient,
 )
-from exasol_integration_test_docker_environment.lib.docker.container.utils import ( # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.container.utils import (  # type: ignore
     remove_docker_container,
 )
-from exasol_integration_test_docker_environment.lib.docker.networks.utils import ( # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.networks.utils import (  # type: ignore
     remove_docker_networks,
 )
-from exasol_integration_test_docker_environment.lib.docker.volumes.utils import ( # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (  # type: ignore
     remove_docker_volumes,
 )
 
 from exasol.ai_lab_config import AILabConfig
+from exasol.container_by_ip import ContainerByIp, IPRetriever
 from exasol.secret_store import Secrets
 
 ENVIRONMENT_NAME = "DemoDb"
@@ -55,6 +58,8 @@ def bring_itde_up(conf: Secrets) -> None:
     db_info = env_info.database_info
     container_info = db_info.container_info
 
+    _add_current_container_to_db_network(container_info)
+
     conf.save(AILabConfig.itde_container, container_info.container_name)
     conf.save(AILabConfig.itde_volume, container_info.volume_name)
     conf.save(AILabConfig.itde_network, env_info.network_info.network_name)
@@ -75,6 +80,16 @@ def bring_itde_up(conf: Secrets) -> None:
     # The BucketFS encryption is turned off temporarily.
     conf.save(AILabConfig.bfs_encryption, "False")
     conf.save(AILabConfig.cert_vld, "False")
+
+
+def _add_current_container_to_db_network(container_info: ContainerInfo):
+    network_name = container_info.network_info.network_name
+    with ContextDockerClient() as docker_client:
+        ip_addresses = [ip.ip for ip in IPRetriever().ips()
+                        if ip.is_IPv4 and isinstance(ip.ip, str)]
+        container = ContainerByIp(docker_client).find(ip_addresses)
+        if container is not None:
+            docker_client.networks.get(network_name).connect(container)
 
 
 def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
