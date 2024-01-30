@@ -19,3 +19,4 @@ This release adds the extension wrappers, the ITDE manager and makes full use of
   * Add a new function - `start_itde` that re-starts an existing docker container.
 * #63: [Integration tests for cloud-storage-extension code](https://github.com/exasol/notebook-connector/issues/63)
 * #75: Connect the current docker container with the ITDE docker network in bring_itde_up
+* #78: Added removal of the current container from docker network of the ITDE 

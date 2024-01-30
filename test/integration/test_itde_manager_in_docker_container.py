@@ -92,9 +92,9 @@ def find_wheel_name(output_bytes: bytes) -> str:
 
 
 @pytest.fixture
-def itde_startup_impl():
+def itde_connect_test_impl():
     """
-    This fixture returns the source code for starting up ITDE.
+    This fixture returns the test source code for starting up ITDE and connecting to it.
     The source code needs to appended to the wheel file inside the Docker container called TEST_CONTAINER.
     """
 
@@ -128,7 +128,67 @@ def itde_startup_impl():
 
 
 @pytest.fixture
-def docker_container(wheel_path, itde_startup_impl, docker_image):
+def itde_recreation_after_take_down():
+    """
+    This fixture returns the test source code for starting up ITDE again, after a first start and take down.
+    The source code needs to appended to the wheel file inside the Docker container called TEST_CONTAINER.
+    """
+
+    def run_test():
+        from pathlib import Path
+
+        from exasol.ai_lab_config import AILabConfig
+        from exasol.itde_manager import bring_itde_up
+        from exasol.itde_manager import take_itde_down
+        from exasol.secret_store import Secrets
+
+        secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
+        secrets.save(AILabConfig.mem_size.value, "2")
+        secrets.save(AILabConfig.disk_size.value, "4")
+
+        bring_itde_up(secrets)
+        take_itde_down(secrets)
+        bring_itde_up(secrets)
+        take_itde_down(secrets)
+
+    function_source_code = textwrap.dedent(dill.source.getsource(run_test))
+    source_code = f"{function_source_code}\nrun_test()"
+    return source_code
+
+
+@pytest.fixture
+def itde_recreation_without_take_down():
+    """
+    This fixture returns the test source code for starting up ITDE again, after a first start and no take down.
+    The source code needs to appended to the wheel file inside the Docker container called TEST_CONTAINER.
+    """
+
+    def run_test():
+        from pathlib import Path
+
+        from exasol.ai_lab_config import AILabConfig
+        from exasol.itde_manager import bring_itde_up
+        from exasol.itde_manager import take_itde_down
+        from exasol.secret_store import Secrets
+
+        secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
+        secrets.save(AILabConfig.mem_size.value, "2")
+        secrets.save(AILabConfig.disk_size.value, "4")
+
+        bring_itde_up(secrets)
+        bring_itde_up(secrets)
+        take_itde_down(secrets)
+
+    function_source_code = textwrap.dedent(dill.source.getsource(run_test))
+    source_code = f"{function_source_code}\nrun_test()"
+    return source_code
+
+
+@pytest.fixture
+def docker_container(wheel_path, docker_image,
+                     itde_connect_test_impl,
+                     itde_recreation_after_take_down,
+                     itde_recreation_without_take_down):
     """
     Create a Docker container named TEST_CONTAINER to manage an instance of ITDE.
     Copy the wheel file resulting from building the current project NC into the container.
@@ -148,7 +208,9 @@ def docker_container(wheel_path, itde_startup_impl, docker_image):
         try:
             copy = DockerContainerCopy(container)
             copy.add_file(str(wheel_path), wheel_path.name)
-            copy.add_string_to_file("test.py", itde_startup_impl)
+            copy.add_string_to_file("itde_connect_test_impl.py", itde_connect_test_impl)
+            copy.add_string_to_file("itde_recreation_after_take_down.py", itde_recreation_after_take_down)
+            copy.add_string_to_file("itde_recreation_without_take_down.py", itde_recreation_without_take_down)
             copy.copy("/tmp")
             exit_code, output = container.exec_run(
                 f"python3 -m pip install /tmp/{wheel_path.name} "
@@ -160,6 +222,16 @@ def docker_container(wheel_path, itde_startup_impl, docker_image):
             remove_docker_container([container.id])
 
 
-def test_bring_itde_up(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/test.py")
+def test_itde_connect(docker_container):
+    exec_result = docker_container.exec_run("python3 /tmp/itde_connect_test_impl.py")
+    assert exec_result.exit_code == 0, exec_result.output
+
+
+def test_itde_recreation_after_take_down(docker_container):
+    exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_after_take_down.py")
+    assert exec_result.exit_code == 0, exec_result.output
+
+
+def test_itde_recreation_without_take_down(docker_container):
+    exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_without_take_down.py")
     assert exec_result.exit_code == 0, exec_result.output
