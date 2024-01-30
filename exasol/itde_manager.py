@@ -1,6 +1,7 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 import docker  # type: ignore
+from docker.models.networks import Network
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo  # type: ignore
 from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
@@ -48,6 +49,8 @@ def bring_itde_up(conf: Secrets) -> None:
     mem_size = f'{conf.get(AILabConfig.mem_size, "4")} GiB'
     disk_size = f'{conf.get(AILabConfig.disk_size, "10")} GiB'
 
+    _remove_current_container_from_db_network(conf)
+
     env_info, _ = api.spawn_test_environment(
         environment_name=ENVIRONMENT_NAME,
         nameserver=(NAME_SERVER_ADDRESS,),
@@ -85,11 +88,41 @@ def bring_itde_up(conf: Secrets) -> None:
 def _add_current_container_to_db_network(container_info: ContainerInfo):
     network_name = container_info.network_info.network_name
     with ContextDockerClient() as docker_client:
-        ip_addresses = [ip.ip for ip in IPRetriever().ips()
-                        if ip.is_IPv4 and isinstance(ip.ip, str)]
+        ip_addresses = _get_ipv4_ddresses()
         container = ContainerByIp(docker_client).find(ip_addresses)
-        if container is not None:
-            docker_client.networks.get(network_name).connect(container)
+        if not container:
+            return
+        network = _get_docker_network(docker_client, network_name)
+        if network:
+            network.connect(container.id)
+
+
+def _get_docker_network(docker_client: docker.DockerClient, network_name: str) -> Optional[Network]:
+    networks = docker_client.networks.list(names=[network_name])
+    if len(networks) == 1:
+        network = networks[0]
+        return network
+    return None
+
+
+def _remove_current_container_from_db_network(conf: Secrets):
+    network_name = conf.get(AILabConfig.itde_network)
+    if not network_name:
+        return
+    with ContextDockerClient() as docker_client:
+        ip_addresses = _get_ipv4_ddresses()
+        container = ContainerByIp(docker_client).find(ip_addresses)
+        if not container:
+            return
+        network = _get_docker_network(docker_client, network_name)
+        if network:
+            network.disconnect(container.id)
+
+
+def _get_ipv4_ddresses():
+    ip_addresses = [ip.ip for ip in IPRetriever().ips()
+                    if ip.is_IPv4 and isinstance(ip.ip, str)]
+    return ip_addresses
 
 
 def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
@@ -143,6 +176,7 @@ def take_itde_down(conf: Secrets) -> None:
     are taken from the provided secret store. If the names are not found
     there no action is taken.
     """
+    _remove_current_container_from_db_network(conf)
 
     remove_container(conf)
     remove_volume(conf)
