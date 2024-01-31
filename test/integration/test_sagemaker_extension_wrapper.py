@@ -17,7 +17,7 @@ def test_initialize_sme_extension(
 ):
     # Here are fake AWS credentials. Should be fine since we are only testing
     # the deployment.
-    secrets.save(CKey.aws_bucket, "NoneExistent")
+    secrets.save(CKey.sme_aws_bucket, "NoneExistent")
     secrets.save(CKey.aws_region, "neverland")
     secrets.save(CKey.aws_access_key_id, "FAKEKEYIDDONTUSEIT")
     secrets.save(CKey.aws_secret_access_key, "FakeSecretAccessKeyDontTryToUseIt")

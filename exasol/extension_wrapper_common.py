@@ -90,7 +90,8 @@ def encapsulate_huggingface_token(conf: Secrets, connection_name: str) -> None:
         conn.execute(query=sql, query_params=query_params)
 
 
-def encapsulate_aws_credentials(conf: Secrets, connection_name: str) -> None:
+def encapsulate_aws_credentials(conf: Secrets, connection_name: str,
+                                s3_bucket_key: CKey) -> None:
     """
     Creates a connection object in the database encapsulating the address of
     an AWS S3 bucket and AWS access credentials.
@@ -102,11 +103,13 @@ def encapsulate_aws_credentials(conf: Secrets, connection_name: str) -> None:
             aws_secret_access_key), as well as the DB connection parameters.
         connection_name:
             Name for the connection object to be created.
+        s3_bucket_key:
+            The secret store key of the AWS S3 bucket name.
     """
 
     sql = f"""
     CREATE OR REPLACE  CONNECTION [{connection_name}]
-        TO 'https://{conf.get(CKey.aws_bucket)}.s3.{conf.get(CKey.aws_region)}.amazonaws.com/'
+        TO 'https://{conf.get(s3_bucket_key)}.s3.{conf.get(CKey.aws_region)}.amazonaws.com/'
         USER {{ACCESS_ID!s}}
         IDENTIFIED BY {{SECRET_KEY!s}}
     """
