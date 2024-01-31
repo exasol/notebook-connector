@@ -137,7 +137,7 @@ def initialize_sme_extension(conf: Secrets,
     if run_deploy_scripts:
         deploy_scripts(conf)
     if run_encapsulate_aws_credentials:
-        encapsulate_aws_credentials(conf, aws_conn_name)
+        encapsulate_aws_credentials(conf, aws_conn_name, CKey.sme_aws_bucket)
 
     # Save the connection object name in the secret store.
     conf.save(CKey.sme_aws_connection, aws_conn_name)

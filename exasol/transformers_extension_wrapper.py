@@ -29,7 +29,7 @@ PATH_IN_BUCKET = "TE"
 
 LANGUAGE_ALIAS = "PYTHON3_TE"
 
-LATEST_KNOWN_VERSION = "0.7.0"
+LATEST_KNOWN_VERSION = "0.9.0"
 
 # Activation SQL for the Transformers Extension will be saved in the secret
 # store with this key.
