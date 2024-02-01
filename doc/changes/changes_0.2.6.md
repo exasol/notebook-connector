@@ -22,3 +22,4 @@ This release adds the extension wrappers, the ITDE manager and makes full use of
 * #78: Added removal of the current container from docker network of the ITDE 
 * #80: Pointed the Transformers Extension wrapper to the version 0.9.0 of the Transformers Extension.
 * #81: Renamed the secret store keys "aws_bucket" and "aws_role" to respectively "sme_aws_bucket" and "sme_aws_role".
+* #83: Fixing the dependencies relevant to the transformers extension, moving to its version 0.9.0

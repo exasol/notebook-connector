@@ -20,7 +20,7 @@ from exasol.ai_lab_config import AILabConfig as CKey
 # Extension, including its language container, will be uploaded.
 PATH_IN_BUCKET = "SME"
 
-LATEST_KNOWN_VERSION = "0.6.0"
+LATEST_KNOWN_VERSION = "0.7.0"
 
 # Activation SQL for the Sagemaker Extension will be saved in the secret
 # store with this key.
