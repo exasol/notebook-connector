@@ -2,8 +2,7 @@ import pytest
 from unittest import mock
 from typing import Generator
 import pathlib
-from exasol import bfs_utils
-
+from exasol.nb_connector import bfs_utils
 
 MOCKED_BUCKET = "bucket"
 MOCKED_FILE_NAME = "bfs.file"

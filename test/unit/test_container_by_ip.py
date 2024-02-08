@@ -1,6 +1,5 @@
 from typing import (
     Dict,
-    List,
     Union, Tuple,
 )
 from unittest.mock import (
@@ -11,11 +10,10 @@ from unittest.mock import (
 )
 
 import docker
-import ifaddr
 import pytest
 from docker.models.containers import Container
 
-from exasol.container_by_ip import (
+from exasol.nb_connector.container_by_ip import (
     ContainerByIp
 )
 from test.utils.mock_cast import mock_cast

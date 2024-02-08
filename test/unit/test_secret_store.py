@@ -2,11 +2,11 @@ import sqlite3
 
 import pytest
 
-from exasol.secret_store import (
+from exasol.nb_connector.secret_store import (
     InvalidPassword,
     Secrets,
 )
-from exasol.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 
 def test_no_database_file(secrets):

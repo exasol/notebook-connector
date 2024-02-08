@@ -11,9 +11,9 @@ from exasol_integration_test_docker_environment.lib.docker.volumes.utils import 
     remove_docker_volumes,  # type: ignore
 )
 
-from exasol.ai_lab_config import AILabConfig
-from exasol.secret_store import Secrets
-from exasol.itde_manager import (
+from exasol.nb_connector.ai_lab_config import AILabConfig
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.itde_manager import (
     bring_itde_up,
     is_itde_running,
     start_itde,

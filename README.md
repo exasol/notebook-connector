@@ -20,7 +20,7 @@ By that users of such notebook applications
 
 ```python
 from pathlib import Path
-from exasol.secret_store import Secrets
+from exasol.nb_connector.secret_store import Secrets
 
 file = "password_db.sqlite"
 secrets = Secrets(Path(file), "my secret password")

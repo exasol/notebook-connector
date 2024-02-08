@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from exasol.secret_store import Secrets
+from exasol.nb_connector.secret_store import Secrets
 
 
 @pytest.fixture

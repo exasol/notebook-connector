@@ -11,7 +11,7 @@ from typing import (
 
 from sqlcipher3 import dbapi2 as sqlcipher  # type: ignore
 
-from exasol.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 _logger = logging.getLogger(__name__)
 TABLE_NAME = "secrets"

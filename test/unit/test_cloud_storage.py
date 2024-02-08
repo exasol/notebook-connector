@@ -1,5 +1,5 @@
 from unittest import mock
-from exasol.cloud_storage import setup_scripts
+from exasol.nb_connector.cloud_storage import setup_scripts
 
 
 def test_setup_scripts(secrets):

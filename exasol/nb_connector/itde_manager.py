@@ -17,9 +17,9 @@ from exasol_integration_test_docker_environment.lib.docker.volumes.utils import 
     remove_docker_volumes,
 )
 
-from exasol.ai_lab_config import AILabConfig
-from exasol.container_by_ip import ContainerByIp, IPRetriever
-from exasol.secret_store import Secrets
+from exasol.nb_connector.ai_lab_config import AILabConfig
+from exasol.nb_connector.container_by_ip import ContainerByIp, IPRetriever
+from exasol.nb_connector.secret_store import Secrets
 
 ENVIRONMENT_NAME = "DemoDb"
 NAME_SERVER_ADDRESS = "8.8.8.8"

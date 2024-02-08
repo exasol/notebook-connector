@@ -1,7 +1,7 @@
 from typing import Dict
 
-from exasol.secret_store import Secrets
-from exasol.connections import open_pyexasol_connection
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.connections import open_pyexasol_connection
 
 # All secret store entries with language container activation commands
 # will have this common prefix in their keys.

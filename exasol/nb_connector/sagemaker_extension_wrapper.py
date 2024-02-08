@@ -1,20 +1,20 @@
 from exasol_sagemaker_extension.deployment.deploy_create_statements import DeployCreateStatements   # type: ignore
 from exasol_sagemaker_extension.deployment.sme_language_container_deployer import SmeLanguageContainerDeployer  # type: ignore
 
-from exasol.connections import (
+from exasol.nb_connector.connections import (
     get_external_host,
     open_pyexasol_connection,
 )
-from exasol.extension_wrapper_common import (
+from exasol.nb_connector.extension_wrapper_common import (
     encapsulate_aws_credentials,
     str_to_bool
 )
-from exasol.language_container_activation import (
+from exasol.nb_connector.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
     get_activation_sql
 )
-from exasol.secret_store import Secrets
-from exasol.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 # Root directory in a BucketFS bucket where all stuff of the Sagemaker
 # Extension, including its language container, will be uploaded.

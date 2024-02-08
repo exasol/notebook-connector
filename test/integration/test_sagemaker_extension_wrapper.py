@@ -1,7 +1,7 @@
-from exasol.sagemaker_extension_wrapper import initialize_sme_extension
-from exasol.connections import open_pyexasol_connection
-from exasol.secret_store import Secrets
-from exasol.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.sagemaker_extension_wrapper import initialize_sme_extension
+from exasol.nb_connector.connections import open_pyexasol_connection
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from test.utils.integration_test_utils import (
     setup_itde,
     activate_languages,
