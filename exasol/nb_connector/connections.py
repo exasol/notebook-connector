@@ -9,9 +9,9 @@ import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
 
 import exasol.bucketfs as bfs  # type: ignore
-from exasol.secret_store import Secrets
-from exasol.utils import optional_str_to_bool
-from exasol.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.utils import optional_str_to_bool
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 
 def _optional_encryption(conf: Secrets, key: CKey = CKey.db_encryption) -> Optional[bool]:

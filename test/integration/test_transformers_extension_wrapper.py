@@ -1,9 +1,9 @@
 from _pytest.fixtures import FixtureRequest
 
-from exasol.connections import open_pyexasol_connection
-from exasol.secret_store import Secrets
-from exasol.ai_lab_config import AILabConfig as CKey
-from exasol.transformers_extension_wrapper import initialize_te_extension
+from exasol.nb_connector.connections import open_pyexasol_connection
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.transformers_extension_wrapper import initialize_te_extension
 from test.utils.integration_test_utils import (
     setup_itde,
     activate_languages,

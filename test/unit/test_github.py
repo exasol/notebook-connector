@@ -3,7 +3,7 @@ import pytest
 import pathlib
 import requests
 from unittest import mock
-from exasol import github
+from exasol.nb_connector import github
 
 CSE_MOCK_URL = "https://github.com/some_path/exasol-cloud-storage-extension-2.7.8.jar"
 

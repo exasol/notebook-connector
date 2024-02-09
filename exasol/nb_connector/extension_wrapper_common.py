@@ -1,7 +1,7 @@
-from exasol.connections import open_pyexasol_connection
-from exasol.secret_store import Secrets
-from exasol.utils import optional_str_to_bool
-from exasol.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.connections import open_pyexasol_connection
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.utils import optional_str_to_bool
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 
 def str_to_bool(conf: Secrets, key: CKey, default_value: bool) -> bool:

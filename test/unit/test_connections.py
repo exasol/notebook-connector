@@ -8,14 +8,14 @@ from unittest.mock import create_autospec
 
 import pytest
 
-from exasol.connections import (
+from exasol.nb_connector.connections import (
     get_external_host,
     open_bucketfs_connection,
     open_pyexasol_connection,
     open_sqlalchemy_connection,
 )
-from exasol.secret_store import Secrets
-from exasol.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 
 @pytest.fixture

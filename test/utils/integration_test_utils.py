@@ -4,14 +4,14 @@ import pytest
 
 from pyexasol import ExaConnection
 
-from exasol.language_container_activation import get_activation_sql
-from exasol.secret_store import Secrets
-from exasol.itde_manager import (
+from exasol.nb_connector.language_container_activation import get_activation_sql
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.itde_manager import (
     bring_itde_up,
     take_itde_down
 )
-from exasol.ai_lab_config import AILabConfig
-from exasol.connections import open_pyexasol_connection
+from exasol.nb_connector.ai_lab_config import AILabConfig
+from exasol.nb_connector.connections import open_pyexasol_connection
 
 
 @pytest.fixture

@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from exasol.utils import upward_file_search, optional_str_to_bool
+from exasol.nb_connector.utils import upward_file_search, optional_str_to_bool
 
 
 def test_upward_file_search():

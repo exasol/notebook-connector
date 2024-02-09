@@ -7,21 +7,21 @@ from exasol_transformers_extension.deployment.te_language_container_deployer imp
 
 # TODO: Disable this mypy "missing imports" nonsense.
 
-from exasol.connections import (
+from exasol.nb_connector.connections import (
     get_external_host,
     open_pyexasol_connection
 )
-from exasol.extension_wrapper_common import (
+from exasol.nb_connector.extension_wrapper_common import (
     encapsulate_bucketfs_credentials,
     encapsulate_huggingface_token,
     str_to_bool
 )
-from exasol.language_container_activation import (
+from exasol.nb_connector.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
     get_activation_sql
 )
-from exasol.secret_store import Secrets
-from exasol.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 # Root directory in a BucketFS bucket where all stuff of the Transformers
 # Extension, including its language container, will be uploaded.

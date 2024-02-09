@@ -1,8 +1,8 @@
-from exasol.secret_store import Secrets
-from exasol.github import retrieve_jar, Project
-from exasol.connections import open_bucketfs_connection, open_pyexasol_connection
-from exasol.bfs_utils import put_file
-from exasol.cloud_storage import setup_scripts
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.github import retrieve_jar, Project
+from exasol.nb_connector.connections import open_bucketfs_connection, open_pyexasol_connection
+from exasol.nb_connector.bfs_utils import put_file
+from exasol.nb_connector.cloud_storage import setup_scripts
 
 from test.utils.integration_test_utils import setup_itde, get_script_counts
 

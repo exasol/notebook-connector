@@ -22,7 +22,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.docker_cont
     DockerContainerCopy,
 )
 
-from exasol.utils import upward_file_search
+from exasol.nb_connector.utils import upward_file_search
 
 # Name of a Docker container used by the tests in this file to manage  ITDE.
 TEST_CONTAINER = "itde_manager_container"
@@ -101,11 +101,11 @@ def itde_connect_test_impl():
     def run_test():
         from pathlib import Path
 
-        from exasol.ai_lab_config import AILabConfig
-        from exasol.connections import open_pyexasol_connection
-        from exasol.itde_manager import bring_itde_up
-        from exasol.itde_manager import take_itde_down
-        from exasol.secret_store import Secrets
+        from exasol.nb_connector.ai_lab_config import AILabConfig
+        from exasol.nb_connector.connections import open_pyexasol_connection
+        from exasol.nb_connector.itde_manager import bring_itde_up
+        from exasol.nb_connector.itde_manager import take_itde_down
+        from exasol.nb_connector.secret_store import Secrets
 
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
         secrets.save(AILabConfig.mem_size.value, "2")
@@ -137,10 +137,10 @@ def itde_recreation_after_take_down():
     def run_test():
         from pathlib import Path
 
-        from exasol.ai_lab_config import AILabConfig
-        from exasol.itde_manager import bring_itde_up
-        from exasol.itde_manager import take_itde_down
-        from exasol.secret_store import Secrets
+        from exasol.nb_connector.ai_lab_config import AILabConfig
+        from exasol.nb_connector.itde_manager import bring_itde_up
+        from exasol.nb_connector.itde_manager import take_itde_down
+        from exasol.nb_connector.secret_store import Secrets
 
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
         secrets.save(AILabConfig.mem_size.value, "2")
@@ -166,10 +166,10 @@ def itde_recreation_without_take_down():
     def run_test():
         from pathlib import Path
 
-        from exasol.ai_lab_config import AILabConfig
-        from exasol.itde_manager import bring_itde_up
-        from exasol.itde_manager import take_itde_down
-        from exasol.secret_store import Secrets
+        from exasol.nb_connector.ai_lab_config import AILabConfig
+        from exasol.nb_connector.itde_manager import bring_itde_up
+        from exasol.nb_connector.itde_manager import take_itde_down
+        from exasol.nb_connector.secret_store import Secrets
 
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
         secrets.save(AILabConfig.mem_size.value, "2")
