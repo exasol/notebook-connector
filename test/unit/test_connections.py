@@ -135,4 +135,57 @@ def test_open_bucketfs_connection(mock_bfs_service, conf):
                 "password": conf.get(CKey.bfs_password),
             }
         },
+        False
     )
+
+
+@unittest.mock.patch("exasol.bucketfs.Service")
+def test_open_bucketfs_connection_https_no_verify(mock_bfs_service, conf):
+    conf.save(CKey.bfs_encryption, 'True')
+    open_bucketfs_connection(conf)
+    mock_bfs_service.assert_called_once_with(
+        f"https://{conf.get(CKey.db_host_name)}:{conf.get(CKey.bfs_port)}",
+        {
+            conf.get(CKey.bfs_bucket): {
+                "username": conf.get(CKey.bfs_user),
+                "password": conf.get(CKey.bfs_password),
+            }
+        },
+        False
+    )
+
+
+@unittest.mock.patch("exasol.bucketfs.Service")
+def test_open_bucketfs_connection_https_verify(mock_bfs_service, conf):
+    conf.save(CKey.bfs_encryption, 'True')
+    conf.save(CKey.cert_vld, 'True')
+    open_bucketfs_connection(conf)
+    mock_bfs_service.assert_called_once_with(
+        f"https://{conf.get(CKey.db_host_name)}:{conf.get(CKey.bfs_port)}",
+        {
+            conf.get(CKey.bfs_bucket): {
+                "username": conf.get(CKey.bfs_user),
+                "password": conf.get(CKey.bfs_password),
+            }
+        },
+        True
+    )
+
+
+@unittest.mock.patch("exasol.bucketfs.Service")
+def test_open_bucketfs_connection_trust_ca_file(mock_bfs_service, conf):
+    conf.save(CKey.bfs_encryption, 'True')
+    conf.save(CKey.cert_vld, 'True')
+    with tempfile.NamedTemporaryFile() as tmp_file:
+        conf.save(CKey.trusted_ca, tmp_file.name)
+        open_bucketfs_connection(conf)
+        mock_bfs_service.assert_called_once_with(
+            f"https://{conf.get(CKey.db_host_name)}:{conf.get(CKey.bfs_port)}",
+            {
+                conf.get(CKey.bfs_bucket): {
+                    "username": conf.get(CKey.bfs_user),
+                    "password": conf.get(CKey.bfs_password),
+                }
+            },
+            tmp_file.name
+        )

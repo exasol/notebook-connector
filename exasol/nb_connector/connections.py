@@ -155,18 +155,20 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.Bucket:
     - Bucket name (bfs_bucket)
     Optional parameters include:
     - Secured comm flag (bfs_encryption), defaults to False.
+    - Some of the SSL options (cert_vld, trusted_ca).
     Currently, it's not possible to set any of the TLS/SSL parameters. If secured comm
     is selected it automatically sets the certificate validation on.
     """
 
     # Set up the connection parameters.
-    # For now, just use the http. Once the exasol.bucketfs is capable of using the
-    # https without validating the server certificate choose between the http and
-    # https depending on the bfs_encryption setting like in the code below:
-    # buckfs_url_prefix = "https" if _optional_encryption(conf, CKey.bfs_encryption) else "http"
-    buckfs_url_prefix = "http"
+    buckfs_url_prefix = "https" if _optional_encryption(conf, CKey.bfs_encryption) else "http"
     buckfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
     buckfs_url = f"{buckfs_url_prefix}://{buckfs_host}:{conf.get(CKey.bfs_port)}"
+
+    sslopt = _extract_ssl_options(conf)
+    verify = sslopt.get("cert_reqs") == ssl.CERT_REQUIRED
+    verify = sslopt.get("ca_certs") or sslopt.get("ca_cert_path") or verify
+
     buckfs_credentials = {
         conf.get(CKey.bfs_bucket): {
             "username": conf.get(CKey.bfs_user),
@@ -175,5 +177,5 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.Bucket:
     }
 
     # Connect to the BucketFS service and navigate to the bucket of choice.
-    bucketfs = bfs.Service(buckfs_url, buckfs_credentials)
+    bucketfs = bfs.Service(buckfs_url, buckfs_credentials, verify)
     return bucketfs[conf.get(CKey.bfs_bucket)]
