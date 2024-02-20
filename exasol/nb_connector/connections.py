@@ -156,8 +156,6 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.Bucket:
     Optional parameters include:
     - Secured comm flag (bfs_encryption), defaults to False.
     - Some of the SSL options (cert_vld, trusted_ca).
-    Currently, it's not possible to set any of the TLS/SSL parameters. If secured comm
-    is selected it automatically sets the certificate validation on.
     """
 
     # Set up the connection parameters.
