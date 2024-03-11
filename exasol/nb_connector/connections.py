@@ -7,7 +7,7 @@ from typing import (
 
 import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
-from sqlalchemy.engine.url import URL
+from sqlalchemy.engine.url import URL   # type: ignore
 
 import exasol.bucketfs as bfs  # type: ignore
 from exasol.nb_connector.secret_store import Secrets
