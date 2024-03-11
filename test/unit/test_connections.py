@@ -107,6 +107,7 @@ def test_open_pyexasol_connection_error(mock_connect, conf):
 
 @unittest.mock.patch("sqlalchemy.create_engine")
 def test_open_sqlalchemy_connection(mock_create_engine, conf):
+    setattr(conf, CKey.db_port.name, conf.get(CKey.db_port))
     open_sqlalchemy_connection(conf)
     mock_create_engine.assert_called_once_with(
         make_url(f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}")
@@ -117,6 +118,7 @@ def test_open_sqlalchemy_connection(mock_create_engine, conf):
 def test_open_sqlalchemy_connection_ssl(mock_create_engine, conf):
     conf.save(CKey.db_encryption, "True")
     conf.save(CKey.cert_vld, "False")
+    setattr(conf, CKey.db_port.name, conf.get(CKey.db_port))
 
     open_sqlalchemy_connection(conf)
     mock_create_engine.assert_called_once_with(

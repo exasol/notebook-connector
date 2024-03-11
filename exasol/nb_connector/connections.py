@@ -138,7 +138,7 @@ def open_sqlalchemy_connection(conf: Secrets):
                                username=conf.get(CKey.db_user),
                                password=conf.get(CKey.db_password),
                                host=conf.get(CKey.db_host_name),
-                               port=int(conf.get(CKey.db_port)),
+                               port=int(getattr(conf, CKey.db_port.name)),
                                database=conf.get(CKey.db_schema),
                                query=query_params
                                )
