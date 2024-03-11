@@ -7,6 +7,7 @@ from typing import (
 
 import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
+from sqlalchemy.engine.url import URL
 
 import exasol.bucketfs as bfs  # type: ignore
 from exasol.nb_connector.secret_store import Secrets
@@ -111,7 +112,7 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
 def open_sqlalchemy_connection(conf: Secrets):
     """
     Creates an Exasol SQLAlchemy websocket engine using provided configuration parameters.
-    Does NOT set the default schema, even if it is defined in the configuration.
+    Sets the default schema if it is defined in the configuration.
 
     The configuration should provide the following parameters:
     - Server address and port (db_host_name, db_port),
@@ -125,21 +126,22 @@ def open_sqlalchemy_connection(conf: Secrets):
     it is possible to set the client TLS/SSL certificate.
     """
 
-    websocket_url = (
-        f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}"
-    )
-
-    delimiter = "?"
+    query_params = {}
     encryption = _optional_encryption(conf)
     if encryption is not None:
-        websocket_url = (
-            f'{websocket_url}{delimiter}ENCRYPTION={"Yes" if encryption else "No"}'
-        )
-        delimiter = "&"
-
+        query_params['ENCRYPTION'] = 'Yes' if encryption else 'No'
     certificate_validation = _extract_ssl_options(conf).get("cert_reqs")
     if (certificate_validation is not None) and (not certificate_validation):
-        websocket_url = f"{websocket_url}{delimiter}SSLCertificate=SSL_VERIFY_NONE"
+        query_params['SSLCertificate'] = 'SSL_VERIFY_NONE'
+
+    websocket_url = URL.create('exa+websocket',
+                               username=conf.get(CKey.db_user),
+                               password=conf.get(CKey.db_password),
+                               host=conf.get(CKey.db_host_name),
+                               port=int(conf.get(CKey.db_port)),
+                               database=conf.get(CKey.db_schema),
+                               query=query_params
+                               )
 
     return sqlalchemy.create_engine(websocket_url)
 

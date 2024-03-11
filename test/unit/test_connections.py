@@ -5,6 +5,7 @@ import unittest.mock
 from contextlib import ExitStack
 from typing import Optional
 from unittest.mock import create_autospec
+from sqlalchemy.engine import make_url
 
 import pytest
 
@@ -108,7 +109,7 @@ def test_open_pyexasol_connection_error(mock_connect, conf):
 def test_open_sqlalchemy_connection(mock_create_engine, conf):
     open_sqlalchemy_connection(conf)
     mock_create_engine.assert_called_once_with(
-        f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}"
+        make_url(f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}")
     )
 
 
@@ -119,8 +120,8 @@ def test_open_sqlalchemy_connection_ssl(mock_create_engine, conf):
 
     open_sqlalchemy_connection(conf)
     mock_create_engine.assert_called_once_with(
-        f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}"
-        "?ENCRYPTION=Yes&SSLCertificate=SSL_VERIFY_NONE"
+        make_url(f"exa+websocket://{conf.get(CKey.db_user)}:{conf.get(CKey.db_password)}@{get_external_host(conf)}"
+                 "?ENCRYPTION=Yes&SSLCertificate=SSL_VERIFY_NONE")
     )
 
 
