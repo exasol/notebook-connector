@@ -72,7 +72,9 @@ def test_itde_exists_and_running(secrets):
         bring_itde_up(secrets)
         itde_exists, itde_running = is_itde_running(secrets)
         assert itde_exists
-        assert itde_running
+        # The non-existent AI-Lab container is not connected to the Docker DB network, so
+        # even if the ITDE is actually running, the returned running flag should still be False.
+        assert not itde_running
     finally:
         remove_itde()
 
@@ -108,7 +110,9 @@ def test_itde_start(secrets):
         start_itde(secrets)
         itde_exists, itde_running = is_itde_running(secrets)
         assert itde_exists
-        assert itde_running
+        # The non-existent AI-Lab container is not connected to the Docker DB network, so
+        # even if the ITDE is actually running, the returned running flag should still be False.
+        assert not itde_running
     finally:
         remove_itde()
 

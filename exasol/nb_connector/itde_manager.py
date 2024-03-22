@@ -140,8 +140,8 @@ def _get_ipv4_ddresses():
 
 def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
     """
-    Checks if the ITDE container exists and if it is running. Returns the two boolean
-    flags - (exists, running).
+    Checks if the ITDE container exists and if it's running and ready to be called by the
+    AI-Lab container. Returns the two boolean flags - (exists, running).
     The name of the container is taken from the provided secret store.
     If the name cannot be found in the secret store the function returns False, False.
     """
@@ -156,21 +156,21 @@ def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
     with ContextDockerClient() as docker_client:
         if docker_client.containers.list(all=True, filters={"name": container_name}):
             container = docker_client.containers.get(container_name)
-            # Here we use a slightly bloated definition of running - the ITDE should
-            # actually be running and the AI-Lab container should be connected to its
-            # network. That's because if the latter is not true we want the user to
-            # think the ITDE is stopped and call the :start_itde: function, which will
-            # connect the container to the network.
-            is_running = (container.status == 'running' and
-                          _is_current_container_in_db_network(network_name))
-            return True,  is_running
+            # The ITDE is ready when it is running and the AI-Lab container is connected
+            # to its network. If the latter is not true we expect the user to call the
+            # :start_itde: function, which will make sure the container is connected.
+            is_ready = (container.status == 'running' and
+                        _is_current_container_in_db_network(network_name))
+            return True,  is_ready
         return False, False
 
 
 def start_itde(conf: Secrets) -> None:
     """
-    Starts an existing ITDE container. If the container is already running the function
-    takes no effect. For this function to work the container must exist. If it doesn't
+    Starts an existing ITDE container if it's not already running and connects the
+    AI-Lab container to its network, unless it's already connected to it.
+
+    For this function to work the container must exist. If it doesn't
     the docker.errors.NotFound exception will be raised. Use the is_itde_running
     function to check if the container exists.
 
