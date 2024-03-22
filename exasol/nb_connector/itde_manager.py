@@ -85,15 +85,29 @@ def bring_itde_up(conf: Secrets) -> None:
     conf.save(AILabConfig.cert_vld, "False")
 
 
-def _add_current_container_to_db_network(network_name: str):
+def _get_current_container(docker_client: docker.DockerClient):
+    ip_addresses = _get_ipv4_ddresses()
+    return ContainerByIp(docker_client).find(ip_addresses)
+
+
+def _add_current_container_to_db_network(network_name: str) -> None:
     with ContextDockerClient() as docker_client:
-        ip_addresses = _get_ipv4_ddresses()
-        container = ContainerByIp(docker_client).find(ip_addresses)
+        container = _get_current_container(docker_client)
         if not container:
             return
         network = _get_docker_network(docker_client, network_name)
-        if network and (container not in network.containers()):
+        if network and (container not in network.containers):
             network.connect(container.id)
+
+
+def _is_current_container_in_db_network(network_name: str) -> bool:
+    with ContextDockerClient() as docker_client:
+        container = _get_current_container(docker_client)
+        if container:
+            network = _get_docker_network(docker_client, network_name)
+            if network:
+                return container in network.containers
+    return False
 
 
 def _get_docker_network(docker_client: docker.DockerClient, network_name: str) -> Optional[Network]:
@@ -132,16 +146,24 @@ def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
     If the name cannot be found in the secret store the function returns False, False.
     """
 
-    # Try to get the name of the container from the secret store.
+    # Try to get the names of the Docker-DB container and its network from the secret store.
     container_name = conf.get(AILabConfig.itde_container)
-    if not container_name:
+    network_name = conf.get(AILabConfig.itde_network)
+    if not container_name or not network_name:
         return False, False
 
     # Check the existence and the status of the container using the Docker API.
-    with ContextDockerClient() as docker_client:
+    with (ContextDockerClient() as docker_client):
         if docker_client.containers.list(all=True, filters={"name": container_name}):
             container = docker_client.containers.get(container_name)
-            return True, container.status == 'running'
+            # Here we use a slightly bloated definition of running - the ITDE should
+            # actually be running and the AI-Lab container should be connected to its
+            # network. That's because if the latter is not true we want the user to
+            # think the ITDE is stopped and call the :start_itde: function, which will
+            # connect the container to the network.
+            is_running = (container.status == 'running' and
+                          _is_current_container_in_db_network(network_name))
+            return True,  is_running
         return False, False
 
 
@@ -156,7 +178,7 @@ def start_itde(conf: Secrets) -> None:
     exist. Otherwise, a RuntimeError will be raised.
     """
 
-    # The names of the container and its network should be in the secret store.
+    # The names of the Docker-DB container and its network should be in the secret store.
     container_name = conf.get(AILabConfig.itde_container)
     network_name = conf.get(AILabConfig.itde_network)
     if not container_name or not network_name:
