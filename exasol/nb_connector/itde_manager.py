@@ -153,7 +153,7 @@ def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
         return False, False
 
     # Check the existence and the status of the container using the Docker API.
-    with (ContextDockerClient() as docker_client):
+    with ContextDockerClient() as docker_client:
         if docker_client.containers.list(all=True, filters={"name": container_name}):
             container = docker_client.containers.get(container_name)
             # Here we use a slightly bloated definition of running - the ITDE should
