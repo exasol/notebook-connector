@@ -100,14 +100,20 @@ def _add_current_container_to_db_network(network_name: str) -> None:
             network.connect(container.id)
 
 
-def _is_current_container_in_db_network(network_name: str) -> bool:
+def _is_current_container_not_in_db_network(network_name: str) -> bool:
+    """
+    For the Docker Edition returns True if the current (AI-Lab) container
+    is NOT connected to the network with the specified name. Otherwise,
+    including the cases of other editions, returns False.
+    """
     with ContextDockerClient() as docker_client:
         container = _get_current_container(docker_client)
-        if container:
-            network = _get_docker_network(docker_client, network_name)
-            if network:
-                return container in network.containers
-    return False
+        if not container:
+            return False
+        network = _get_docker_network(docker_client, network_name)
+        if not network:
+            return True
+        return container not in network.containers
 
 
 def _get_docker_network(docker_client: docker.DockerClient, network_name: str) -> Optional[Network]:
@@ -140,8 +146,12 @@ def _get_ipv4_ddresses():
 
 def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
     """
-    Checks if the ITDE container exists and if it's running and ready to be called by the
-    AI-Lab container. Returns the two boolean flags - (exists, running).
+    Checks if the ITDE container exists and ready to be used. In the Docker Edition that
+    means the ITDE is running and the AI-Lab container is connected to its network. In
+    other editions it will just check that the ITDE is running.
+
+    Returns two boolean flags - (exists, running).
+
     The name of the container is taken from the provided secret store.
     If the name cannot be found in the secret store the function returns False, False.
     """
@@ -156,19 +166,17 @@ def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
     with ContextDockerClient() as docker_client:
         if docker_client.containers.list(all=True, filters={"name": container_name}):
             container = docker_client.containers.get(container_name)
-            # The ITDE is ready when it is running and the AI-Lab container is connected
-            # to its network. If the latter is not true we expect the user to call the
-            # :start_itde: function, which will make sure the container is connected.
-            is_ready = (container.status == 'running' and
-                        _is_current_container_in_db_network(network_name))
+            is_ready = (container.status == 'running' and not
+                        _is_current_container_not_in_db_network(network_name))
             return True,  is_ready
         return False, False
 
 
 def start_itde(conf: Secrets) -> None:
     """
-    Starts an existing ITDE container if it's not already running and connects the
-    AI-Lab container to its network, unless it's already connected to it.
+    Starts an existing ITDE container if it's not already running. In the Docker Edition
+    connects the AI-Lab container to the Docker-DB network, unless it's already connected
+    to it.
 
     For this function to work the container must exist. If it doesn't
     the docker.errors.NotFound exception will be raised. Use the is_itde_running
