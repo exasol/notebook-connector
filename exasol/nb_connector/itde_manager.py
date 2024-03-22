@@ -61,7 +61,7 @@ def bring_itde_up(conf: Secrets) -> None:
     db_info = env_info.database_info
     container_info = db_info.container_info
 
-    _add_current_container_to_db_network(container_info)
+    _add_current_container_to_db_network(container_info.network_info.network_name)
 
     conf.save(AILabConfig.itde_container, container_info.container_name)
     conf.save(AILabConfig.itde_volume, container_info.volume_name)
@@ -85,15 +85,14 @@ def bring_itde_up(conf: Secrets) -> None:
     conf.save(AILabConfig.cert_vld, "False")
 
 
-def _add_current_container_to_db_network(container_info: ContainerInfo):
-    network_name = container_info.network_info.network_name
+def _add_current_container_to_db_network(network_name: str):
     with ContextDockerClient() as docker_client:
         ip_addresses = _get_ipv4_ddresses()
         container = ContainerByIp(docker_client).find(ip_addresses)
         if not container:
             return
         network = _get_docker_network(docker_client, network_name)
-        if network:
+        if network and (container not in network.containers()):
             network.connect(container.id)
 
 
@@ -157,16 +156,19 @@ def start_itde(conf: Secrets) -> None:
     exist. Otherwise, a RuntimeError will be raised.
     """
 
-    # The name of the container should be in the secret store.
+    # The names of the container and its network should be in the secret store.
     container_name = conf.get(AILabConfig.itde_container)
-    if not container_name:
-        raise RuntimeError('Unable to find the name of the Docker container.')
+    network_name = conf.get(AILabConfig.itde_network)
+    if not container_name or not network_name:
+        raise RuntimeError('Unable to find the name of the Docker container or its network.')
 
     # Start the container using the Docker API, unless it's already running.
     with ContextDockerClient() as docker_client:
         container = docker_client.containers.get(container_name)
         if container.status != 'running':
             container.start()
+
+    _add_current_container_to_db_network(network_name)
 
 
 def take_itde_down(conf: Secrets) -> None:

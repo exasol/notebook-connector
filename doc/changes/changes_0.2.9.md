@@ -9,3 +9,4 @@ Post-release fixes.
 * AI-Lab#230: Connection via SQLAlchemy fails
   - Enables fingerprints in the host name.
   - Handles correctly special characters in the password. 
+* #89: Connecting a new AI-Lab container to the Docker DB network when the latter container restarts.
