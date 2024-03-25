@@ -168,7 +168,7 @@ def is_itde_running(conf: Secrets) -> Tuple[bool, bool]:
             container = docker_client.containers.get(container_name)
             is_ready = (container.status == 'running' and not
                         _is_current_container_not_in_db_network(network_name))
-            return True,  is_ready
+            return True, is_ready
         return False, False
 
 
