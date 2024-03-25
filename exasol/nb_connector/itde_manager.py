@@ -86,7 +86,7 @@ def bring_itde_up(conf: Secrets) -> None:
 
 
 def _get_current_container(docker_client: docker.DockerClient):
-    ip_addresses = _get_ipv4_ddresses()
+    ip_addresses = _get_ipv4_addresses()
     return ContainerByIp(docker_client).find(ip_addresses)
 
 
