@@ -129,7 +129,7 @@ def _remove_current_container_from_db_network(conf: Secrets):
     if not network_name:
         return
     with ContextDockerClient() as docker_client:
-        ip_addresses = _get_ipv4_ddresses()
+        ip_addresses = _get_ipv4_addresses()
         container = ContainerByIp(docker_client).find(ip_addresses)
         if not container:
             return
@@ -138,7 +138,7 @@ def _remove_current_container_from_db_network(conf: Secrets):
             network.disconnect(container.id)
 
 
-def _get_ipv4_ddresses():
+def _get_ipv4_addresses():
     ip_addresses = [ip.ip for ip in IPRetriever().ips()
                     if ip.is_IPv4 and isinstance(ip.ip, str)]
     return ip_addresses
