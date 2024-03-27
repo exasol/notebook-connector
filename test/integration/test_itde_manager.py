@@ -15,9 +15,10 @@ from exasol.nb_connector.ai_lab_config import AILabConfig
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.itde_manager import (
     bring_itde_up,
-    is_itde_running,
-    start_itde,
+    get_itde_status,
+    restart_itde,
     take_itde_down,
+    ItdeContainerStatus,
 )
 
 DB_NETWORK_NAME = "db_network_DemoDb"
@@ -70,18 +71,16 @@ def test_itde_exists_and_running(secrets):
 
     try:
         bring_itde_up(secrets)
-        itde_exists, itde_running = is_itde_running(secrets)
-        assert itde_exists
-        assert itde_running
+        itde_status = get_itde_status(secrets)
+        assert itde_status & ItdeContainerStatus.RUNNING
     finally:
         remove_itde()
 
 
 def test_itde_neither_exists_nor_running(secrets):
     remove_itde()
-    itde_exists, itde_running = is_itde_running(secrets)
-    assert not itde_exists
-    assert not itde_running
+    itde_status = get_itde_status(secrets)
+    assert itde_status == ItdeContainerStatus.ABSENT
 
 
 def test_itde_exists_not_running(secrets):
@@ -91,9 +90,8 @@ def test_itde_exists_not_running(secrets):
     try:
         bring_itde_up(secrets)
         stop_itde(secrets)
-        itde_exists, itde_running = is_itde_running(secrets)
-        assert itde_exists
-        assert not itde_running
+        itde_status = get_itde_status(secrets)
+        assert itde_status == ItdeContainerStatus.STOPPED
     finally:
         remove_itde()
 
@@ -105,10 +103,9 @@ def test_itde_start(secrets):
     try:
         bring_itde_up(secrets)
         stop_itde(secrets)
-        start_itde(secrets)
-        itde_exists, itde_running = is_itde_running(secrets)
-        assert itde_exists
-        assert itde_running
+        restart_itde(secrets)
+        itde_status = get_itde_status(secrets)
+        assert itde_status & ItdeContainerStatus.RUNNING
     finally:
         remove_itde()
 
@@ -145,8 +142,7 @@ def test_take_itde_down_is_not_itde_running(secrets):
     try:
         bring_itde_up(secrets)
         take_itde_down(secrets)
-        itde_exists, itde_running = is_itde_running(secrets)
-        assert not itde_exists
-        assert not itde_running
+        itde_status = get_itde_status(secrets)
+        assert itde_status & ItdeContainerStatus.RUNNING
     finally:
         remove_itde()
