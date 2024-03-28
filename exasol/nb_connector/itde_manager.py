@@ -197,16 +197,16 @@ def restart_itde(conf: Secrets) -> None:
 
     status = get_itde_status(conf)
 
-    if status == ItdeContainerStatus.ABSENT:
+    if status is ItdeContainerStatus.ABSENT:
         raise RuntimeError("The Docker-DB container doesn't exist.")
 
-    if not (status & ItdeContainerStatus.RUNNING):
+    if ItdeContainerStatus.RUNNING not in status:
         container_name = conf.get(AILabConfig.itde_container)
         with ContextDockerClient() as docker_client:
             container = docker_client.containers.get(container_name)
             container.start()
 
-    if not (status & ItdeContainerStatus.VISIBLE):
+    if ItdeContainerStatus.VISIBLE not in status:
         network_name = conf.get(AILabConfig.itde_network)
         _add_current_container_to_db_network(network_name)
 

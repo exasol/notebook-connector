@@ -10,3 +10,4 @@ Post-release fixes.
   - Enables fingerprints in the host name.
   - Handles correctly special characters in the password. 
 * #89: Connecting a new AI-Lab container to the Docker DB network when the latter container restarts.
+* #93: Refactoring the ITDE manager interface.

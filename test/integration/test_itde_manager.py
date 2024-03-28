@@ -72,7 +72,7 @@ def test_itde_exists_and_running(secrets):
     try:
         bring_itde_up(secrets)
         itde_status = get_itde_status(secrets)
-        assert itde_status & ItdeContainerStatus.RUNNING
+        assert ItdeContainerStatus.RUNNING in itde_status
     finally:
         remove_itde()
 
@@ -80,7 +80,7 @@ def test_itde_exists_and_running(secrets):
 def test_itde_neither_exists_nor_running(secrets):
     remove_itde()
     itde_status = get_itde_status(secrets)
-    assert itde_status == ItdeContainerStatus.ABSENT
+    assert itde_status is ItdeContainerStatus.ABSENT
 
 
 def test_itde_exists_not_running(secrets):
@@ -91,7 +91,7 @@ def test_itde_exists_not_running(secrets):
         bring_itde_up(secrets)
         stop_itde(secrets)
         itde_status = get_itde_status(secrets)
-        assert itde_status == ItdeContainerStatus.STOPPED
+        assert itde_status is ItdeContainerStatus.STOPPED
     finally:
         remove_itde()
 
@@ -105,7 +105,7 @@ def test_itde_start(secrets):
         stop_itde(secrets)
         restart_itde(secrets)
         itde_status = get_itde_status(secrets)
-        assert itde_status & ItdeContainerStatus.RUNNING
+        assert ItdeContainerStatus.RUNNING in itde_status
     finally:
         remove_itde()
 
@@ -143,6 +143,6 @@ def test_take_itde_down_is_not_itde_running(secrets):
         bring_itde_up(secrets)
         take_itde_down(secrets)
         itde_status = get_itde_status(secrets)
-        assert itde_status & ItdeContainerStatus.RUNNING
+        assert itde_status is ItdeContainerStatus.ABSENT
     finally:
         remove_itde()
