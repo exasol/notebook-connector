@@ -208,7 +208,8 @@ def restart_itde(conf: Secrets) -> None:
 
     if ItdeContainerStatus.VISIBLE not in status:
         network_name = conf.get(AILabConfig.itde_network)
-        _add_current_container_to_db_network(network_name)
+        if network_name:
+            _add_current_container_to_db_network(network_name)
 
 
 def take_itde_down(conf: Secrets) -> None:
