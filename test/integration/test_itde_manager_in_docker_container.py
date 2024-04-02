@@ -220,6 +220,7 @@ def itde_stop_and_restart():
                 network = _get_docker_network(docker_client, network_name)
                 assert network is not None, 'Cannot find the Docker-DB network.'
                 err_code = network.connect(container.id)
+                network.reload()
                 in_network = container in network.containers
                 connected_containers = [cont.name for cont in network.containers]
                 assert in_network, f'Container is not connected to the Docker DB network. Error code: {err_code}. Containers: {connected_containers}'
