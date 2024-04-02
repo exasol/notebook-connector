@@ -70,7 +70,7 @@ def bring_itde_up(conf: Secrets) -> None:
     db_info = env_info.database_info
     container_info = db_info.container_info
 
-    _add_current_container_to_db_network(container_info.network_info.network_name)
+    # _add_current_container_to_db_network(container_info.network_info.network_name)
 
     conf.save(AILabConfig.itde_container, container_info.container_name)
     conf.save(AILabConfig.itde_volume, container_info.volume_name)
