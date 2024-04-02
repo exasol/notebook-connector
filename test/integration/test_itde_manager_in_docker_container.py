@@ -209,38 +209,23 @@ def itde_stop_and_restart():
 
         bring_itde_up(secrets)
         status = get_itde_status(secrets)
-        # ----- Debugging ------
-        if status is ItdeContainerStatus.RUNNING:
-            from exasol.nb_connector.itde_manager import _get_current_container, _get_docker_network
-            with ContextDockerClient() as docker_client:
-                container = _get_current_container(docker_client)
-                assert container is not None, 'Cannot find the calling container.'
-                network_name = secrets.get(AILabConfig.itde_network)
-                assert network_name, 'Network name is not in the configuration store.'
-                network = _get_docker_network(docker_client, network_name)
-                assert network is not None, 'Cannot find the Docker-DB network.'
-                err_code = network.connect(container.id)
-                network.reload()
-                in_network = container in network.containers
-                connected_containers = [cont.name for cont in network.containers]
-                assert in_network, f'Container is not connected to the Docker DB network. Error code: {err_code}. Containers: {connected_containers}'
-        assert status is ItdeContainerStatus.READY, f'The status after bringing itde up is {status}'
+        assert status is ItdeContainerStatus.READY, f'The status after bringing itde up is {status.name}'
 
         # Disconnect calling container from Docker-DB network
         _remove_current_container_from_db_network(secrets)
         status = get_itde_status(secrets)
-        assert status is ItdeContainerStatus.RUNNING, f'The status after disconnecting the container is {status}'
+        assert status is ItdeContainerStatus.RUNNING, f'The status after disconnecting the container is {status.name}'
 
         # Stop the Docker-DB container.
         container_name = secrets.get(AILabConfig.itde_container)
         with ContextDockerClient() as docker_client:
             docker_client.api.stop(container_name)
         status = get_itde_status(secrets)
-        assert status is ItdeContainerStatus.STOPPED, f'The status after stopping ITDE is {status}'
+        assert status is ItdeContainerStatus.STOPPED, f'The status after stopping ITDE is {status.name}'
 
         restart_itde(secrets)
         status = get_itde_status(secrets)
-        assert status is ItdeContainerStatus.READY, f'The status after restarting ITDE is {status}'
+        assert status is ItdeContainerStatus.READY, f'The status after restarting ITDE is {status.name}'
 
     function_source_code = textwrap.dedent(dill.source.getsource(run_test))
     source_code = f"{function_source_code}\nrun_test()"
