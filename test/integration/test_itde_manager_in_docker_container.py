@@ -207,20 +207,24 @@ def itde_stop_and_restart():
         secrets.save(AILabConfig.disk_size.value, "4")
 
         bring_itde_up(secrets)
-        assert get_itde_status(secrets) is ItdeContainerStatus.READY
+        status = get_itde_status(secrets)
+        assert status is ItdeContainerStatus.READY, f'The status after bringing tde up is {status}'
 
         # Disconnect calling container from Docker-DB network
         _remove_current_container_from_db_network(secrets)
-        assert get_itde_status(secrets) is ItdeContainerStatus.RUNNING
+        status = get_itde_status(secrets)
+        assert status is ItdeContainerStatus.RUNNING, f'The status after disconnecting the container is {status}'
 
         # Stop the Docker-DB container.
         container_name = secrets.get(AILabConfig.itde_container)
         with ContextDockerClient() as docker_client:
             docker_client.api.stop(container_name)
-        assert get_itde_status(secrets) is ItdeContainerStatus.STOPPED
+        status = get_itde_status(secrets)
+        assert status is ItdeContainerStatus.STOPPED, f'The status after stopping ITDE is {status}'
 
         restart_itde(secrets)
-        assert get_itde_status(secrets) is ItdeContainerStatus.READY
+        status = get_itde_status(secrets)
+        assert status is ItdeContainerStatus.READY, f'The status after restarting ITDE is {status}'
 
     function_source_code = textwrap.dedent(dill.source.getsource(run_test))
     source_code = f"{function_source_code}\nrun_test()"
