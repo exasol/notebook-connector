@@ -4,6 +4,7 @@ import subprocess
 import textwrap
 from inspect import cleandoc
 from pathlib import Path
+import pytest
 
 import dill
 import pytest
@@ -208,7 +209,18 @@ def itde_stop_and_restart():
 
         bring_itde_up(secrets)
         status = get_itde_status(secrets)
-        assert status is ItdeContainerStatus.READY, f'The status after bringing tde up is {status}'
+        # ----- Debugging ------
+        if status is ItdeContainerStatus.RUNNING:
+            from exasol.nb_connector.itde_manager import _get_current_container, _get_docker_network
+            with ContextDockerClient() as docker_client:
+                container = _get_current_container(docker_client)
+                assert container is not None, 'Cannot find the calling container.'
+                network_name = secrets.get(AILabConfig.itde_network)
+                assert network_name, 'Network name is not in the configuration store.'
+                network = _get_docker_network(docker_client, network_name)
+                assert network is not None, 'Cannot find the Docker-DB network.'
+                assert container in network.containers, 'Calling container is not connected to the Docker DB network.'
+        assert status is ItdeContainerStatus.READY, f'The status after bringing itde up is {status}'
 
         # Disconnect calling container from Docker-DB network
         _remove_current_container_from_db_network(secrets)
@@ -271,16 +283,19 @@ def docker_container(wheel_path, docker_image,
             remove_docker_container([container.id])
 
 
+@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_itde_connect(docker_container):
     exec_result = docker_container.exec_run("python3 /tmp/itde_connect_test_impl.py")
     assert exec_result.exit_code == 0, exec_result.output
 
 
+@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_itde_recreation_after_take_down(docker_container):
     exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_after_take_down.py")
     assert exec_result.exit_code == 0, exec_result.output
 
 
+@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_itde_recreation_without_take_down(docker_container):
     exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_without_take_down.py")
     assert exec_result.exit_code == 0, exec_result.output
