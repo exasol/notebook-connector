@@ -195,7 +195,6 @@ def itde_stop_and_restart():
 
     def run_test():
         from pathlib import Path
-        import time
 
         from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
         from exasol.nb_connector.ai_lab_config import AILabConfig
@@ -209,7 +208,6 @@ def itde_stop_and_restart():
         secrets.save(AILabConfig.disk_size.value, "4")
 
         bring_itde_up(secrets)
-        time.sleep(10)
         status = get_itde_status(secrets)
         # ----- Debugging ------
         if status is ItdeContainerStatus.RUNNING:
@@ -221,13 +219,14 @@ def itde_stop_and_restart():
                 assert network_name, 'Network name is not in the configuration store.'
                 network = _get_docker_network(docker_client, network_name)
                 assert network is not None, 'Cannot find the Docker-DB network.'
-                assert container in network.containers, 'Calling container is not connected to the Docker DB network.'
+                in_network = container in network.containers
+                err_code = 0 if in_network else network.connect(container.id)
+                assert in_network, f'Container is not connected to the Docker DB network. Error code: {err_code}'
         assert status is ItdeContainerStatus.READY, f'The status after bringing itde up is {status}'
 
         # Disconnect calling container from Docker-DB network
         _remove_current_container_from_db_network(secrets)
         status = get_itde_status(secrets)
-        time.sleep(10)
         assert status is ItdeContainerStatus.RUNNING, f'The status after disconnecting the container is {status}'
 
         # Stop the Docker-DB container.
@@ -239,7 +238,6 @@ def itde_stop_and_restart():
 
         restart_itde(secrets)
         status = get_itde_status(secrets)
-        time.sleep(10)
         assert status is ItdeContainerStatus.READY, f'The status after restarting ITDE is {status}'
 
     function_source_code = textwrap.dedent(dill.source.getsource(run_test))
