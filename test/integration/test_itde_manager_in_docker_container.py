@@ -195,6 +195,7 @@ def itde_stop_and_restart():
     def run_test():
         from pathlib import Path
 
+        from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
         from exasol.nb_connector.ai_lab_config import AILabConfig
         from exasol.nb_connector.itde_manager import (
             ItdeContainerStatus, bring_itde_up, restart_itde, get_itde_status,
@@ -206,16 +207,20 @@ def itde_stop_and_restart():
         secrets.save(AILabConfig.disk_size.value, "4")
 
         bring_itde_up(secrets)
+        assert get_itde_status(secrets) is ItdeContainerStatus.READY
 
+        # Disconnect calling container from Docker-DB network
         _remove_current_container_from_db_network(secrets)
-        # Stop the ITDE container.
+        assert get_itde_status(secrets) is ItdeContainerStatus.RUNNING
+
+        # Stop the Docker-DB container.
         container_name = secrets.get(AILabConfig.itde_container)
         with ContextDockerClient() as docker_client:
             docker_client.api.stop(container_name)
+        assert get_itde_status(secrets) is ItdeContainerStatus.STOPPED
 
         restart_itde(secrets)
-        status = get_itde_status(secrets)
-        assert status is ItdeContainerStatus.READY
+        assert get_itde_status(secrets) is ItdeContainerStatus.READY
 
     function_source_code = textwrap.dedent(dill.source.getsource(run_test))
     source_code = f"{function_source_code}\nrun_test()"
