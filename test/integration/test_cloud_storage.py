@@ -1,4 +1,3 @@
-import pytest
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.github import retrieve_jar, Project
 from exasol.nb_connector.connections import open_bucketfs_connection, open_pyexasol_connection
@@ -8,7 +7,6 @@ from exasol.nb_connector.cloud_storage import setup_scripts
 from test.utils.integration_test_utils import setup_itde, get_script_counts
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_cloud_storage_setup_scripts(
     secrets: Secrets,
     setup_itde

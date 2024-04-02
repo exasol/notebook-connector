@@ -4,7 +4,6 @@ import subprocess
 import textwrap
 from inspect import cleandoc
 from pathlib import Path
-import pytest
 
 import dill
 import pytest
@@ -272,19 +271,16 @@ def docker_container(wheel_path, docker_image,
             remove_docker_container([container.id])
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_itde_connect(docker_container):
     exec_result = docker_container.exec_run("python3 /tmp/itde_connect_test_impl.py")
     assert exec_result.exit_code == 0, exec_result.output
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_itde_recreation_after_take_down(docker_container):
     exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_after_take_down.py")
     assert exec_result.exit_code == 0, exec_result.output
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_itde_recreation_without_take_down(docker_container):
     exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_without_take_down.py")
     assert exec_result.exit_code == 0, exec_result.output

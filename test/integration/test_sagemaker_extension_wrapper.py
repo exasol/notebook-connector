@@ -1,4 +1,3 @@
-import pytest
 from exasol.nb_connector.sagemaker_extension_wrapper import initialize_sme_extension
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.secret_store import Secrets
@@ -12,7 +11,6 @@ from test.utils.integration_test_utils import (
 )
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_initialize_sme_extension(
     secrets: Secrets,
     setup_itde

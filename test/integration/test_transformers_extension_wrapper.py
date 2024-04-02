@@ -1,4 +1,3 @@
-import pytest
 from _pytest.fixtures import FixtureRequest
 
 from exasol.nb_connector.connections import open_pyexasol_connection
@@ -14,7 +13,6 @@ from test.utils.integration_test_utils import (
 )
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_initialize_te_extension(
     request: FixtureRequest,
     secrets: Secrets,

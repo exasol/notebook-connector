@@ -1,4 +1,3 @@
-import pytest
 from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
     ContextDockerClient,
 )
@@ -29,14 +28,12 @@ DB_VOLUME_NAME = "db_container_DemoDb_volume"
 DB_CONTAINER_NAME = "db_container_DemoDb"
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def remove_itde():
     remove_docker_container([DB_CONTAINER_NAME])
     remove_docker_networks([DB_NETWORK_NAME])
     remove_docker_volumes([DB_VOLUME_NAME])
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def stop_itde(conf: Secrets):
     container_name = conf.get(AILabConfig.itde_container)
     with ContextDockerClient() as docker_client:
@@ -44,7 +41,6 @@ def stop_itde(conf: Secrets):
         container.stop()
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_bring_itde_up(secrets):
     secrets.save(AILabConfig.mem_size, "2")
     secrets.save(AILabConfig.disk_size, "4")
@@ -69,7 +65,6 @@ def test_bring_itde_up(secrets):
         remove_itde()
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_itde_exists_and_running(secrets):
     secrets.save(AILabConfig.mem_size, "2")
     secrets.save(AILabConfig.disk_size, "4")
@@ -82,14 +77,12 @@ def test_itde_exists_and_running(secrets):
         remove_itde()
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_itde_neither_exists_nor_running(secrets):
     remove_itde()
     itde_status = get_itde_status(secrets)
     assert itde_status is ItdeContainerStatus.ABSENT
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_itde_exists_not_running(secrets):
     secrets.save(AILabConfig.mem_size, "2")
     secrets.save(AILabConfig.disk_size, "4")
@@ -103,7 +96,6 @@ def test_itde_exists_not_running(secrets):
         remove_itde()
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_itde_start(secrets):
     secrets.save(AILabConfig.mem_size, "2")
     secrets.save(AILabConfig.disk_size, "4")
@@ -118,7 +110,6 @@ def test_itde_start(secrets):
         remove_itde()
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_take_itde_down(secrets):
     secrets.save(AILabConfig.mem_size, "2")
     secrets.save(AILabConfig.disk_size, "4")
@@ -145,7 +136,6 @@ def test_take_itde_down(secrets):
         remove_itde()
 
 
-@pytest.mark.skip(reason="Debugging the test_itde_stop_and_restart")
 def test_take_itde_down_is_not_itde_running(secrets):
     secrets.save(AILabConfig.mem_size, "2")
     secrets.save(AILabConfig.disk_size, "4")
