@@ -185,10 +185,49 @@ def itde_recreation_without_take_down():
 
 
 @pytest.fixture
+def itde_stop_and_restart():
+    """
+    This fixture returns the test source code for restarting ITDE after its container is stopped
+    and the calling container is disconnected from its network.
+    The source code needs to appended to the wheel file inside the Docker container called TEST_CONTAINER.
+    """
+
+    def run_test():
+        from pathlib import Path
+
+        from exasol.nb_connector.ai_lab_config import AILabConfig
+        from exasol.nb_connector.itde_manager import (
+            ItdeContainerStatus, bring_itde_up, restart_itde, get_itde_status,
+            _remove_current_container_from_db_network)
+        from exasol.nb_connector.secret_store import Secrets
+
+        secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
+        secrets.save(AILabConfig.mem_size.value, "2")
+        secrets.save(AILabConfig.disk_size.value, "4")
+
+        bring_itde_up(secrets)
+
+        _remove_current_container_from_db_network(secrets)
+        # Stop the ITDE container.
+        container_name = secrets.get(AILabConfig.itde_container)
+        with ContextDockerClient() as docker_client:
+            docker_client.api.stop(container_name)
+
+        restart_itde(secrets)
+        status = get_itde_status(secrets)
+        assert status is ItdeContainerStatus.READY
+
+    function_source_code = textwrap.dedent(dill.source.getsource(run_test))
+    source_code = f"{function_source_code}\nrun_test()"
+    return source_code
+
+
+@pytest.fixture
 def docker_container(wheel_path, docker_image,
                      itde_connect_test_impl,
                      itde_recreation_after_take_down,
-                     itde_recreation_without_take_down):
+                     itde_recreation_without_take_down,
+                     itde_stop_and_restart):
     """
     Create a Docker container named TEST_CONTAINER to manage an instance of ITDE.
     Copy the wheel file resulting from building the current project NC into the container.
@@ -211,6 +250,7 @@ def docker_container(wheel_path, docker_image,
             copy.add_string_to_file("itde_connect_test_impl.py", itde_connect_test_impl)
             copy.add_string_to_file("itde_recreation_after_take_down.py", itde_recreation_after_take_down)
             copy.add_string_to_file("itde_recreation_without_take_down.py", itde_recreation_without_take_down)
+            copy.add_string_to_file("itde_stop_and_restart.py", itde_stop_and_restart)
             copy.copy("/tmp")
             exit_code, output = container.exec_run(
                 f"python3 -m pip install /tmp/{wheel_path.name} "
@@ -234,4 +274,9 @@ def test_itde_recreation_after_take_down(docker_container):
 
 def test_itde_recreation_without_take_down(docker_container):
     exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_without_take_down.py")
+    assert exec_result.exit_code == 0, exec_result.output
+
+
+def test_itde_stop_and_restart(docker_container):
+    exec_result = docker_container.exec_run("python3 /tmp/itde_stop_and_restart.py")
     assert exec_result.exit_code == 0, exec_result.output
