@@ -105,8 +105,13 @@ def _add_current_container_to_db_network(network_name: str) -> None:
         if not container:
             return
         network = _get_docker_network(docker_client, network_name)
-        if network and (container not in network.containers):
+        if network and not _is_container_connected_to_network(container, network):
             network.connect(container.id)
+
+
+def _is_container_connected_to_network(container, network) -> bool:
+    network.reload()
+    return container in network.containers
 
 
 def _is_current_container_visible(network_name: str) -> bool:
@@ -123,7 +128,7 @@ def _is_current_container_visible(network_name: str) -> bool:
         network = _get_docker_network(docker_client, network_name)
         if not network:
             return False
-        return container in network.containers
+        return _is_container_connected_to_network(container, network)
 
 
 def _get_docker_network(docker_client: docker.DockerClient, network_name: str) -> Optional[Network]:

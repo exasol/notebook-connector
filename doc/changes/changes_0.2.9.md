@@ -11,3 +11,5 @@ Post-release fixes.
   - Handles correctly special characters in the password. 
 * #89: Connecting a new AI-Lab container to the Docker DB network when the latter container restarts.
 * #93: Refactoring the ITDE manager interface.
+* #94: Adding an integration test for restart_itde() in a container.
+* #95: Adding an integration test for get_itde_status() in a container.
