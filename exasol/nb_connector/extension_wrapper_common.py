@@ -1,3 +1,5 @@
+from typing import Optional
+
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.utils import optional_str_to_bool
@@ -49,7 +51,7 @@ def encapsulate_bucketfs_credentials(
         f"{conf.get(CKey.bfs_bucket)}/{path_in_bucket};{conf.get(CKey.bfs_service)}"
     )
     # TLS certificate verification option shall be provided in the fragment field.
-    verify = conf.get(CKey.trusted_ca)
+    verify: Optional[str | bool] = conf.get(CKey.trusted_ca)
     if not verify:
         verify = optional_str_to_bool(conf.get(CKey.cert_vld))
     if verify is not None:
