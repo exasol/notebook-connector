@@ -13,3 +13,5 @@ Post-release fixes.
 * #93: Refactoring the ITDE manager interface.
 * #94: Adding an integration test for restart_itde() in a container.
 * #95: Adding an integration test for get_itde_status() in a container.
+* #99: Setting the correct protocol and TLS certificate verification option when creating a
+       connection object with BucketFS credentials.

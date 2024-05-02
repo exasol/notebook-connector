@@ -43,16 +43,17 @@ def encapsulate_bucketfs_credentials(
     """
 
     bfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
-    # For now, just use the http. Once the exasol.bucketfs is capable of using
-    # the https without validating the server certificate choose between the
-    # http and https depending on the bfs_encryption setting, like this:
-    # bfs_protocol = "https" if str_to_bool(conf, CKey.bfs_encryption, True)
-    # else "http"
-    bfs_protocol = "http"
+    bfs_protocol = "https" if str_to_bool(conf, CKey.bfs_encryption, True) else "http"
     bfs_dest = (
         f"{bfs_protocol}://{bfs_host}:{conf.get(CKey.bfs_port)}/"
         f"{conf.get(CKey.bfs_bucket)}/{path_in_bucket};{conf.get(CKey.bfs_service)}"
     )
+    # TLS certificate verification option shall be provided in the fragment field.
+    verify = conf.get(CKey.trusted_ca)
+    if not verify:
+        verify = optional_str_to_bool(conf.get(CKey.cert_vld))
+    if verify is not None:
+        bfs_dest += f'#{verify}'
 
     sql = f"""
     CREATE OR REPLACE CONNECTION [{connection_name}]
