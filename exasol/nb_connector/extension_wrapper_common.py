@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Optional
 
 from exasol.nb_connector.connections import open_pyexasol_connection
