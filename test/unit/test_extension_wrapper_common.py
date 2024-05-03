@@ -41,10 +41,10 @@ def test_bucketfs_credentials_default(mock_connect, filled_secrets):
 
 
 @unittest.mock.patch("pyexasol.connect")
-def test_bucketfs_credentials_not_verify(mock_connect, filled_secrets):
+def test_bucketfs_credentials_verify(mock_connect, filled_secrets):
 
     path_in_bucket = 'location'
-    filled_secrets.save(CKey.cert_vld, 'no')
+    filled_secrets.save(CKey.cert_vld, 'yes')
 
     mock_connection = unittest.mock.MagicMock()
     mock_connection.__enter__.return_value = mock_connection
@@ -52,7 +52,7 @@ def test_bucketfs_credentials_not_verify(mock_connect, filled_secrets):
 
     encapsulate_bucketfs_credentials(filled_secrets, path_in_bucket=path_in_bucket,
                                      connection_name='whatever')
-    expected_url = f"https://localhost:6666/default/{path_in_bucket};bfsdefault#False"
+    expected_url = f"https://localhost:6666/default/{path_in_bucket};bfsdefault#True"
 
     mock_connection.execute.assert_called_once()
     query = mock_connection.execute.call_args_list[0].kwargs['query']
@@ -65,7 +65,7 @@ def test_bucketfs_credentials_ca(mock_connect, filled_secrets):
     with tempfile.NamedTemporaryFile() as f:
         path_in_bucket = 'location'
         filled_secrets.save(CKey.trusted_ca, f.name)
-        filled_secrets.save(CKey.cert_vld, 'no')
+        filled_secrets.save(CKey.cert_vld, 'yes')
 
         mock_connection = unittest.mock.MagicMock()
         mock_connection.__enter__.return_value = mock_connection
@@ -73,8 +73,7 @@ def test_bucketfs_credentials_ca(mock_connect, filled_secrets):
 
         encapsulate_bucketfs_credentials(filled_secrets, path_in_bucket=path_in_bucket,
                                          connection_name='whatever')
-        expected_url = (f"https://localhost:6666/default/{path_in_bucket};bfsdefault"        
-                        f"#{f.name}")
+        expected_url = f"https://localhost:6666/default/{path_in_bucket};bfsdefault#False"
 
         mock_connection.execute.assert_called_once()
         query = mock_connection.execute.call_args_list[0].kwargs['query']

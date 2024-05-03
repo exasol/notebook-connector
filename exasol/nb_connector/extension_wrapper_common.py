@@ -43,6 +43,17 @@ def encapsulate_bucketfs_credentials(
             Path identifying a location in the bucket.
         connection_name:
             Name for the connection object to be created.
+
+    A note about handling the TLS certificate verification settings.
+    If the server certificate verification is turned on, either through
+    reliance of the default https request settings or by setting the cert_vld
+    configuration parameter to True, this intention will be passed to
+    the connection object. However, if the user specifies a custom CA list
+    file or directory, which also implies the certificate verification,
+    the connection object will instead turn the verification off. This is
+    because there is no guarantee that the consumer of the connection object,
+    i.e. a UDF, would have this custom CA list, and even if it would, its location
+    is unknown.
     """
 
     bfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
@@ -52,9 +63,8 @@ def encapsulate_bucketfs_credentials(
         f"{conf.get(CKey.bfs_bucket)}/{path_in_bucket};{conf.get(CKey.bfs_service)}"
     )
     # TLS certificate verification option shall be provided in the fragment field.
-    verify: Optional[str | bool] = conf.get(CKey.trusted_ca)
-    if not verify:
-        verify = optional_str_to_bool(conf.get(CKey.cert_vld))
+    verify: Optional[bool] = (False if conf.get(CKey.trusted_ca)
+                              else optional_str_to_bool(conf.get(CKey.cert_vld)))
     if verify is not None:
         bfs_dest += f'#{verify}'
 
