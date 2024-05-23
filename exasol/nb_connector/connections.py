@@ -10,7 +10,7 @@ import sqlalchemy  # type: ignore
 from sqlalchemy.engine.url import URL   # type: ignore
 
 import exasol.bucketfs as bfs  # type: ignore
-import exasol.saas.client.api_access as saas_api
+import exasol.saas.client.api_access as saas_api    # type: ignore
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.utils import optional_str_to_bool
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend
@@ -243,7 +243,7 @@ def open_sqlalchemy_connection(conf: Secrets):
     if infer_db_backend(conf) == StorageBackend.onprem:
         conn_params: dict[str, Any] = {
             "host": conf.get(CKey.db_host_name),
-            "port": int(conf.get(CKey.db_port)),
+            "port": int(conf.get(CKey.db_port)),    # type: ignore
             "username": conf.get(CKey.db_user),
             "password": conf.get(CKey.db_password),
         }
@@ -256,7 +256,7 @@ def open_sqlalchemy_connection(conf: Secrets):
             database_name=conf.get(CKey.saas_database_name)
         )
         host, port = str(conn_params['dsn']).split(':')
-        conn_params: dict[str, Any] = {
+        conn_params = {
             "host": host,
             "port": int(port),
             "username": conn_params['user'],
