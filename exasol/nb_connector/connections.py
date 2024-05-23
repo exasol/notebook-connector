@@ -66,17 +66,19 @@ def infer_backend(conf: Secrets,
                   backend_requirements: dict[StorageBackend, list[list[CKey]]]) -> StorageBackend:
     """
     Infers the backend looking at the provided configuration data. Raises a ValueError exception
-    if the configuration is insufficient for any of the backends.
+    if the configuration does not satisfy any backend.
 
     Parameters:
         conf:
             The secret store.
         backend_requirements:
-            Configuration requirements for each backend. The requirements should
-            be given as a list of groups of configuration element. The first group
-            contains elements all of which are required for accessing the backend.
-            Additionally, required is at least one element from each of the remaining
-            groups.
+            List of backends and required configuration items. For a specific
+            backend the required configuration items are specified by a list
+            of groups.
+
+	    To allow access to a specific backend the configuration must
+            contain all items of the first group and at least 1 item of each
+            of the remaining groups.
     """
 
     def group_match(group_no: int, key_group: list[CKey]) -> bool:
