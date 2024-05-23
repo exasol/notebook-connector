@@ -36,3 +36,13 @@ class AILabConfig(Enum):
     sme_aws_bucket = auto()
     sme_aws_role = auto()
     sme_aws_connection = auto()
+    saas_url = auto()
+    saas_token = auto()
+    saas_account_id = auto()
+    saas_database_id = auto()
+    saas_database_name = auto()
+
+
+class StorageBackend(Enum):
+    onprem = auto()
+    saas = auto()
