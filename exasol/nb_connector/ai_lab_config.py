@@ -41,6 +41,7 @@ class AILabConfig(Enum):
     saas_account_id = auto()
     saas_database_id = auto()
     saas_database_name = auto()
+    storage_backend = auto()
 
 
 class StorageBackend(Enum):
