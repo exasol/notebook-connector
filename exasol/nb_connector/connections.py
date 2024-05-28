@@ -70,7 +70,7 @@ def get_backend(conf: Secrets) -> StorageBackend:
     StorageBackend.onprem.
     """
     storage_backend = conf.get(CKey.storage_backend, StorageBackend.onprem.name)
-    return StorageBackend[storage_backend]
+    return StorageBackend[storage_backend]      # type: ignore
 
 
 def get_external_host(conf: Secrets) -> str:
