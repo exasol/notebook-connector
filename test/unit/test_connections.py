@@ -12,9 +12,6 @@ from sqlalchemy.engine import make_url
 import pytest
 
 from exasol.nb_connector.connections import (
-    infer_backend,
-    infer_db_backend,
-    infer_bfs_backend,
     get_external_host,
     open_bucketfs_connection,
     open_pyexasol_connection,
@@ -62,6 +59,7 @@ def conf_saas(mock_conf) -> Secrets:
     mock_conf.save(CKey.saas_account_id, "w53lhsoifid794ms")
     mock_conf.save(CKey.saas_database_name, "my_database")
     mock_conf.save(CKey.saas_token, "xmfi58302lfj0ojf64ndk3ls")
+    mock_conf.save(CKey.storage_backend, 'saas')
 
     return mock_conf
 
@@ -77,51 +75,6 @@ def saas_connection_params() -> dict[str, Any]:
 
 def test_get_external_host(conf):
     assert get_external_host(conf) == f"{conf.get(CKey.db_host_name)}:{conf.get(CKey.db_port)}"
-
-
-def test_infer_db_backend_onprem(conf):
-    assert infer_db_backend(conf) == StorageBackend.onprem
-
-
-def test_infer_db_backend_saas(conf_saas):
-    assert infer_db_backend(conf_saas) == StorageBackend.saas
-
-
-def test_infer_bfs_backend_onprem(conf):
-    assert infer_bfs_backend(conf) == StorageBackend.onprem
-
-
-def test_infer_bfs_backend_saas(conf_saas):
-    assert infer_bfs_backend(conf_saas) == StorageBackend.saas
-
-
-def test_infer_backend_error(conf):
-
-    with pytest.raises(ValueError) as ex:
-        infer_backend(
-            conf,
-            {
-                StorageBackend.onprem: [
-                    [CKey.db_host_name, CKey.db_port],
-                    [CKey.db_user, CKey.db_password],
-                    [CKey.saas_token, CKey.saas_account_id]
-                ],
-                StorageBackend.saas: [
-                    [CKey.saas_url, CKey.saas_token],
-                    [CKey.db_host_name, CKey.db_port],
-                    [CKey.saas_database_id, CKey.saas_database_name]
-                ]
-            }
-        )
-        expected_text = (f"[{CKey.db_host_name.name}, {CKey.db_port.name}, "
-                         f"{CKey.db_user.name} or {CKey.db_password.name}, "
-                         f"{CKey.saas_token.name} or {CKey.saas_account_id.name}] "
-                         f"for {StorageBackend.onprem.name} database or "
-                         f"[{CKey.saas_url.name}, {CKey.saas_token.name}, "
-                         f"{CKey.db_host_name.name} or {CKey.db_port.name}, "
-                         f"{CKey.saas_database_id.name} or {CKey.saas_database_name.name}] "
-                         f"for {StorageBackend.saas.name} database")
-        assert expected_text in str(ex)
 
 
 @unittest.mock.patch("pyexasol.connect")

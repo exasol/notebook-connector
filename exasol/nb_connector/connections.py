@@ -62,86 +62,15 @@ def _extract_ssl_options(conf: Secrets) -> dict:
     return sslopt
 
 
-def infer_backend(conf: Secrets,
-                  backend_requirements: dict[StorageBackend, list[list[CKey]]]) -> StorageBackend:
+def get_backend(conf: Secrets) -> StorageBackend:
     """
-    Infers the backend looking at the provided configuration data. Raises a ValueError exception
-    if the configuration does not satisfy any backend.
-
-    Parameters:
-        conf:
-            The secret store.
-        backend_requirements:
-            List of backends and required configuration items. For a specific
-            backend the required configuration items are specified by a list
-            of groups.
-
-	    To allow access to a specific backend the configuration must
-            contain all items of the first group and at least 1 item of each
-            of the remaining groups.
+    Tries to find which backend was selected in the configuration. If the relevant
+    configuration element is not there - which may be the case if the configuration
+    has been created before the SaaS support was introduced - returns the
+    StorageBackend.onprem.
     """
-
-    def group_match(group_no: int, key_group: list[CKey]) -> bool:
-        bool_func = all if group_no == 0 else any
-        return bool_func(conf.get(key) for key in key_group)
-
-    def all_groups_match(key_groups: list[list[CKey]]) -> bool:
-        return all(group_match(group_no, key_group)
-                   for group_no, key_group in enumerate(key_groups))
-
-    def key_names(group_no: int, key_group: list[CKey]) -> str:
-        sep = ', ' if group_no == 0 else ' or '
-        return sep.join(key.name for key in key_group)
-
-    def expected_keys(key_groups: list[list[CKey]]) -> str:
-        return ', '.join(key_names(group_no, key_group)
-                         for group_no, key_group in enumerate(key_groups))
-
-    for backend, backend_key_groups in backend_requirements.items():
-        if all_groups_match(backend_key_groups):
-            return backend
-
-    message = ('Incomplete parameter list. Please provide the parameters ' +
-               ' or '.join(f'[{expected_keys(backend_key_groups)}] for {backend.name} database'
-                           for backend, backend_key_groups in backend_requirements.items()))
-    raise ValueError(message)
-
-
-def infer_db_backend(conf: Secrets) -> StorageBackend:
-    """
-    Infers the backend for a database connection.
-    """
-    return infer_backend(
-        conf,
-        {
-            StorageBackend.onprem: [
-                [CKey.db_host_name, CKey.db_port, CKey.db_user, CKey.db_password]
-            ],
-            StorageBackend.saas: [
-                [CKey.saas_url, CKey.saas_token, CKey.saas_account_id],
-                [CKey.saas_database_id, CKey.saas_database_name]
-            ]
-        }
-    )
-
-
-def infer_bfs_backend(conf: Secrets) -> StorageBackend:
-    """
-    Infers the backend for a BucketFS connection.
-    """
-    return infer_backend(
-        conf,
-        {
-            StorageBackend.onprem: [
-                [CKey.bfs_port, CKey.bfs_user, CKey.bfs_password, CKey.bfs_bucket],
-                [CKey.bfs_host_name, CKey.db_host_name]
-            ],
-            StorageBackend.saas: [
-                [CKey.saas_url, CKey.saas_token, CKey.saas_account_id],
-                [CKey.saas_database_id, CKey.saas_database_name]
-            ]
-        }
-    )
+    storage_backend = conf.get(CKey.storage_backend, StorageBackend.onprem.name)
+    return StorageBackend[storage_backend]      # type: ignore
 
 
 def get_external_host(conf: Secrets) -> str:
@@ -154,7 +83,8 @@ def get_udf_bucket_path(conf: Secrets) -> str:
     Builds the path of the BucketFS bucket specified in the configuration,
     as it's seen in the udf's file system.
     """
-    return f"/buckets/{conf.get(CKey.bfs_service)}/{conf.get(CKey.bfs_bucket)}"
+    bucket = open_bucketfs_connection(conf)
+    return bucket.udf_path
 
 
 def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
@@ -183,7 +113,7 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
     For other optional parameters the default settings are as per the pyexasol interface.
     """
 
-    if infer_db_backend(conf) == StorageBackend.onprem:
+    if get_backend(conf) == StorageBackend.onprem:
         conn_params: dict[str, Any] = {
             "dsn": get_external_host(conf),
             "user": conf.get(CKey.db_user),
@@ -243,7 +173,7 @@ def open_sqlalchemy_connection(conf: Secrets):
     if (certificate_validation is not None) and (not certificate_validation):
         query_params['SSLCertificate'] = 'SSL_VERIFY_NONE'
 
-    if infer_db_backend(conf) == StorageBackend.onprem:
+    if get_backend(conf) == StorageBackend.onprem:
         conn_params: dict[str, Any] = {
             "host": conf.get(CKey.db_host_name),
             "port": int(conf.get(CKey.db_port)),    # type: ignore
@@ -296,7 +226,7 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
         - Client security credentials (saas_token).
     """
 
-    if infer_db_backend(conf) == StorageBackend.onprem:
+    if get_backend(conf) == StorageBackend.onprem:
         # Set up the connection parameters.
         buckfs_url_prefix = "https" if _optional_encryption(conf, CKey.bfs_encryption) else "http"
         buckfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
