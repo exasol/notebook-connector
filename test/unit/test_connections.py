@@ -47,6 +47,7 @@ def conf(mock_conf) -> Secrets:
     mock_conf.save(CKey.bfs_port, "6666")
     mock_conf.save(CKey.bfs_user, "buck_user")
     mock_conf.save(CKey.bfs_password, "buck_pwd")
+    mock_conf.save(CKey.bfs_service, "buck_svc")
     mock_conf.save(CKey.bfs_bucket, "my_bucket")
 
     return mock_conf
@@ -192,7 +193,8 @@ def test_open_bucketfs_connection(mock_bfs_service, conf):
                 "password": conf.get(CKey.bfs_password),
             }
         },
-        False
+        False,
+        conf.get(CKey.bfs_service)
     )
 
 
@@ -208,7 +210,8 @@ def test_open_bucketfs_connection_https_no_verify(mock_bfs_service, conf):
                 "password": conf.get(CKey.bfs_password),
             }
         },
-        False
+        False,
+        conf.get(CKey.bfs_service)
     )
 
 
@@ -225,7 +228,8 @@ def test_open_bucketfs_connection_https_verify(mock_bfs_service, conf):
                 "password": conf.get(CKey.bfs_password),
             }
         },
-        True
+        True,
+        conf.get(CKey.bfs_service)
     )
 
 
@@ -244,7 +248,8 @@ def test_open_bucketfs_connection_trust_ca_file(mock_bfs_service, conf):
                     "password": conf.get(CKey.bfs_password),
                 }
             },
-            tmp_file.name
+            tmp_file.name,
+            conf.get(CKey.bfs_service)
         )
 
 
