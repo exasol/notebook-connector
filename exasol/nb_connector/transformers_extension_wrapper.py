@@ -1,7 +1,3 @@
-from exasol_transformers_extension.utils.bucketfs_operations import get_model_path  # type: ignore
-from exasol_transformers_extension.utils.bucketfs_operations import upload_model_files_to_bucketfs  # type: ignore
-from exasol_transformers_extension.utils.bucketfs_operations import create_bucketfs_location    # type: ignore
-
 from exasol_transformers_extension.deployment.scripts_deployer import ScriptsDeployer   # type: ignore
 from exasol_transformers_extension.deployment.te_language_container_deployer import TeLanguageContainerDeployer     # type: ignore
 
@@ -215,17 +211,8 @@ def upload_model_from_cache(
             should have its own cache directory.
     """
 
-    # Create bucketfs location
-    bfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
-    bucketfs_location = create_bucketfs_location(
-        conf.get(CKey.bfs_service), bfs_host,
-        int(str(conf.get(CKey.bfs_port))), str(conf.get(CKey.bfs_encryption)).lower() == 'true',
-        conf.get(CKey.bfs_user), conf.get(CKey.bfs_password), conf.get(CKey.bfs_bucket),
-        PATH_IN_BUCKET)
-
-    # Upload the downloaded model files into bucketfs
-    upload_path = get_model_path(conf.get(CKey.te_models_bfs_dir), model_name)
-    upload_model_files_to_bucketfs(cache_dir, upload_path, bucketfs_location)
+    raise NotImplementedError('(Uploading the model is temporarily unavailable. '
+                              'Awaiting changes in the Transformers Extension module.')
 
 
 def upload_model(
