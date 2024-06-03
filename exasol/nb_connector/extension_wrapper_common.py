@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional
 
-import exasol.bucketfs as bfs
+import exasol.bucketfs as bfs   # type: ignore
 
 from exasol.nb_connector.connections import (open_pyexasol_connection,
                                              get_backend, get_saas_database_id)
