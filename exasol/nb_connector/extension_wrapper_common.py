@@ -1,10 +1,13 @@
 from __future__ import annotations
 from typing import Optional
 
-from exasol.nb_connector.connections import open_pyexasol_connection
+import exasol.bucketfs as bfs
+
+from exasol.nb_connector.connections import (open_pyexasol_connection,
+                                             get_backend, get_saas_database_id)
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.utils import optional_str_to_bool
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend
 
 
 def str_to_bool(conf: Secrets, key: CKey, default_value: bool) -> bool:
@@ -34,15 +37,40 @@ def encapsulate_bucketfs_credentials(
 
     Parameters:
         conf:
-            The secret store. The store must hold the BucketFS service
+            The secret store.
+            For an On-Prem database the store must hold the BucketFS service
             parameters (bfs_host_name or db_host_name, bfs_port,
             bfs_service), the access credentials (bfs_user,
             bfs_password), and the bucket name (bfs_bucket), as well
             as the DB connection parameters.
+            For a SaaS database the store must hold the SaaS connection
+            parameters (saas_url, saas_account_id, saas_database_id or
+            saas_database_name, saas_token).
         path_in_bucket:
             Path identifying a location in the bucket.
         connection_name:
             Name for the connection object to be created.
+
+    The parameters will be stored in json strings. The distribution
+    of the parameters among the connection entities will be as following.
+    On-Prem:
+        TO: backend, url, service_name, bucket_name, verify, path
+        USER: username
+        IDENTIFIED BY: password
+    SaaS:
+        TO: backend, url, account_id, path
+        USER: database_id
+        IDENTIFIED BY: pat
+
+    Note that the parameter names correspond to the arguments of the build_path
+    function. provided by the bucketfs-python. Hence, the most convenient way to
+    handle this lot is to combine json structures from all three entities and
+    pass them as kwargs to the build_path. The code below gives a usage example.
+
+    bfs_params = json.loads(conn_obj.address)
+    bfs_params.update(json.loads(conn_obj.user))
+    bfs_params.update(json.loads(conn_obj.password))
+    bfs_path = build_path(**bfs_params)
 
     A note about handling the TLS certificate verification settings.
     If the server certificate verification is turned on, either through
@@ -53,30 +81,45 @@ def encapsulate_bucketfs_credentials(
     the connection object will instead turn the verification off. This is
     because there is no guarantee that the consumer of the connection object,
     i.e. a UDF, would have this custom CA list, and even if it would, its location
-    is unknown.
+    is unknown. This is only applicable for an On-Prem backend.
     """
 
-    bfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
-    bfs_protocol = "https" if str_to_bool(conf, CKey.bfs_encryption, True) else "http"
-    bfs_dest = (
-        f"{bfs_protocol}://{bfs_host}:{conf.get(CKey.bfs_port)}/"
-        f"{conf.get(CKey.bfs_bucket)}/{path_in_bucket};{conf.get(CKey.bfs_service)}"
-    )
-    # TLS certificate verification option shall be provided in the fragment field.
-    verify: Optional[bool] = (False if conf.get(CKey.trusted_ca)
-                              else optional_str_to_bool(conf.get(CKey.cert_vld)))
-    if verify is not None:
-        bfs_dest += f'#{verify}'
+    backend = (bfs.path.StorageBackend.saas if get_backend(conf) == StorageBackend.saas
+               else bfs.path.StorageBackend.onprem)
+    if backend == bfs.path.StorageBackend.onprem:
+        host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
+        protocol = "https" if str_to_bool(conf, CKey.bfs_encryption, True) else "http"
+        url = f"{protocol}://{host}:{conf.get(CKey.bfs_port)}"
+        verify: Optional[bool] = (False if conf.get(CKey.trusted_ca)
+                                  else optional_str_to_bool(conf.get(CKey.cert_vld)))
+        conn_to = (f'"backend":"{backend.name}", '
+                   f'"url":"{url}", '
+                   f'"service_name":"{conf.get(CKey.bfs_service)}", '
+                   f'"bucket_name":"{conf.get(CKey.bfs_bucket)}", '
+                   f'"path":"{path_in_bucket}"')
+        if verify is not None:
+            conn_to += f', "verify":{verify}'
+        conn_user = f'"username":"{conf.get(CKey.bfs_user)}"'
+        conn_password = f'"password":"{conf.get(CKey.bfs_password)}"'
+    else:
+        database_id = get_saas_database_id(conf)
+        conn_to = (f'"backend":"{backend.name}", '
+                   f'"url":"{conf.get(CKey.saas_url)}", '
+                   f'"account_id":"{conf.get(CKey.saas_account_id)}", '
+                   f'"path":"{path_in_bucket}"')
+        conn_user = f'"database_id":"{database_id}"'
+        conn_password = f'"pat":"{conf.get(CKey.saas_token)}"'
 
     sql = f"""
     CREATE OR REPLACE CONNECTION [{connection_name}]
-        TO '{bfs_dest}'
+        TO {{BUCKETFS_ADDRESS!s}}
         USER {{BUCKETFS_USER!s}}
         IDENTIFIED BY {{BUCKETFS_PASSWORD!s}}
     """
     query_params = {
-        "BUCKETFS_USER": conf.get(CKey.bfs_user),
-        "BUCKETFS_PASSWORD": conf.get(CKey.bfs_password),
+        "BUCKETFS_ADDRESS": conn_to,
+        "BUCKETFS_USER": conn_user,
+        "BUCKETFS_PASSWORD": conn_password
     }
     with open_pyexasol_connection(conf, compression=True) as conn:
         conn.execute(query=sql, query_params=query_params)
