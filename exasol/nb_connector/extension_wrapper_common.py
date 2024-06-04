@@ -84,31 +84,35 @@ def encapsulate_bucketfs_credentials(
     is unknown. This is only applicable for an On-Prem backend.
     """
 
-    backend = (bfs.path.StorageBackend.saas if get_backend(conf) == StorageBackend.saas
-               else bfs.path.StorageBackend.onprem)
-    if backend == bfs.path.StorageBackend.onprem:
+    def to_json_str(**kwargs) -> str:
+        def format_value(v):
+            return f'"{v}"' if isinstance(v, str) else v
+
+        return ", ".join(f'"{k}":{format_value(v)}' for k, v in kwargs.items()
+                         if v is not None)
+
+    backend = get_backend(conf)
+    if backend == StorageBackend.onprem:
         host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
         protocol = "https" if str_to_bool(conf, CKey.bfs_encryption, True) else "http"
         url = f"{protocol}://{host}:{conf.get(CKey.bfs_port)}"
         verify: Optional[bool] = (False if conf.get(CKey.trusted_ca)
                                   else optional_str_to_bool(conf.get(CKey.cert_vld)))
-        conn_to = (f'"backend":"{backend.name}", '
-                   f'"url":"{url}", '
-                   f'"service_name":"{conf.get(CKey.bfs_service)}", '
-                   f'"bucket_name":"{conf.get(CKey.bfs_bucket)}", '
-                   f'"path":"{path_in_bucket}"')
-        if verify is not None:
-            conn_to += f', "verify":{verify}'
-        conn_user = f'"username":"{conf.get(CKey.bfs_user)}"'
-        conn_password = f'"password":"{conf.get(CKey.bfs_password)}"'
+        conn_to = to_json_str(backend=bfs.path.StorageBackend.onprem.name,
+                              url=url, service_name=conf.get(CKey.bfs_service),
+                              bucket_name=conf.get(CKey.bfs_bucket),
+                              path=path_in_bucket,
+                              verify=verify)
+        conn_user = to_json_str(username=conf.get(CKey.bfs_user))
+        conn_password = to_json_str(password=conf.get(CKey.bfs_password))
     else:
         database_id = get_saas_database_id(conf)
-        conn_to = (f'"backend":"{backend.name}", '
-                   f'"url":"{conf.get(CKey.saas_url)}", '
-                   f'"account_id":"{conf.get(CKey.saas_account_id)}", '
-                   f'"path":"{path_in_bucket}"')
-        conn_user = f'"database_id":"{database_id}"'
-        conn_password = f'"pat":"{conf.get(CKey.saas_token)}"'
+        conn_to = to_json_str(backend=bfs.path.StorageBackend.saas.name,
+                              url=conf.get(CKey.saas_url),
+                              account_id=conf.get(CKey.saas_account_id),
+                              path=path_in_bucket)
+        conn_user = to_json_str(database_id=database_id)
+        conn_password = to_json_str(pat=conf.get(CKey.saas_token))
 
     sql = f"""
     CREATE OR REPLACE CONNECTION [{connection_name}]

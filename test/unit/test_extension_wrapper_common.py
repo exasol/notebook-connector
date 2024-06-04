@@ -28,9 +28,9 @@ def filled_secrets(secrets) -> Secrets:
 @pytest.fixture
 def filled_saas_secrets(secrets) -> Secrets:
     secrets.save(CKey.saas_url, "https://mock_saas.exasol.com")
-    secrets.save(CKey.saas_account_id, "w53lhsoifid794ms")
-    secrets.save(CKey.saas_database_name, "my_database")
-    secrets.save(CKey.saas_token, "xmfi58302lfj0ojf64ndk3ls")
+    secrets.save(CKey.saas_account_id, "faked_saas_account_id")
+    secrets.save(CKey.saas_database_name, "faked_saas_database")
+    secrets.save(CKey.saas_token, "faked_saas_access_token")
     secrets.save(CKey.storage_backend, 'saas')
     return secrets
 
