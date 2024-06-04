@@ -87,6 +87,20 @@ def get_udf_bucket_path(conf: Secrets) -> str:
     return bucket.udf_path
 
 
+def get_saas_database_id(conf: Secrets) -> str:
+    """
+    Gets the SaaS database id using the available configuration elements.
+    """
+    saas_database_id = conf.get(CKey.saas_database_id)
+    if saas_database_id:
+        return saas_database_id
+    return saas_api.get_database_id(
+        host=conf.get(CKey.saas_url),
+        account_id=conf.get(CKey.saas_account_id),
+        pat=conf.get(CKey.saas_token),
+        database_name=conf.get(CKey.saas_database_name))
+
+
 def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
     """
     Opens a pyexasol connection using provided configuration parameters.
@@ -248,17 +262,10 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
         return bucketfs[conf.get(CKey.bfs_bucket)]
 
     else:
-        saas_url, saas_token, saas_account_id, saas_database_id = [
-            conf.get(key) for key in [
-                CKey.saas_url, CKey.saas_token, CKey.saas_account_id, CKey.saas_database_id]
+        saas_url, saas_token, saas_account_id = [
+            conf.get(key) for key in [CKey.saas_url, CKey.saas_token, CKey.saas_account_id]
         ]
-        saas_database_id = (saas_database_id or
-                            saas_api.get_database_id(
-                                host=saas_url,
-                                account_id=saas_account_id,
-                                pat=saas_token,
-                                database_name=conf.get(CKey.saas_database_name)
-                            ))
+        saas_database_id = get_saas_database_id(conf)
         return bfs.SaaSBucket(url=saas_url,
                               account_id=saas_account_id,
                               database_id=saas_database_id,

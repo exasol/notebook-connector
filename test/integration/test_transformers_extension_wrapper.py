@@ -1,3 +1,4 @@
+import pytest
 from _pytest.fixtures import FixtureRequest
 
 from exasol.nb_connector.connections import open_pyexasol_connection
@@ -13,6 +14,7 @@ from test.utils.integration_test_utils import (
 )
 
 
+@pytest.mark.skip(reason="The expected functionality is not yet implemented in the Transformers Extension")
 def test_initialize_te_extension(
     request: FixtureRequest,
     secrets: Secrets,

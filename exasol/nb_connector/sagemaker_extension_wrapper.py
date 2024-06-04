@@ -20,6 +20,8 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 # Extension, including its language container, will be uploaded.
 PATH_IN_BUCKET = "SME"
 
+LANGUAGE_ALIAS = "PYTHON3_SME"
+
 LATEST_KNOWN_VERSION = "0.7.0"
 
 # Activation SQL for the Sagemaker Extension will be saved in the secret
@@ -31,7 +33,9 @@ ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "sme"
 AWS_CONNECTION_PREFIX = "SME_AWS"
 
 
-def deploy_language_container(conf: Secrets, version: str) -> None:
+def deploy_language_container(conf: Secrets,
+                              version: str,
+                              language_alias: str) -> None:
     """
     Calls the Sagemaker Extension's language container deployment API.
     Downloads the specified released version of the extension from the GitHub
@@ -51,6 +55,8 @@ def deploy_language_container(conf: Secrets, version: str) -> None:
             and the parameters of the BucketFS service.
         version:
             Sagemaker Extension version.
+        language_alias:
+            The language alias of the extension's language container.
     """
 
     deployer = SmeLanguageContainerDeployer.create(
@@ -64,7 +70,13 @@ def deploy_language_container(conf: Secrets, version: str) -> None:
         bucketfs_password=conf.get(CKey.bfs_password),
         bucketfs_use_https=str_to_bool(conf,  CKey.bfs_encryption, True),
         bucket=conf.get(CKey.bfs_bucket),
+        saas_url=conf.get(CKey.saas_url),
+        saas_account_id=conf.get(CKey.saas_account_id),
+        saas_database_id=conf.get(CKey.saas_database_id),
+        saas_database_name=conf.get(CKey.saas_database_name),
+        saas_token=conf.get(CKey.saas_token),
         path_in_bucket=PATH_IN_BUCKET,
+        language_alias=language_alias,
         use_ssl_cert_validation=str_to_bool(conf, CKey.cert_vld, True),
         ssl_trusted_ca=conf.get(CKey.trusted_ca),
         ssl_client_certificate=conf.get(CKey.client_cert),
@@ -103,6 +115,7 @@ def deploy_scripts(conf: Secrets) -> None:
 
 def initialize_sme_extension(conf: Secrets,
                              version: str = LATEST_KNOWN_VERSION,
+                             language_alias: str = LANGUAGE_ALIAS,
                              run_deploy_container: bool = True,
                              run_deploy_scripts: bool = True,
                              run_encapsulate_aws_credentials: bool = True) -> None:
@@ -118,6 +131,9 @@ def initialize_sme_extension(conf: Secrets,
         version:
             Sagemaker Extension version. If not specified the hardcoded
             latest known version will be used.
+        language_alias:
+            The language alias of the extension's language container. Normally
+            this parameter would only be used for testing.
         run_deploy_container:
             If set to False will skip the language container deployment.
         run_deploy_scripts:
@@ -131,7 +147,7 @@ def initialize_sme_extension(conf: Secrets,
     aws_conn_name = "_".join([AWS_CONNECTION_PREFIX, str(conf.get(CKey.db_user))])
 
     if run_deploy_container:
-        deploy_language_container(conf, version)
+        deploy_language_container(conf, version, language_alias)
 
     # Create the required objects in the database
     if run_deploy_scripts:

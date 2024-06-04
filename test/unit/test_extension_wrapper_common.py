@@ -1,6 +1,9 @@
+from __future__ import annotations
+from typing import Any
 import unittest.mock
 import pytest
 import tempfile
+import re
 
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
@@ -22,6 +25,24 @@ def filled_secrets(secrets) -> Secrets:
     return secrets
 
 
+@pytest.fixture
+def filled_saas_secrets(secrets) -> Secrets:
+    secrets.save(CKey.saas_url, "https://mock_saas.exasol.com")
+    secrets.save(CKey.saas_account_id, "faked_saas_account_id")
+    secrets.save(CKey.saas_database_name, "faked_saas_database")
+    secrets.save(CKey.saas_token, "faked_saas_access_token")
+    secrets.save(CKey.storage_backend, 'saas')
+    return secrets
+
+
+def validate_params(actual_params: str, expected_params: tuple[list[str], list[Any]]):
+    for param_name, param_value in zip(*expected_params):
+        if isinstance(param_value, str):
+            param_value = f'"{param_value}"'
+        expected_pattern = rf'"{param_name}":\s*{param_value}'
+        assert re.search(expected_pattern, actual_params) is not None
+
+
 @unittest.mock.patch("pyexasol.connect")
 def test_bucketfs_credentials_default(mock_connect, filled_secrets):
 
@@ -33,11 +54,19 @@ def test_bucketfs_credentials_default(mock_connect, filled_secrets):
 
     encapsulate_bucketfs_credentials(filled_secrets, path_in_bucket=path_in_bucket,
                                      connection_name='whatever')
-    expected_url = f"https://localhost:6666/default/{path_in_bucket};bfsdefault"
 
     mock_connection.execute.assert_called_once()
-    query = mock_connection.execute.call_args_list[0].kwargs['query']
-    assert f"TO '{expected_url}'" in query
+    query_params = mock_connection.execute.call_args_list[0].kwargs['query_params']
+    validate_params(query_params['BUCKETFS_ADDRESS'], (
+        ['backend', 'url', 'service_name', 'bucket_name', 'path'],
+        ['onprem', 'https://localhost:6666', 'bfsdefault', 'default', path_in_bucket]
+    ))
+    validate_params(query_params['BUCKETFS_USER'], (
+        ['username'], ['user']
+    ))
+    validate_params(query_params['BUCKETFS_PASSWORD'], (
+        ['password'], ['password']
+    ))
 
 
 @unittest.mock.patch("pyexasol.connect")
@@ -52,11 +81,12 @@ def test_bucketfs_credentials_verify(mock_connect, filled_secrets):
 
     encapsulate_bucketfs_credentials(filled_secrets, path_in_bucket=path_in_bucket,
                                      connection_name='whatever')
-    expected_url = f"https://localhost:6666/default/{path_in_bucket};bfsdefault#True"
 
     mock_connection.execute.assert_called_once()
-    query = mock_connection.execute.call_args_list[0].kwargs['query']
-    assert f"TO '{expected_url}'" in query
+    query_params = mock_connection.execute.call_args_list[0].kwargs['query_params']
+    validate_params(query_params['BUCKETFS_ADDRESS'], (
+        ['verify'], [True]
+    ))
 
 
 @unittest.mock.patch("pyexasol.connect")
@@ -73,8 +103,42 @@ def test_bucketfs_credentials_ca(mock_connect, filled_secrets):
 
         encapsulate_bucketfs_credentials(filled_secrets, path_in_bucket=path_in_bucket,
                                          connection_name='whatever')
-        expected_url = f"https://localhost:6666/default/{path_in_bucket};bfsdefault#False"
 
         mock_connection.execute.assert_called_once()
-        query = mock_connection.execute.call_args_list[0].kwargs['query']
-        assert f"TO '{expected_url}'" in query
+        query_params = mock_connection.execute.call_args_list[0].kwargs['query_params']
+        validate_params(query_params['BUCKETFS_ADDRESS'], (
+            ['verify'], [False]
+        ))
+
+
+@unittest.mock.patch("pyexasol.connect")
+@unittest.mock.patch("exasol.saas.client.api_access.get_connection_params")
+@unittest.mock.patch("exasol.saas.client.api_access.get_database_id")
+def test_bucketfs_credentials_saas(mock_database_id, mock_connection_params,
+                                   mock_connect, filled_saas_secrets):
+
+    path_in_bucket = 'location'
+
+    database_id = 'dfdopt568se'
+    mock_database_id.return_value = database_id
+    mock_connection = unittest.mock.MagicMock()
+    mock_connection.__enter__.return_value = mock_connection
+    mock_connect.return_value = mock_connection
+    mock_connection_params.return_value = {}
+
+    encapsulate_bucketfs_credentials(filled_saas_secrets, path_in_bucket=path_in_bucket,
+                                     connection_name='whatever')
+
+    mock_connection.execute.assert_called_once()
+    query_params = mock_connection.execute.call_args_list[0].kwargs['query_params']
+    validate_params(query_params['BUCKETFS_ADDRESS'], (
+        ['backend', 'url', 'account_id', 'path'],
+        ['saas', filled_saas_secrets.get(CKey.saas_url),
+         filled_saas_secrets.get(CKey.saas_account_id), path_in_bucket]
+    ))
+    validate_params(query_params['BUCKETFS_USER'], (
+        ['database_id'], [database_id]
+    ))
+    validate_params(query_params['BUCKETFS_PASSWORD'], (
+        ['pat'], [filled_saas_secrets.get(CKey.saas_token)]
+    ))
