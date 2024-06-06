@@ -2,12 +2,13 @@ from exasol_sagemaker_extension.deployment.deploy_create_statements import Deplo
 from exasol_sagemaker_extension.deployment.sme_language_container_deployer import SmeLanguageContainerDeployer  # type: ignore
 
 from exasol.nb_connector.connections import (
-    get_external_host,
     open_pyexasol_connection,
 )
 from exasol.nb_connector.extension_wrapper_common import (
     encapsulate_aws_credentials,
-    str_to_bool
+    str_to_bool,
+    get_optional_external_host,
+    get_optional_bfs_port
 )
 from exasol.nb_connector.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
@@ -60,12 +61,12 @@ def deploy_language_container(conf: Secrets,
     """
 
     deployer = SmeLanguageContainerDeployer.create(
-        dsn=get_external_host(conf),
+        dsn=get_optional_external_host(conf),
         db_user=conf.get(CKey.db_user),
         db_password=conf.get(CKey.db_password),
         bucketfs_name=conf.get(CKey.bfs_service),
         bucketfs_host=conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name)),
-        bucketfs_port=int(str(conf.get(CKey.bfs_port))),
+        bucketfs_port=get_optional_bfs_port(conf),
         bucketfs_user=conf.get(CKey.bfs_user),
         bucketfs_password=conf.get(CKey.bfs_password),
         bucketfs_use_https=str_to_bool(conf,  CKey.bfs_encryption, True),
