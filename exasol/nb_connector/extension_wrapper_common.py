@@ -3,7 +3,7 @@ from typing import Optional
 
 import exasol.bucketfs as bfs   # type: ignore
 
-from exasol.nb_connector.connections import (open_pyexasol_connection,
+from exasol.nb_connector.connections import (open_pyexasol_connection, get_external_host,
                                              get_backend, get_saas_database_id)
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.utils import optional_str_to_bool
@@ -26,6 +26,27 @@ def str_to_bool(conf: Secrets, key: CKey, default_value: bool) -> bool:
     """
     prop_value = optional_str_to_bool(conf.get(key))
     return default_value if prop_value is None else prop_value
+
+
+def get_optional_external_host(conf: Secrets) -> str | None:
+    """
+    Get the host part of an onprem database URL if the data can be found
+    in the configuration, otherwise None.
+    """
+    if conf.get(CKey.db_host_name) and conf.get(CKey.db_port):
+        return get_external_host(conf)
+    return None
+
+
+def get_optional_bfs_port(conf: Secrets) -> int | None:
+    """
+    Return the BucketFS service port number if it can be found in the
+    configuration, otherwise None.
+    """
+    port_str = conf.get(CKey.bfs_port)
+    if port_str:
+        return int(port_str)
+    return None
 
 
 def encapsulate_bucketfs_credentials(
