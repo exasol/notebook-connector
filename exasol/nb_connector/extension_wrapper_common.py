@@ -56,7 +56,7 @@ def get_container_deployer_kwargs(conf: Secrets) -> dict[str, Any]:
     """
 
     backend = get_backend(conf)
-    kwargs = {
+    kwargs: dict[str, Any] = {
         "use_ssl_cert_validation": str_to_bool(conf, CKey.cert_vld, True),
         "ssl_trusted_ca": conf.get(CKey.trusted_ca),
         "ssl_client_certificate": conf.get(CKey.client_cert),
