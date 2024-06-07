@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, Any
 
 import exasol.bucketfs as bfs   # type: ignore
 
@@ -28,7 +28,7 @@ def str_to_bool(conf: Secrets, key: CKey, default_value: bool) -> bool:
     return default_value if prop_value is None else prop_value
 
 
-def get_optional_external_host(conf: Secrets) -> str | None:
+def _get_optional_external_host(conf: Secrets) -> str | None:
     """
     Get the host part of an onprem database URL if the data can be found
     in the configuration, otherwise None.
@@ -38,7 +38,7 @@ def get_optional_external_host(conf: Secrets) -> str | None:
     return None
 
 
-def get_optional_bfs_port(conf: Secrets) -> int | None:
+def _get_optional_bfs_port(conf: Secrets) -> int | None:
     """
     Return the BucketFS service port number if it can be found in the
     configuration, otherwise None.
@@ -47,6 +47,39 @@ def get_optional_bfs_port(conf: Secrets) -> int | None:
     if port_str:
         return int(port_str)
     return None
+
+
+def get_container_deployer_kwargs(conf: Secrets) -> dict[str, Any]:
+    """
+    Creates kwargs required to create a language container deployer.
+    The set of arguments depends on the selected storage backend.
+    """
+
+    backend = get_backend(conf)
+    kwargs: dict[str, Any] = {
+        "use_ssl_cert_validation": str_to_bool(conf, CKey.cert_vld, True),
+        "ssl_trusted_ca": conf.get(CKey.trusted_ca),
+        "ssl_client_certificate": conf.get(CKey.client_cert),
+        "ssl_private_key": conf.get(CKey.client_key),
+    }
+    if backend == StorageBackend.onprem:
+        kwargs["dsn"] = _get_optional_external_host(conf)
+        kwargs["db_user"] = conf.get(CKey.db_user)
+        kwargs["db_password"] = conf.get(CKey.db_password)
+        kwargs["bucketfs_name"] = conf.get(CKey.bfs_service)
+        kwargs["bucketfs_host"] = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
+        kwargs["bucketfs_port"] = _get_optional_bfs_port(conf)
+        kwargs["bucketfs_user"] = conf.get(CKey.bfs_user)
+        kwargs["bucketfs_password"] = conf.get(CKey.bfs_password)
+        kwargs["bucketfs_use_https"] = str_to_bool(conf,  CKey.bfs_encryption, True)
+        kwargs["bucket"] = conf.get(CKey.bfs_bucket)
+    else:
+        kwargs["saas_url"] = conf.get(CKey.saas_url)
+        kwargs["saas_account_id"] = conf.get(CKey.saas_account_id)
+        kwargs["saas_database_id"] = conf.get(CKey.saas_database_id)
+        kwargs["saas_database_name"] = conf.get(CKey.saas_database_name)
+        kwargs["saas_token"] = conf.get(CKey.saas_token)
+    return kwargs
 
 
 def encapsulate_bucketfs_credentials(

@@ -2,20 +2,18 @@ from exasol_sagemaker_extension.deployment.deploy_create_statements import Deplo
 from exasol_sagemaker_extension.deployment.sme_language_container_deployer import SmeLanguageContainerDeployer  # type: ignore
 
 from exasol.nb_connector.connections import (
-    open_pyexasol_connection,
+    open_pyexasol_connection
 )
 from exasol.nb_connector.extension_wrapper_common import (
     encapsulate_aws_credentials,
-    str_to_bool,
-    get_optional_external_host,
-    get_optional_bfs_port
+    get_container_deployer_kwargs
 )
 from exasol.nb_connector.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
     get_activation_sql
 )
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend
 
 # Root directory in a BucketFS bucket where all stuff of the Sagemaker
 # Extension, including its language container, will be uploaded.
@@ -61,28 +59,10 @@ def deploy_language_container(conf: Secrets,
     """
 
     deployer = SmeLanguageContainerDeployer.create(
-        dsn=get_optional_external_host(conf),
-        db_user=conf.get(CKey.db_user),
-        db_password=conf.get(CKey.db_password),
-        bucketfs_name=conf.get(CKey.bfs_service),
-        bucketfs_host=conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name)),
-        bucketfs_port=get_optional_bfs_port(conf),
-        bucketfs_user=conf.get(CKey.bfs_user),
-        bucketfs_password=conf.get(CKey.bfs_password),
-        bucketfs_use_https=str_to_bool(conf,  CKey.bfs_encryption, True),
-        bucket=conf.get(CKey.bfs_bucket),
-        saas_url=conf.get(CKey.saas_url),
-        saas_account_id=conf.get(CKey.saas_account_id),
-        saas_database_id=conf.get(CKey.saas_database_id),
-        saas_database_name=conf.get(CKey.saas_database_name),
-        saas_token=conf.get(CKey.saas_token),
         path_in_bucket=PATH_IN_BUCKET,
         language_alias=language_alias,
-        use_ssl_cert_validation=str_to_bool(conf, CKey.cert_vld, True),
-        ssl_trusted_ca=conf.get(CKey.trusted_ca),
-        ssl_client_certificate=conf.get(CKey.client_cert),
-        ssl_private_key=conf.get(CKey.client_key),
-    )
+        **get_container_deployer_kwargs(conf)
+        )
 
     # Install the language container.
     deployer.download_from_github_and_run(version, False)
