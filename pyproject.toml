@@ -16,10 +16,10 @@ readme = "README.md"
 license = "MIT"
 
 [tool.poetry.urls]
-"Homepage" = "https://github.io/exasol/notebook-connector"
-"Documentation" = "https://github.io/exasol/notebook-connector"
-"Source" = "https://github.io/exasol/notebook-connector"
-"Issues" = "https://github.io/exasol/notebook-connector/issues"
+"Homepage" = "https://github.com/exasol/notebook-connector"
+"Documentation" = "https://github.com/exasol/notebook-connector"
+"Source" = "https://github.com/exasol/notebook-connector"
+"Issues" = "https://github.com/exasol/notebook-connector/issues"
 
 
 [tool.poetry.dependencies]
