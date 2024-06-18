@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Optional, Any
+import json
 
 import exasol.bucketfs as bfs   # type: ignore
 
@@ -139,15 +140,8 @@ def encapsulate_bucketfs_credentials(
     """
 
     def to_json_str(**kwargs) -> str:
-        def format_value(v):
-            if isinstance(v, str):
-                return f'"{v}"'
-            elif isinstance(v, bool):
-                return str(v).lower()
-            return v
-
-        return "{" + ", ".join(f'"{k}":{format_value(v)}' for k, v in kwargs.items()
-                               if v is not None) + "}"
+        filtered_kwargs = {k: v for k,v in kwargs.items() if v is not None}
+        return json.dumps(filtered_kwargs)
 
     backend = get_backend(conf)
     if backend == StorageBackend.onprem:
