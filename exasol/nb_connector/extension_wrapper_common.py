@@ -140,10 +140,14 @@ def encapsulate_bucketfs_credentials(
 
     def to_json_str(**kwargs) -> str:
         def format_value(v):
-            return f'"{v}"' if isinstance(v, str) else v
+            if isinstance(v, str):
+                return f'"{v}"'
+            elif isinstance(v, bool):
+                return str(v).lower()
+            return v
 
-        return ", ".join(f'"{k}":{format_value(v)}' for k, v in kwargs.items()
-                         if v is not None)
+        return "{" + ", ".join(f'"{k}":{format_value(v)}' for k, v in kwargs.items()
+                               if v is not None) + "}"
 
     backend = get_backend(conf)
     if backend == StorageBackend.onprem:
