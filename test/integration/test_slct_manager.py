@@ -66,7 +66,7 @@ def test_check_slc_config(slct_manager):
 )
 def test_export_slc(slct_manager):
     slct_manager.export()
-    export_path = slct_manager.export_path
+    export_path = slct_manager.working_path.export_path
     assert export_path.exists()
     tgz = [f for f in export_path.glob("*.tar.gz")]
     assert len(tgz) == 1

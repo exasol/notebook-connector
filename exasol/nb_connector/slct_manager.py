@@ -9,6 +9,7 @@ from pathlib import Path
 from exasol_script_languages_container_tool.lib import api as exaslct_api
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, AILabConfig
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
+from exasol.nb_connector.secret_store import Secrets
 
 RELEASE_NAME = "current"
 PATH_IN_BUCKET = "container"
@@ -26,46 +27,66 @@ FLAVOR_PATH_IN_SLC_REPO = Path("flavors") / REQUIRED_FLAVOR
 PipPackageDefinition = namedtuple('PipPackageDefinition', ['pkg', 'version'])
 
 
-class SlctManager:
-    def __init__(self, secrets, working_path: Optional[Path] = None):
-        if not working_path:
-            self.working_path = Path.cwd()
-        else:
-            self.working_path = working_path
+class SlcDir:
+    def __init__(self, secrets: Secrets):
         self._secrets = secrets
+
+    @property
+    def root_dir(self) -> Path:
+        return Path(self._secrets.get(AILabConfig.slc_target_dir))
+
+    @property
+    def flavor_dir(self) -> Path:
+        return self.root_dir / FLAVOR_PATH_IN_SLC_REPO
+
+    @contextlib.contextmanager
+    def enter(self):
+        """Changes working directory and returns to previous on exit."""
+        prev_cwd = Path.cwd()
+        os.chdir(self.root_dir)
+        try:
+            yield
+        finally:
+            os.chdir(prev_cwd)
+
+    def __str__(self):
+        return str(self.root_dir)
+
+
+class WorkingDir:
+    def __init__(self, p: Optional[Path]):
+        if p is None:
+            self.root_dir = Path.cwd()
+        else:
+            self.root_dir = p
 
     @property
     def export_path(self):
         """
         Returns the export path for script-languages-container
         """
-        return self.working_path / "container"
+        return self.root_dir / "container"
 
     @property
     def output_path(self):
         """
         Returns the output path containing caches and logs.
         """
-        return self.working_path / "output"
+        return self.root_dir / "output"
 
-    @contextlib.contextmanager
-    def _slc_working_directory(self):
-        """Changes working directory and returns to previous on exit."""
-        slc_dir = Path(self._secrets.get(AILabConfig.slc_target_dir))
-        prev_cwd = Path.cwd()
-        os.chdir(slc_dir)
-        try:
-            yield
-        finally:
-            os.chdir(prev_cwd)
+
+class SlctManager:
+    def __init__(self, secrets: Secrets, working_path: Optional[Path] = None):
+        self.working_path = WorkingDir(working_path)
+        self.slc_dir = SlcDir(secrets)
+        self._secrets = secrets
 
     def check_slc_repo_complete(self) -> bool:
         """
         Checks if the target dir for the script-languages repository is present and correct.
         """
-        slc_dir = Path(self._secrets.get(AILabConfig.slc_target_dir))
-        print(f"Script-languages repository path is '{slc_dir}'")
-        if not (Path(slc_dir) / FLAVOR_PATH_IN_SLC_REPO).is_dir():
+        print(f"Script-languages repository path is '{self.slc_dir}'")
+        if not self.slc_dir.flavor_dir.is_dir():
             return False
         return True
 
@@ -73,23 +94,22 @@ class SlctManager:
         """
         Clones the script-languages-release repository from Github into the target dir configured in the secret store.
         """
-        slc_dir = Path(self._secrets.get(AILabConfig.slc_target_dir))
-        if not slc_dir.is_dir():
-            print(f"Cloning into {slc_dir}...")
-            repo = Repo.clone_from("https://github.com/exasol/script-languages-release", slc_dir)
+        if not self.slc_dir.root_dir.is_dir():
+            print(f"Cloning into {self.slc_dir}...")
+            repo = Repo.clone_from("https://github.com/exasol/script-languages-release", self.slc_dir.root_dir)
             print("Fetching submodules...")
             repo.submodule_update(recursive=True)
         else:
-            print(f"Directory '{slc_dir}' already exists. Skipping cloning....")
+            print(f"Directory '{self.slc_dir}' already exists. Skipping cloning....")
 
     def export(self):
         """
         Exports the current script-languages-container to the export directory.
         """
-        with self._slc_working_directory():
+        with self.slc_dir.enter():
             exaslct_api.export(flavor_path=(str(FLAVOR_PATH_IN_SLC_REPO),),
-                               export_path=str(self.export_path),
-                               output_directory=str(self.output_path))
+                               export_path=str(self.working_path.export_path),
+                               output_directory=str(self.working_path.output_path))
 
     def upload(self):
         """
@@ -103,7 +123,7 @@ class SlctManager:
         bucketfs_username = self._secrets.get(CKey.bfs_user)
         bucketfs_password = self._secrets.get(CKey.bfs_password)
 
-        with self._slc_working_directory():
+        with self.slc_dir.enter():
             exaslct_api.upload(flavor_path=(str(FLAVOR_PATH_IN_SLC_REPO),),
                                database_host=database_host,
                                bucketfs_name=bucketfs_name,
@@ -111,7 +131,7 @@ class SlctManager:
                                bucketfs_username=bucketfs_username,
                                bucketfs_password=bucketfs_password, path_in_bucket=PATH_IN_BUCKET,
                                release_name=RELEASE_NAME,
-                               output_directory=str(self.output_path))
+                               output_directory=str(self.working_path.output_path))
             container_name = f"{REQUIRED_FLAVOR}-release-{RELEASE_NAME}"
             result = exaslct_api.generate_language_activation(flavor_path=str(FLAVOR_PATH_IN_SLC_REPO),
                                                               bucketfs_name=bucketfs_name,
@@ -147,8 +167,7 @@ class SlctManager:
         """
         Returns the path to the custom pip file of the flavor
         """
-        return Path(self._secrets.get(
-            AILabConfig.slc_target_dir)) / FLAVOR_PATH_IN_SLC_REPO / "flavor_customization" / "packages" / "python3_pip_packages"
+        return self.slc_dir.flavor_dir / "flavor_customization" / "packages" / "python3_pip_packages"
 
     def append_custom_packages(self, pip_packages: List[PipPackageDefinition]):
         """
