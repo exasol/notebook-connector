@@ -87,9 +87,9 @@ class SlctManager:
         Exports the current script-languages-container to the export directory.
         """
         with self._slc_working_directory():
-            export_result = exaslct_api.export(flavor_path=(str(FLAVOR_PATH_IN_SLC_REPO),),
-                                               export_path=str(self.export_path),
-                                               output_directory=str(self.output_path))
+            exaslct_api.export(flavor_path=(str(FLAVOR_PATH_IN_SLC_REPO),),
+                               export_path=str(self.export_path),
+                               output_directory=str(self.output_path))
 
     def upload(self):
         """
@@ -110,7 +110,8 @@ class SlctManager:
                                bucket_name=bucket_name, bucketfs_port=bucketfs_port,
                                bucketfs_username=bucketfs_username,
                                bucketfs_password=bucketfs_password, path_in_bucket=PATH_IN_BUCKET,
-                               release_name=RELEASE_NAME)
+                               release_name=RELEASE_NAME,
+                               output_directory=str(self.output_path))
             container_name = f"{REQUIRED_FLAVOR}-release-{RELEASE_NAME}"
             result = exaslct_api.generate_language_activation(flavor_path=str(FLAVOR_PATH_IN_SLC_REPO),
                                                               bucketfs_name=bucketfs_name,
