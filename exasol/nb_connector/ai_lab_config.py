@@ -43,6 +43,7 @@ class AILabConfig(Enum):
     saas_database_name = auto()
     storage_backend = auto()
     slc_target_dir = auto()
+    slc_source = auto()
 
 
 class StorageBackend(Enum):
