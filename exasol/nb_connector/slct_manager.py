@@ -6,7 +6,7 @@ from typing import Optional, List
 
 from git import Repo
 from pathlib import Path
-from exasol_script_languages_container_tool.lib import api as exaslct_api
+from exasol_script_languages_container_tool.lib import api as exaslct_api # type: ignore
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, AILabConfig
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 from exasol.nb_connector.secret_store import Secrets
@@ -33,7 +33,10 @@ class SlcDir:
 
     @property
     def root_dir(self) -> Path:
-        return Path(self._secrets.get(AILabConfig.slc_target_dir))
+        target_dir = self._secrets.get(AILabConfig.slc_target_dir)
+        if not target_dir:
+            raise RuntimeError("slc target dir is not defined in secrets.")
+        return Path(target_dir)
 
     @property
     def flavor_dir(self) -> Path:
@@ -150,7 +153,10 @@ class SlctManager:
         the language of the uploaded script-language-container.
         Must not be called after an initial upload.
         """
-        return self._secrets.get(ACTIVATION_KEY)
+        activation_key = self._secrets.get(ACTIVATION_KEY)
+        if not activation_key:
+            raise RuntimeError("SLC activation key not defined in secrets.")
+        return activation_key
 
     @property
     def language_alias(self) -> str:

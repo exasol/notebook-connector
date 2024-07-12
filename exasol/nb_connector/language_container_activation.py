@@ -1,6 +1,6 @@
 from typing import Dict
 
-import pyexasol
+import pyexasol # type: ignore
 
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.connections import open_pyexasol_connection
