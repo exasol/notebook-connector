@@ -114,8 +114,11 @@ def run(ctx):
     """)
     slct_manager.upload()
     con = open_pyexasol_connection_with_lang_definitions(slc_secrets)
-    con.execute("CREATE SCHEMA TEST")
-    con.execute(udf)
-    res = con.execute("select test_custom_packages(1)")
-    rows = res.fetchall()
-    assert rows == [('success',)]
+    try:
+        con.execute("CREATE SCHEMA TEST")
+        con.execute(udf)
+        res = con.execute("select test_custom_packages(1)")
+        rows = res.fetchall()
+        assert rows == [('success',)]
+    finally:
+        con.close()
