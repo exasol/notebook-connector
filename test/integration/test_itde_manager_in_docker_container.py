@@ -265,7 +265,6 @@ def docker_container(wheel_path, docker_image,
                 f"python3 -m pip install /tmp/{wheel_path.name} "
                 f"--extra-index-url https://download.pytorch.org/whl/cpu"
             )
-            print(output)
             assert exit_code == 0, output
             yield container
         finally:

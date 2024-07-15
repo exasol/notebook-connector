@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import contextlib
@@ -98,12 +99,12 @@ class SlctManager:
         Clones the script-languages-release repository from Github into the target dir configured in the secret store.
         """
         if not self.slc_dir.root_dir.is_dir():
-            print(f"Cloning into {self.slc_dir}...")
+            logging.info(f"Cloning into {self.slc_dir}...")
             repo = Repo.clone_from("https://github.com/exasol/script-languages-release", self.slc_dir.root_dir)
-            print("Fetching submodules...")
+            logging.info("Fetching submodules...")
             repo.submodule_update(recursive=True)
         else:
-            print(f"Directory '{self.slc_dir}' already exists. Skipping cloning....")
+            logging.warning(f"Directory '{self.slc_dir}' already exists. Skipping cloning....")
 
     def export(self):
         """
