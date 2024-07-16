@@ -6,7 +6,7 @@ import shutil
 from collections import namedtuple
 from typing import Optional, List
 
-from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient # type: ignore
 from git import Repo
 from pathlib import Path
 from exasol_script_languages_container_tool.lib import api as exaslct_api # type: ignore
