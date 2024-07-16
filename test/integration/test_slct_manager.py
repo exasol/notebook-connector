@@ -80,8 +80,8 @@ def test_export_slc(slct_manager):
     name="upload_slc", depends=["check_config"]
 )
 def test_upload(slct_manager: SlctManager, itde):
-    slct_manager.upload()
-    assert slct_manager.activation_key == "PYTHON3=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-current?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-current/exaudf/exaudfclient_py3"
+    slct_manager.upload("my_python")
+    assert slct_manager.activation_key == "my_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-current?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-current/exaudf/exaudfclient_py3"
 
 
 @pytest.mark.dependency(
@@ -100,7 +100,7 @@ def test_append_custom_packages(slct_manager: SlctManager, custom_packages: List
 )
 def test_check_new_packages(slc_secrets: Secrets, slct_manager: SlctManager,
                             custom_packages: List[Tuple[str, str, str]]):
-    alias = slct_manager.language_alias
+    alias = "my_python"
 
     import_statements = "\n".join(f"    import {module}" for pkg, version, module in custom_packages)
     udf = textwrap.dedent(f"""
@@ -112,7 +112,7 @@ def run(ctx):
     ctx.emit("success")
 /
     """)
-    slct_manager.upload()
+    slct_manager.upload(alias)
     con = open_pyexasol_connection_with_lang_definitions(slc_secrets)
     try:
         con.execute("CREATE SCHEMA TEST")

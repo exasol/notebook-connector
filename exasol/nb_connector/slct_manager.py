@@ -115,10 +115,11 @@ class SlctManager:
                                export_path=str(self.working_path.export_path),
                                output_directory=str(self.working_path.output_path))
 
-    def upload(self):
+    def upload(self, alias: str):
         """
         Uploads the current script-languages-container to the database
         and stores the activation string in the secret store.
+        @param alias: The alias used for the script-language-container activation
         """
         bucketfs_name = self._secrets.get(CKey.bfs_service)
         bucket_name = self._secrets.get(CKey.bfs_bucket)
@@ -144,7 +145,9 @@ class SlctManager:
 
             alter_session_cmd = result[0]
             re_res = re.search(r"ALTER SESSION SET SCRIPT_LANGUAGES='(.*)'", alter_session_cmd)
-            self._secrets.save(ACTIVATION_KEY, re_res.groups()[0])
+            activation_key = re_res.groups()[0]
+            _, url = activation_key.split("=", maxsplit=1)
+            self._secrets.save(ACTIVATION_KEY, f"{alias}={url}")
 
     @property
     def activation_key(self) -> str:
