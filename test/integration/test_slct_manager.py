@@ -76,6 +76,15 @@ def test_export_slc(slct_manager):
     assert len(tgz_sum) == 1
     assert tgz_sum[0].is_file()
 
+@pytest.mark.dependency(
+    name="slc_images", depends=["export_slc"]
+)
+def test_slc_images(slct_manager):
+    images = slct_manager.slc_docker_images
+    assert len(images) > 0
+    for img in images:
+        assert "exasol/script-language-container" in img
+
 
 @pytest.mark.dependency(
     name="upload_slc", depends=["check_config"]

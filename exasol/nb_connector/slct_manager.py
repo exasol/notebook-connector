@@ -6,6 +6,7 @@ import shutil
 from collections import namedtuple
 from typing import Optional, List
 
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from git import Repo
 from pathlib import Path
 from exasol_script_languages_container_tool.lib import api as exaslct_api # type: ignore
@@ -210,6 +211,13 @@ class SlctManager:
         with open(self.slc_dir.custom_pip_file, "a") as f:
             for p in pip_packages:
                 print(f"{p.pkg}|{p.version}", file=f)
+
+    @property
+    def slc_docker_images(self):
+        with ContextDockerClient() as docker_client:
+            images = docker_client.images.list(name="exasol/script-language-container")
+            image_tags = [img.tags[0] for img in images]
+            return image_tags
 
     def clean_all_images(self):
         """
