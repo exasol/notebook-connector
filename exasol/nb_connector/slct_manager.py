@@ -2,6 +2,7 @@ import logging
 import os
 import re
 import contextlib
+import shutil
 from collections import namedtuple
 from typing import Optional, List
 
@@ -43,6 +44,13 @@ class SlcDir:
     def flavor_dir(self) -> Path:
         return self.root_dir / FLAVOR_PATH_IN_SLC_REPO
 
+    @property
+    def custom_pip_file(self) -> Path:
+        """
+        Returns the path to the custom pip file of the flavor
+        """
+        return self.flavor_dir / "flavor_customization" / "packages" / "python3_pip_packages"
+
     @contextlib.contextmanager
     def enter(self):
         """Changes working directory and returns to previous on exit."""
@@ -77,6 +85,18 @@ class WorkingDir:
         Returns the output path containing caches and logs.
         """
         return self.root_dir / "output"
+
+    def cleanup_output_path(self):
+        """
+        Remove the output path recursively.
+        """
+        shutil.rmtree(self.output_path)
+
+    def cleanup_export_path(self):
+        """
+        Remove the export path recursively
+        """
+        shutil.rmtree(self.export_path)
 
 
 class SlctManager:
@@ -182,19 +202,17 @@ class SlctManager:
         """
         self._secrets.save(AILabConfig.slc_alias, alias)
 
-
-    @property
-    def custom_pip_file(self) -> Path:
-        """
-        Returns the path to the custom pip file of the flavor
-        """
-        return self.slc_dir.flavor_dir / "flavor_customization" / "packages" / "python3_pip_packages"
-
     def append_custom_packages(self, pip_packages: List[PipPackageDefinition]):
         """
         Appends packages to the custom pip file.
         Note: This method is not idempotent: Multiple calls with the same package definitions will result in duplicated entries.
         """
-        with open(self.custom_pip_file, "a") as f:
+        with open(self.slc_dir.custom_pip_file, "a") as f:
             for p in pip_packages:
                 print(f"{p.pkg}|{p.version}", file=f)
+
+    def clean_all_images(self):
+        """
+        Deletes all local docker images.
+        """
+        exaslct_api.clean_all_images(output_directory=str(self.working_path.output_path))

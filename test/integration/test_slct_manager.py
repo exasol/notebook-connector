@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 from typing import List, Tuple
 
 import pytest
+from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 from exasol.nb_connector.ai_lab_config import AILabConfig
 from exasol.nb_connector.itde_manager import bring_itde_up
@@ -90,7 +91,7 @@ def test_upload(slct_manager: SlctManager, itde):
 )
 def test_append_custom_packages(slct_manager: SlctManager, custom_packages: List[Tuple[str, str, str]]):
     slct_manager.append_custom_packages([PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages])
-    with open(slct_manager.custom_pip_file, "r") as f:
+    with open(slct_manager.slc_dir.custom_pip_file, "r") as f:
         pip_content = f.read()
         for custom_package, version, _ in custom_packages:
             assert f"{custom_package}|{version}" in pip_content
@@ -152,3 +153,32 @@ def run(ctx):
         assert rows == [('success',)]
     finally:
         con.close()
+
+
+@pytest.mark.dependency(
+    name="clean_up_images", depends=["upload_slc_with_new_packages"]
+)
+def test_clean_up_images(slct_manager: SlctManager):
+    slct_manager.clean_all_images()
+    with ContextDockerClient() as docker_client:
+        images = docker_client.images.list(name="exasol/script-language-container")
+        assert len(images) == 0
+
+
+@pytest.mark.dependency(
+    name="clean_up_output_path", depends=["clean_up_images"]
+)
+def test_clean_output(slct_manager: SlctManager):
+    slct_manager.working_path.cleanup_output_path()
+    p = Path(slct_manager.working_path.output_path)
+    assert not p.is_dir()
+
+
+@pytest.mark.dependency(
+    name="clean_up_export_path", depends=["clean_up_images"]
+)
+def test_clean_export(slct_manager: SlctManager):
+    slct_manager.working_path.cleanup_export_path()
+    p = Path(slct_manager.working_path.export_path)
+    assert not p.is_dir()
+
