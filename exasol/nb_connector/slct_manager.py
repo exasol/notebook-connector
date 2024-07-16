@@ -12,7 +12,7 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, AILabConfig
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 from exasol.nb_connector.secret_store import Secrets
 
-RELEASE_NAME = "current"
+DEFAULT_ALIAS = "my_language"
 PATH_IN_BUCKET = "container"
 
 # Activation SQL for the Custom SLC will be saved in the secret
@@ -113,7 +113,8 @@ class SlctManager:
         with self.slc_dir.enter():
             exaslct_api.export(flavor_path=(str(FLAVOR_PATH_IN_SLC_REPO),),
                                export_path=str(self.working_path.export_path),
-                               output_directory=str(self.working_path.output_path))
+                               output_directory=str(self.working_path.output_path),
+                               release_name=self.language_alias,)
 
     def upload(self):
         """
@@ -169,9 +170,9 @@ class SlctManager:
         """
         Returns the stored language alias.
         """
-        language_alias = self._secrets.get(AILabConfig.slc_alias)
+        language_alias = self._secrets.get(AILabConfig.slc_alias, DEFAULT_ALIAS)
         if not language_alias:
-            raise RuntimeError("SLC language alias key not defined in secrets.")
+            return DEFAULT_ALIAS
         return language_alias
 
     @language_alias.setter
