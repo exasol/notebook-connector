@@ -44,6 +44,7 @@ class AILabConfig(Enum):
     storage_backend = auto()
     slc_target_dir = auto()
     slc_source = auto()
+    slc_alias = auto()
 
 
 class StorageBackend(Enum):

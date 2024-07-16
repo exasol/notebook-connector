@@ -80,8 +80,9 @@ def test_export_slc(slct_manager):
     name="upload_slc", depends=["check_config"]
 )
 def test_upload(slct_manager: SlctManager, itde):
-    slct_manager.upload("my_python")
-    assert slct_manager.activation_key == "my_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-current?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-current/exaudf/exaudfclient_py3"
+    slct_manager.language_alias = "my_python"
+    slct_manager.upload()
+    assert slct_manager.activation_key == "my_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_python?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_python/exaudf/exaudfclient_py3"
 
 
 @pytest.mark.dependency(
@@ -96,28 +97,57 @@ def test_append_custom_packages(slct_manager: SlctManager, custom_packages: List
 
 
 @pytest.mark.dependency(
-    name="check_new_packages", depends=["append_custom_packages"]
+    name="upload_slc_with_new_packages", depends=["append_custom_packages"]
 )
-def test_check_new_packages(slc_secrets: Secrets, slct_manager: SlctManager,
-                            custom_packages: List[Tuple[str, str, str]]):
-    alias = "my_python"
+def test_upload_slc_with_new_packages(slc_secrets: Secrets, slct_manager: SlctManager,
+                                      custom_packages: List[Tuple[str, str, str]]):
+    slct_manager.language_alias = "my_new_python"
+    slct_manager.upload()
+    assert slct_manager.activation_key == "my_new_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_new_python?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_new_python/exaudf/exaudfclient_py3"
 
+
+@pytest.mark.dependency(
+    name="udf_with_new_packages", depends=["upload_slc_with_new_packages"]
+)
+def test_udf_with_new_packages(slc_secrets: Secrets, slct_manager: SlctManager,
+                               custom_packages: List[Tuple[str, str, str]]):
     import_statements = "\n".join(f"    import {module}" for pkg, version, module in custom_packages)
     udf = textwrap.dedent(f"""
-CREATE OR REPLACE {alias} SET SCRIPT test_custom_packages(i integer)
+CREATE OR REPLACE {slct_manager.language_alias} SET SCRIPT test_custom_packages(i integer)
 EMITS (o VARCHAR(2000000)) AS
 def run(ctx):
 {import_statements}
-    
+
     ctx.emit("success")
 /
-    """)
-    slct_manager.upload(alias)
+        """)
     con = open_pyexasol_connection_with_lang_definitions(slc_secrets)
     try:
         con.execute("CREATE SCHEMA TEST")
         con.execute(udf)
         res = con.execute("select test_custom_packages(1)")
+        rows = res.fetchall()
+        assert rows == [('success',)]
+    finally:
+        con.close()
+
+
+@pytest.mark.dependency(
+    name="test_old_alias", depends=["udf_with_new_packages"]
+)
+def test_old_alias(slc_secrets: Secrets, slct_manager: SlctManager):
+
+    udf = textwrap.dedent(f"""
+CREATE OR REPLACE my_python SET SCRIPT test_old_slc(i integer)
+EMITS (o VARCHAR(2000000)) AS
+def run(ctx):
+    ctx.emit("success")
+/
+        """)
+    con = open_pyexasol_connection_with_lang_definitions(slc_secrets, schema='TEST')
+    try:
+        con.execute(udf)
+        res = con.execute("select test_old_slc(1)")
         rows = res.fetchall()
         assert rows == [('success',)]
     finally:

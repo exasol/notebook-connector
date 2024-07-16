@@ -17,7 +17,7 @@ PATH_IN_BUCKET = "container"
 
 # Activation SQL for the Custom SLC will be saved in the secret
 # store with this key.
-ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "slc"
+SLC_ACTIVATION_KEY_PREFIX = ACTIVATION_KEY_PREFIX + "slc_"
 
 # This is the flavor customers are supposed to use for modifications.
 REQUIRED_FLAVOR = "template-Exasol-all-python-3.10"
@@ -115,11 +115,10 @@ class SlctManager:
                                export_path=str(self.working_path.export_path),
                                output_directory=str(self.working_path.output_path))
 
-    def upload(self, alias: str):
+    def upload(self):
         """
         Uploads the current script-languages-container to the database
         and stores the activation string in the secret store.
-        @param alias: The alias used for the script-language-container activation
         """
         bucketfs_name = self._secrets.get(CKey.bfs_service)
         bucket_name = self._secrets.get(CKey.bfs_bucket)
@@ -132,12 +131,12 @@ class SlctManager:
             exaslct_api.upload(flavor_path=(str(FLAVOR_PATH_IN_SLC_REPO),),
                                database_host=database_host,
                                bucketfs_name=bucketfs_name,
-                               bucket_name=bucket_name, bucketfs_port=bucketfs_port,
+                               bucket_name=bucket_name, bucketfs_port=int(bucketfs_port),
                                bucketfs_username=bucketfs_username,
                                bucketfs_password=bucketfs_password, path_in_bucket=PATH_IN_BUCKET,
-                               release_name=RELEASE_NAME,
+                               release_name=self.language_alias,
                                output_directory=str(self.working_path.output_path))
-            container_name = f"{REQUIRED_FLAVOR}-release-{RELEASE_NAME}"
+            container_name = f"{REQUIRED_FLAVOR}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(flavor_path=str(FLAVOR_PATH_IN_SLC_REPO),
                                                               bucketfs_name=bucketfs_name,
                                                               bucket_name=bucket_name, container_name=container_name,
@@ -147,7 +146,11 @@ class SlctManager:
             re_res = re.search(r"ALTER SESSION SET SCRIPT_LANGUAGES='(.*)'", alter_session_cmd)
             activation_key = re_res.groups()[0]
             _, url = activation_key.split("=", maxsplit=1)
-            self._secrets.save(ACTIVATION_KEY, f"{alias}={url}")
+            self._secrets.save(self._alias_key, f"{self.language_alias}={url}")
+
+    @property
+    def _alias_key(self):
+        return SLC_ACTIVATION_KEY_PREFIX + self.language_alias
 
     @property
     def activation_key(self) -> str:
@@ -155,9 +158,8 @@ class SlctManager:
         Returns the language activation string for the uploaded script-language-container.
         Can be used in `ALTER SESSION` or `ALTER_SYSTEM` SQL commands to activate
         the language of the uploaded script-language-container.
-        Must not be called after an initial upload.
         """
-        activation_key = self._secrets.get(ACTIVATION_KEY)
+        activation_key = self._secrets.get(self._alias_key)
         if not activation_key:
             raise RuntimeError("SLC activation key not defined in secrets.")
         return activation_key
@@ -165,12 +167,20 @@ class SlctManager:
     @property
     def language_alias(self) -> str:
         """
-        Returns the language alias of the uploaded script-language-container.
-        Must not be called after an initial upload.
+        Returns the stored language alias.
         """
-        activation_key = self.activation_key
-        alias, _ = activation_key.split("=", maxsplit=1)
-        return alias
+        language_alias = self._secrets.get(AILabConfig.slc_alias)
+        if not language_alias:
+            raise RuntimeError("SLC language alias key not defined in secrets.")
+        return language_alias
+
+    @language_alias.setter
+    def language_alias(self, alias: str):
+        """
+        Stores the language alias in the secret store.
+        """
+        self._secrets.save(AILabConfig.slc_alias, alias)
+
 
     @property
     def custom_pip_file(self) -> Path:
