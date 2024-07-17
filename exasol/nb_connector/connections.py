@@ -9,7 +9,7 @@ from typing import (
 import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
 from sqlalchemy.engine.url import URL   # type: ignore
-import ibis
+import ibis         # type: ignore
 
 import exasol.bucketfs as bfs  # type: ignore
 import exasol.saas.client.api_access as saas_api    # type: ignore
