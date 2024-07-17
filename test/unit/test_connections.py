@@ -16,6 +16,7 @@ from exasol.nb_connector.connections import (
     open_bucketfs_connection,
     open_pyexasol_connection,
     open_sqlalchemy_connection,
+    open_ibis_connection
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend
@@ -264,4 +265,16 @@ def test_open_bucketfs_connection_saas(mock_database_id, mock_saas_bucket, conf_
         account_id=conf_saas.get(CKey.saas_account_id),
         database_id=database_id,
         pat=conf_saas.get(CKey.saas_token)
+    )
+
+
+@unittest.mock.patch("ibis.exasol.connect")
+def test_open_ibis_connection(mock_connect, conf):
+    schema = 'test_schema'
+    conf.save(CKey.db_schema, schema)
+    open_ibis_connection(conf)
+    mock_connect.assert_called_once_with(
+        host=conf.get(CKey.db_host_name), port=int(conf.get(CKey.db_port)),
+        user=conf.get(CKey.db_user), password=conf.get(CKey.db_password),
+        schema=schema
     )

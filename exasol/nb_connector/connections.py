@@ -9,6 +9,7 @@ from typing import (
 import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
 from sqlalchemy.engine.url import URL   # type: ignore
+import ibis
 
 import exasol.bucketfs as bfs  # type: ignore
 import exasol.saas.client.api_access as saas_api    # type: ignore
@@ -101,6 +102,34 @@ def get_saas_database_id(conf: Secrets) -> str:
         database_name=conf.get(CKey.saas_database_name))
 
 
+def _get_pyexasol_connection_params(conf: Secrets, **kwargs) -> dict[str, Any]:
+
+    if get_backend(conf) == StorageBackend.onprem:
+        conn_params: dict[str, Any] = {
+            "dsn": get_external_host(conf),
+            "user": conf.get(CKey.db_user),
+            "password": conf.get(CKey.db_password),
+        }
+    else:
+        conn_params = saas_api.get_connection_params(
+            host=conf.get(CKey.saas_url),
+            account_id=conf.get(CKey.saas_account_id),
+            pat=conf.get(CKey.saas_token),
+            database_id=conf.get(CKey.saas_database_id),
+            database_name=conf.get(CKey.saas_database_name)
+        )
+
+    encryption = _optional_encryption(conf)
+    if encryption is not None:
+        conn_params["encryption"] = encryption
+    ssopt = _extract_ssl_options(conf)
+    if ssopt:
+        conn_params["websocket_sslopt"] = ssopt
+
+    conn_params.update(kwargs)
+    return conn_params
+
+
 def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
     """
     Opens a pyexasol connection using provided configuration parameters.
@@ -127,30 +156,7 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
     For other optional parameters the default settings are as per the pyexasol interface.
     """
 
-    if get_backend(conf) == StorageBackend.onprem:
-        conn_params: dict[str, Any] = {
-            "dsn": get_external_host(conf),
-            "user": conf.get(CKey.db_user),
-            "password": conf.get(CKey.db_password),
-        }
-    else:
-        conn_params = saas_api.get_connection_params(
-            host=conf.get(CKey.saas_url),
-            account_id=conf.get(CKey.saas_account_id),
-            pat=conf.get(CKey.saas_token),
-            database_id=conf.get(CKey.saas_database_id),
-            database_name=conf.get(CKey.saas_database_name)
-        )
-
-    encryption = _optional_encryption(conf)
-    if encryption is not None:
-        conn_params["encryption"] = encryption
-    ssopt = _extract_ssl_options(conf)
-    if ssopt:
-        conn_params["websocket_sslopt"] = ssopt
-
-    conn_params.update(kwargs)
-
+    conn_params = _get_pyexasol_connection_params(conf, **kwargs)
     return pyexasol.connect(**conn_params)
 
 
@@ -270,3 +276,30 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
                               account_id=saas_account_id,
                               database_id=saas_database_id,
                               pat=saas_token)
+
+
+def open_ibis_connection(conf: Secrets, **kwargs):
+    """
+    Creates a connection to Ibis with Exasol backend.
+
+    The parameters are similar to those of open_pyexasol_connection function.
+    The downstream call signature is also similar to pyexasol, except that the dsn is
+    provided in two separate parts - host and port.
+
+    Unlike open_pyexasol_connection, this function sets the default schema if it's
+    defined in the configuration.
+    """
+
+    conn_params = _get_pyexasol_connection_params(conf, **kwargs)
+
+    dsn = conn_params.pop('dsn')
+    host_port = dsn.split(':')
+    conn_params['host'] = host_port[0]
+    if len(host_port) > 1:
+        conn_params['port'] = int(host_port[1])
+
+    schema = conf.get(CKey.db_schema)
+    if schema:
+        conn_params['schema'] = schema
+
+    return ibis.exasol.connect(**conn_params)
