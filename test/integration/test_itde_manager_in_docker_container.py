@@ -44,7 +44,7 @@ def remove_itde():
 def dockerfile_content() -> str:
     return cleandoc(
         """
-        FROM ubuntu:20.04
+        FROM ubuntu:22.04
         
         RUN apt-get update
         RUN apt-get install --yes --no-install-recommends python3 python3-pip git
