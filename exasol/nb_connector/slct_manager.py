@@ -14,7 +14,7 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, AILabConfig
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 from exasol.nb_connector.secret_store import Secrets
 
-DEFAULT_ALIAS = "ai-lab-default"
+DEFAULT_ALIAS = "ai_lab_default"
 PATH_IN_BUCKET = "container"
 
 # Activation SQL for the Custom SLC will be saved in the secret
