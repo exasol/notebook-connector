@@ -7,6 +7,7 @@
 * #110: Added the support of SaaS to the extension wrappers.
   * Added SaaS configuration parameters in a call to the language container deployer.
   * Changed how the bucketfs parameters are stored in a connection object.
+* #123 Added a function that opens a connection to Ibis.
 
 ## Bugfixes
 

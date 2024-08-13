@@ -39,6 +39,8 @@ def validate_params(actual_params: str, expected_params: tuple[list[str], list[A
     for param_name, param_value in zip(*expected_params):
         if isinstance(param_value, str):
             param_value = f'"{param_value}"'
+        elif isinstance(param_value, bool):
+            param_value = str(param_value).lower()
         expected_pattern = rf'"{param_name}":\s*{param_value}'
         assert re.search(expected_pattern, actual_params) is not None
 
