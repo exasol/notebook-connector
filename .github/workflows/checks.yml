@@ -10,12 +10,12 @@ jobs:
 
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.5.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.14.0
 
       - name: Check Version(s)
         run: poetry run version-check version.py
@@ -27,10 +27,10 @@ jobs:
 
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.5.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.14.0
 
       - name: Build Documentation
         run: |
@@ -47,10 +47,10 @@ jobs:
 
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.5.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.14.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -74,10 +74,10 @@ jobs:
 
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.5.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.14.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -92,11 +92,11 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.10", "3.11"]
-        exasol-version: ["7.1.9"]
+        exasol-version: ["7.1.26"]
 
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
         with:
@@ -112,7 +112,7 @@ jobs:
           sudo rm -rf /usr/local/lib/node_modules
           sudo rm -rf /opt/ghc
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.5.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.14.0
         with:
           python-version: ${{ matrix.python-version }}
 

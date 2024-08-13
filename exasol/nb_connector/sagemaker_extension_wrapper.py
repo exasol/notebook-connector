@@ -58,7 +58,7 @@ def deploy_language_container(conf: Secrets,
             The language alias of the extension's language container.
     """
 
-    deployer = SmeLanguageContainerDeployer.create(
+    deployer = SmeLanguageContainerDeployer.create( # pylint: disable=unexpected-keyword-arg
         path_in_bucket=PATH_IN_BUCKET,
         language_alias=language_alias,
         **get_container_deployer_kwargs(conf)
