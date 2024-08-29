@@ -5,6 +5,7 @@ import docker  # type: ignore
 from docker.models.networks import Network # type: ignore
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo  # type: ignore
+from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo    # type: ignore
 from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
     ContextDockerClient,
 )
@@ -34,7 +35,7 @@ class ItdeContainerStatus(IntFlag):
     READY = RUNNING | VISIBLE
 
 
-def bring_itde_up(conf: Secrets) -> None:
+def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> None:
     """
     Launches the ITDE environment using its API. Sets hardcoded environment name,
     and Google name server address. Additionally, can set the following
@@ -44,8 +45,11 @@ def bring_itde_up(conf: Secrets) -> None:
     - database memory size (the value is assumed to be the number of gigabytes),
     - database disk size (the value is assumed to be the number of gigabytes).
 
-    The function assumes that ITDE is not running at the time of the call. If this
-    is not the case the behaviour is undefined.
+    Optionally, an existing instance of the DockerDB can be used instead. In this
+    case the EnvironmentInfo object must be provided.
+
+    The function connects the current container to the network of the container
+    where the Docker DB is running.
 
     The names of created docker container, docker volume and docker network will be
     saved in the provided secret store. They will be used by the function that
@@ -55,17 +59,17 @@ def bring_itde_up(conf: Secrets) -> None:
     BucketFS connection parameters, in the secret store.
     """
 
-    mem_size = f'{conf.get(AILabConfig.mem_size, "4")} GiB'
-    disk_size = f'{conf.get(AILabConfig.disk_size, "10")} GiB'
-
     _remove_current_container_from_db_network(conf)
 
-    env_info, _ = api.spawn_test_environment(
-        environment_name=ENVIRONMENT_NAME,
-        nameserver=(NAME_SERVER_ADDRESS,),
-        db_mem_size=mem_size,
-        db_disk_size=disk_size,
-    )
+    if env_info is not None:
+        mem_size = f'{conf.get(AILabConfig.mem_size, "4")} GiB'
+        disk_size = f'{conf.get(AILabConfig.disk_size, "10")} GiB'
+        env_info, _ = api.spawn_test_environment(
+            environment_name=ENVIRONMENT_NAME,
+            nameserver=(NAME_SERVER_ADDRESS,),
+            db_mem_size=mem_size,
+            db_disk_size=disk_size,
+        )
 
     db_info = env_info.database_info
     container_info = db_info.container_info
@@ -217,18 +221,22 @@ def restart_itde(conf: Secrets) -> None:
             _add_current_container_to_db_network(network_name)
 
 
-def take_itde_down(conf: Secrets) -> None:
+def take_itde_down(conf: Secrets, stop_db: bool = True) -> None:
     """
     Shuts down the ITDE.
     The names of the docker container, docker volume and docker network
     are taken from the provided secret store. If the names are not found
     there no action is taken.
+
+    Stopping the DockerDB can be skipped by setting the stop_db parameter to False.
+    This is a useful option in case the DockerDB has been provided externally.
     """
     _remove_current_container_from_db_network(conf)
 
-    remove_container(conf)
-    remove_volume(conf)
-    remove_network(conf)
+    if stop_db:
+        remove_container(conf)
+        remove_volume(conf)
+        remove_network(conf)
 
     conf.remove(AILabConfig.db_host_name)
     conf.remove(AILabConfig.bfs_host_name)
