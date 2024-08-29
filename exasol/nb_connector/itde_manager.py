@@ -61,7 +61,7 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
 
     _remove_current_container_from_db_network(conf)
 
-    if env_info is not None:
+    if env_info is None:
         mem_size = f'{conf.get(AILabConfig.mem_size, "4")} GiB'
         disk_size = f'{conf.get(AILabConfig.disk_size, "10")} GiB'
         env_info, _ = api.spawn_test_environment(
