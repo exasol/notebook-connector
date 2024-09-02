@@ -234,13 +234,13 @@ def itde_stop_and_restart():
 @pytest.fixture
 def itde_external_test():
     """
-    This fixture returns the test source code for testing the use of an externally created ITDE. The test
-    checks that it survives the calls bring_itde_up/take_itde_down with an indication of using an external ITDE.
+    This fixture returns the test source code for testing the use of an externally created ITDE.
     The source code needs to appended to the wheel file inside the Docker container called TEST_CONTAINER.
     """
 
     def run_test():
         from pathlib import Path
+        from unittest.mock import patch
 
         from exasol_integration_test_docker_environment.lib import api
         from exasol.nb_connector.connections import open_pyexasol_connection
@@ -250,11 +250,12 @@ def itde_external_test():
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
         env_info, cleanup_func = api.spawn_test_environment(environment_name="TestDemoDb")
         try:
-            bring_itde_up(secrets, env_info)
-            with open_pyexasol_connection(secrets) as conn:
+            with patch('exasol_integration_test_docker_environment.lib.api.spawn_test_environment'):
+                bring_itde_up(secrets, env_info)
+                with open_pyexasol_connection(secrets) as conn:
+                    result = conn.execute("select 1").fetchval()
+                    assert result == 1
                 take_itde_down(secrets, False)
-                result = conn.execute("select 1").fetchval()
-                assert result == 1
         finally:
             cleanup_func()
 
