@@ -251,6 +251,10 @@ def itde_external_test():
         env_info, cleanup_func = api.spawn_test_environment(environment_name="TestDemoDb")
         try:
             with patch('exasol_integration_test_docker_environment.lib.api.spawn_test_environment'):
+                # We have effectively disabled the spawn_test_environment(). The bring_itde_up()
+                # should use the provided instance of the DockerDB. If it tries to create a new
+                # one this will fail since a spawn_test_environment() mock will be called instead.
+                # The mock will not return a valid EnvironmentInfo object.
                 bring_itde_up(secrets, env_info)
                 with open_pyexasol_connection(secrets) as conn:
                     result = conn.execute("select 1").fetchval()
