@@ -145,9 +145,13 @@ def encapsulate_bucketfs_credentials(
 
     backend = get_backend(conf)
     if backend == StorageBackend.onprem:
-        host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
+        # Here we are using the internal bucket-fs host and port, falling back
+        # to the external parameters if the former are not specified.
+        host = conf.get(CKey.bfs_internal_host_name,
+                        conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name)))
+        port = conf.get(CKey.bfs_internal_port, conf.get(CKey.bfs_port))
         protocol = "https" if str_to_bool(conf, CKey.bfs_encryption, True) else "http"
-        url = f"{protocol}://{host}:{conf.get(CKey.bfs_port)}"
+        url = f"{protocol}://{host}:{port}"
         verify: Optional[bool] = (False if conf.get(CKey.trusted_ca)
                                   else optional_str_to_bool(conf.get(CKey.cert_vld)))
         conn_to = to_json_str(backend=bfs.path.StorageBackend.onprem.name,
