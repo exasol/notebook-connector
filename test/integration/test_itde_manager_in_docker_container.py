@@ -232,11 +232,49 @@ def itde_stop_and_restart():
 
 
 @pytest.fixture
+def itde_external_test():
+    """
+    This fixture returns the test source code for testing the use of an externally created ITDE.
+    The source code needs to appended to the wheel file inside the Docker container called TEST_CONTAINER.
+    """
+
+    def run_test():
+        from pathlib import Path
+        from unittest.mock import patch
+
+        from exasol_integration_test_docker_environment.lib import api
+        from exasol.nb_connector.connections import open_pyexasol_connection
+        from exasol.nb_connector.itde_manager import bring_itde_up, take_itde_down
+        from exasol.nb_connector.secret_store import Secrets
+
+        secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
+        env_info, cleanup_func = api.spawn_test_environment(environment_name="TestDemoDb")
+        try:
+            with patch('exasol_integration_test_docker_environment.lib.api.spawn_test_environment'):
+                # We have effectively disabled the spawn_test_environment(). The bring_itde_up()
+                # should use the provided instance of the DockerDB. If it tries to create a new
+                # one this will fail since a spawn_test_environment() mock will be called instead.
+                # The mock will not return a valid EnvironmentInfo object.
+                bring_itde_up(secrets, env_info)
+                with open_pyexasol_connection(secrets) as conn:
+                    result = conn.execute("select 1").fetchval()
+                    assert result == 1
+                take_itde_down(secrets, False)
+        finally:
+            cleanup_func()
+
+    function_source_code = textwrap.dedent(dill.source.getsource(run_test))
+    source_code = f"{function_source_code}\nrun_test()"
+    return source_code
+
+
+@pytest.fixture
 def docker_container(wheel_path, docker_image,
                      itde_connect_test_impl,
                      itde_recreation_after_take_down,
                      itde_recreation_without_take_down,
-                     itde_stop_and_restart):
+                     itde_stop_and_restart,
+                     itde_external_test):
     """
     Create a Docker container named TEST_CONTAINER to manage an instance of ITDE.
     Copy the wheel file resulting from building the current project NC into the container.
@@ -260,6 +298,7 @@ def docker_container(wheel_path, docker_image,
             copy.add_string_to_file("itde_recreation_after_take_down.py", itde_recreation_after_take_down)
             copy.add_string_to_file("itde_recreation_without_take_down.py", itde_recreation_without_take_down)
             copy.add_string_to_file("itde_stop_and_restart.py", itde_stop_and_restart)
+            copy.add_string_to_file("itde_external_test.py", itde_external_test)
             copy.copy("/tmp")
             exit_code, output = container.exec_run(
                 f"python3 -m pip install /tmp/{wheel_path.name} "
@@ -288,4 +327,9 @@ def test_itde_recreation_without_take_down(docker_container):
 
 def test_itde_stop_and_restart(docker_container):
     exec_result = docker_container.exec_run("python3 /tmp/itde_stop_and_restart.py")
+    assert exec_result.exit_code == 0, exec_result.output
+
+
+def test_itde_external(docker_container):
+    exec_result = docker_container.exec_run("python3 /tmp/itde_external_test.py")
     assert exec_result.exit_code == 0, exec_result.output
