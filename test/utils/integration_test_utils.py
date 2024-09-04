@@ -99,3 +99,12 @@ def assert_connection_exists(
         """
     ).fetchall()
     assert result
+
+
+def set_language_definition(language_alias: str, pyexasol_connection: ExaConnection
+                            ) -> None:
+    for alter_type in ['SYSTEM', 'SESSION']:
+        sql = (f"ALTER {alter_type} SET SCRIPT_LANGUAGES='PYTHON=builtin_python "
+               "R=builtin_r JAVA=builtin_java PYTHON3=builtin_python3 "
+               f"{language_alias}=builtin_python3';")
+        pyexasol_connection.execute(sql)

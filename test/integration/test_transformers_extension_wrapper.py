@@ -10,7 +10,8 @@ from test.utils.integration_test_utils import (
     activate_languages,
     assert_connection_exists,
     assert_run_empty_udf,
-    get_script_counts
+    get_script_counts,
+    set_language_definition,
 )
 
 
@@ -25,6 +26,9 @@ def test_initialize_te_extension(
     secrets.save(CKey.huggingface_token, "abc")
 
     with open_pyexasol_connection(secrets) as pyexasol_connection:
+
+        # Set pre-existing language definition with the chosen alias.
+        set_language_definition(language_alias, pyexasol_connection)
 
         # Run the extension deployment.
         initialize_te_extension(secrets, language_alias=language_alias)

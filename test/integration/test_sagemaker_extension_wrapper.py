@@ -7,7 +7,8 @@ from test.utils.integration_test_utils import (
     activate_languages,
     assert_connection_exists,
     assert_run_empty_udf,
-    get_script_counts
+    get_script_counts,
+    set_language_definition,
 )
 
 
@@ -22,10 +23,14 @@ def test_initialize_sme_extension(
     secrets.save(CKey.aws_access_key_id, "FAKEKEYIDDONTUSEIT")
     secrets.save(CKey.aws_secret_access_key, "FakeSecretAccessKeyDontTryToUseIt")
 
-    # Run the extension deployment.
-    initialize_sme_extension(secrets)
-
     with open_pyexasol_connection(secrets) as pyexasol_connection:
+        # Set pre-existing language definition with the chosen alias.
+        language_alias = 'PYTHON3_SME'
+        set_language_definition(language_alias, pyexasol_connection)
+
+        # Run the extension deployment.
+        initialize_sme_extension(secrets, language_alias=language_alias)
+
         activate_languages(pyexasol_connection, secrets)
         assert_run_empty_udf("PYTHON3_SME", pyexasol_connection, secrets)
         script_counts = get_script_counts(pyexasol_connection, secrets)

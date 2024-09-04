@@ -9,10 +9,12 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.extension_wrapper_common import encapsulate_bucketfs_credentials
 
+DB_HOST = '1.2.3.4'
+
 
 @pytest.fixture
 def filled_secrets(secrets) -> Secrets:
-    secrets.save(CKey.db_host_name, 'localhost')
+    secrets.save(CKey.db_host_name, DB_HOST)
     secrets.save(CKey.db_port, '8888')
     secrets.save(CKey.db_user, 'user')
     secrets.save(CKey.db_password, 'password')
@@ -61,13 +63,36 @@ def test_bucketfs_credentials_default(mock_connect, filled_secrets):
     query_params = mock_connection.execute.call_args_list[0].kwargs['query_params']
     validate_params(query_params['BUCKETFS_ADDRESS'], (
         ['backend', 'url', 'service_name', 'bucket_name', 'path'],
-        ['onprem', 'https://localhost:6666', 'bfsdefault', 'default', path_in_bucket]
+        ['onprem', f'https://{DB_HOST}:6666', 'bfsdefault', 'default', path_in_bucket]
     ))
     validate_params(query_params['BUCKETFS_USER'], (
         ['username'], ['user']
     ))
     validate_params(query_params['BUCKETFS_PASSWORD'], (
         ['password'], ['password']
+    ))
+
+
+def test_bucketfs_credentials_internal(mock_connect, filled_secrets):
+
+    path_in_bucket = 'location'
+    internal_host = 'localhost'
+    internal_port = 3377
+    filled_secrets.save(CKey.bfs_internal_host_name, internal_host)
+    filled_secrets.save(CKey.bfs_internal_port, str(internal_port))
+
+    mock_connection = unittest.mock.MagicMock()
+    mock_connection.__enter__.return_value = mock_connection
+    mock_connect.return_value = mock_connection
+
+    encapsulate_bucketfs_credentials(filled_secrets, path_in_bucket=path_in_bucket,
+                                     connection_name='whatever')
+
+    mock_connection.execute.assert_called_once()
+    query_params = mock_connection.execute.call_args_list[0].kwargs['query_params']
+    validate_params(query_params['BUCKETFS_ADDRESS'], (
+        ['backend', 'url', 'service_name', 'bucket_name', 'path'],
+        ['onprem', f'https://{internal_host}:{internal_port}', 'bfsdefault', 'default', path_in_bucket]
     ))
 
 
