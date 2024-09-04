@@ -73,6 +73,7 @@ def test_bucketfs_credentials_default(mock_connect, filled_secrets):
     ))
 
 
+@unittest.mock.patch("pyexasol.connect")
 def test_bucketfs_credentials_internal(mock_connect, filled_secrets):
 
     path_in_bucket = 'location'
