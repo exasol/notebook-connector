@@ -116,7 +116,7 @@ def language_definition_context(pyexasol_connection: ExaConnection,
 
     # Remember the current language settings.
     alter_types = ['SYSTEM', 'SESSION']
-    sql0 = (f"""SELECT "{', '.join(alter_type + '_VALUE' for alter_type in alter_types)}" """
+    sql0 = (f"""SELECT {', '.join(alter_type + '_VALUE' for alter_type in alter_types)} """
             "FROM SYS.EXA_PARAMETERS WHERE PARAMETER_NAME='SCRIPT_LANGUAGES';")
     current_definitions = pyexasol_connection.execute(sql0).fetchall()[0]
 
