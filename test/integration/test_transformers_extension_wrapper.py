@@ -15,7 +15,6 @@ from test.utils.integration_test_utils import (
 )
 
 
-@pytest.mark.skip(reason="The expected functionality is not yet implemented in the Transformers Extension")
 def test_initialize_te_extension(
     secrets: Secrets,
     setup_itde

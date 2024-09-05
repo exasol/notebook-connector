@@ -23,7 +23,9 @@ def test_initialize_sme_extension(
     secrets.save(CKey.aws_access_key_id, "FAKEKEYIDDONTUSEIT")
     secrets.save(CKey.aws_secret_access_key, "FakeSecretAccessKeyDontTryToUseIt")
 
-    language_alias = 'PYTHON3_SME_TEST'
+    # At the moment the language alias is hard-coded in the extension,
+    # so we have to use this exact value.
+    language_alias = 'PYTHON3_SME'
 
     with open_pyexasol_connection(secrets) as pyexasol_connection:
 
