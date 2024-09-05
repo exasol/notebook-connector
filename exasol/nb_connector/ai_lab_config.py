@@ -15,6 +15,8 @@ class AILabConfig(Enum):
     client_key = auto()
     bfs_host_name = auto()
     bfs_port = auto()
+    bfs_internal_host_name = auto()
+    bfs_internal_port = auto()
     bfs_service = auto()
     bfs_bucket = auto()
     bfs_user = auto()
