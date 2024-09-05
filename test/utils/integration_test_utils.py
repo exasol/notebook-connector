@@ -1,5 +1,6 @@
+from __future__ import annotations
 import textwrap
-from typing import Dict
+from contextlib import contextmanager
 import pytest
 
 from pyexasol import ExaConnection
@@ -71,7 +72,7 @@ def assert_run_empty_udf(
 
 def get_script_counts(
     pyexasol_connection: ExaConnection, secrets: Secrets
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """
     Returns numbers of installed scripts of different types.
     """
@@ -101,10 +102,33 @@ def assert_connection_exists(
     assert result
 
 
-def set_language_definition(language_alias: str, pyexasol_connection: ExaConnection
-                            ) -> None:
-    for alter_type in ['SYSTEM', 'SESSION']:
-        sql = (f"ALTER {alter_type} SET SCRIPT_LANGUAGES='PYTHON=builtin_python "
-               "R=builtin_r JAVA=builtin_java PYTHON3=builtin_python3 "
-               f"{language_alias}=builtin_python3';")
+@contextmanager
+def language_definition_context(pyexasol_connection: ExaConnection,
+                                language_alias: str | None = None) -> None:
+    """
+    A context manager that preserves the current language definitions at both
+    SESSION and SYSTEM levels. Optionally creates a definition for the specified
+    alias to test the ability to override an existing definition.
+    """
+    def alter_language_settings(alter_type: str, lang_definition: str):
+        sql = f"ALTER {alter_type} SET SCRIPT_LANGUAGES='{lang_definition}';"
         pyexasol_connection.execute(sql)
+
+    # Remember the current language settings.
+    alter_types = ['SYSTEM', 'SESSION']
+    sql0 = (f"""SELECT "{', '.join(alter_type + '_VALUE' for alter_type in alter_types)}" """
+            "FROM SYS.EXA_PARAMETERS WHERE PARAMETER_NAME='SCRIPT_LANGUAGES';")
+    current_definitions = pyexasol_connection.execute(sql0).fetchall()[0]
+
+    for alter_type in alter_types:
+        # Creates a trivial language definition for the specified alias.
+        if language_alias:
+            lang_def = ('PYTHON=builtin_python R=builtin_r JAVA=builtin_java '
+                        f'PYTHON3=builtin_python3 {language_alias}=builtin_python3')
+            alter_language_settings(alter_type, lang_def)
+    try:
+        yield
+    finally:
+        # Restore language settings.
+        for alter_type, lang_def in zip(alter_types, current_definitions):
+            alter_language_settings(alter_type, lang_def)
