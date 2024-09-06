@@ -29,6 +29,7 @@ FLAVOR_PATH_IN_SLC_REPO = Path("flavors") / REQUIRED_FLAVOR
 
 PipPackageDefinition = namedtuple('PipPackageDefinition', ['pkg', 'version'])
 
+SLC_RELEASE_TAG = "8.2.0"
 
 class SlcDir:
     def __init__(self, secrets: Secrets):
@@ -121,7 +122,8 @@ class SlctManager:
         """
         if not self.slc_dir.root_dir.is_dir():
             logging.info(f"Cloning into {self.slc_dir}...")
-            repo = Repo.clone_from("https://github.com/exasol/script-languages-release", self.slc_dir.root_dir)
+            repo = Repo.clone_from("https://github.com/exasol/script-languages-release", self.slc_dir.root_dir,
+                                   branch=SLC_RELEASE_TAG)
             logging.info("Fetching submodules...")
             repo.submodule_update(recursive=True)
         else:

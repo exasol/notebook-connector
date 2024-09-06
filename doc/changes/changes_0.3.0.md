@@ -11,3 +11,7 @@
 * #133: Fixed the following defects:
   - Using the `allow_override` option when deploying a language container.
   - Storing internal bucket-fs host and port in a bucket-fs connection object. 
+
+## Refactoring
+
+* 125: Pin Script-Language-Release repository to tag 8.2.0
