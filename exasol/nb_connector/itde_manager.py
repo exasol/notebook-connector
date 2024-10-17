@@ -66,7 +66,7 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
         disk_size = f'{conf.get(AILabConfig.disk_size, "10")} GiB'
         env_info, _ = api.spawn_test_environment(
             environment_name=ENVIRONMENT_NAME,
-            nameserver=(NAME_SERVER_ADDRESS,),
+            nameserver=(NAME_SERVER_ADDRESS,"1.1.1.1","208.67.222.222","208.67.220.220","2001:4860:4860:0:0:0:0:8888", "2606:4700:4700::1111"),
             db_mem_size=mem_size,
             db_disk_size=disk_size,
         )
