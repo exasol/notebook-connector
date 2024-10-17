@@ -73,6 +73,7 @@ def test_nameserver(secrets):
     try:
         bring_itde_up(secrets)
         with open_pyexasol_connection(secrets) as con:
+            con.execute("create schema test;")
             con.execute(cleandoc("""
 --/
 CREATE OR REPLACE PYTHON3 SCALAR SCRIPT process_users(url VARCHAR(500))
