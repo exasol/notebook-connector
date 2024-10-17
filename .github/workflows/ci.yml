@@ -1,22 +1,37 @@
-name: CI
+name: Checks
 
 on:
+  pull_request:
   push:
-    branches-ignore:
-      - "github-pages/*"
-      - "gh-pages/*"
-      - "main"
-      - "master"
-  schedule:
-    # “At 00:00 on every 7th day-of-month from 1 through 31.” (https://crontab.guru)
-    - cron: "0 0 1/7 * *"
 
 jobs:
+  tests-job:
+    name: Tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
 
-  ci-job:
-    name: Checks
-    uses: ./.github/workflows/checks.yml
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          large-packages: false
 
-  metrics:
-    needs: [ ci-job ]
-    uses: ./.github/workflows/report.yml
+      - name: Free disk space by removing large directories
+        run: |
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/.ghcup/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/lib/node_modules
+          sudo rm -rf /opt/ghc
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.14.0
+        with:
+          python-version: '3.10'
+
+      - name: Calculate Test Coverage
+        run: poetry run pytest test/test_itde_manager_in_docker_container.py

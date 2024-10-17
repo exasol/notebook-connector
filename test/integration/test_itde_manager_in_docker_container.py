@@ -128,6 +128,52 @@ def itde_connect_test_impl():
 
 
 @pytest.fixture
+def itde_connect_test_impl_dns():
+    """
+    This fixture returns the test source code for starting up ITDE,connecting to it and let the DB execute a UDF which requires proper internet access.
+    The source code needs to appended to the wheel file inside the Docker container called TEST_CONTAINER.
+    """
+
+    def run_test():
+        from pathlib import Path
+
+        from exasol.nb_connector.ai_lab_config import AILabConfig
+        from exasol.nb_connector.connections import open_pyexasol_connection
+        from exasol.nb_connector.itde_manager import bring_itde_up
+        from exasol.nb_connector.itde_manager import take_itde_down
+        from exasol.nb_connector.secret_store import Secrets
+        import requests
+
+        requests.get("https://example.com/")
+        secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
+        secrets.save(AILabConfig.mem_size.value, "2")
+        secrets.save(AILabConfig.disk_size.value, "4")
+
+        bring_itde_up(secrets)
+        try:
+            con = open_pyexasol_connection(secrets)
+            try:
+                udf = textwrap.dedent('''
+                CREATE OR REPLACE PYTHON SCALAR SCRIPT test_dns(dummy INTEGER)
+                RETURNS INTEGER AS
+                def run(ctx):
+                    import requests
+                    requests.get("https://example.com/")
+                    return 1
+                ''')
+                result = con.execute(udf).fetchmany()
+                assert result[0][0] == 1
+            finally:
+                con.close()
+        finally:
+            take_itde_down(secrets)
+
+    function_source_code = textwrap.dedent(dill.source.getsource(run_test))
+    source_code = f"{function_source_code}\nrun_test()"
+    return source_code
+
+
+@pytest.fixture
 def itde_recreation_after_take_down():
     """
     This fixture returns the test source code for starting up ITDE again, after a first start and take down.
