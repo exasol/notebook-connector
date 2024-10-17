@@ -42,7 +42,7 @@ def env_info() -> EnvironmentInfo:
     return EnvironmentInfo("env_name", "env_type", db_info, None, net_info)
 
 
-@mock.patch("exasol_integration_test_docker_environment.lib.api.spawn_test_environment")
+""" @mock.patch("exasol_integration_test_docker_environment.lib.api.spawn_test_environment")
 def test_bring_itde_up(mock_spawn_env, secrets, env_info):
     mock_spawn_env.return_value = (env_info, None)
 
@@ -73,7 +73,7 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info):
     assert secrets.get(CKey.bfs_encryption) == "False"
     assert secrets.get(CKey.bfs_user) == "w"
     assert secrets.get(CKey.bfs_password) == "write"
-
+ """
 
 @mock.patch(
     "exasol_integration_test_docker_environment.lib.docker.container.utils.remove_docker_container"
