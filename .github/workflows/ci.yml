@@ -2,7 +2,6 @@ name: Checks
 
 on:
   pull_request:
-  push:
 
 jobs:
   tests-job:
@@ -34,4 +33,4 @@ jobs:
           python-version: '3.10'
 
       - name: Calculate Test Coverage
-        run: poetry run pytest test/test_itde_manager_in_docker_container.py
+        run: poetry run pytest test/integration/test_itde_manager_in_docker_container.py

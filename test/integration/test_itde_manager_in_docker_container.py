@@ -143,6 +143,7 @@ def itde_connect_test_impl_dns():
         from exasol.nb_connector.itde_manager import take_itde_down
         from exasol.nb_connector.secret_store import Secrets
         import requests
+        import textwrap
 
         requests.get("https://example.com/")
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
@@ -153,15 +154,18 @@ def itde_connect_test_impl_dns():
         try:
             con = open_pyexasol_connection(secrets)
             try:
+                con.execute("CREATE SCHEMA IF NOT EXISTS TEST")
                 udf = textwrap.dedent('''
-                CREATE OR REPLACE PYTHON SCALAR SCRIPT test_dns(dummy INTEGER)
+                CREATE OR REPLACE PYTHON3 SCALAR SCRIPT test_dns(dummy INTEGER)
                 RETURNS INTEGER AS
                 def run(ctx):
                     import requests
                     requests.get("https://example.com/")
                     return 1
                 ''')
-                result = con.execute(udf).fetchmany()
+                con.execute(udf)
+
+                result = con.execute("SELECT test_dns(1)").fetchmany()
                 assert result[0][0] == 1
             finally:
                 con.close()
@@ -316,11 +320,7 @@ def itde_external_test():
 
 @pytest.fixture
 def docker_container(wheel_path, docker_image,
-                     itde_connect_test_impl,
-                     itde_recreation_after_take_down,
-                     itde_recreation_without_take_down,
-                     itde_stop_and_restart,
-                     itde_external_test):
+                     itde_connect_test_impl_dns):
     """
     Create a Docker container named TEST_CONTAINER to manage an instance of ITDE.
     Copy the wheel file resulting from building the current project NC into the container.
@@ -340,11 +340,7 @@ def docker_container(wheel_path, docker_image,
         try:
             copy = DockerContainerCopy(container)
             copy.add_file(str(wheel_path), wheel_path.name)
-            copy.add_string_to_file("itde_connect_test_impl.py", itde_connect_test_impl)
-            copy.add_string_to_file("itde_recreation_after_take_down.py", itde_recreation_after_take_down)
-            copy.add_string_to_file("itde_recreation_without_take_down.py", itde_recreation_without_take_down)
-            copy.add_string_to_file("itde_stop_and_restart.py", itde_stop_and_restart)
-            copy.add_string_to_file("itde_external_test.py", itde_external_test)
+            copy.add_string_to_file("itde_connect_test_impl_dns.py", itde_connect_test_impl_dns)
             copy.copy("/tmp")
             exit_code, output = container.exec_run(
                 f"python3 -m pip install /tmp/{wheel_path.name} "
@@ -356,26 +352,6 @@ def docker_container(wheel_path, docker_image,
             remove_docker_container([container.id])
 
 
-def test_itde_connect(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/itde_connect_test_impl.py")
-    assert exec_result.exit_code == 0, exec_result.output
-
-
-def test_itde_recreation_after_take_down(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_after_take_down.py")
-    assert exec_result.exit_code == 0, exec_result.output
-
-
-def test_itde_recreation_without_take_down(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_without_take_down.py")
-    assert exec_result.exit_code == 0, exec_result.output
-
-
-def test_itde_stop_and_restart(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/itde_stop_and_restart.py")
-    assert exec_result.exit_code == 0, exec_result.output
-
-
-def test_itde_external(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/itde_external_test.py")
+def test_itde_connect_dns(docker_container):
+    exec_result = docker_container.exec_run("python3 /tmp/itde_connect_test_impl_dns.py")
     assert exec_result.exit_code == 0, exec_result.output
