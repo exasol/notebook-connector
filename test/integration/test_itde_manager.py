@@ -20,6 +20,8 @@ from exasol.nb_connector.itde_manager import (
     take_itde_down,
     ItdeContainerStatus,
 )
+from exasol.nb_connector.connections import open_pyexasol_connection
+from inspect import cleandoc
 
 DB_NETWORK_NAME = "db_network_DemoDb"
 
@@ -61,6 +63,29 @@ def test_bring_itde_up(secrets):
         assert secrets.get(AILabConfig.bfs_user) == "w"
         assert secrets.get(AILabConfig.bfs_password) == "write"
         assert secrets.get(AILabConfig.bfs_port) == "2580"
+    finally:
+        remove_itde()
+
+def test_nameserver(secrets):
+    secrets.save(AILabConfig.mem_size, "2")
+    secrets.save(AILabConfig.disk_size, "4")
+
+    try:
+        bring_itde_up(secrets)
+        with open_pyexasol_connection(secrets) as con:
+            con.execute(cleandoc("""
+--/
+CREATE OR REPLACE PYTHON3 SCALAR SCRIPT process_users(url VARCHAR(500))
+EMITS (firstname VARCHAR(200000)) AS
+import urllib.request
+import lxml.etree as etree
+
+def run(ctx):
+  for l in urllib.request.urlopen(ctx.url).readlines():
+    ctx.emit(str(l))
+/
+"""))
+            con.execute("select process_users('https://www.google.com');").fetchall()
     finally:
         remove_itde()
 
