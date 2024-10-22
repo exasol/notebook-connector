@@ -236,7 +236,7 @@ def restart_itde(conf: Secrets) -> None:
             container = docker_client.containers.get(container_name)
             container.start()
 
-    if not ItdeContainerStatus.VISIBLE not in status: # type: ignore[operator]
+    if ItdeContainerStatus.VISIBLE not in status: # type: ignore[operator]
         network_name = conf.get(AILabConfig.itde_network)
         if network_name:
             _add_current_container_to_db_network(network_name)

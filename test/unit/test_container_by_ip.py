@@ -46,6 +46,8 @@ def create_container_mock(networks: Dict[str, str]) -> Union[MagicMock, Containe
 
 
 class TestSetup:
+    __test__ = False
+
     def __init__(self, containers: Dict[str, Dict[str, str]]):
         self.docker_client_mock, self.container_mocks = create_docker_client_mock(containers)
         self.container_by_ip = ContainerByIp(
