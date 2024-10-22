@@ -224,7 +224,7 @@ def itde_stop_and_restart():
 
         restart_itde(secrets)
         status = get_itde_status(secrets)
-        assert status is ItdeContainerStatus.RUNNING, f'The status after restarting ITDE is {status.name}'
+        assert status is ItdeContainerStatus.READY, f'The status after restarting ITDE is {status.name}'
 
     function_source_code = textwrap.dedent(dill.source.getsource(run_test))
     source_code = f"{function_source_code}\nrun_test()"
