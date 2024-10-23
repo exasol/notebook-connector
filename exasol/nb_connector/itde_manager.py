@@ -23,18 +23,6 @@ from exasol.nb_connector.ai_lab_config import AILabConfig
 from exasol.nb_connector.container_by_ip import ContainerByIp, IPRetriever
 from exasol.nb_connector.secret_store import Secrets
 
-import logging
-LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.DEBUG)
-logging.basicConfig(
-    format="%(asctime)s %(levelname)-7s %(filename)s: %(message)s",
-    datefmt="%Y-%m-%d %X",
-)
-
-# if __name__ == "__main__":
-#     LOG.info("info")
-#     LOG.debug("debug")
-
 
 ENVIRONMENT_NAME = "DemoDb"
 NAME_SERVER_ADDRESS = "8.8.8.8"
@@ -113,24 +101,17 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
 
 def _get_current_container(docker_client: docker.DockerClient):
     ip_addresses = _get_ipv4_addresses()
-    LOG.debug(f"_get_current_container: ip_addresses = {ip_addresses}")
     return ContainerByIp(docker_client).find(ip_addresses)
 
 
 def _add_current_container_to_db_network(network_name: str) -> None:
-    LOG.debug(f"_add_current_container_to_db_network({network_name})")
     with ContextDockerClient() as docker_client:
         container = _get_current_container(docker_client)
-        LOG.debug(f"- container = {container and container.name}")
         if not container:
             return
         network = _get_docker_network(docker_client, network_name)
-        LOG.debug(f"- network = {network}")
         if network and not _is_container_connected_to_network(container, network):
-            LOG.debug(f"- connecting container {container.id} to the network")
             network.connect(container.id)
-        else:
-            LOG.debug("- either network is falsy or container is already connected")
 
 
 
