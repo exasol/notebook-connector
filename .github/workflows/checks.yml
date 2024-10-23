@@ -118,6 +118,13 @@ jobs:
 
       - name: Calculate Test Coverage
         run: poetry run nox -s coverage -- -- --db-version ${{ matrix.exasol-version }}
+        env:
+          PYTEST_ADDOPTS: >
+            -W 'ignore::DeprecationWarning:luigi:'
+            -W 'ignore::DeprecationWarning:pkg_resources:'
+            -W 'ignore:pkg_resources is deprecated as an API:DeprecationWarning'
+            -W 'ignore:Deprecated call to \`pkg_resources.declare_namespace:DeprecationWarning'
+            -W 'ignore::DeprecationWarning:exasol_integration_test_docker_environment:'
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "exasol-notebook-connector"
-version = "0.3.0"
+version = "0.4.0"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [ {include = "exasol"}, ]
 authors = [ "Christoph Kuhnke <christoph.kuhnke@exasol.com>" ]

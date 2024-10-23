@@ -21,6 +21,7 @@ from exasol.nb_connector.itde_manager import (
     NAME_SERVER_ADDRESS,
     bring_itde_up,
     take_itde_down,
+    ItdeContainerStatus,
 )
 
 TEST_CONTAINER_NAME = "the_new_container"
@@ -106,3 +107,37 @@ def test_take_itde_down(mock_util1, mock_util2, mock_util3, secrets):
     assert secrets.get(CKey.bfs_user) is None
     assert secrets.get(CKey.bfs_password) is None
     assert secrets.get(CKey.bfs_port) is None
+
+
+@pytest.mark.parametrize("status", [
+    ItdeContainerStatus.RUNNING,
+    ItdeContainerStatus.READY,
+])
+def test_status_running(status):
+    assert ItdeContainerStatus.RUNNING in status
+
+
+@pytest.mark.parametrize("status", [
+    ItdeContainerStatus.ABSENT,
+    ItdeContainerStatus.STOPPED,
+    ItdeContainerStatus.VISIBLE,
+])
+def test_status_not_running(status):
+    assert ItdeContainerStatus.RUNNING not in status
+
+
+@pytest.mark.parametrize("status", [
+    ItdeContainerStatus.VISIBLE,
+    ItdeContainerStatus.READY,
+])
+def test_status_visible(status):
+    assert ItdeContainerStatus.VISIBLE in status
+
+
+@pytest.mark.parametrize("status", [
+    ItdeContainerStatus.ABSENT,
+    ItdeContainerStatus.STOPPED,
+    ItdeContainerStatus.RUNNING,
+])
+def test_status_not_visible(status):
+    assert ItdeContainerStatus.VISIBLE not in status
