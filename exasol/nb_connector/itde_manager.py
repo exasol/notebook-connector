@@ -23,7 +23,6 @@ from exasol.nb_connector.ai_lab_config import AILabConfig
 from exasol.nb_connector.container_by_ip import ContainerByIp, IPRetriever
 from exasol.nb_connector.secret_store import Secrets
 
-
 ENVIRONMENT_NAME = "DemoDb"
 NAME_SERVER_ADDRESS = "8.8.8.8"
 
@@ -112,7 +111,6 @@ def _add_current_container_to_db_network(network_name: str) -> None:
         network = _get_docker_network(docker_client, network_name)
         if network and not _is_container_connected_to_network(container, network):
             network.connect(container.id)
-
 
 
 def _is_container_connected_to_network(container, network) -> bool:
