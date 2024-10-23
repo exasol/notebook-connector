@@ -325,29 +325,8 @@ def test_itde_recreation_without_take_down(docker_container):
     assert exec_result.exit_code == 0, exec_result.output
 
 
-_IGNORE_WARNINGS1 = (
-    '-W "ignore::DeprecationWarning:luigi.*:" '
-    '-W "ignore::DeprecationWarning:pkg_resources.*:" '
-    '-W "ignore:pkg_resources is deprecated as an API:DeprecationWarning" '
-    '-W "ignore::DeprecationWarning:exasol_integration_test_docker_environment.*:"'
-)
-
-
-_IGNORE_WARNINGS = " ".join(
-    f'-W "ignore:{w}"' for w in [
-        ":DeprecationWarning:luigi.*:",
-        ":DeprecationWarning:pkg_resources.*:",
-        "pkg_resources is deprecated as an API:DeprecationWarning",
-        ":DeprecationWarning:exasol_integration_test_docker_environment.*:",
-        ])
-
-
-def test_x1():
-    print(f'{_IGNORE_WARNINGS}')
-    assert _IGNORE_WARNINGS == _IGNORE_WARNINGS1
-
 def test_itde_stop_and_restart(docker_container):
-    exec_result = docker_container.exec_run(f"python3 {_IGNORE_WARNINGS} /tmp/itde_stop_and_restart.py")
+    exec_result = docker_container.exec_run("python3 /tmp/itde_stop_and_restart.py")
     assert exec_result.exit_code == 0, exec_result.output
 
 

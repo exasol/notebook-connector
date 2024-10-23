@@ -33,7 +33,7 @@ exasol-transformers-extension = "^2.0.0"
 transformers = {extras = ["torch"], version = "^4.36.2"}
 exasol-sagemaker-extension = ">=0.10.0,<1.0.0"
 
-exasol-integration-test-docker-environment = ">=3.2.0"
+exasol-integration-test-docker-environment = ">=2.0.0"
 requests = ">=2.31.0,<2.32.0"
 types-requests = "^2.31.0.6"
 ifaddr = "^0.2.0"
