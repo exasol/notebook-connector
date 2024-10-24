@@ -153,7 +153,7 @@ def _remove_current_container_from_db_network(conf: Secrets):
         if not container:
             return
         network = _get_docker_network(docker_client, network_name)
-        if network:
+        if network and _is_container_connected_to_network(container, network):
             network.disconnect(container.id)
 
 

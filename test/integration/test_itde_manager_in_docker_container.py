@@ -147,7 +147,13 @@ def itde_recreation_after_take_down():
         secrets.save(AILabConfig.disk_size.value, "4")
 
         bring_itde_up(secrets)
+        # Remember the network name
+        network_name = secrets.get(AILabConfig.itde_network)
         take_itde_down(secrets)
+        # Restore the network name. This simulates the situation when a new AI-Lab container
+        # replaces an old one. It is not connected to the network, but the network name is
+        # nonetheless present in the secret store.
+        secrets.save(AILabConfig.itde_network, network_name)
         bring_itde_up(secrets)
         take_itde_down(secrets)
 
