@@ -114,12 +114,11 @@ jobs:
 
       - name: Allow unprivileged user namespaces
         run: |
-          echo content of /etc/sysctl.d/:
-          ls -l /etc/sysctl.d/
-          OPTION="kernel.apparmor_restrict_unprivileged_userns = 0"
-          FILE="/etc/sysctl.d/99-apparmor.conf"
-          sudo bash -c "echo '${OPTION}' >> ${FILE}"
-          sudo sysctl --system
+          # OPTION="kernel.apparmor_restrict_unprivileged_userns = 0"
+          # FILE="/etc/sysctl.d/99-apparmor.conf"
+          # sudo bash -c "echo '${OPTION}' >> ${FILE}"
+          # sudo sysctl --system
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@0.14.0
