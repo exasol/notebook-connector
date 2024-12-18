@@ -52,7 +52,7 @@ build-backend = "poetry.core.masonry.api"
 pytest = "^7.1.1"
 pytest-mock = "^3.7.0"
 pytest_dependency = ">=0.6.0"
-exasol-toolbox = "^0.19.0"
+exasol-toolbox = "^0.18.0"
 
 
 [tool.pytest.ini_options]
