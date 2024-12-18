@@ -11,6 +11,8 @@ class Config:
     doc: Path = ROOT_DIR / "doc"
     version_file: Path = ROOT_DIR / "version.py"
     path_filters: Iterable[str] = ("dist", ".eggs", "venv")
+    python_versions: Iterable[str] = ("3.10", "3.11")
+    exasol_versions: Iterable[str] = ("7.1.26", )
 
 
 PROJECT_CONFIG = Config()
