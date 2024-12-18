@@ -9,7 +9,7 @@ on:
 jobs:
 
   cd-job:
-    name: Continues Delivery
+    name: Continuous Delivery
     runs-on: ubuntu-latest
     steps:
 
@@ -34,5 +34,5 @@ jobs:
         run: >
           gh release create ${GITHUB_REF_NAME}
           --title ${GITHUB_REF_NAME}
-          --notes-file doc/changes/changes_${GITHUB_REF_NAME}.md
+          --notes-file ./doc/changes/changes_${GITHUB_REF_NAME}.md
           dist/*
