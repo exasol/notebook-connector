@@ -57,6 +57,7 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info):
         nameserver=(NAME_SERVER_ADDRESS,),
         db_mem_size="4 GiB",
         db_disk_size="10 GiB",
+        docker_db_image_version="8.18.1",
     )
 
     assert secrets.get(CKey.itde_container) == TEST_CONTAINER_NAME
