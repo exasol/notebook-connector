@@ -10,7 +10,7 @@ jobs:
 
   Version-Check:
     name: Version
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: SCM Checkout
@@ -27,7 +27,7 @@ jobs:
   Documentation:
     name: Build Documentation
     needs: [ Version-Check ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: SCM Checkout
@@ -43,7 +43,7 @@ jobs:
   Lint:
     name: Linting (Python-${{ matrix.python-version }})
     needs: [ Version-Check ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -71,7 +71,7 @@ jobs:
   Type-Check:
     name: Type Checking (Python-${{ matrix.python-version }})
     needs: [ Version-Check ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -92,11 +92,7 @@ jobs:
   Security:
     name: Security Checks (Python-${{ matrix.python-version }})
     needs: [ Version-Check ]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.11"]
+    runs-on: ubuntu-24.04
 
     steps:
        - name: SCM Checkout
@@ -142,6 +138,7 @@ jobs:
           sudo rm -rf /usr/local/share/chromium
           sudo rm -rf /usr/local/lib/node_modules
           sudo rm -rf /opt/ghc
+
       - name: Allow unprivileged user namespaces
         run: |
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
@@ -152,7 +149,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Calculate Test Coverage
-        run: poetry run nox -s test:coverage
+        run: poetry run nox -s coverage
         env:
           TEST_DB_VERSION: ${{matrix.exasol-version}}
           PYTEST_ADDOPTS: >
