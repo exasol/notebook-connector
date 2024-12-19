@@ -7,7 +7,7 @@ from docker.models.networks import Network # type: ignore
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo  # type: ignore
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo    # type: ignore
-from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
+from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION   # type: ignore
 from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
     ContextDockerClient,
 )
