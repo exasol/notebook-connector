@@ -122,8 +122,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Calculate Test Coverage
-        run: poetry run nox -s coverage -- -- --db-version ${{ matrix.exasol-version }}
+        run: poetry run nox -s coverage
         env:
+          TEST_DB_VERSION: ${{matrix.exasol-version}}
           PYTEST_ADDOPTS: >
             -W 'ignore::DeprecationWarning:luigi:'
             -W 'ignore::DeprecationWarning:pkg_resources:'

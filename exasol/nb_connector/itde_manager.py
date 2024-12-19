@@ -1,3 +1,4 @@
+import os
 from typing import Tuple, Optional
 from enum import IntFlag
 
@@ -6,6 +7,7 @@ from docker.models.networks import Network # type: ignore
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
 from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo  # type: ignore
 from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo    # type: ignore
+from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION
 from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
     ContextDockerClient,
 )
@@ -25,6 +27,7 @@ from exasol.nb_connector.secret_store import Secrets
 
 ENVIRONMENT_NAME = "DemoDb"
 NAME_SERVER_ADDRESS = "8.8.8.8"
+TEST_DB_VERSION_ENV_VAR = "TEST_DB_VERSION"
 
 
 class ItdeContainerStatus(IntFlag):
@@ -64,11 +67,13 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
     if env_info is None:
         mem_size = f'{conf.get(AILabConfig.mem_size, "4")} GiB'
         disk_size = f'{conf.get(AILabConfig.disk_size, "10")} GiB'
+        db_version = os.getenv(TEST_DB_VERSION_ENV_VAR, LATEST_DB_VERSION)
         env_info, _ = api.spawn_test_environment(
             environment_name=ENVIRONMENT_NAME,
             nameserver=(NAME_SERVER_ADDRESS,),
             db_mem_size=mem_size,
             db_disk_size=disk_size,
+            docker_db_image_version=db_version,
         )
 
     db_info = env_info.database_info
