@@ -1,3 +1,4 @@
+import pytest
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.github import retrieve_jar, Project
 from exasol.nb_connector.connections import open_bucketfs_connection, open_pyexasol_connection
@@ -19,3 +20,11 @@ def test_cloud_storage_setup_scripts(
         setup_scripts(db_conn, secrets.db_schema, str(bfs_jar_path))
         counts = get_script_counts(db_conn, secrets)
         assert counts['UDF'] == 3
+
+
+# this test was used to check SaaS integration tests, but
+# might be broken if SaaSBucket will support iteration eventually
+def test_saas_bucket_cannot_be_iterated(secrets: Secrets, setup_itde):
+    bucket = open_bucketfs_connection(secrets)
+    with pytest.raises(TypeError, match="not iterable"):
+        list(bucket)
