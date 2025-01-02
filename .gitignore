@@ -7,3 +7,4 @@ __pycache__/
 /.lint.json
 /.lint.txt
 /.html-documentation/
+.build_output
