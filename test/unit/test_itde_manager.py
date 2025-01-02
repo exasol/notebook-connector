@@ -18,6 +18,7 @@ from exasol_integration_test_docker_environment.lib.test_environment.ports impor
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.itde_manager import (
     ENVIRONMENT_NAME,
+    TEST_DB_VERSION_ENV_VAR,
     NAME_SERVER_ADDRESS,
     bring_itde_up,
     take_itde_down,
@@ -43,8 +44,16 @@ def env_info() -> EnvironmentInfo:
     return EnvironmentInfo("env_name", "env_type", db_info, None, net_info)
 
 
+@pytest.fixture
+def db_image_version(monkeypatch) -> str:
+    mocked_db_version = "8.31.0"
+    monkeypatch.setenv(TEST_DB_VERSION_ENV_VAR, mocked_db_version)
+    yield mocked_db_version
+    monkeypatch.delenv(TEST_DB_VERSION_ENV_VAR)
+
+
 @mock.patch("exasol_integration_test_docker_environment.lib.api.spawn_test_environment")
-def test_bring_itde_up(mock_spawn_env, secrets, env_info):
+def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
     mock_spawn_env.return_value = (env_info, None)
 
     secrets.save(CKey.mem_size, "4")
@@ -57,6 +66,7 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info):
         nameserver=(NAME_SERVER_ADDRESS,),
         db_mem_size="4 GiB",
         db_disk_size="10 GiB",
+        docker_db_image_version=db_image_version,
     )
 
     assert secrets.get(CKey.itde_container) == TEST_CONTAINER_NAME
