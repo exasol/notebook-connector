@@ -24,7 +24,9 @@ def test_cloud_storage_setup_scripts(
 
 # this test was used to check SaaS integration tests, but
 # might be broken if SaaSBucket will support iteration eventually
-def test_saas_bucket_cannot_be_iterated(secrets: Secrets, setup_itde):
+def test_saas_bucket_cannot_be_iterated(backend, secrets: Secrets, setup_itde):
+    if backend != "saas":
+        pytest.skip('The test runs only with SaaS database')
     bucket = open_bucketfs_connection(secrets)
     with pytest.raises(TypeError, match="not iterable"):
         list(bucket)
