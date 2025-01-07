@@ -27,10 +27,20 @@ jobs:
     #   If you add additional jobs, make sure they are added as a requirement 
     #   to the approve-merge job's input requirements (needs).
     steps:
-      - name: Tests
-        run: |
-          echo "Slow tests ran successfully"
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      -
 
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.18.0
+
+      - name: Tests
+        env:
+          SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+          SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+          SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
+        run: poetry run pytest --backend=all test/integration
 
   # This job ensures inputs have been executed successfully.
   approve-merge:
