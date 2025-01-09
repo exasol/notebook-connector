@@ -29,4 +29,5 @@ def test_saas_bucket_cannot_be_iterated(backend, secrets: Secrets, setup_itde):
         pytest.skip('The test runs only with SaaS database')
     bucket = open_bucketfs_connection(secrets)
     with pytest.raises(TypeError, match="not iterable"):
-        list(bucket)
+        v = list(bucket)
+        print(v)
