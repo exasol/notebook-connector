@@ -1,0 +1,71 @@
+name: Merge-Gate
+
+on:
+  workflow_call:
+    secrets:
+      ALTERNATIVE_GITHUB_TOKEN:
+        required: false
+
+jobs:
+
+  fast-checks:
+    name: Fast
+    uses: ./.github/workflows/checks.yml
+
+  slow-checks:
+    name: SaaS Tests
+    runs-on: ubuntu-24.04
+    environment: manual-approval
+
+    # Replace the steps below with the required actions 
+    # and/or add additional jobs if required
+    # Note: 
+    #   If you add additional jobs, make sure they are added as a requirement 
+    #   to the approve-merge job's input requirements (needs).
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          large-packages: false
+
+      - name: Free disk space by removing large directories
+        run: |
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/.ghcup/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/lib/node_modules
+          sudo rm -rf /opt/ghc
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.18.0
+
+      - name: Allow unprivileged user namespaces
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0      
+
+      - name: Tests
+        env:
+          SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+          SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+          SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
+        run: poetry run pytest --backend=saas test/integration
+
+  # This job ensures inputs have been executed successfully.
+  approve-merge:
+    name: Allow Merge 
+    runs-on: ubuntu-latest
+    # If you need additional jobs to be part of the merge gate, add them below
+    needs: [ fast-checks, slow-checks ]
+
+    # Each job requires a step, so we added this dummy step.
+    steps:
+      - name: Approve 
+        run: |
+          echo "Merge Approved"
