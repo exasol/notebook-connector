@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/checks.yml
 
   slow-checks:
-    name: Slow
+    name: SaaS Tests
     runs-on: ubuntu-24.04
 
     # Even though the environment "manual-approval" will be created automatically,
