@@ -15,10 +15,6 @@ jobs:
   slow-checks:
     name: SaaS Tests
     runs-on: ubuntu-24.04
-
-    # Even though the environment "manual-approval" will be created automatically,
-    # it still needs to be configured to require interactive review.
-    # See project settings on GitHub (Settings / Environments / manual-approval).
     environment: manual-approval
 
     # Replace the steps below with the required actions 
