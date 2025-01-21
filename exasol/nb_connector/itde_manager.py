@@ -79,10 +79,12 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
     db_info = env_info.database_info
     container_info = db_info.container_info
 
+    assert container_info is not None
     _add_current_container_to_db_network(container_info.network_info.network_name)
 
     conf.save(AILabConfig.itde_container, container_info.container_name)
-    conf.save(AILabConfig.itde_volume, container_info.volume_name)
+    if container_info.volume_name is not None:
+        conf.save(AILabConfig.itde_volume, container_info.volume_name)
     conf.save(AILabConfig.itde_network, env_info.network_info.network_name)
 
     conf.save(AILabConfig.db_host_name, db_info.host)
