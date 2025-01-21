@@ -1,4 +1,4 @@
-# 0.4.0 - 2024-10-23
+# 0.4.1 - 2025-01-21
 
 ## Summary
 Fixes of vulnerabilities, several bugs and python-toolbox workflows update.
