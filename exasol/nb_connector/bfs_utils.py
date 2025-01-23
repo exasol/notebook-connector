@@ -26,7 +26,7 @@ def _file_in_bucket(file_name: str, bucket: bfs.Bucket) -> bool:
 
 
 def put_file(bucket: bfs.Bucket, file_path: pathlib.Path,
-             skip_if_exists: bool = True) -> pathlib.Path:
+             skip_if_exists: bool = True) -> bfs.path.BucketPath:
     """
     Uploads given file into bucketfs
     :param bucket: bucket to use
@@ -43,4 +43,4 @@ def put_file(bucket: bfs.Bucket, file_path: pathlib.Path,
         _logger.info("Uploading file %s to bucketfs", local_name)
         with file_path.open("rb") as file:
             bucket.upload(local_name, file)
-    return pathlib.Path("/buckets/bfsdefault/") / bucket.name / local_name
+    return bfs.path.BucketPath(local_name, bucket)

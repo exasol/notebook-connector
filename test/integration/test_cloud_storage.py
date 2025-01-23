@@ -15,9 +15,10 @@ def test_cloud_storage_setup_scripts(
     local_jar_path = retrieve_jar(Project.CLOUD_STORAGE_EXTENSION)
     bucket = open_bucketfs_connection(secrets)
     bfs_jar_path = put_file(bucket, local_jar_path)
-    assert str(bfs_jar_path).startswith("/buckets/")
+    udf_jar_path = bfs_jar_path.as_udf_path()
+    assert udf_jar_path.startswith("/buckets/")
     with open_pyexasol_connection(secrets) as db_conn:
-        setup_scripts(db_conn, secrets.db_schema, str(bfs_jar_path))
+        setup_scripts(db_conn, secrets.db_schema, udf_jar_path)
         counts = get_script_counts(db_conn, secrets)
         assert counts['UDF'] == 3
 
