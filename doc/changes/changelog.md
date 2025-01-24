@@ -1,6 +1,7 @@
 # Changes
 
 * [unreleased](unreleased)
+* [0.4.2](changes_0.4.2)
 * [0.4.1](changes_0.4.1)
 * [0.4.0](changes_0.4.0.md)
 * [0.3.0](changes_0.3.0.md)
