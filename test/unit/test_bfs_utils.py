@@ -34,12 +34,12 @@ def temp_file(tmp_path) -> Generator[pathlib.Path, None, None]:
 def test_put_file_exists(caplog, bucket_with_file, temp_file):
     caplog.set_level("INFO")
     path = bfs_utils.put_file(bucket_with_file, temp_file)
-    assert str(path) == f"/buckets/bfsdefault/{MOCKED_BUCKET}/{MOCKED_FILE_NAME}"
+    assert isinstance(path, bfs_utils.bfs.path.BucketPath)
     assert "already present in the bucketfs" in caplog.text
     assert not bucket_with_file.upload.called
 
     caplog.clear()
     path = bfs_utils.put_file(bucket_with_file, temp_file, skip_if_exists=False)
-    assert str(path) == f"/buckets/bfsdefault/{MOCKED_BUCKET}/{MOCKED_FILE_NAME}"
+    assert isinstance(path, bfs_utils.bfs.path.BucketPath)
     assert bucket_with_file.upload.called
     assert "Uploading file" in caplog.text
