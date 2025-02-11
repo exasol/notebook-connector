@@ -4,4 +4,7 @@
 
 ## Security Issues
 
-### Bug fixing
+Re-locked the dependencies (2025-02-11)
+
+## Bug fixing
+
