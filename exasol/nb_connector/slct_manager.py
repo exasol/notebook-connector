@@ -9,7 +9,7 @@ from typing import Optional, List
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient # type: ignore
 from git import Repo
 from pathlib import Path
-from exasol_script_languages_container_tool.lib import api as exaslct_api # type: ignore
+from exasol.slc import api as exaslct_api # type: ignore
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, AILabConfig
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 from exasol.nb_connector.secret_store import Secrets
