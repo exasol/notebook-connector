@@ -92,7 +92,7 @@ def test_slc_images(slct_manager):
 def test_upload(slct_manager: SlctManager, itde):
     slct_manager.language_alias = "my_python"
     slct_manager.upload()
-    assert slct_manager.activation_key == "my_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_python?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_python/exaudf/exaudfclient_py3"
+    assert slct_manager.activation_key == "my_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_python?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_python/exaudf/exaudfclient"
 
 
 @pytest.mark.dependency(
@@ -113,7 +113,7 @@ def test_upload_slc_with_new_packages(slc_secrets: Secrets, slct_manager: SlctMa
                                       custom_packages: List[Tuple[str, str, str]]):
     slct_manager.language_alias = "my_new_python"
     slct_manager.upload()
-    assert slct_manager.activation_key == "my_new_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_new_python?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_new_python/exaudf/exaudfclient_py3"
+    assert slct_manager.activation_key == "my_new_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_new_python?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_new_python/exaudf/exaudfclient"
 
 
 @pytest.mark.dependency(
