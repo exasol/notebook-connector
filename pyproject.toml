@@ -26,7 +26,7 @@ license = "MIT"
 python = ">=3.10,<4.0"
 sqlcipher3-binary = {version = ">=0.5.0", platform = "linux"}
 sqlcipher3 = {version = ">=0.5.0", platform = "darwin"}
-sqlalchemy-exasol = "^.0.0"
+sqlalchemy-exasol = "^5.0.0"
 pyexasol = ">=0.26.0"
 exasol-bucketfs = "^1.0.0"
 exasol-transformers-extension = "^2.2.1"
@@ -54,7 +54,7 @@ build-backend = "poetry.core.masonry.api"
 pytest = "^7.1.1"
 pytest-mock = "^3.7.0"
 pytest_dependency = ">=0.6.0"
-exasol-toolbox = "^0.18.0"
+exasol-toolbox = ">=0.18.0"
 pytest-exasol-backend = ">=0.3.2,<1"
 
 
