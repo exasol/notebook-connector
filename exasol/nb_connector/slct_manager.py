@@ -29,7 +29,7 @@ FLAVOR_PATH_IN_SLC_REPO = Path("flavors") / REQUIRED_FLAVOR
 
 PipPackageDefinition = namedtuple('PipPackageDefinition', ['pkg', 'version'])
 
-SLC_RELEASE_TAG = "8.2.0"
+SLC_RELEASE_TAG = "9.1.0"
 
 class SlcDir:
     def __init__(self, secrets: Secrets):
