@@ -26,17 +26,17 @@ license = "MIT"
 python = ">=3.10,<4.0"
 sqlcipher3-binary = {version = ">=0.5.0", platform = "linux"}
 sqlcipher3 = {version = ">=0.5.0", platform = "darwin"}
-sqlalchemy-exasol = ">=5.0.0"
+sqlalchemy-exasol = "^.0.0"
 pyexasol = ">=0.26.0"
-exasol-bucketfs = ">=1.0.0"
-exasol-transformers-extension = ">=2.2.1"
+exasol-bucketfs = "^1.0.0"
+exasol-transformers-extension = "^2.2.1"
 transformers = {extras = ["torch"], version = "^4.36.2"}
 exasol-sagemaker-extension = ">=0.11.3"
 
-exasol-integration-test-docker-environment = ">=3.2.0"
+exasol-integration-test-docker-environment = "^3.2.0"
 # The version of SLCT is dictated by its usage in the python-extension-common,
 # which at the moment still uses version 1.*.
-exasol-script-languages-container-tool = ">=1.0.0, < 2.0.0"
+exasol-script-languages-container-tool = "^1.0.0"
 requests = ">=2.32.0"
 types-requests = "^2.31.0.6"
 ifaddr = "^0.2.0"
