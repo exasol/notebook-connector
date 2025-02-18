@@ -264,18 +264,18 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
         }
 
         # Connect to the BucketFS service and navigate to the bucket of choice.
-        bucketfs = bfs.Service(buckfs_url, buckfs_credentials, verify, conf.get(CKey.bfs_service))
-        return bucketfs[conf.get(CKey.bfs_bucket)]
+        bucketfs = bfs.Service(buckfs_url, buckfs_credentials, verify, conf.get(CKey.bfs_service))  # type: ignore
+        return bucketfs[conf.get(CKey.bfs_bucket)]  # type: ignore
 
     else:
         saas_url, saas_token, saas_account_id = [
             conf.get(key) for key in [CKey.saas_url, CKey.saas_token, CKey.saas_account_id]
         ]
         saas_database_id = get_saas_database_id(conf)
-        return bfs.SaaSBucket(url=saas_url,
-                              account_id=saas_account_id,
-                              database_id=saas_database_id,
-                              pat=saas_token)
+        return bfs.SaaSBucket(url=saas_url,     # type: ignore
+                              account_id=saas_account_id,   # type: ignore
+                              database_id=saas_database_id, # type: ignore
+                              pat=saas_token)   # type: ignore
 
 
 def open_ibis_connection(conf: Secrets, **kwargs):

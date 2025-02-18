@@ -26,29 +26,18 @@ license = "MIT"
 python = ">=3.10,<4.0"
 sqlcipher3-binary = {version = ">=0.5.0", platform = "linux"}
 sqlcipher3 = {version = ">=0.5.0", platform = "darwin"}
-sqlalchemy-exasol  = ">=4.6.0"
-pyexasol = ">=0.24.0"
-exasol-bucketfs = ">=0.9.0,<1.0.0"
-exasol-transformers-extension = "^2.0.0"
+sqlalchemy-exasol = "^5.0.0"
+pyexasol = ">=0.26.0, < 1"
+exasol-bucketfs = "^1.0.0"
+exasol-transformers-extension = "^2.2.1"
 transformers = {extras = ["torch"], version = "^4.36.2"}
-exasol-sagemaker-extension = ">=0.10.0,<1.0.0"
+exasol-sagemaker-extension = ">=0.11.3"
 
-# Pin ITDE, because module
-# lib.test_environment.database_setup.upload_file_to_db was removed but is
-# needed by SLCT < 1.0.0.
-#
-# SLCT cannot be updated due to version conflict
-# with transformers-extension:
-#
-# transformers-extension 2.0.0 depends on importlib-resources (>=5.4.0,<6.0.0),
-# exasol-script-languages-container-tool (>=1.0.0,<2.0.0) is incompatible with
-# exasol-transformers-extension (2.0.0).
-# 
-# See ticket https://github.com/exasol/notebook-connector/issues/153
-
-exasol-integration-test-docker-environment = "==3.2.0"
-exasol-script-languages-container-tool = ">=0.19.0"
-requests = ">=2.31.0,<2.32.0"
+exasol-integration-test-docker-environment = "^3.2.0"
+# The version of SLCT is dictated by its usage in the python-extension-common,
+# which at the moment still uses version 1.*.
+exasol-script-languages-container-tool = "^1.0.0"
+requests = ">=2.32.0"
 types-requests = "^2.31.0.6"
 ifaddr = "^0.2.0"
 exasol-saas-api = ">=0.9.0,<1.0.0"
@@ -65,7 +54,7 @@ build-backend = "poetry.core.masonry.api"
 pytest = "^7.1.1"
 pytest-mock = "^3.7.0"
 pytest_dependency = ">=0.6.0"
-exasol-toolbox = "^0.18.0"
+exasol-toolbox = ">=0.18.0, < 1"
 pytest-exasol-backend = ">=0.3.2,<1"
 
 
