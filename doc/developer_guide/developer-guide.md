@@ -12,7 +12,7 @@ Creating a new release of the NC requires 4 steps
 ### Prepare the Release
 
 ```shell
-poetry run nox -s release:prepare <additional-options> <version>
+poetry run nox -s release:prepare -- -- <additional-options> <version>
 ```
 
 `<additional-options>` include
