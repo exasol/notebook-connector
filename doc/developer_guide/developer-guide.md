@@ -6,6 +6,7 @@ Creating a new release of the NC requires 4 steps
 
 1. [Prepare the release](#prepare-the-release)
 2. Merge your pull request to the default branch
+3. [Switch to main branch and update it from remote](#switching-to-the-default-branch)
 3. [Create and push a tag to GitHub](#creating-a-git-tag-and-pushing-it-to-github)
 
 ### Prepare the Release
@@ -29,6 +30,21 @@ Updating the Change Log includes
 * Updating the list of changes files in `doc/changes/changelog.md`
 * Adding the current date at the top of the changelog as the date of the release
 * Creating a new file `doc/changes/unreleased.md`
+
+### Switching to the default Branch
+
+You can find out the default branch with
+
+```shell
+git remote show origin | sed -n '/HEAD branch/s/.*: //p'
+```
+
+The following commands switches to branch `main` and updates it from remote
+
+```shell
+git checkout main
+git pull
+```
 
 ### Creating a Git Tag and Pushing it to GitHub
 
