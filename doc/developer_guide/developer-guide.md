@@ -7,7 +7,7 @@ Creating a new release of the NC requires 4 steps
 1. [Prepare the release](#prepare-the-release)
 2. Merge your pull request to the default branch
 3. [Switch to main branch and update it from remote](#switching-to-the-default-branch)
-3. [Create and push a tag to GitHub](#creating-a-git-tag-and-pushing-it-to-github)
+4. [Create and push a tag to GitHub](#creating-a-git-tag-and-pushing-it-to-github)
 
 ### Prepare the Release
 
