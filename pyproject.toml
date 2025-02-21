@@ -36,6 +36,7 @@ exasol-sagemaker-extension = ">=0.11.3"
 exasol-integration-test-docker-environment = "^3.2.0"
 # The version of SLCT is dictated by its usage in the python-extension-common,
 # which at the moment still uses version 1.*.
+# See developer guide, section "Selecting the Versions for SLCT and SLCR".
 exasol-script-languages-container-tool = "^1.0.0"
 requests = ">=2.32.0"
 types-requests = "^2.31.0.6"
