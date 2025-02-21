@@ -82,6 +82,8 @@ NC contains multiple dependencies including the following
 
 Additionally, each version of the SLCR depends on a specific version of the SLCT, see the SLCR release letters and the file `pyproject.toml` used by any specific released version of the SLCR.
 
+Conclusion: Whenever you update the major version of `script-languages-container-tool` in `pyproject.toml` you will need to update the referenced tag of SLCR in `slct_manager.py`
+
 ### Example
 
 For the versions named in the table above
