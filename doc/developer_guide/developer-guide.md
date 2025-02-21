@@ -14,7 +14,7 @@ Creating a new release of the NC requires 4 steps
 poetry run nox -s release:prepare <additional-options> <version>
 ```
 
-Optional additional CLI options are
+`<additional-options>` include
 * `--no-branch` if already working on a branch
 * `--no-pr` if you already created a pull request or plan to do so manually after preparing the release
 
