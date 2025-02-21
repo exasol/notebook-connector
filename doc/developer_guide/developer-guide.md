@@ -62,7 +62,7 @@ NC contains multiple dependencies including the following
 | Dependency | Defined in | Example |
 |------------|------------|---------|
 | `script-languages-container-tool` (SLCT) | File [pyproject.toml](https://github.com/exasol/notebook-connector/blob/main/pyproject.toml) | `exasol-script-languages-container-tool = "^1.0.0"` |
-| A release of the Exasol default Script Language Container `script-languages-release` (SLCR) | File [exasol/nb_connector/nb_connector/slct_manager.py](https://github.com/exasol/notebook-connector/blob/main/exasol/nb_connector/slct_manager.py) | `SLC_RELEASE_TAG = "9.1.0"` |
+| A release of the Exasol Script Language Containers `script-languages-release` (SLCR) | File [exasol/nb_connector/slct_manager.py](https://github.com/exasol/notebook-connector/blob/main/exasol/nb_connector/slct_manager.py) | `SLC_RELEASE_TAG = "9.1.0"` |
 
 Additionally, each version of the SLCR depends on a specific version of the SLCT, see the SLCR release letters and the file `pyproject.toml` used by any specific released version of the SLCR.
 
