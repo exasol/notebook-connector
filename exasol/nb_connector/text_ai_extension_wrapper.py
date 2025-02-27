@@ -1,3 +1,5 @@
+from typing import Optional
+
 from exasol.nb_connector.secret_store import Secrets
 from pathlib import Path
 
@@ -6,8 +8,8 @@ LANGUAGE_ALIAS = "PYTHON3_TXAIE"
 LATEST_KNOWN_VERSION = "???"
 
 def deploy_licence(conf: Secrets,
-                   licence_file: Path = None,
-                   licence_content: str = None) -> None:
+                   licence_file: Optional[Path] = None,
+                   licence_content: Optional[str] = None) -> None:
     """
     Deploys the given license and saves its identifier to the secret store. The licence can either be
     defined by a path pointing to a licence file, or by the licence content given as a string.
