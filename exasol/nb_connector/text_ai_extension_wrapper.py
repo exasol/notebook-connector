@@ -17,16 +17,16 @@ def deploy_licence(conf: Secrets,
          conf:
             The secret store.
         licence_file:
-            Path of a licence file.
+            Optional. Path of a licence file.
         licence_content:
-            Content of a licence given as a string.
+            Optional. Content of a licence given as a string.
 
     """
     pass
 
 def initialize_text_ai_extension(conf: Secrets,
-                                 container_file: Path,
-                                 version: str = LATEST_KNOWN_VERSION,
+                                 container_file: Optional[Path],
+                                 version: Optional[str] = LATEST_KNOWN_VERSION,
                                  language_alias: str = LANGUAGE_ALIAS,
                                  run_deploy_container: bool = True,
                                  run_deploy_scripts: bool = True,
@@ -37,8 +37,10 @@ def initialize_text_ai_extension(conf: Secrets,
     Possible steps:
 
     * Call the Text-AI Extension's language container deployment API.
-    Downloads the specified released version of the extension from ???
+    If given a version, downloads the specified released version of the extension from ???
     and uploads it to the BucketFS.
+
+    If given a container_file path instead, installs the given contaner in the Bucketfs.
 
     This function doesn't activate the language container. Instead, it gets the
     activation SQL using the same API and writes it to the secret store. The name
@@ -54,9 +56,9 @@ def initialize_text_ai_extension(conf: Secrets,
             The secret store. The store must contain the DB connection parameters
             and the parameters of the BucketFS service.
         container_file:
-            Path pointing to the locally stored Script Language Container file for the Text-AI Extension.
+            Optional. Path pointing to the locally stored Script Language Container file for the Text-AI Extension.
         version:
-            Text-AI extension version.
+            Optional. Text-AI extension version.
         language_alias:
             The language alias of the extension's language container.
         run_deploy_container:
