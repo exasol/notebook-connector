@@ -25,12 +25,13 @@ def deploy_licence(conf: Secrets,
     pass
 
 def initialize_text_ai_extension(conf: Secrets,
-                                 container_file: Optional[Path],
+                                 container_file: Optional[Path] = None,
                                  version: Optional[str] = LATEST_KNOWN_VERSION,
                                  language_alias: str = LANGUAGE_ALIAS,
                                  run_deploy_container: bool = True,
                                  run_deploy_scripts: bool = True,
                                  run_upload_models: bool = True,
+                                 run_encapsulate_bfs_credentials: bool = True,
                                  allow_override: bool = True) -> None:
     """
     Depending on which flags are set, runs different steps to install Text-AI Extension in the DB.
@@ -40,7 +41,9 @@ def initialize_text_ai_extension(conf: Secrets,
     If given a version, downloads the specified released version of the extension from ???
     and uploads it to the BucketFS.
 
-    If given a container_file path instead, installs the given contaner in the Bucketfs.
+    If given a container_file path instead, installs the given container in the Bucketfs.
+
+    If neither is given, attempts to install the latest version from ???.
 
     This function doesn't activate the language container. Instead, it gets the
     activation SQL using the same API and writes it to the secret store. The name
@@ -67,6 +70,9 @@ def initialize_text_ai_extension(conf: Secrets,
             If True runs deployment of Text-AI Extension scripts.
         run_upload_models:
             If True uploads default Transformers models to the BucketFS.
+        run_encapsulate_bfs_credentials:
+            If set to False will skip the creation of the text ai specific database connection
+            object encapsulating the BucketFS credentials.
         allow_override:
             If True allows overriding the language definition.
     """
