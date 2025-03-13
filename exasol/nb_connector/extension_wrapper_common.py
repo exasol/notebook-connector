@@ -1,11 +1,15 @@
 from __future__ import annotations
-from typing import Optional, Any
+from typing import Optional
+from datetime import timedelta
 import json
 
-import exasol.bucketfs as bfs   # type: ignore
+import exasol.bucketfs as bfs
+from exasol.python_extension_common.deployment.extract_validator import ExtractValidator
+from exasol.python_extension_common.deployment.language_container_deployer import LanguageContainerDeployer
 
-from exasol.nb_connector.connections import (open_pyexasol_connection, get_external_host,
-                                             get_backend, get_saas_database_id)
+from exasol.nb_connector.connections import (
+    open_pyexasol_connection, open_bucketfs_location,
+    get_external_host, get_backend, get_saas_database_id)
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.utils import optional_str_to_bool
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend
@@ -50,37 +54,64 @@ def _get_optional_bfs_port(conf: Secrets) -> int | None:
     return None
 
 
-def get_container_deployer_kwargs(conf: Secrets) -> dict[str, Any]:
+def deploy_language_container(conf: Secrets,
+                              container_url: str,
+                              container_name: str,
+                              path_in_bucket: str,
+                              language_alias: str,
+                              activation_key: str,
+                              allow_override: bool = True,
+                              timeout: timedelta = timedelta(minutes=10)) -> None:
     """
-    Creates kwargs required to create a language container deployer.
-    The set of arguments depends on the selected storage backend.
+    Downloads language container from the specified location and uploads it to the
+    BucketFS.
+
+    This function doesn't activate the language container. Instead, it gets the
+    activation SQL using the same API and writes it to the secret store using the
+    provided key.
+
+    Parameters:
+        conf:
+            The secret store. The store must contain the DB connection parameters
+            and the parameters of the BucketFS service.
+        container_url:
+            The url to download the language container from
+        container_name:
+            The language container will be saved in the BucketFS with this name.
+        path_in_bucket:
+            Path in the BucketFS where the container should be saved.
+        language_alias:
+            The language alias of the extension's language container.
+        activation_key:
+            A secret store key for saving the activation SQL.
+        allow_override:
+            If True allows overriding the language definition.
+        timeout:
+            Maximum time allowed for saving the container in the BucketFS.
+            This includes the time required to unpack the container.
+            The downloading time is not included.
     """
 
-    backend = get_backend(conf)
-    kwargs: dict[str, Any] = {
-        "use_ssl_cert_validation": str_to_bool(conf, CKey.cert_vld, True),
-        "ssl_trusted_ca": conf.get(CKey.trusted_ca),
-        "ssl_client_certificate": conf.get(CKey.client_cert),
-        "ssl_private_key": conf.get(CKey.client_key),
-    }
-    if backend == StorageBackend.onprem:
-        kwargs["dsn"] = _get_optional_external_host(conf)
-        kwargs["db_user"] = conf.get(CKey.db_user)
-        kwargs["db_password"] = conf.get(CKey.db_password)
-        kwargs["bucketfs_name"] = conf.get(CKey.bfs_service)
-        kwargs["bucketfs_host"] = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
-        kwargs["bucketfs_port"] = _get_optional_bfs_port(conf)
-        kwargs["bucketfs_user"] = conf.get(CKey.bfs_user)
-        kwargs["bucketfs_password"] = conf.get(CKey.bfs_password)
-        kwargs["bucketfs_use_https"] = str_to_bool(conf,  CKey.bfs_encryption, True)
-        kwargs["bucket"] = conf.get(CKey.bfs_bucket)
-    else:
-        kwargs["saas_url"] = conf.get(CKey.saas_url)
-        kwargs["saas_account_id"] = conf.get(CKey.saas_account_id)
-        kwargs["saas_database_id"] = conf.get(CKey.saas_database_id)
-        kwargs["saas_database_name"] = conf.get(CKey.saas_database_name)
-        kwargs["saas_token"] = conf.get(CKey.saas_token)
-    return kwargs
+    with open_pyexasol_connection(conf, compression=True) as conn:
+        validator = ExtractValidator(conn, timeout)
+        bucketfs_location = open_bucketfs_location(conf) / path_in_bucket
+        deployer = LanguageContainerDeployer(
+            pyexasol_connection=conn,
+            language_alias=language_alias,
+            bucketfs_path=bucketfs_location,
+            extract_validator=validator
+        )
+
+        deployer.download_and_run(container_url,
+                                  container_name,
+                                  alter_system=False,
+                                  allow_override=allow_override,
+                                  wait_for_completion=True)
+
+        # Install the language container.
+        # Save the activation SQL in the secret store.
+        language_def = deployer.get_language_definition(container_name)
+        conf.save(activation_key, language_def)
 
 
 def encapsulate_bucketfs_credentials(

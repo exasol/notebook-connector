@@ -7,6 +7,10 @@
 * #146: Add interface for text_ai_extension_wrapper
 * #169: Added a function that creates a bucket-fs PathLike object
 
+## Refactoring
+
+* #171: Stopped using deprecated factory of the LanguageContainerDeployer.
+
 ## Security Issues
 
 * #101: Updated bucketfs-python dependency to the version 1.0.0+
