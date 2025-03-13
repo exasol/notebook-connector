@@ -5,6 +5,7 @@
 ## Features
 
 * #146: Add interface for text_ai_extension_wrapper
+* #169: Added a function that creates a bucket-fs PathLike object
 
 ## Security Issues
 

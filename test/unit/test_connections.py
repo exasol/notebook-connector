@@ -10,10 +10,12 @@ from unittest.mock import create_autospec
 from sqlalchemy.engine import make_url
 
 import pytest
+import exasol.bucketfs as bfs
 
 from exasol.nb_connector.connections import (
     get_external_host,
     open_bucketfs_connection,
+    open_bucketfs_location,
     open_pyexasol_connection,
     open_sqlalchemy_connection,
     open_ibis_connection
@@ -266,6 +268,24 @@ def test_open_bucketfs_connection_saas(mock_database_id, mock_saas_bucket, conf_
         database_id=database_id,
         pat=conf_saas.get(CKey.saas_token)
     )
+
+
+@unittest.mock.patch("exasol.bucketfs.path.build_path")
+def test_open_bucketfs_location(mock_build_path, conf):
+    open_bucketfs_location(conf)
+    assert mock_build_path.called
+    call_kwargs = mock_build_path.call_args.kwargs
+    assert call_kwargs['backend'] == bfs.path.StorageBackend.onprem
+
+
+@unittest.mock.patch("exasol.bucketfs.path.build_path")
+@unittest.mock.patch("exasol.saas.client.api_access.get_database_id")
+def test_open_bucketfs_location_saas(mock_database_id, mock_build_path, conf_saas):
+    mock_database_id.return_value = 'my_saas_db'
+    open_bucketfs_location(conf_saas)
+    assert mock_build_path.called
+    call_kwargs = mock_build_path.call_args.kwargs
+    assert call_kwargs['backend'] == bfs.path.StorageBackend.saas
 
 
 @unittest.mock.patch("ibis.exasol.connect")
