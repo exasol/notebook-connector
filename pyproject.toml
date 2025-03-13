@@ -91,6 +91,9 @@ force_grid_wrap = 2
 errors-only = true
 output-format = "colorized,json:.lint.json,text:.lint.txt"
 
+[tool.mypy]
+ignore_missing_imports = true
+
 [[tool.mypy.overrides]]
 module = [
     "exasol.toolbox.nox.tasks",
@@ -98,7 +101,6 @@ module = [
     "test.*",
     ]
 ignore_errors = true
-ignore_missing_imports = true
 
 [tool.pylint.format]
 max-line-length = 88

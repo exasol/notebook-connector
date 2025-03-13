@@ -225,6 +225,19 @@ def open_sqlalchemy_connection(conf: Secrets):
     return sqlalchemy.create_engine(websocket_url)
 
 
+def _get_onprem_bucketfs_url(conf: Secrets) -> str:
+    bucketfs_url_prefix = ("https" if _optional_encryption(conf, CKey.bfs_encryption)
+                           else "http")
+    bucketfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
+    return f"{bucketfs_url_prefix}://{bucketfs_host}:{conf.get(CKey.bfs_port)}"
+
+
+def _get_ca_cert_verification(conf: Secrets) -> Any:
+    sslopt = _extract_ssl_options(conf)
+    verify = sslopt.get("cert_reqs") == ssl.CERT_REQUIRED
+    return sslopt.get("ca_certs") or sslopt.get("ca_cert_path") or verify
+
+
 def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
     """
     Connects to a BucketFS service using provided configuration parameters.
@@ -247,16 +260,9 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
     """
 
     if get_backend(conf) == StorageBackend.onprem:
-        # Set up the connection parameters.
-        buckfs_url_prefix = "https" if _optional_encryption(conf, CKey.bfs_encryption) else "http"
-        buckfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
-        buckfs_url = f"{buckfs_url_prefix}://{buckfs_host}:{conf.get(CKey.bfs_port)}"
-
-        sslopt = _extract_ssl_options(conf)
-        verify = sslopt.get("cert_reqs") == ssl.CERT_REQUIRED
-        verify = sslopt.get("ca_certs") or sslopt.get("ca_cert_path") or verify
-
-        buckfs_credentials = {
+        bucketfs_url = _get_onprem_bucketfs_url(conf)
+        verify = _get_ca_cert_verification(conf)
+        bucketfs_credentials = {
             conf.get(CKey.bfs_bucket): {
                 "username": conf.get(CKey.bfs_user),
                 "password": conf.get(CKey.bfs_password),
@@ -264,8 +270,9 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
         }
 
         # Connect to the BucketFS service and navigate to the bucket of choice.
-        bucketfs = bfs.Service(buckfs_url, buckfs_credentials, verify, conf.get(CKey.bfs_service))  # type: ignore
-        return bucketfs[conf.get(CKey.bfs_bucket)]  # type: ignore
+        bucketfs = bfs.Service(bucketfs_url, bucketfs_credentials, verify,  # type: ignore
+                               conf.get(CKey.bfs_service))
+        return bucketfs[conf.get(CKey.bfs_bucket)]          # type: ignore
 
     else:
         saas_url, saas_token, saas_account_id = [
@@ -276,6 +283,30 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
                               account_id=saas_account_id,   # type: ignore
                               database_id=saas_database_id, # type: ignore
                               pat=saas_token)   # type: ignore
+
+
+def open_bucketfs_location(conf: Secrets) -> bfs.path.PathLike:
+    """
+    Similar to `open_buckets_connection`, but returns a PathLike interface.
+    """
+    if get_backend(conf) == StorageBackend.onprem:
+        return bfs.path.build_path(
+            backend=bfs.path.StorageBackend.onprem,
+            url=_get_onprem_bucketfs_url(conf),
+            username=conf.get(CKey.bfs_user),
+            password=conf.get(CKey.bfs_password),
+            verify=_get_ca_cert_verification(conf),
+            bucket_name=conf.get(CKey.bfs_bucket),
+            service_name=conf.get(CKey.bfs_service)
+        )
+    else:
+        return bfs.path.build_path(
+            backend=bfs.path.StorageBackend.saas,
+            url=conf.get(CKey.saas_url),
+            account_id=conf.get(CKey.saas_account_id),
+            database_id=get_saas_database_id(conf),
+            pat=conf.get(CKey.saas_token)
+        )
 
 
 def open_ibis_connection(conf: Secrets, **kwargs):
