@@ -66,9 +66,8 @@ def deploy_language_container(conf: Secrets,
     Downloads language container from the specified location and uploads it to the
     BucketFS.
 
-    This function doesn't activate the language container. Instead, it gets the
-    activation SQL using the same API and writes it to the secret store using the
-    provided key.
+    This function doesn't activate the language container. Instead, it builds the
+    activation SQL command and writes it to the secret store using the provided key.
 
     Parameters:
         conf:
