@@ -1,5 +1,5 @@
-from exasol_transformers_extension.deployment.scripts_deployer import ScriptsDeployer   # type: ignore
-from exasol_transformers_extension.deployment.te_language_container_deployer import TeLanguageContainerDeployer     # type: ignore
+from exasol_transformers_extension.deployment.scripts_deployer import ScriptsDeployer
+from exasol_transformers_extension.deployment.te_language_container_deployer import TeLanguageContainerDeployer
 
 from exasol.nb_connector.connections import (
     open_pyexasol_connection
@@ -7,14 +7,14 @@ from exasol.nb_connector.connections import (
 from exasol.nb_connector.extension_wrapper_common import (
     encapsulate_bucketfs_credentials,
     encapsulate_huggingface_token,
-    get_container_deployer_kwargs
+    deploy_language_container
 )
 from exasol.nb_connector.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
     get_activation_sql
 )
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 # Root directory in a BucketFS bucket where all stuff of the Transformers
 # Extension, including its language container, will be uploaded.
@@ -42,51 +42,6 @@ HF_CONNECTION_PREFIX = "TE_HF"
 # Models downloaded from the Huggingface archive to a local drive will be
 # cached in this directory.
 MODELS_CACHE_DIR = "models_cache"
-
-
-def deploy_language_container(conf: Secrets,
-                              version: str,
-                              language_alias: str,
-                              allow_override: bool) -> None:
-    """
-    Calls the Transformers Extension's language container deployment API.
-    Downloads the specified released version of the extension from the GitHub
-    and uploads it to the BucketFS.
-
-    This function doesn't activate the language container. Instead, it gets the
-    activation SQL using the same API and writes it to the secret store. The name
-    of the key is defined in the ACTIVATION_KEY constant.
-
-    This function will eventually be shared between different extension wrappers,
-    once the language container deployment functionality is moved to the
-    script-language-container-tool repo.
-
-    Parameters:
-        conf:
-
-            The secret store. The store must contain the DB connection parameters
-            and the parameters of the BucketFS service.
-        version:
-            Transformers Extension version.
-        language_alias:
-            The language alias of the extension's language container.
-        allow_override:
-            If True allows overriding the language definition.
-    """
-
-    deployer = TeLanguageContainerDeployer.create(
-        path_in_bucket=PATH_IN_BUCKET,
-        language_alias=language_alias,
-        **get_container_deployer_kwargs(conf)
-    )
-
-    # Install the language container.
-    deployer.download_from_github_and_run(version, alter_system=False,
-                                          allow_override=allow_override)
-
-    # Save the activation SQL in the secret store.
-    language_def = deployer.get_language_definition(deployer.SLC_NAME)
-    conf.save(ACTIVATION_KEY, language_def)
 
 
 def deploy_scripts(conf: Secrets,
@@ -159,7 +114,14 @@ def initialize_te_extension(conf: Secrets,
     hf_conn_name = "_".join([HF_CONNECTION_PREFIX, db_user]) if token else ""
 
     if run_deploy_container:
-        deploy_language_container(conf, version, language_alias, allow_override)
+        container_url = TeLanguageContainerDeployer.SLC_URL_FORMATTER.format(version=version)
+        deploy_language_container(conf,
+                                  container_url=container_url,
+                                  container_name=TeLanguageContainerDeployer.SLC_NAME,
+                                  language_alias=language_alias,
+                                  activation_key=ACTIVATION_KEY,
+                                  path_in_bucket=PATH_IN_BUCKET,
+                                  allow_override=allow_override)
 
     # Create the required objects in the database
     if run_deploy_scripts:
