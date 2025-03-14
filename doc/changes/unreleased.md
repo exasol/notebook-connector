@@ -6,6 +6,7 @@
 
 * #146: Add interface for text_ai_extension_wrapper
 * #169: Added a function that creates a bucket-fs PathLike object
+* #173: Added an option to upload an SLC from file.
 
 ## Refactoring
 
