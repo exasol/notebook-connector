@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Optional
 from datetime import timedelta
 import json
+from pathlib import Path
 
 import exasol.bucketfs as bfs
 from exasol.python_extension_common.deployment.extract_validator import ExtractValidator
@@ -55,11 +56,12 @@ def _get_optional_bfs_port(conf: Secrets) -> int | None:
 
 
 def deploy_language_container(conf: Secrets,
-                              container_url: str,
-                              container_name: str,
                               path_in_bucket: str,
                               language_alias: str,
                               activation_key: str,
+                              container_url: str | None = None,
+                              container_file: Path | None = None,
+                              container_name: str | None = None,
                               allow_override: bool = True,
                               timeout: timedelta = timedelta(minutes=10)) -> None:
     """
@@ -73,16 +75,24 @@ def deploy_language_container(conf: Secrets,
         conf:
             The secret store. The store must contain the DB connection parameters
             and the parameters of the BucketFS service.
-        container_url:
-            The url to download the language container from
-        container_name:
-            The language container will be saved in the BucketFS with this name.
         path_in_bucket:
             Path in the BucketFS where the container should be saved.
         language_alias:
             The language alias of the extension's language container.
         activation_key:
             A secret store key for saving the activation SQL.
+        container_url:
+            An optional URL to download the language container from.
+            Either the `container_url` or `container_file` must be provided,
+            otherwise a ValueError will be raised.
+        container_file:
+            An optional path of the container file (*.tar.gz) in a local file system.
+            Either the `container_url` or `container_file` must be provided,
+            otherwise a ValueError will be raised.
+        container_name:
+            If provided, the language container will be saved in given bucket of
+            BucketFS with this filename. Otherwise, the name of the container file
+            will be used.
         allow_override:
             If True allows overriding the language definition.
         timeout:
@@ -101,11 +111,20 @@ def deploy_language_container(conf: Secrets,
             extract_validator=validator
         )
 
-        deployer.download_and_run(container_url,
-                                  container_name,
-                                  alter_system=False,
-                                  allow_override=allow_override,
-                                  wait_for_completion=True)
+        if container_file:
+            deployer.run(container_file,
+                         container_name,
+                         alter_system=False,
+                         allow_override=allow_override,
+                         wait_for_completion=True)
+        elif container_url:
+            deployer.download_and_run(container_url,
+                                      container_name,
+                                      alter_system=False,
+                                      allow_override=allow_override,
+                                      wait_for_completion=True)
+        else:
+            raise ValueError("Either container URL or container file must be provided")
 
         # Install the language container.
         # Save the activation SQL in the secret store.
