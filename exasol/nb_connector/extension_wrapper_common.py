@@ -82,14 +82,17 @@ def deploy_language_container(conf: Secrets,
         activation_key:
             A secret store key for saving the activation SQL.
         container_url:
-            An optional url to download the language container from.
-            Either the `container_url` or `container_file` should be provided.
+            An optional URL to download the language container from.
+            Either the `container_url` or `container_file` must be provided,
+            otherwise a ValueError will be raised.
         container_file:
             An optional path of the container file (*.tar.gz) in a local file system.
-            Either the `container_url` or `container_file` should be provided.
+            Either the `container_url` or `container_file` must be provided,
+            otherwise a ValueError will be raised.
         container_name:
-            If provided, the language container will be saved in the BucketFS with
-            this name. Otherwise, the name of the container file will be used.
+            If provided, the language container will be saved in given bucket of
+            BucketFS with this filename. Otherwise, the name of the container file
+            will be used.
         allow_override:
             If True allows overriding the language definition.
         timeout:
