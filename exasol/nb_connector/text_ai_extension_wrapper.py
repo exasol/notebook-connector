@@ -1,11 +1,34 @@
 from typing import Optional
 
+from exasol.nb_connector.extension_wrapper_common import deploy_language_container, encapsulate_bucketfs_credentials
+from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 from exasol.nb_connector.secret_store import Secrets
 from pathlib import Path
+
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+
+# Root directory in a BucketFS bucket where all stuff of the Text AI
+# Extension, including its language container, will be uploaded.
+PATH_IN_BUCKET = "TXAIE"
 
 LANGUAGE_ALIAS = "PYTHON3_TXAIE"
 
 LATEST_KNOWN_VERSION = "???"
+
+# Activation SQL for the Text AI Extension will be saved in the secret
+# store with this key.
+ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "txaie"
+
+# The name of the connection object with BucketFS location and credentials
+# will be prefixed with this string.
+BFS_CONNECTION_PREFIX = "TXAIE_BFS"
+
+# Models will be uploaded into this directory in BucketFS.
+BFS_MODELS_DIR = 'txaie_models'
+
+# Models downloaded from the Huggingface archive to a local drive will be
+# cached in this directory.
+MODELS_CACHE_DIR = "models_cache"
 
 def deploy_licence(conf: Secrets,
                    licence_file: Optional[Path] = None,
@@ -76,4 +99,51 @@ def initialize_text_ai_extension(conf: Secrets,
         allow_override:
             If True allows overriding the language definition.
     """
+
+    # Make the connection object names
+    db_user = str(conf.get(CKey.db_user))
+    bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, db_user])
+
+
+    if run_deploy_container:
+        if version:
+            install_txaie_version(version)
+        elif container_file:
+            deploy_language_container(conf=conf,
+                                      path_in_bucket=PATH_IN_BUCKET,
+                                      language_alias=language_alias,
+                                      activation_key=ACTIVATION_KEY,
+                                      container_file=container_file,
+                                      container_name=TXAIELanguageContainerDeployer.SLC_NAME,#todo needs release or hardcode for now
+                                      allow_override=allow_override,
+                                      )
+        else:
+            version = LATEST_KNOWN_VERSION
+            install_txaie_version(version)
+
+
+
+    if run_upload_models:
+        # todo Install default transformers models into the Bucketfs using Transformers Extensions upload model functionality.
+        # todo needs TE release
+        pass
+
+    if run_deploy_scripts:
+        # todo Install Text-AI specific scripts. once we have some
+        pass
+
+    if run_encapsulate_bfs_credentials:
+        encapsulate_bucketfs_credentials(
+            conf, path_in_bucket=PATH_IN_BUCKET, connection_name=bfs_conn_name
+        )
+
+    # Save the connection object names in the secret store.
+    conf.save(CKey.te_bfs_connection, bfs_conn_name)
+    # Save the directory names in the secret store
+    conf.save(CKey.te_models_bfs_dir, BFS_MODELS_DIR) #todo do we want to keep TE and TXAIE models seperate?
+    conf.save(CKey.te_models_cache_dir, MODELS_CACHE_DIR)
+
+
+def install_txaie_version(version: str) -> None:
+    # todo implement once we know where to get them from
     pass
