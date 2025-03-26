@@ -36,11 +36,11 @@ def download_pre_release(conf: Secrets) -> Generator[tuple[Path, Path], None, No
     response = requests.get(zip_url, stream=True)
     response.raise_for_status()
 
-    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+    with tempfile.NamedTemporaryFile() as tmp_file:
         # Save the downloaded zip in a temporary file
         for chunk in response.iter_content(chunk_size=1048576):
             tmp_file.write(chunk)
-        tmp_file.close()
+        tmp_file.flush()
         with tempfile.TemporaryDirectory() as tmp_dir:
             # Unzip the file into a temporary directory
             unzip_cmd = ["unzip", "-q", "-P", zip_password, tmp_file.name, "-d", tmp_dir]
