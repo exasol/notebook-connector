@@ -92,12 +92,14 @@ def deploy_licence(conf: Secrets,
             Optional. Content of a licence given as a string.
 
     """
-    pass
+    raise NotImplementedError('Currently this is not implemented, '
+                              'will be changed once the licensing process is finalized.')
+
 
 
 def initialize_text_ai_extension(conf: Secrets,
                                  container_file: Optional[Path] = None,
-                                 version: Optional[str] = LATEST_KNOWN_VERSION,
+                                 version: Optional[str] = None,
                                  language_alias: str = LANGUAGE_ALIAS,
                                  run_deploy_container: bool = True,
                                  run_deploy_scripts: bool = True,
@@ -151,6 +153,8 @@ def initialize_text_ai_extension(conf: Secrets,
     # Make the connection object names
     db_user = str(conf.get(CKey.db_user))
     bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, db_user])
+    #container_name = TXAIELanguageContainerDeployer.SLC_NAME,#todo needs release or hardcode for now
+    container_name = "exasol_text_ai_extension_container_release.tar.gz"
 
 
     if run_deploy_container:
@@ -162,7 +166,7 @@ def initialize_text_ai_extension(conf: Secrets,
                                       language_alias=language_alias,
                                       activation_key=ACTIVATION_KEY,
                                       container_file=container_file,
-                                      container_name=TXAIELanguageContainerDeployer.SLC_NAME,#todo needs release or hardcode for now
+                                      container_name=container_name,
                                       allow_override=allow_override,
                                       )
         else:
@@ -172,13 +176,14 @@ def initialize_text_ai_extension(conf: Secrets,
 
 
     if run_upload_models:
-        # todo Install default transformers models into the Bucketfs using Transformers Extensions upload model functionality.
-        # todo needs TE release
-        pass
+        #  Install default transformers models into the Bucketfs using
+        #  Transformers Extensions upload model functionality.
+        raise NotImplementedError('Implementation is waiting for TE release.')
+
 
     if run_deploy_scripts:
-        # todo Install Text-AI specific scripts. once we have some
-        pass
+        raise NotImplementedError('Currently there are no Text-AI specific scripts to deploy.')
+
 
     if run_encapsulate_bfs_credentials:
         encapsulate_bucketfs_credentials(
@@ -186,12 +191,11 @@ def initialize_text_ai_extension(conf: Secrets,
         )
 
     # Save the connection object names in the secret store.
-    conf.save(CKey.te_bfs_connection, bfs_conn_name)
+    conf.save(CKey.txaie_bfs_connection, bfs_conn_name)
     # Save the directory names in the secret store
-    conf.save(CKey.te_models_bfs_dir, BFS_MODELS_DIR) #todo do we want to keep TE and TXAIE models seperate?
-    conf.save(CKey.te_models_cache_dir, MODELS_CACHE_DIR)
+    conf.save(CKey.txaie_models_bfs_dir, BFS_MODELS_DIR) #todo do we want to keep TE and TXAIE models seperate?
+    conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
 
 
 def install_txaie_version(version: str) -> None:
-    # todo implement once we know where to get them from
-    pass
+    raise NotImplementedError('Implementation is decision on where the releases will be hosted.')
