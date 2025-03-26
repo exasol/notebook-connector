@@ -1,11 +1,56 @@
-from typing import Optional
+from typing import Optional, Generator
+from contextlib import contextmanager
+from pathlib import Path
+import requests
+import subprocess
+import tempfile
 
 from exasol.nb_connector.secret_store import Secrets
-from pathlib import Path
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 LANGUAGE_ALIAS = "PYTHON3_TXAIE"
 
 LATEST_KNOWN_VERSION = "???"
+
+
+@contextmanager
+def download_pre_release(conf: Secrets) -> Generator[tuple[Path, Path], None, None]:
+    """
+    Downloads and unzips the pre-release archive. Returns the paths to the temporary
+    files of the project wheel and the SLC.
+
+    Usage:
+    with download_pre_release(conf) as unzipped_files:
+        project_wheel, slc_tar_gz = unzipped_files
+        ...
+    """
+
+    zip_url = conf.get(CKey.text_ai_pre_release_url)
+    if not zip_url:
+        raise ValueError("Pre-release URL is not set.")
+    zip_password = conf.get(CKey.text_ai_zip_password)
+    if not zip_password:
+        raise ValueError("Pre-release zip password is not set.")
+
+    # Download the file
+    response = requests.get(zip_url, stream=True)
+    response.raise_for_status()
+
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        # Save the downloaded zip in a temporary file
+        for chunk in response.iter_content(chunk_size=1048576):
+            tmp_file.write(chunk)
+        tmp_file.close()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            # Unzip the file into a temporary directory
+            unzip_cmd = ["unzip", "-q", "-P", zip_password, tmp_file.name, "-d", tmp_dir]
+            subprocess.run(unzip_cmd, check=True, capture_output=True)
+            tmp_path = Path(tmp_dir)
+            # Find and return the project wheel and the SLC
+            project_wheel = next(tmp_path.glob("*.whl"))
+            slc_tar_gz = next(tmp_path.glob("*.tar.gz"))
+            yield project_wheel, slc_tar_gz
+
 
 def deploy_licence(conf: Secrets,
                    licence_file: Optional[Path] = None,
@@ -23,6 +68,7 @@ def deploy_licence(conf: Secrets,
 
     """
     pass
+
 
 def initialize_text_ai_extension(conf: Secrets,
                                  container_file: Optional[Path] = None,
