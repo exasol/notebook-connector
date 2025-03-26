@@ -47,6 +47,8 @@ class AILabConfig(Enum):
     slc_target_dir = auto()
     slc_source = auto()
     slc_alias = auto()
+    text_ai_pre_release_url = auto()
+    text_ai_zip_password = auto()
 
 
 class StorageBackend(Enum):
