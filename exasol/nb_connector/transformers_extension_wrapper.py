@@ -63,7 +63,7 @@ def deploy_scripts(conf: Secrets,
         activation_sql = get_activation_sql(conf)
         conn.execute(activation_sql)
 
-        scripts_deployer = ScriptsDeployer(language_alias, conf.get(CKey.db_schema), conn)
+        scripts_deployer = ScriptsDeployer(language_alias, conf.get(CKey.db_schema), conn, install_all_scripts=True)
         scripts_deployer.deploy_scripts()
 
 
