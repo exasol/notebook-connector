@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from exasol.nb_connector.text_ai_extension_wrapper import download_pre_release
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.secret_store import Secrets
@@ -10,13 +8,13 @@ from test.utils.integration_test_utils import (
     activate_languages,
     assert_connection_exists,
     assert_run_empty_udf,
-    get_script_counts,
     language_definition_context,
 )
+import os
 
 def test_download_pre_release(secrets):
     secrets.save(CKey.text_ai_pre_release_url,
-                 'https://dut5tonqye28.cloudfront.net/ai_lab/text_ai/mibe_test.zip')
+                 'https://dut5tonqye28.cloudfront.net/ai_lab/text_ai/mibe_test.zip')#this should really have a better name.
     secrets.save(CKey.text_ai_zip_password, 'xyz')
     with download_pre_release(secrets) as unzipped_files:
         expected_contents = ['my_wheel\n', 'my_slc\n']
@@ -30,8 +28,11 @@ def test_text_ai_extension_with_container_file(
     setup_itde
 ):
     language_alias = f"PYTHON3_TXAIE_TEST"
-    #container_file = Path("./../../export/exasol_text_ai_extension_container_release.tar.gz")
-    with (download_pre_release(secrets) as unzipped_files):
+    secrets.save(CKey.text_ai_pre_release_url,
+                 os.environ.get('TXAIE_PRE_RELEASE_URL'))
+    secrets.save(CKey.text_ai_zip_password, os.environ.get('TXAIE_PRE_RELEASE_PASSWORD'))
+
+    with download_pre_release(secrets) as unzipped_files:
         project_wheel, container_file = unzipped_files
         try:
             with open_pyexasol_connection(secrets) as pyexasol_connection:
