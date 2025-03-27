@@ -8,6 +8,7 @@
 * #169: Added a function that creates a bucket-fs PathLike object
 * #173: Added an option to upload an SLC from file.
 * #167: Added partial implementation for text_ai_extension_wrapper
+* #168: Install all TE scripts with transformers_extension_wrapper
 * #175: Added function to download and decrypt Text-AI pre-release.
 
 ## Refactoring
