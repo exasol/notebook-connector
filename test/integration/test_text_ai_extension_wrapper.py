@@ -31,7 +31,7 @@ def test_text_ai_extension_with_container_file(
 ):
     # this test is very slow and downloads and unpacks a 6GB file, so we only
     # execute it in the manually triggered slow tests
-    if use_saas:
+    if not use_saas:
         pytest.skip('The test runs only with SaaS database')
     language_alias = f"PYTHON3_TXAIE_TEST"
     secrets.save(CKey.text_ai_pre_release_url,
