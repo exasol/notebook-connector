@@ -44,7 +44,9 @@ jobs:
           sudo rm -rf /opt/ghc
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.18.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+        with:
+          poetry-version: 2.0.1
 
       - name: Allow unprivileged user namespaces
         run: |
@@ -55,6 +57,8 @@ jobs:
           SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
           SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
           SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
+          TXAIE_PRE_RELEASE_URL: ${{ vars.ZIP_URL }}
+          TXAIE_PRE_RELEASE_PASSWORD: ${{ secrets.ZIP_PASSWORD }}
         run: poetry run pytest --backend=saas test/integration
 
   # This job ensures inputs have been executed successfully.
