@@ -2,7 +2,7 @@ import pytest
 from exasol.nb_connector.text_ai_extension_wrapper import download_pre_release
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend
 from exasol.nb_connector.text_ai_extension_wrapper import initialize_text_ai_extension
 from test.utils.integration_test_utils import (
     setup_itde,
@@ -31,7 +31,7 @@ def test_text_ai_extension_with_container_file(
 ):
     # this test is very slow and downloads and unpacks a 6GB file, so we only
     # execute it in the manually triggered slow tests
-    if backend != "saas":
+    if backend != StorageBackend.saas:
         pytest.skip('The test runs only with SaaS database')
     language_alias = f"PYTHON3_TXAIE_TEST"
     secrets.save(CKey.text_ai_pre_release_url,
