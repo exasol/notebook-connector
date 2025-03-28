@@ -1,3 +1,4 @@
+from os import PathLike
 
 from exasol.nb_connector.extension_wrapper_common import deploy_language_container, encapsulate_bucketfs_credentials
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
@@ -73,7 +74,7 @@ def download_pre_release(conf: Secrets) -> Generator[tuple[Path, Path], None, No
             # Find and return the project wheel and the SLC
             project_wheel = next(tmp_path.glob("*.whl"))
             slc_tar_gz = next(tmp_path.glob("*.tar.gz"))
-            conf.save(CKey.txaie_slc_file_local_path, slc_tar_gz)
+            conf.save(CKey.txaie_slc_file_local_path, str(slc_tar_gz))
             yield project_wheel, slc_tar_gz
 
 
@@ -166,7 +167,8 @@ def initialize_text_ai_extension(conf: Secrets,
             # if container_file and version are not set,
             # use txaie_slc_file_local_path for installing the slc, if it exists
             try:
-                container_file = Path(conf.get(CKey.txaie_slc_file_local_path))
+                container_file_str = str(conf.get(CKey.txaie_slc_file_local_path))
+                container_file = Path(container_file_str)
             finally:
                 pass
 
