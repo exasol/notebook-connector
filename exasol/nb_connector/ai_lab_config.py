@@ -38,6 +38,7 @@ class AILabConfig(Enum):
     txaie_bfs_connection = auto()
     txaie_models_bfs_dir = auto()
     txaie_models_cache_dir = auto()
+    txaie_slc_file_local_path = auto()
     sme_aws_bucket = auto()
     sme_aws_role = auto()
     sme_aws_connection = auto()

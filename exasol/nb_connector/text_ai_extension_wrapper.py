@@ -1,7 +1,6 @@
 
 from exasol.nb_connector.extension_wrapper_common import deploy_language_container, encapsulate_bucketfs_credentials
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
-from exasol.nb_connector.secret_store import Secrets
 from typing import Optional, Generator
 from contextlib import contextmanager
 from pathlib import Path
@@ -12,7 +11,13 @@ import tempfile
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+# Models will be uploaded into this directory in BucketFS.
+# Models downloaded from the Huggingface archive to a local drive will be
+# cached in this directory.
+# we use the same dirs as in initialize_te_extension, because both extensions use
+# Huggingface Models and splitting them is confusing. So we reuse the TE directories to be also backwards compatible.
+from exasol.nb_connector.transformers_extension_wrapper import BFS_MODELS_DIR, MODELS_CACHE_DIR
+
 
 # Root directory in a BucketFS bucket where all stuff of the Text AI
 # Extension, including its language container, will be uploaded.
@@ -30,12 +35,6 @@ ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "txaie"
 # will be prefixed with this string.
 BFS_CONNECTION_PREFIX = "TXAIE_BFS"
 
-# Models will be uploaded into this directory in BucketFS.
-BFS_MODELS_DIR = 'txaie_models'
-
-# Models downloaded from the Huggingface archive to a local drive will be
-# cached in this directory.
-MODELS_CACHE_DIR = "models_cache"
 
 
 @contextmanager
@@ -74,6 +73,7 @@ def download_pre_release(conf: Secrets) -> Generator[tuple[Path, Path], None, No
             # Find and return the project wheel and the SLC
             project_wheel = next(tmp_path.glob("*.whl"))
             slc_tar_gz = next(tmp_path.glob("*.tar.gz"))
+            conf.save(CKey.txaie_slc_file_local_path, slc_tar_gz)
             yield project_wheel, slc_tar_gz
 
 
@@ -116,7 +116,8 @@ def initialize_text_ai_extension(conf: Secrets,
 
     If given a container_file path instead, installs the given container in the Bucketfs.
 
-    If neither is given, attempts to install the latest version from ???.
+    If neither is given, checks if txaie_slc_file_local_path is set and installs this SLC if found,
+    otherwise attempts to install the latest version from ???.
 
     This function doesn't activate the language container. Instead, it gets the
     activation SQL using the same API and writes it to the secret store. The name
@@ -153,14 +154,23 @@ def initialize_text_ai_extension(conf: Secrets,
     # Make the connection object names
     db_user = str(conf.get(CKey.db_user))
     bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, db_user])
-    #container_name = TXAIELanguageContainerDeployer.SLC_NAME,#todo needs release or hardcode for now
+    #container_name = TXAIELanguageContainerDeployer.SLC_NAME, #todo needs release in TXAIE, therefore hardcode for now
     container_name = "exasol_text_ai_extension_container_release.tar.gz"
 
 
     if run_deploy_container:
         if version:
             install_txaie_version(version)
-        elif container_file:
+            return
+        if not container_file:
+            # if container_file and version are not set,
+            # use txaie_slc_file_local_path for installing the slc, if it exists
+            try:
+                container_file = Path(conf.get(CKey.txaie_slc_file_local_path))
+            finally:
+                pass
+
+        if container_file:
             deploy_language_container(conf=conf,
                                       path_in_bucket=PATH_IN_BUCKET,
                                       language_alias=language_alias,
@@ -192,10 +202,11 @@ def initialize_text_ai_extension(conf: Secrets,
 
     # Save the connection object names in the secret store.
     conf.save(CKey.txaie_bfs_connection, bfs_conn_name)
+
     # Save the directory names in the secret store
-    conf.save(CKey.txaie_models_bfs_dir, BFS_MODELS_DIR) #todo do we want to keep TE and TXAIE models seperate?
+    conf.save(CKey.txaie_models_bfs_dir, BFS_MODELS_DIR)
     conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
 
 
 def install_txaie_version(version: str) -> None:
-    raise NotImplementedError('Implementation is decision on where the releases will be hosted.')
+    raise NotImplementedError('Implementation is waiting for decision on where the releases will be hosted.')
