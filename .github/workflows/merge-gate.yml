@@ -99,7 +99,7 @@ jobs:
     name: Allow Merge 
     runs-on: ubuntu-latest
     # If you need additional jobs to be part of the merge gate, add them below
-    needs: [ fast-checks, saas-checks, text-ai-tests ]
+    needs: [ fast-checks, saas-tests, text-ai-tests ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
