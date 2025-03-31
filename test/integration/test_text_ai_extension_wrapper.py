@@ -46,9 +46,7 @@ def test_text_ai_extension_with_container_file(
 
                     # Run the extension deployment.
                     initialize_text_ai_extension(secrets,
-                                                 language_alias=language_alias,
-                                                 run_deploy_scripts=False,
-                                                 run_upload_models=False,
+                                                 language_alias=language_alias
                     )
 
                     activate_languages(pyexasol_connection, secrets)

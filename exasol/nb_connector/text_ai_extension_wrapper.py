@@ -103,8 +103,8 @@ def initialize_text_ai_extension(conf: Secrets,
                                  version: Optional[str] = None,
                                  language_alias: str = LANGUAGE_ALIAS,
                                  run_deploy_container: bool = True,
-                                 run_deploy_scripts: bool = True,
-                                 run_upload_models: bool = True,
+                                 run_deploy_scripts: bool = False,
+                                 run_upload_models: bool = False,
                                  run_encapsulate_bfs_credentials: bool = True,
                                  allow_override: bool = True) -> None:
     """
