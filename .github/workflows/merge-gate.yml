@@ -27,7 +27,7 @@ jobs:
   saas-tests:
     name: SaaS Tests
     runs-on: ubuntu-24.04
-    needs: [ slow-checks ]
+    needs: [ slow-checks-approval ]
 
     steps:
       - name: SCM Checkout
@@ -56,7 +56,7 @@ jobs:
     runs-on:
       labels: int-linux-x64-4core-ubuntu24.04-1
     environment: text-ai-prerelease
-    needs: [ slow-checks ]
+    needs: [ slow-checks-approval ]
 
     steps:
       - name: SCM Checkout
