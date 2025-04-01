@@ -189,7 +189,7 @@ def initialize_text_ai_extension(conf: Secrets,
         container_file = container_file or from_ai_lab_config(CKey.txaie_slc_file_local_path)
         if not container_file:
             install_text_ai_extension(LATEST_KNOWN_VERSION)
-        else
+        else:
             deploy_language_container(
                 conf=conf,
                 path_in_bucket=PATH_IN_BUCKET,
