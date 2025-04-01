@@ -132,7 +132,7 @@ def initialize_text_ai_extension(conf: Secrets,
     If given a container_file path instead, installs the given container in the Bucketfs.
 
     If neither is given, checks if txaie_slc_file_local_path is set and installs this SLC if found,
-    otherwise attempts to install the latest version from ???.
+    otherwise attempts to install the latest version from t.b.d.
 
     This function doesn't activate the language container. Instead, it gets the
     activation SQL using the same API and writes it to the secret store. The name
@@ -166,10 +166,12 @@ def initialize_text_ai_extension(conf: Secrets,
             If True allows overriding the language definition.
     """
 
-    # Make the connection object names
+    # Create the name of the Exasol connection object
     db_user = str(conf.get(CKey.db_user))
     bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, db_user])
-    #container_name = TXAIELanguageContainerDeployer.SLC_NAME, #todo needs release in TXAIE, therefore hardcode for now
+    # As soon as the official release of TXAIE is available, the hard-coded value for
+    # container_name can be replaced by TXAIELanguageContainerDeployer.SLC_NAME,
+    # see https://github.com/exasol/notebook-connector/issues/179.
     container_name = "exasol_text_ai_extension_container_release.tar.gz"
 
 

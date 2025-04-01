@@ -51,7 +51,7 @@ jobs:
           SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
         run: poetry run pytest -rA --setup-show --backend=saas test/integration/test_cloud_storage.py
 
-  text-ai-tests:
+  large-runner-tests:
     name: Text AI Tests
     runs-on:
       labels: int-linux-x64-4core-ubuntu24.04-1
@@ -99,7 +99,7 @@ jobs:
     name: Allow Merge 
     runs-on: ubuntu-latest
     # If you need additional jobs to be part of the merge gate, add them below
-    needs: [ fast-checks, saas-tests, text-ai-tests ]
+    needs: [ fast-checks, saas-tests, large-runner-tests ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
