@@ -44,9 +44,11 @@ Using `ACTIVATION_KEY` as defined key, TXAIE can provide convenient interfaces
 accepting only the SCS and retrieving all further data from the there.
 """
 
-# The name of the connection object with BucketFS location and credentials
-# will be prefixed with this string.
 BFS_CONNECTION_PREFIX = "TXAIE_BFS"
+"""
+Prefix for Exasol CONNECTION objects containing a BucketFS location and
+credentials.
+"""
 
 
 
