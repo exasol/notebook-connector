@@ -175,7 +175,7 @@ def initialize_text_ai_extension(conf: Secrets,
     container_name = "exasol_text_ai_extension_container_release.tar.gz"
 
 
-    def from_ai_lab_config(key: AILabConfig) -> Path | None:
+    def from_ai_lab_config(key: CKey) -> Path | None:
         entry = conf.get(key)
         return Path(entry) if entry else None
 
