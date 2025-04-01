@@ -12,25 +12,37 @@ import tempfile
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
-# Models will be uploaded into this directory in BucketFS.
+# Models will be uploaded into directory BFS_MODELS_DIR in BucketFS.
+#
 # Models downloaded from the Huggingface archive to a local drive will be
-# cached in this directory.
-# we use the same dirs as in initialize_te_extension, because both extensions use
-# Huggingface Models and splitting them is confusing. So we reuse the TE directories to be also backwards compatible.
+# cached in directory MODELS_CACHE_DIR.
+#
+# TXAIE uses the same directories as TE (see function initialize_te_extension)
+# as both extensions are using Huggingface Models. This also avoids confusion,
+# and ensures backwards compatibility.
 from exasol.nb_connector.transformers_extension_wrapper import BFS_MODELS_DIR, MODELS_CACHE_DIR
 
 
-# Root directory in a BucketFS bucket where all stuff of the Text AI
-# Extension, including its language container, will be uploaded.
 PATH_IN_BUCKET = "TXAIE"
+""" Location in BucketFS bucket to upload data for TXAIE, e.g. its language container. """
 
 LANGUAGE_ALIAS = "PYTHON3_TXAIE"
 
 LATEST_KNOWN_VERSION = "???"
 
-# Activation SQL for the Text AI Extension will be saved in the secret
-# store with this key.
 ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "txaie"
+"""
+Activation SQL for the Text AI Extension will be saved in the secret store
+with this key.
+
+TXAIE brings its own Script Language Container (SLC) which needs to be
+activated by a dedicated SQL statement `ALTER SESSION SET SCRIPT_LANGUAGES`.  Applications
+can store the language definition in the configuration store (SCS) from the Notebook
+Connector's class `exasol.nb_connector.secret_store.Secrets`.
+
+Using `ACTIVATION_KEY` as defined key, TXAIE can provide convenient interfaces
+accepting only the SCS and retrieving all further data from the there.
+"""
 
 # The name of the connection object with BucketFS location and credentials
 # will be prefixed with this string.
@@ -159,36 +171,35 @@ def initialize_text_ai_extension(conf: Secrets,
     container_name = "exasol_text_ai_extension_container_release.tar.gz"
 
 
+    def from_ai_lab_config(key: AILabConfig) -> Path | None:
+        entry = conf.get(key)
+        return Path(entry) if entry else None
+
     if run_deploy_container:
         if version:
-            install_txaie_version(version)
+            install_text_ai_extension(version)
+            # Can run_upload_models, run_deploy_scripts,
+            # run_encapsulate_bfs_credentials, etc. be ignored here?
             return
-        if not container_file:
-            # if container_file and version are not set,
-            # use txaie_slc_file_local_path for installing the slc, if it exists
-            try:
-                container_file_str = str(conf.get(CKey.txaie_slc_file_local_path))
-                container_file = Path(container_file_str)
-            finally:
-                pass
 
-        if container_file:
-            deploy_language_container(conf=conf,
-                                      path_in_bucket=PATH_IN_BUCKET,
-                                      language_alias=language_alias,
-                                      activation_key=ACTIVATION_KEY,
-                                      container_file=container_file,
-                                      container_name=container_name,
-                                      allow_override=allow_override,
-                                      )
-        else:
-            version = LATEST_KNOWN_VERSION
-            install_txaie_version(version)
+        container_file = container_file or from_ai_lab_config(CKey.txaie_slc_file_local_path)
+        if not container_file:
+            install_text_ai_extension(LATEST_KNOWN_VERSION)
+        else
+            deploy_language_container(
+                conf=conf,
+                path_in_bucket=PATH_IN_BUCKET,
+                language_alias=language_alias,
+                activation_key=ACTIVATION_KEY,
+                container_file=container_file,
+                container_name=container_name,
+                allow_override=allow_override,
+            )
 
 
 
     if run_upload_models:
-        #  Install default transformers models into the Bucketfs using
+        #  Install default Hugging Face models into the Bucketfs using
         #  Transformers Extensions upload model functionality.
         raise NotImplementedError('Implementation is waiting for TE release.')
 
@@ -202,10 +213,8 @@ def initialize_text_ai_extension(conf: Secrets,
             conf, path_in_bucket=PATH_IN_BUCKET, connection_name=bfs_conn_name
         )
 
-    # Save the connection object names in the secret store.
+    # Update secret store
     conf.save(CKey.txaie_bfs_connection, bfs_conn_name)
-
-    # Save the directory names in the secret store
     conf.save(CKey.txaie_models_bfs_dir, BFS_MODELS_DIR)
     conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
 
