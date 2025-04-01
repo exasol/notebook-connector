@@ -15,7 +15,7 @@ import os
 
 def test_download_pre_release(secrets):
     secrets.save(CKey.text_ai_pre_release_url,
-                 'https://dut5tonqye28.cloudfront.net/ai_lab/text_ai/mibe_test.zip')#this should really have a better name.
+                 'https://dut5tonqye28.cloudfront.net/ai_lab/text_ai/prerelease_test.zip')
     secrets.save(CKey.text_ai_zip_password, 'xyz')
     with download_pre_release(secrets) as unzipped_files:
         expected_contents = ['my_wheel\n', 'my_slc\n']
