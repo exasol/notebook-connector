@@ -221,5 +221,5 @@ def initialize_text_ai_extension(conf: Secrets,
     conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
 
 
-def install_txaie_version(version: str) -> None:
+def install_text_ai_extension(version: str) -> None:
     raise NotImplementedError('Implementation is waiting for decision on where the releases will be hosted.')
