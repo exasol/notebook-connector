@@ -46,7 +46,7 @@ jobs:
           SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
           SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
           SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
-        run: poetry run pytest -rA --setup-show --backend=saas test/integration/test_cloud_storage.py
+        run: poetry run -- pytest -rA --setup-show --backend=saas test/integration/test_cloud_storage.py
 
   large-runner-tests:
     name: Text AI Tests
@@ -89,7 +89,7 @@ jobs:
         env:
           TXAIE_PRE_RELEASE_URL: ${{ vars.ZIP_URL }}
           TXAIE_PRE_RELEASE_PASSWORD: ${{ secrets.ZIP_PASSWORD }}
-        run: poetry run pytest -rA --setup-show test/integration/test_text_ai_extension_wrapper.py
+        run: poetry run -- pytest -rA --setup-show test/integration/test_text_ai_extension_wrapper.py
 
   # This job ensures inputs have been executed successfully.
   approve-merge:
