@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import ssl
 from pathlib import Path
 from typing import (
@@ -6,19 +7,20 @@ from typing import (
     Optional,
 )
 
+import exasol.bucketfs as bfs  # type: ignore
+import exasol.saas.client.api_access as saas_api  # type: ignore
+import ibis  # type: ignore
 import pyexasol  # type: ignore
 import sqlalchemy  # type: ignore
-from sqlalchemy.engine.url import URL   # type: ignore
-import ibis         # type: ignore
+from sqlalchemy.engine.url import URL  # type: ignore
 
-import exasol.bucketfs as bfs  # type: ignore
-import exasol.saas.client.api_access as saas_api    # type: ignore
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.utils import optional_str_to_bool
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend
 
 
-def _optional_encryption(conf: Secrets, key: CKey = CKey.db_encryption) -> Optional[bool]:
+def _optional_encryption(conf: Secrets, key: CKey = CKey.db_encryption) -> bool | None:
     return optional_str_to_bool(conf.get(key))
 
 
@@ -71,7 +73,7 @@ def get_backend(conf: Secrets) -> StorageBackend:
     StorageBackend.onprem.
     """
     storage_backend = conf.get(CKey.storage_backend, StorageBackend.onprem.name)
-    return StorageBackend[storage_backend]      # type: ignore
+    return StorageBackend[storage_backend]  # type: ignore
 
 
 def get_external_host(conf: Secrets) -> str:
@@ -99,7 +101,8 @@ def get_saas_database_id(conf: Secrets) -> str:
         host=conf.get(CKey.saas_url),
         account_id=conf.get(CKey.saas_account_id),
         pat=conf.get(CKey.saas_token),
-        database_name=conf.get(CKey.saas_database_name))
+        database_name=conf.get(CKey.saas_database_name),
+    )
 
 
 def _get_pyexasol_connection_params(conf: Secrets, **kwargs) -> dict[str, Any]:
@@ -116,7 +119,7 @@ def _get_pyexasol_connection_params(conf: Secrets, **kwargs) -> dict[str, Any]:
             account_id=conf.get(CKey.saas_account_id),
             pat=conf.get(CKey.saas_token),
             database_id=conf.get(CKey.saas_database_id),
-            database_name=conf.get(CKey.saas_database_name)
+            database_name=conf.get(CKey.saas_database_name),
         )
 
     encryption = _optional_encryption(conf)
@@ -188,15 +191,15 @@ def open_sqlalchemy_connection(conf: Secrets):
     query_params = {}
     encryption = _optional_encryption(conf)
     if encryption is not None:
-        query_params['ENCRYPTION'] = 'Yes' if encryption else 'No'
+        query_params["ENCRYPTION"] = "Yes" if encryption else "No"
     certificate_validation = _extract_ssl_options(conf).get("cert_reqs")
     if (certificate_validation is not None) and (not certificate_validation):
-        query_params['SSLCertificate'] = 'SSL_VERIFY_NONE'
+        query_params["SSLCertificate"] = "SSL_VERIFY_NONE"
 
     if get_backend(conf) == StorageBackend.onprem:
         conn_params: dict[str, Any] = {
             "host": conf.get(CKey.db_host_name),
-            "port": int(conf.get(CKey.db_port)),    # type: ignore
+            "port": int(conf.get(CKey.db_port)),  # type: ignore
             "username": conf.get(CKey.db_user),
             "password": conf.get(CKey.db_password),
         }
@@ -206,28 +209,30 @@ def open_sqlalchemy_connection(conf: Secrets):
             account_id=conf.get(CKey.saas_account_id),
             pat=conf.get(CKey.saas_token),
             database_id=conf.get(CKey.saas_database_id),
-            database_name=conf.get(CKey.saas_database_name)
+            database_name=conf.get(CKey.saas_database_name),
         )
-        host, port = str(conn_params['dsn']).split(':')
+        host, port = str(conn_params["dsn"]).split(":")
         conn_params = {
             "host": host,
             "port": int(port),
-            "username": conn_params['user'],
-            "password": conn_params['password']
+            "username": conn_params["user"],
+            "password": conn_params["password"],
         }
 
-    websocket_url = URL.create('exa+websocket',
-                               **conn_params,
-                               database=conf.get(CKey.db_schema),
-                               query=query_params
-                               )
+    websocket_url = URL.create(
+        "exa+websocket",
+        **conn_params,
+        database=conf.get(CKey.db_schema),
+        query=query_params,
+    )
 
     return sqlalchemy.create_engine(websocket_url)
 
 
 def _get_onprem_bucketfs_url(conf: Secrets) -> str:
-    bucketfs_url_prefix = ("https" if _optional_encryption(conf, CKey.bfs_encryption)
-                           else "http")
+    bucketfs_url_prefix = (
+        "https" if _optional_encryption(conf, CKey.bfs_encryption) else "http"
+    )
     bucketfs_host = conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name))
     return f"{bucketfs_url_prefix}://{bucketfs_host}:{conf.get(CKey.bfs_port)}"
 
@@ -270,19 +275,26 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
         }
 
         # Connect to the BucketFS service and navigate to the bucket of choice.
-        bucketfs = bfs.Service(bucketfs_url, bucketfs_credentials, verify,  # type: ignore
-                               conf.get(CKey.bfs_service))
-        return bucketfs[conf.get(CKey.bfs_bucket)]          # type: ignore
+        bucketfs = bfs.Service(
+            bucketfs_url,
+            bucketfs_credentials,
+            verify,  # type: ignore
+            conf.get(CKey.bfs_service),
+        )
+        return bucketfs[conf.get(CKey.bfs_bucket)]  # type: ignore
 
     else:
-        saas_url, saas_token, saas_account_id = [
-            conf.get(key) for key in [CKey.saas_url, CKey.saas_token, CKey.saas_account_id]
-        ]
+        saas_url, saas_token, saas_account_id = (
+            conf.get(key)
+            for key in [CKey.saas_url, CKey.saas_token, CKey.saas_account_id]
+        )
         saas_database_id = get_saas_database_id(conf)
-        return bfs.SaaSBucket(url=saas_url,     # type: ignore
-                              account_id=saas_account_id,   # type: ignore
-                              database_id=saas_database_id, # type: ignore
-                              pat=saas_token)   # type: ignore
+        return bfs.SaaSBucket(
+            url=saas_url,  # type: ignore
+            account_id=saas_account_id,  # type: ignore
+            database_id=saas_database_id,  # type: ignore
+            pat=saas_token,
+        )  # type: ignore
 
 
 def open_bucketfs_location(conf: Secrets) -> bfs.path.PathLike:
@@ -297,7 +309,7 @@ def open_bucketfs_location(conf: Secrets) -> bfs.path.PathLike:
             password=conf.get(CKey.bfs_password),
             verify=_get_ca_cert_verification(conf),
             bucket_name=conf.get(CKey.bfs_bucket),
-            service_name=conf.get(CKey.bfs_service)
+            service_name=conf.get(CKey.bfs_service),
         )
     else:
         return bfs.path.build_path(
@@ -305,7 +317,7 @@ def open_bucketfs_location(conf: Secrets) -> bfs.path.PathLike:
             url=conf.get(CKey.saas_url),
             account_id=conf.get(CKey.saas_account_id),
             database_id=get_saas_database_id(conf),
-            pat=conf.get(CKey.saas_token)
+            pat=conf.get(CKey.saas_token),
         )
 
 
@@ -323,14 +335,14 @@ def open_ibis_connection(conf: Secrets, **kwargs):
 
     conn_params = _get_pyexasol_connection_params(conf, **kwargs)
 
-    dsn = conn_params.pop('dsn')
-    host_port = dsn.split(':')
-    conn_params['host'] = host_port[0]
+    dsn = conn_params.pop("dsn")
+    host_port = dsn.split(":")
+    conn_params["host"] = host_port[0]
     if len(host_port) > 1:
-        conn_params['port'] = int(host_port[1])
+        conn_params["port"] = int(host_port[1])
 
     schema = conf.get(CKey.db_schema)
     if schema:
-        conn_params['schema'] = schema
+        conn_params["schema"] = schema
 
     return ibis.exasol.connect(**conn_params)

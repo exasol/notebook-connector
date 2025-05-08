@@ -1,20 +1,20 @@
 from exasol_transformers_extension.deployment.scripts_deployer import ScriptsDeployer
-from exasol_transformers_extension.deployment.te_language_container_deployer import TeLanguageContainerDeployer
-
-from exasol.nb_connector.connections import (
-    open_pyexasol_connection
+from exasol_transformers_extension.deployment.te_language_container_deployer import (
+    TeLanguageContainerDeployer,
 )
+
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.extension_wrapper_common import (
+    deploy_language_container,
     encapsulate_bucketfs_credentials,
     encapsulate_huggingface_token,
-    deploy_language_container
 )
 from exasol.nb_connector.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
-    get_activation_sql
+    get_activation_sql,
 )
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 # Root directory in a BucketFS bucket where all stuff of the Transformers
 # Extension, including its language container, will be uploaded.
@@ -33,7 +33,7 @@ ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "te"
 BFS_CONNECTION_PREFIX = "TE_BFS"
 
 # Models will be uploaded into this directory in BucketFS.
-BFS_MODELS_DIR = 'te_models'
+BFS_MODELS_DIR = "te_models"
 
 # The name of the connection object with a Huggingface token will be prefixed
 # with this string.
@@ -44,8 +44,7 @@ HF_CONNECTION_PREFIX = "TE_HF"
 MODELS_CACHE_DIR = "models_cache"
 
 
-def deploy_scripts(conf: Secrets,
-                   language_alias: str) -> None:
+def deploy_scripts(conf: Secrets, language_alias: str) -> None:
     """
     Deploys all the extension's scripts to the database.
 
@@ -63,18 +62,22 @@ def deploy_scripts(conf: Secrets,
         activation_sql = get_activation_sql(conf)
         conn.execute(activation_sql)
 
-        scripts_deployer = ScriptsDeployer(language_alias, conf.get(CKey.db_schema), conn, install_all_scripts=True)
+        scripts_deployer = ScriptsDeployer(
+            language_alias, conf.get(CKey.db_schema), conn, install_all_scripts=True
+        )
         scripts_deployer.deploy_scripts()
 
 
-def initialize_te_extension(conf: Secrets,
-                            version: str = LATEST_KNOWN_VERSION,
-                            language_alias: str = LANGUAGE_ALIAS,
-                            run_deploy_container: bool = True,
-                            run_deploy_scripts: bool = True,
-                            run_encapsulate_bfs_credentials: bool = True,
-                            run_encapsulate_hf_token: bool = True,
-                            allow_override: bool = True) -> None:
+def initialize_te_extension(
+    conf: Secrets,
+    version: str = LATEST_KNOWN_VERSION,
+    language_alias: str = LANGUAGE_ALIAS,
+    run_deploy_container: bool = True,
+    run_deploy_scripts: bool = True,
+    run_encapsulate_bfs_credentials: bool = True,
+    run_encapsulate_hf_token: bool = True,
+    allow_override: bool = True,
+) -> None:
     """
     Performs all necessary operations to get the Transformers Extension
     up and running. See the "Getting Started" and "Setup" sections of the
@@ -114,14 +117,18 @@ def initialize_te_extension(conf: Secrets,
     hf_conn_name = "_".join([HF_CONNECTION_PREFIX, db_user]) if token else ""
 
     if run_deploy_container:
-        container_url = TeLanguageContainerDeployer.SLC_URL_FORMATTER.format(version=version)
-        deploy_language_container(conf,
-                                  container_url=container_url,
-                                  container_name=TeLanguageContainerDeployer.SLC_NAME,
-                                  language_alias=language_alias,
-                                  activation_key=ACTIVATION_KEY,
-                                  path_in_bucket=PATH_IN_BUCKET,
-                                  allow_override=allow_override)
+        container_url = TeLanguageContainerDeployer.SLC_URL_FORMATTER.format(
+            version=version
+        )
+        deploy_language_container(
+            conf,
+            container_url=container_url,
+            container_name=TeLanguageContainerDeployer.SLC_NAME,
+            language_alias=language_alias,
+            activation_key=ACTIVATION_KEY,
+            path_in_bucket=PATH_IN_BUCKET,
+            allow_override=allow_override,
+        )
 
     # Create the required objects in the database
     if run_deploy_scripts:
@@ -141,10 +148,7 @@ def initialize_te_extension(conf: Secrets,
     conf.save(CKey.te_models_cache_dir, MODELS_CACHE_DIR)
 
 
-def upload_model_from_cache(
-        conf: Secrets,
-        model_name: str,
-        cache_dir: str) -> None:
+def upload_model_from_cache(conf: Secrets, model_name: str, cache_dir: str) -> None:
     """
     Uploads model previously downloaded and cached on a local drive. This,
     for instance, could have been done with the following code.
@@ -163,15 +167,13 @@ def upload_model_from_cache(
             should have its own cache directory.
     """
 
-    raise NotImplementedError('Uploading the model is temporarily unavailable. '                              
-                              'Awaiting changes in the Transformers Extension module.')
+    raise NotImplementedError(
+        "Uploading the model is temporarily unavailable. "
+        "Awaiting changes in the Transformers Extension module."
+    )
 
 
-def upload_model(
-        conf: Secrets,
-        model_name: str,
-        cache_dir: str,
-        **kwargs) -> None:
+def upload_model(conf: Secrets, model_name: str, cache_dir: str, **kwargs) -> None:
     """
     Uploads model from the Huggingface hub or from the local cache in case it
     has already been downloaded from the hub. The user token, if found in the
@@ -190,12 +192,15 @@ def upload_model(
             methods of the AutoTokenizer and AutoModel. The user token, if specified
             here, will be used instead of the one in the secret store.
     """
-    from transformers import AutoTokenizer, AutoModel   # type: ignore
+    from transformers import (  # type: ignore
+        AutoModel,
+        AutoTokenizer,
+    )
 
-    if 'token' not in kwargs:
+    if "token" not in kwargs:
         token = conf.get(CKey.huggingface_token)
         if token:
-            kwargs['token'] = token
+            kwargs["token"] = token
 
     AutoTokenizer.from_pretrained(model_name, cache_dir=cache_dir, **kwargs)
     AutoModel.from_pretrained(model_name, cache_dir=cache_dir, **kwargs)
