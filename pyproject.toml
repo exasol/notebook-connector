@@ -1,10 +1,30 @@
-[tool.poetry]
+[project]
 name = "exasol-notebook-connector"
 version = "0.5.0"
+requires-python = ">=3.10,<4.0"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [ {include = "exasol"}, ]
-authors = [ "Christoph Kuhnke <christoph.kuhnke@exasol.com>" ]
-maintainers = [ "Christoph Kuhnke <christoph.kuhnke@exasol.com>" ]
+authors = [
+    {name="Christoph Kuhnke", email="christoph.kuhnke@exasol.com"},
+]
+maintainers= [
+    {name="Christoph Kuhnke", email="christoph.kuhnke@exasol.com"},
+]
+readme = "README.md"
+license = "MIT"
+dynamic = ["classifiers", "dependencies"]
+
+[project.urls]
+Homepage = "https://github.io/exasol/notebook-connector"
+Documentation = "https://github.io/exasol/notebook-connector"
+Source = "https://github.io/exasol/notebook-connector"
+Issues = "https://github.io/exasol/notebook-connector/issues"
+
+[tool.poetry]
+requires-poetry = ">=2.1.0"
+packages = [
+    { include = "exasol" }
+]
 classifiers = [
    "Programming Language :: Python :: 3",
    "Development Status :: 3 - Alpha",
@@ -12,18 +32,8 @@ classifiers = [
    "License :: OSI Approved :: MIT License",
    "Topic :: Security :: Cryptography",
 ]
-readme = "README.md"
-license = "MIT"
-
-[tool.poetry.urls]
-"Homepage" = "https://github.io/exasol/notebook-connector"
-"Documentation" = "https://github.io/exasol/notebook-connector"
-"Source" = "https://github.io/exasol/notebook-connector"
-"Issues" = "https://github.io/exasol/notebook-connector/issues"
-
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4.0"
 sqlcipher3-binary = {version = ">=0.5.0", platform = "linux"}
 sqlcipher3 = {version = ">=0.5.0", platform = "darwin"}
 sqlalchemy-exasol = "^5.0.0"
@@ -47,11 +57,11 @@ GitPython = ">=2.1.0"
 
 
 [build-system]
-requires = ["poetry_core>=1.0.0"]
+requires = ["poetry_core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.1.1"
 pytest-mock = "^3.7.0"
 pytest_dependency = ">=0.6.0"
