@@ -2,9 +2,6 @@ name: Merge-Gate
 
 on:
   workflow_call:
-    secrets:
-      ALTERNATIVE_GITHUB_TOKEN:
-        required: false
 
 jobs:
 
@@ -36,9 +33,9 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
-          poetry-version: 2.0.1
+          poetry-version: 2.1.2
 
       - name: Allow unprivileged user namespaces
         run: |
@@ -49,7 +46,7 @@ jobs:
           SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
           SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
           SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
-        run: poetry run pytest -rA --setup-show --backend=saas test/integration/test_cloud_storage.py
+        run: poetry run -- pytest -rA --setup-show --backend=saas test/integration/test_cloud_storage.py
 
   large-runner-tests:
     name: Text AI Tests
@@ -80,9 +77,9 @@ jobs:
           sudo rm -rf /opt/ghc
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.20.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
-          poetry-version: 2.0.1
+          poetry-version: 2.1.2
 
       - name: Allow unprivileged user namespaces
         run: |
@@ -92,17 +89,17 @@ jobs:
         env:
           TXAIE_PRE_RELEASE_URL: ${{ vars.ZIP_URL }}
           TXAIE_PRE_RELEASE_PASSWORD: ${{ secrets.ZIP_PASSWORD }}
-        run: poetry run pytest -rA --setup-show test/integration/test_text_ai_extension_wrapper.py
+        run: poetry run -- pytest -rA --setup-show test/integration/test_text_ai_extension_wrapper.py
 
   # This job ensures inputs have been executed successfully.
   approve-merge:
-    name: Allow Merge 
-    runs-on: ubuntu-latest
+    name: Allow Merge
+    runs-on: ubuntu-24.04
     # If you need additional jobs to be part of the merge gate, add them below
     needs: [ fast-checks, saas-tests, large-runner-tests ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
-      - name: Approve 
+      - name: Approve
         run: |
           echo "Merge Approved"

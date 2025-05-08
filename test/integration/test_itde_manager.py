@@ -12,14 +12,14 @@ from exasol_integration_test_docker_environment.lib.docker.volumes.utils import 
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig
-from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.itde_manager import (
+    ItdeContainerStatus,
     bring_itde_up,
     get_itde_status,
     restart_itde,
     take_itde_down,
-    ItdeContainerStatus,
 )
+from exasol.nb_connector.secret_store import Secrets
 
 DB_NETWORK_NAME = "db_network_DemoDb"
 
@@ -50,7 +50,9 @@ def test_bring_itde_up(secrets):
         assert secrets.get(AILabConfig.itde_container) == DB_CONTAINER_NAME
         assert secrets.get(AILabConfig.itde_volume) == DB_VOLUME_NAME
         assert secrets.get(AILabConfig.itde_network) == DB_NETWORK_NAME
-        assert secrets.get(AILabConfig.db_host_name) == secrets.get(AILabConfig.bfs_host_name)
+        assert secrets.get(AILabConfig.db_host_name) == secrets.get(
+            AILabConfig.bfs_host_name
+        )
         assert secrets.get(AILabConfig.db_user) == "sys"
         assert secrets.get(AILabConfig.db_password) == "exasol"
         assert secrets.get(AILabConfig.db_encryption) == "True"

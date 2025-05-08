@@ -18,7 +18,7 @@ class IPRetriever:
 
 
 def retrieve_networks_of_container(
-        container: docker.models.containers.Container
+    container: docker.models.containers.Container,
 ) -> List[Dict[str, Any]]:
     container.reload()
     network_settings = container.attrs["NetworkSettings"]
@@ -48,6 +48,7 @@ class ContainerByIp:
         elif len(candidates) == 0:
             return None
         else:
+
             def format(container):
                 return f'{container.id[:12]} "{container.name}"'
 

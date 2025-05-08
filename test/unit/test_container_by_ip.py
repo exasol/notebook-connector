@@ -1,6 +1,8 @@
+from test.utils.mock_cast import mock_cast
 from typing import (
     Dict,
-    Union, Tuple,
+    Tuple,
+    Union,
 )
 from unittest.mock import (
     MagicMock,
@@ -13,23 +15,24 @@ import docker
 import pytest
 from docker.models.containers import Container
 
-from exasol.nb_connector.container_by_ip import (
-    ContainerByIp
-)
-from test.utils.mock_cast import mock_cast
+from exasol.nb_connector.container_by_ip import ContainerByIp
 
 
 def create_docker_client_mock(
-        containers: Dict[str, Dict[str, str]]) \
-        -> Tuple[
-            Union[docker.DockerClient, MagicMock],
-            Dict[str, Union[MagicMock, Container]]]:
+    containers: Dict[str, Dict[str, str]],
+) -> Tuple[
+    Union[docker.DockerClient, MagicMock], Dict[str, Union[MagicMock, Container]]
+]:
     docker_client_mock: Union[MagicMock, docker.DockerClient] = create_autospec(
         docker.DockerClient
     )
-    container_mocks = {container_name: create_container_mock(networks)
-                       for container_name, networks in containers.items()}
-    mock_cast(docker_client_mock.containers.list).return_value = container_mocks.values()
+    container_mocks = {
+        container_name: create_container_mock(networks)
+        for container_name, networks in containers.items()
+    }
+    mock_cast(docker_client_mock.containers.list).return_value = (
+        container_mocks.values()
+    )
     return docker_client_mock, container_mocks
 
 
@@ -49,10 +52,10 @@ class TestSetup:
     __test__ = False
 
     def __init__(self, containers: Dict[str, Dict[str, str]]):
-        self.docker_client_mock, self.container_mocks = create_docker_client_mock(containers)
-        self.container_by_ip = ContainerByIp(
-            docker_client=self.docker_client_mock
+        self.docker_client_mock, self.container_mocks = create_docker_client_mock(
+            containers
         )
+        self.container_by_ip = ContainerByIp(docker_client=self.docker_client_mock)
 
 
 def test_single_container():
@@ -98,7 +101,5 @@ def test_multiple_containers_matching():
     )
     ip_addresses = ["192.168.4.1", "192.168.5.1", "192.168.0.1", "192.168.2.1"]
 
-    with pytest.raises(
-            RuntimeError, match="Found multiple matching containers: "
-    ):
+    with pytest.raises(RuntimeError, match="Found multiple matching containers: "):
         test_setup.container_by_ip.find(ip_addresses)

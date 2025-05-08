@@ -12,7 +12,7 @@ Creating a new release of the NC requires 4 steps
 ### Prepare the Release
 
 ```shell
-poetry run nox -s release:prepare -- -- <additional-options> <version>
+poetry run -- nox -s release:prepare -- <additional-options> <version>
 ```
 
 `<additional-options>` include
@@ -67,7 +67,7 @@ The workflow completely automates the release process, incl.
 You can use the following commands to manually update the version number without preparing a release:
 
 1. Update version in file `pyproject.toml` or call `poetry version <version>`
-2. Call `poetry run version-check version.py --fix`
+2. Call `poetry run -- version-check version.py --fix`
 
 The second command will update the version number in file `version.py`.
 

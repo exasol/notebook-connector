@@ -1,9 +1,9 @@
 from typing import Dict
 
-import pyexasol # type: ignore
+import pyexasol  # type: ignore
 
-from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.connections import open_pyexasol_connection
+from exasol.nb_connector.secret_store import Secrets
 
 # All secret store entries with language container activation commands
 # will have this common prefix in their keys.
@@ -89,11 +89,15 @@ def get_activation_sql(conf: Secrets) -> str:
     lang_definitions.update(get_requested_languages(conf))
 
     # Build and return an SQL command for the language container activation.
-    merged_langs_str = " ".join(f"{key}={value}" for key, value in lang_definitions.items())
+    merged_langs_str = " ".join(
+        f"{key}={value}" for key, value in lang_definitions.items()
+    )
     return f"ALTER SESSION SET SCRIPT_LANGUAGES='{merged_langs_str}';"
 
 
-def open_pyexasol_connection_with_lang_definitions(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
+def open_pyexasol_connection_with_lang_definitions(
+    conf: Secrets, **kwargs
+) -> pyexasol.ExaConnection:
     """
     Opens a `pyexasol` connection and applies the `ALTER SESSION` command using all registered languages.
     """

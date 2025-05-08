@@ -1,19 +1,27 @@
 from __future__ import annotations
-from typing import Optional
-from datetime import timedelta
+
 import json
+from datetime import timedelta
 from pathlib import Path
+from typing import Optional
 
 import exasol.bucketfs as bfs
 from exasol.python_extension_common.deployment.extract_validator import ExtractValidator
-from exasol.python_extension_common.deployment.language_container_deployer import LanguageContainerDeployer
+from exasol.python_extension_common.deployment.language_container_deployer import (
+    LanguageContainerDeployer,
+)
 
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.connections import (
-    open_pyexasol_connection, open_bucketfs_location,
-    get_external_host, get_backend, get_saas_database_id)
+    get_backend,
+    get_external_host,
+    get_saas_database_id,
+    open_bucketfs_location,
+    open_pyexasol_connection,
+)
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.utils import optional_str_to_bool
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend
 
 
 def str_to_bool(conf: Secrets, key: CKey, default_value: bool) -> bool:
@@ -55,15 +63,17 @@ def _get_optional_bfs_port(conf: Secrets) -> int | None:
     return None
 
 
-def deploy_language_container(conf: Secrets,
-                              path_in_bucket: str,
-                              language_alias: str,
-                              activation_key: str,
-                              container_url: str | None = None,
-                              container_file: Path | None = None,
-                              container_name: str | None = None,
-                              allow_override: bool = True,
-                              timeout: timedelta = timedelta(minutes=10)) -> None:
+def deploy_language_container(
+    conf: Secrets,
+    path_in_bucket: str,
+    language_alias: str,
+    activation_key: str,
+    container_url: str | None = None,
+    container_file: Path | None = None,
+    container_name: str | None = None,
+    allow_override: bool = True,
+    timeout: timedelta = timedelta(minutes=10),
+) -> None:
     """
     Downloads language container from the specified location and uploads it to the
     BucketFS.
@@ -108,21 +118,25 @@ def deploy_language_container(conf: Secrets,
             pyexasol_connection=conn,
             language_alias=language_alias,
             bucketfs_path=bucketfs_location,
-            extract_validator=validator
+            extract_validator=validator,
         )
 
         if container_file:
-            deployer.run(container_file,
-                         container_name,
-                         alter_system=False,
-                         allow_override=allow_override,
-                         wait_for_completion=True)
+            deployer.run(
+                container_file,
+                container_name,
+                alter_system=False,
+                allow_override=allow_override,
+                wait_for_completion=True,
+            )
         elif container_url:
-            deployer.download_and_run(container_url,
-                                      container_name,
-                                      alter_system=False,
-                                      allow_override=allow_override,
-                                      wait_for_completion=True)
+            deployer.download_and_run(
+                container_url,
+                container_name,
+                alter_system=False,
+                allow_override=allow_override,
+                wait_for_completion=True,
+            )
         else:
             raise ValueError("Either container URL or container file must be provided")
 
@@ -189,33 +203,43 @@ def encapsulate_bucketfs_credentials(
     """
 
     def to_json_str(**kwargs) -> str:
-        filtered_kwargs = {k: v for k,v in kwargs.items() if v is not None}
+        filtered_kwargs = {k: v for k, v in kwargs.items() if v is not None}
         return json.dumps(filtered_kwargs)
 
     backend = get_backend(conf)
     if backend == StorageBackend.onprem:
         # Here we are using the internal bucket-fs host and port, falling back
         # to the external parameters if the former are not specified.
-        host = conf.get(CKey.bfs_internal_host_name,
-                        conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name)))
+        host = conf.get(
+            CKey.bfs_internal_host_name,
+            conf.get(CKey.bfs_host_name, conf.get(CKey.db_host_name)),
+        )
         port = conf.get(CKey.bfs_internal_port, conf.get(CKey.bfs_port))
         protocol = "https" if str_to_bool(conf, CKey.bfs_encryption, True) else "http"
         url = f"{protocol}://{host}:{port}"
-        verify: Optional[bool] = (False if conf.get(CKey.trusted_ca)
-                                  else optional_str_to_bool(conf.get(CKey.cert_vld)))
-        conn_to = to_json_str(backend=bfs.path.StorageBackend.onprem.name,
-                              url=url, service_name=conf.get(CKey.bfs_service),
-                              bucket_name=conf.get(CKey.bfs_bucket),
-                              path=path_in_bucket,
-                              verify=verify)
+        verify: bool | None = (
+            False
+            if conf.get(CKey.trusted_ca)
+            else optional_str_to_bool(conf.get(CKey.cert_vld))
+        )
+        conn_to = to_json_str(
+            backend=bfs.path.StorageBackend.onprem.name,
+            url=url,
+            service_name=conf.get(CKey.bfs_service),
+            bucket_name=conf.get(CKey.bfs_bucket),
+            path=path_in_bucket,
+            verify=verify,
+        )
         conn_user = to_json_str(username=conf.get(CKey.bfs_user))
         conn_password = to_json_str(password=conf.get(CKey.bfs_password))
     else:
         database_id = get_saas_database_id(conf)
-        conn_to = to_json_str(backend=bfs.path.StorageBackend.saas.name,
-                              url=conf.get(CKey.saas_url),
-                              account_id=conf.get(CKey.saas_account_id),
-                              path=path_in_bucket)
+        conn_to = to_json_str(
+            backend=bfs.path.StorageBackend.saas.name,
+            url=conf.get(CKey.saas_url),
+            account_id=conf.get(CKey.saas_account_id),
+            path=path_in_bucket,
+        )
         conn_user = to_json_str(database_id=database_id)
         conn_password = to_json_str(pat=conf.get(CKey.saas_token))
 
@@ -228,7 +252,7 @@ def encapsulate_bucketfs_credentials(
     query_params = {
         "BUCKETFS_ADDRESS": conn_to,
         "BUCKETFS_USER": conn_user,
-        "BUCKETFS_PASSWORD": conn_password
+        "BUCKETFS_PASSWORD": conn_password,
     }
     with open_pyexasol_connection(conf, compression=True) as conn:
         conn.execute(query=sql, query_params=query_params)
@@ -256,8 +280,9 @@ def encapsulate_huggingface_token(conf: Secrets, connection_name: str) -> None:
         conn.execute(query=sql, query_params=query_params)
 
 
-def encapsulate_aws_credentials(conf: Secrets, connection_name: str,
-                                s3_bucket_key: CKey) -> None:
+def encapsulate_aws_credentials(
+    conf: Secrets, connection_name: str, s3_bucket_key: CKey
+) -> None:
     """
     Creates a connection object in the database encapsulating the address of
     an AWS S3 bucket and AWS access credentials.

@@ -1,10 +1,30 @@
-[tool.poetry]
+[project]
 name = "exasol-notebook-connector"
 version = "0.5.0"
+requires-python = ">=3.10,<4.0"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [ {include = "exasol"}, ]
-authors = [ "Christoph Kuhnke <christoph.kuhnke@exasol.com>" ]
-maintainers = [ "Christoph Kuhnke <christoph.kuhnke@exasol.com>" ]
+authors = [
+    {name="Christoph Kuhnke", email="christoph.kuhnke@exasol.com"},
+]
+maintainers= [
+    {name="Christoph Kuhnke", email="christoph.kuhnke@exasol.com"},
+]
+readme = "README.md"
+license = "MIT"
+dynamic = ["classifiers", "dependencies"]
+
+[project.urls]
+Homepage = "https://github.io/exasol/notebook-connector"
+Documentation = "https://github.io/exasol/notebook-connector"
+Source = "https://github.io/exasol/notebook-connector"
+Issues = "https://github.io/exasol/notebook-connector/issues"
+
+[tool.poetry]
+requires-poetry = ">=2.1.0"
+packages = [
+    { include = "exasol" }
+]
 classifiers = [
    "Programming Language :: Python :: 3",
    "Development Status :: 3 - Alpha",
@@ -12,25 +32,15 @@ classifiers = [
    "License :: OSI Approved :: MIT License",
    "Topic :: Security :: Cryptography",
 ]
-readme = "README.md"
-license = "MIT"
-
-[tool.poetry.urls]
-"Homepage" = "https://github.io/exasol/notebook-connector"
-"Documentation" = "https://github.io/exasol/notebook-connector"
-"Source" = "https://github.io/exasol/notebook-connector"
-"Issues" = "https://github.io/exasol/notebook-connector/issues"
-
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4.0"
 sqlcipher3-binary = {version = ">=0.5.0", platform = "linux"}
 sqlcipher3 = {version = ">=0.5.0", platform = "darwin"}
 sqlalchemy-exasol = "^5.0.0"
 pyexasol = ">=0.26.0, < 1"
 exasol-bucketfs = "^1.0.0"
 exasol-transformers-extension = "^2.2.1"
-transformers = {extras = ["torch"], version = "^4.36.2"}
+transformers = {extras = ["torch"], version = "^4.50.0"}
 exasol-sagemaker-extension = ">=0.11.3"
 
 exasol-integration-test-docker-environment = "^3.2.0"
@@ -47,15 +57,15 @@ GitPython = ">=2.1.0"
 
 
 [build-system]
-requires = ["poetry_core>=1.0.0"]
+requires = ["poetry_core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.1.1"
 pytest-mock = "^3.7.0"
 pytest_dependency = ">=0.6.0"
-exasol-toolbox = ">=0.18.0, < 1"
+exasol-toolbox = "^1.1.0"
 pytest-exasol-backend = ">=0.3.2,<1"
 
 
@@ -97,6 +107,7 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
     "exasol.toolbox.nox.tasks",
+    "exasol/nb_connector/connections",
     "test.conftest.*",
     "test.*",
     ]

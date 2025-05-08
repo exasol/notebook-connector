@@ -56,14 +56,14 @@ def dockerfile_content() -> str:
 @pytest.fixture
 def docker_image(dockerfile_content) -> Image:
     with ContextDockerClient() as client:
-        image, _ = client.images.build(fileobj=io.BytesIO(dockerfile_content.encode("UTF-8")))
+        image, _ = client.images.build(
+            fileobj=io.BytesIO(dockerfile_content.encode("UTF-8"))
+        )
         yield image
         try:
             client.images.remove(image)
         except Exception as e:
-            logging.root.warning(
-                "Failed removing image %s with exception %s", image, e
-            )
+            logging.root.warning("Failed removing image %s with exception %s", image, e)
 
 
 @pytest.fixture
@@ -103,8 +103,10 @@ def itde_connect_test_impl():
 
         from exasol.nb_connector.ai_lab_config import AILabConfig
         from exasol.nb_connector.connections import open_pyexasol_connection
-        from exasol.nb_connector.itde_manager import bring_itde_up
-        from exasol.nb_connector.itde_manager import take_itde_down
+        from exasol.nb_connector.itde_manager import (
+            bring_itde_up,
+            take_itde_down,
+        )
         from exasol.nb_connector.secret_store import Secrets
 
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
@@ -138,8 +140,10 @@ def itde_recreation_after_take_down():
         from pathlib import Path
 
         from exasol.nb_connector.ai_lab_config import AILabConfig
-        from exasol.nb_connector.itde_manager import bring_itde_up
-        from exasol.nb_connector.itde_manager import take_itde_down
+        from exasol.nb_connector.itde_manager import (
+            bring_itde_up,
+            take_itde_down,
+        )
         from exasol.nb_connector.secret_store import Secrets
 
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
@@ -173,8 +177,10 @@ def itde_recreation_without_take_down():
         from pathlib import Path
 
         from exasol.nb_connector.ai_lab_config import AILabConfig
-        from exasol.nb_connector.itde_manager import bring_itde_up
-        from exasol.nb_connector.itde_manager import take_itde_down
+        from exasol.nb_connector.itde_manager import (
+            bring_itde_up,
+            take_itde_down,
+        )
         from exasol.nb_connector.secret_store import Secrets
 
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
@@ -201,11 +207,18 @@ def itde_stop_and_restart():
     def run_test():
         from pathlib import Path
 
-        from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+        from exasol_integration_test_docker_environment.lib.docker import (
+            ContextDockerClient,
+        )
+
         from exasol.nb_connector.ai_lab_config import AILabConfig
         from exasol.nb_connector.itde_manager import (
-            ItdeContainerStatus, bring_itde_up, restart_itde, get_itde_status,
-            _remove_current_container_from_db_network)
+            ItdeContainerStatus,
+            _remove_current_container_from_db_network,
+            bring_itde_up,
+            get_itde_status,
+            restart_itde,
+        )
         from exasol.nb_connector.secret_store import Secrets
 
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
@@ -214,23 +227,31 @@ def itde_stop_and_restart():
 
         bring_itde_up(secrets)
         status = get_itde_status(secrets)
-        assert status is ItdeContainerStatus.READY, f'The status after bringing itde up is {status.name}'
+        assert (
+            status is ItdeContainerStatus.READY
+        ), f"The status after bringing itde up is {status.name}"
 
         # Disconnect calling container from Docker-DB network
         _remove_current_container_from_db_network(secrets)
         status = get_itde_status(secrets)
-        assert status is ItdeContainerStatus.RUNNING, f'The status after disconnecting the container is {status.name}'
+        assert (
+            status is ItdeContainerStatus.RUNNING
+        ), f"The status after disconnecting the container is {status.name}"
 
         # Stop the Docker-DB container.
         container_name = secrets.get(AILabConfig.itde_container)
         with ContextDockerClient() as docker_client:
             docker_client.api.stop(container_name)
         status = get_itde_status(secrets)
-        assert status is ItdeContainerStatus.STOPPED, f'The status after stopping ITDE is {status.name}'
+        assert (
+            status is ItdeContainerStatus.STOPPED
+        ), f"The status after stopping ITDE is {status.name}"
 
         restart_itde(secrets)
         status = get_itde_status(secrets)
-        assert status is ItdeContainerStatus.READY, f'The status after restarting ITDE is {status.name}'
+        assert (
+            status is ItdeContainerStatus.READY
+        ), f"The status after restarting ITDE is {status.name}"
 
     function_source_code = textwrap.dedent(dill.source.getsource(run_test))
     source_code = f"{function_source_code}\nrun_test()"
@@ -249,14 +270,22 @@ def itde_external_test():
         from unittest.mock import patch
 
         from exasol_integration_test_docker_environment.lib import api
+
         from exasol.nb_connector.connections import open_pyexasol_connection
-        from exasol.nb_connector.itde_manager import bring_itde_up, take_itde_down
+        from exasol.nb_connector.itde_manager import (
+            bring_itde_up,
+            take_itde_down,
+        )
         from exasol.nb_connector.secret_store import Secrets
 
         secrets = Secrets(db_file=Path("secrets.sqlcipher"), master_password="test")
-        env_info, cleanup_func = api.spawn_test_environment(environment_name="TestDemoDb")
+        env_info, cleanup_func = api.spawn_test_environment(
+            environment_name="TestDemoDb"
+        )
         try:
-            with patch('exasol_integration_test_docker_environment.lib.api.spawn_test_environment'):
+            with patch(
+                "exasol_integration_test_docker_environment.lib.api.spawn_test_environment"
+            ):
                 # We have effectively disabled the spawn_test_environment(). The bring_itde_up()
                 # should use the provided instance of the DockerDB. If it tries to create a new
                 # one this will fail since a spawn_test_environment() mock will be called instead.
@@ -275,12 +304,15 @@ def itde_external_test():
 
 
 @pytest.fixture
-def docker_container(wheel_path, docker_image,
-                     itde_connect_test_impl,
-                     itde_recreation_after_take_down,
-                     itde_recreation_without_take_down,
-                     itde_stop_and_restart,
-                     itde_external_test):
+def docker_container(
+    wheel_path,
+    docker_image,
+    itde_connect_test_impl,
+    itde_recreation_after_take_down,
+    itde_recreation_without_take_down,
+    itde_stop_and_restart,
+    itde_external_test,
+):
     """
     Create a Docker container named TEST_CONTAINER to manage an instance of ITDE.
     Copy the wheel file resulting from building the current project NC into the container.
@@ -301,8 +333,13 @@ def docker_container(wheel_path, docker_image,
             copy = DockerContainerCopy(container)
             copy.add_file(str(wheel_path), wheel_path.name)
             copy.add_string_to_file("itde_connect_test_impl.py", itde_connect_test_impl)
-            copy.add_string_to_file("itde_recreation_after_take_down.py", itde_recreation_after_take_down)
-            copy.add_string_to_file("itde_recreation_without_take_down.py", itde_recreation_without_take_down)
+            copy.add_string_to_file(
+                "itde_recreation_after_take_down.py", itde_recreation_after_take_down
+            )
+            copy.add_string_to_file(
+                "itde_recreation_without_take_down.py",
+                itde_recreation_without_take_down,
+            )
             copy.add_string_to_file("itde_stop_and_restart.py", itde_stop_and_restart)
             copy.add_string_to_file("itde_external_test.py", itde_external_test)
             copy.copy("/tmp")
@@ -322,12 +359,16 @@ def test_itde_connect(docker_container):
 
 
 def test_itde_recreation_after_take_down(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_after_take_down.py")
+    exec_result = docker_container.exec_run(
+        "python3 /tmp/itde_recreation_after_take_down.py"
+    )
     assert exec_result.exit_code == 0, exec_result.output
 
 
 def test_itde_recreation_without_take_down(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/itde_recreation_without_take_down.py")
+    exec_result = docker_container.exec_run(
+        "python3 /tmp/itde_recreation_without_take_down.py"
+    )
     assert exec_result.exit_code == 0, exec_result.output
 
 

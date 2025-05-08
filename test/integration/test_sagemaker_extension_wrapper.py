@@ -1,21 +1,19 @@
-from exasol.nb_connector.sagemaker_extension_wrapper import initialize_sme_extension
-from exasol.nb_connector.connections import open_pyexasol_connection
-from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from test.utils.integration_test_utils import (
-    setup_itde,
     activate_languages,
     assert_connection_exists,
     assert_run_empty_udf,
     get_script_counts,
     language_definition_context,
+    setup_itde,
 )
 
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.connections import open_pyexasol_connection
+from exasol.nb_connector.sagemaker_extension_wrapper import initialize_sme_extension
+from exasol.nb_connector.secret_store import Secrets
 
-def test_initialize_sme_extension(
-    secrets: Secrets,
-    setup_itde
-):
+
+def test_initialize_sme_extension(secrets: Secrets, setup_itde):
     # Here are fake AWS credentials. Should be fine since we are only testing
     # the deployment.
     secrets.save(CKey.sme_aws_bucket, "NoneExistent")
@@ -25,7 +23,7 @@ def test_initialize_sme_extension(
 
     # At the moment the language alias is hard-coded in the extension,
     # so we have to use this exact value.
-    language_alias = 'PYTHON3_SME'
+    language_alias = "PYTHON3_SME"
 
     with open_pyexasol_connection(secrets) as pyexasol_connection:
 
@@ -39,4 +37,6 @@ def test_initialize_sme_extension(
             script_counts = get_script_counts(pyexasol_connection, secrets)
             assert script_counts["SCRIPTING"] >= 4
             assert script_counts["UDF"] >= 5
-            assert_connection_exists(secrets.get(CKey.sme_aws_connection), pyexasol_connection)
+            assert_connection_exists(
+                secrets.get(CKey.sme_aws_connection), pyexasol_connection
+            )

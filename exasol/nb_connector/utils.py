@@ -32,12 +32,12 @@ def optional_str_to_bool(value: Optional[str]) -> Optional[bool]:
         return None
 
     mapping = {
-        'y': True,
-        'yes': True,
-        'true': True,
-        'n': False,
-        'no': False,
-        'false': False,
+        "y": True,
+        "yes": True,
+        "true": True,
+        "n": False,
+        "no": False,
+        "false": False,
     }
     key = value.lower()
 
