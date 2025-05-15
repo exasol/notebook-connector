@@ -1,7 +1,9 @@
-import pytest
-from unittest import mock
-from typing import Generator
 import pathlib
+from typing import Generator
+from unittest import mock
+
+import pytest
+
 from exasol.nb_connector import bfs_utils
 
 MOCKED_BUCKET = "bucket"

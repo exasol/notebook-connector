@@ -1,10 +1,11 @@
 """
 Bucketfs-related functions.
 """
-import pathlib
-import logging
-import exasol.bucketfs as bfs  # type: ignore
 
+import logging
+import pathlib
+
+import exasol.bucketfs as bfs  # type: ignore
 
 _logger = logging.getLogger(__name__)
 
@@ -25,8 +26,9 @@ def _file_in_bucket(file_name: str, bucket: bfs.Bucket) -> bool:
         raise e
 
 
-def put_file(bucket: bfs.Bucket, file_path: pathlib.Path,
-             skip_if_exists: bool = True) -> bfs.path.BucketPath:
+def put_file(
+    bucket: bfs.Bucket, file_path: pathlib.Path, skip_if_exists: bool = True
+) -> bfs.path.BucketPath:
     """
     Uploads given file into bucketfs
     :param bucket: bucket to use

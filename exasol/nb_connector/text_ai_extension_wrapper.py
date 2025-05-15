@@ -1,16 +1,22 @@
-from os import PathLike
-
-from exasol.nb_connector.extension_wrapper_common import deploy_language_container, encapsulate_bucketfs_credentials
-from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
-from typing import Optional, Generator
-from contextlib import contextmanager
-from pathlib import Path
-import requests
 import subprocess
 import tempfile
+from contextlib import contextmanager
+from os import PathLike
+from pathlib import Path
+from typing import (
+    Generator,
+    Optional,
+)
 
-from exasol.nb_connector.secret_store import Secrets
+import requests
+
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.extension_wrapper_common import (
+    deploy_language_container,
+    encapsulate_bucketfs_credentials,
+)
+from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
+from exasol.nb_connector.secret_store import Secrets
 
 # Models will be uploaded into directory BFS_MODELS_DIR in BucketFS.
 #
@@ -20,8 +26,10 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 # TXAIE uses the same directories as TE (see function initialize_te_extension)
 # as both extensions are using Huggingface Models. This also avoids confusion,
 # and ensures backwards compatibility.
-from exasol.nb_connector.transformers_extension_wrapper import BFS_MODELS_DIR, MODELS_CACHE_DIR
-
+from exasol.nb_connector.transformers_extension_wrapper import (
+    BFS_MODELS_DIR,
+    MODELS_CACHE_DIR,
+)
 
 PATH_IN_BUCKET = "TXAIE"
 """ Location in BucketFS bucket to upload data for TXAIE, e.g. its language container. """
@@ -49,7 +57,6 @@ BFS_CONNECTION_PREFIX = "TXAIE_BFS"
 Prefix for Exasol CONNECTION objects containing a BucketFS location and
 credentials.
 """
-
 
 
 @contextmanager
@@ -82,7 +89,15 @@ def download_pre_release(conf: Secrets) -> Generator[tuple[Path, Path], None, No
         tmp_file.flush()
         with tempfile.TemporaryDirectory() as tmp_dir:
             # Unzip the file into a temporary directory
-            unzip_cmd = ["unzip", "-q", "-P", zip_password, tmp_file.name, "-d", tmp_dir]
+            unzip_cmd = [
+                "unzip",
+                "-q",
+                "-P",
+                zip_password,
+                tmp_file.name,
+                "-d",
+                tmp_dir,
+            ]
             subprocess.run(unzip_cmd, check=True, capture_output=True)
             tmp_path = Path(tmp_dir)
             # Find and return the project wheel and the SLC
@@ -92,9 +107,11 @@ def download_pre_release(conf: Secrets) -> Generator[tuple[Path, Path], None, No
             yield project_wheel, slc_tar_gz
 
 
-def deploy_licence(conf: Secrets,
-                   licence_file: Optional[Path] = None,
-                   licence_content: Optional[str] = None) -> None:
+def deploy_licence(
+    conf: Secrets,
+    licence_file: Optional[Path] = None,
+    licence_content: Optional[str] = None,
+) -> None:
     """
     Deploys the given license and saves its identifier to the secret store. The licence can either be
     defined by a path pointing to a licence file, or by the licence content given as a string.
@@ -107,20 +124,23 @@ def deploy_licence(conf: Secrets,
             Optional. Content of a licence given as a string.
 
     """
-    raise NotImplementedError('Currently this is not implemented, '
-                              'will be changed once the licensing process is finalized.')
+    raise NotImplementedError(
+        "Currently this is not implemented, "
+        "will be changed once the licensing process is finalized."
+    )
 
 
-
-def initialize_text_ai_extension(conf: Secrets,
-                                 container_file: Optional[Path] = None,
-                                 version: Optional[str] = None,
-                                 language_alias: str = LANGUAGE_ALIAS,
-                                 run_deploy_container: bool = True,
-                                 run_deploy_scripts: bool = False,
-                                 run_upload_models: bool = False,
-                                 run_encapsulate_bfs_credentials: bool = True,
-                                 allow_override: bool = True) -> None:
+def initialize_text_ai_extension(
+    conf: Secrets,
+    container_file: Optional[Path] = None,
+    version: Optional[str] = None,
+    language_alias: str = LANGUAGE_ALIAS,
+    run_deploy_container: bool = True,
+    run_deploy_scripts: bool = False,
+    run_upload_models: bool = False,
+    run_encapsulate_bfs_credentials: bool = True,
+    allow_override: bool = True,
+) -> None:
     """
     Depending on which flags are set, runs different steps to install Text-AI Extension in the DB.
     Possible steps:
@@ -174,7 +194,6 @@ def initialize_text_ai_extension(conf: Secrets,
     # see https://github.com/exasol/notebook-connector/issues/179.
     container_name = "exasol_text_ai_extension_container_release.tar.gz"
 
-
     def from_ai_lab_config(key: CKey) -> Path | None:
         entry = conf.get(key)
         return Path(entry) if entry else None
@@ -186,7 +205,9 @@ def initialize_text_ai_extension(conf: Secrets,
             # run_encapsulate_bfs_credentials, etc. be ignored here?
             return
 
-        container_file = container_file or from_ai_lab_config(CKey.txaie_slc_file_local_path)
+        container_file = container_file or from_ai_lab_config(
+            CKey.txaie_slc_file_local_path
+        )
         if not container_file:
             install_text_ai_extension(LATEST_KNOWN_VERSION)
         else:
@@ -200,17 +221,15 @@ def initialize_text_ai_extension(conf: Secrets,
                 allow_override=allow_override,
             )
 
-
-
     if run_upload_models:
         #  Install default Hugging Face models into the Bucketfs using
         #  Transformers Extensions upload model functionality.
-        raise NotImplementedError('Implementation is waiting for TE release.')
-
+        raise NotImplementedError("Implementation is waiting for TE release.")
 
     if run_deploy_scripts:
-        raise NotImplementedError('Currently there are no Text-AI specific scripts to deploy.')
-
+        raise NotImplementedError(
+            "Currently there are no Text-AI specific scripts to deploy."
+        )
 
     if run_encapsulate_bfs_credentials:
         encapsulate_bucketfs_credentials(
@@ -224,4 +243,6 @@ def initialize_text_ai_extension(conf: Secrets,
 
 
 def install_text_ai_extension(version: str) -> None:
-    raise NotImplementedError('Implementation is waiting for decision on where the releases will be hosted.')
+    raise NotImplementedError(
+        "Implementation is waiting for decision on where the releases will be hosted."
+    )

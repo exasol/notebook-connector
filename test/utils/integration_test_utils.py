@@ -1,18 +1,19 @@
 from __future__ import annotations
+
 import textwrap
 from contextlib import contextmanager
-import pytest
 
+import pytest
 from pyexasol import ExaConnection
 
-from exasol.nb_connector.language_container_activation import get_activation_sql
-from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.itde_manager import (
-    bring_itde_up,
-    take_itde_down
-)
 from exasol.nb_connector.ai_lab_config import AILabConfig
 from exasol.nb_connector.connections import open_pyexasol_connection
+from exasol.nb_connector.itde_manager import (
+    bring_itde_up,
+    take_itde_down,
+)
+from exasol.nb_connector.language_container_activation import get_activation_sql
+from exasol.nb_connector.secret_store import Secrets
 
 
 @pytest.fixture
@@ -24,7 +25,7 @@ def setup_itde(secrets) -> None:
 
     bring_itde_up(secrets)
 
-    schema = 'INTEGRATION_TEST'
+    schema = "INTEGRATION_TEST"
     secrets.save(AILabConfig.db_schema, schema)
     with open_pyexasol_connection(secrets) as pyexasol_connection:
         pyexasol_connection.execute(f"CREATE SCHEMA {schema};")
@@ -103,28 +104,34 @@ def assert_connection_exists(
 
 
 @contextmanager
-def language_definition_context(pyexasol_connection: ExaConnection,
-                                language_alias: str | None = None) -> None:
+def language_definition_context(
+    pyexasol_connection: ExaConnection, language_alias: str | None = None
+) -> None:
     """
     A context manager that preserves the current language definitions at both
     SESSION and SYSTEM levels. Optionally creates a definition for the specified
     alias to test the ability to override an existing definition.
     """
+
     def alter_language_settings(alter_type: str, lang_definition: str):
         sql = f"ALTER {alter_type} SET SCRIPT_LANGUAGES='{lang_definition}';"
         pyexasol_connection.execute(sql)
 
     # Remember the current language settings.
-    alter_types = ['SYSTEM', 'SESSION']
-    sql0 = (f"""SELECT {', '.join(alter_type + '_VALUE' for alter_type in alter_types)} """
-            "FROM SYS.EXA_PARAMETERS WHERE PARAMETER_NAME='SCRIPT_LANGUAGES';")
+    alter_types = ["SYSTEM", "SESSION"]
+    sql0 = (
+        f"""SELECT {', '.join(alter_type + '_VALUE' for alter_type in alter_types)} """
+        "FROM SYS.EXA_PARAMETERS WHERE PARAMETER_NAME='SCRIPT_LANGUAGES';"
+    )
     current_definitions = pyexasol_connection.execute(sql0).fetchall()[0]
 
     for alter_type in alter_types:
         # Creates a trivial language definition for the specified alias.
         if language_alias:
-            lang_def = ('PYTHON=builtin_python R=builtin_r JAVA=builtin_java '
-                        f'PYTHON3=builtin_python3 {language_alias}=builtin_python3')
+            lang_def = (
+                "PYTHON=builtin_python R=builtin_r JAVA=builtin_java "
+                f"PYTHON3=builtin_python3 {language_alias}=builtin_python3"
+            )
             alter_language_settings(alter_type, lang_def)
     try:
         yield

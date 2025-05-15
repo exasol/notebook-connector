@@ -1,19 +1,21 @@
-from exasol_sagemaker_extension.deployment.deploy_create_statements import DeployCreateStatements
-from exasol_sagemaker_extension.deployment.sme_language_container_deployer import SmeLanguageContainerDeployer
-
-from exasol.nb_connector.connections import (
-    open_pyexasol_connection
+from exasol_sagemaker_extension.deployment.deploy_create_statements import (
+    DeployCreateStatements,
 )
+from exasol_sagemaker_extension.deployment.sme_language_container_deployer import (
+    SmeLanguageContainerDeployer,
+)
+
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.extension_wrapper_common import (
+    deploy_language_container,
     encapsulate_aws_credentials,
-    deploy_language_container
 )
 from exasol.nb_connector.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
-    get_activation_sql
+    get_activation_sql,
 )
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
 # Root directory in a BucketFS bucket where all stuff of the Sagemaker
 # Extension, including its language container, will be uploaded.
@@ -49,18 +51,23 @@ def deploy_scripts(conf: Secrets) -> None:
         conn.execute(activation_sql)
 
         scripts_deployer = DeployCreateStatements(
-            exasol_conn=conn, schema=conf.get(CKey.db_schema), to_print=False, develop=False
+            exasol_conn=conn,
+            schema=conf.get(CKey.db_schema),
+            to_print=False,
+            develop=False,
         )
         scripts_deployer.run()
 
 
-def initialize_sme_extension(conf: Secrets,
-                             version: str = LATEST_KNOWN_VERSION,
-                             language_alias: str = LANGUAGE_ALIAS,
-                             run_deploy_container: bool = True,
-                             run_deploy_scripts: bool = True,
-                             run_encapsulate_aws_credentials: bool = True,
-                             allow_override: bool = True) -> None:
+def initialize_sme_extension(
+    conf: Secrets,
+    version: str = LATEST_KNOWN_VERSION,
+    language_alias: str = LANGUAGE_ALIAS,
+    run_deploy_container: bool = True,
+    run_deploy_scripts: bool = True,
+    run_encapsulate_aws_credentials: bool = True,
+    allow_override: bool = True,
+) -> None:
     """
     Performs all necessary operations to get the Sagemaker Extension
     up and running. See the "Getting Started" and "Setup" sections of the
@@ -94,14 +101,18 @@ def initialize_sme_extension(conf: Secrets,
     aws_conn_name = "_".join([AWS_CONNECTION_PREFIX, str(conf.get(CKey.db_user))])
 
     if run_deploy_container:
-        container_url = SmeLanguageContainerDeployer.SLC_URL_FORMATTER.format(version=version)
-        deploy_language_container(conf,
-                                  container_url=container_url,
-                                  container_name=SmeLanguageContainerDeployer.SLC_NAME,
-                                  language_alias=language_alias,
-                                  activation_key=ACTIVATION_KEY,
-                                  path_in_bucket=PATH_IN_BUCKET,
-                                  allow_override=allow_override)
+        container_url = SmeLanguageContainerDeployer.SLC_URL_FORMATTER.format(
+            version=version
+        )
+        deploy_language_container(
+            conf,
+            container_url=container_url,
+            container_name=SmeLanguageContainerDeployer.SLC_NAME,
+            language_alias=language_alias,
+            activation_key=ACTIVATION_KEY,
+            path_in_bucket=PATH_IN_BUCKET,
+            allow_override=allow_override,
+        )
 
     # Create the required objects in the database
     if run_deploy_scripts:

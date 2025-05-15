@@ -1,8 +1,10 @@
 import os
-import pytest
 import pathlib
-import requests
 from unittest import mock
+
+import pytest
+import requests
+
 from exasol.nb_connector import github
 
 CSE_MOCK_URL = "https://github.com/some_path/exasol-cloud-storage-extension-2.7.8.jar"
@@ -17,8 +19,8 @@ MOCKED_RELEASES_RESULT = {
         {
             "name": "exasol-cloud-storage-extension-2.7.8.jar",
             "browser_download_url": CSE_MOCK_URL,
-        }
-    ]
+        },
+    ],
 }
 
 
@@ -35,7 +37,7 @@ def mocked_requests_get(*args, **_):
             res.status_code = 500
     elif url == CSE_MOCK_URL:
         res.status_code = 200
-        res.content = b'binary data'
+        res.content = b"binary data"
     return res
 
 
@@ -56,11 +58,13 @@ def test_retrieve_jar(_, tmpdir, caplog):
     # fetch for the first time, local dir
     jar_path = github.retrieve_jar(github.Project.CLOUD_STORAGE_EXTENSION)
     assert jar_path.exists()
-    assert jar_path.read_bytes() == b'binary data'
+    assert jar_path.read_bytes() == b"binary data"
 
     # ensure file is recreated without cache
     old_ts = jar_path.lstat().st_ctime
-    jar_path = github.retrieve_jar(github.Project.CLOUD_STORAGE_EXTENSION, use_local_cache=False)
+    jar_path = github.retrieve_jar(
+        github.Project.CLOUD_STORAGE_EXTENSION, use_local_cache=False
+    )
     assert jar_path.exists()
     assert old_ts < jar_path.lstat().st_ctime
 
@@ -68,15 +72,20 @@ def test_retrieve_jar(_, tmpdir, caplog):
     caplog.set_level("INFO")
     caplog.clear()
     old_ts = jar_path.lstat().st_ctime_ns
-    jar_path = github.retrieve_jar(github.Project.CLOUD_STORAGE_EXTENSION, use_local_cache=True)
+    jar_path = github.retrieve_jar(
+        github.Project.CLOUD_STORAGE_EXTENSION, use_local_cache=True
+    )
     assert jar_path.lstat().st_ctime_ns == old_ts
     assert "skip downloading" in caplog.text
 
     # test storage path specification
     caplog.clear()
     stg_path = pathlib.Path(tmpdir.mkdir("sub"))
-    jar_path_sub = github.retrieve_jar(github.Project.CLOUD_STORAGE_EXTENSION,
-                                       use_local_cache=True, storage_path=stg_path)
+    jar_path_sub = github.retrieve_jar(
+        github.Project.CLOUD_STORAGE_EXTENSION,
+        use_local_cache=True,
+        storage_path=stg_path,
+    )
     assert jar_path_sub.exists()
     assert jar_path != jar_path_sub
     assert "Fetching jar" in caplog.text

@@ -1,13 +1,22 @@
 import os
-from typing import Tuple, Optional
 from enum import IntFlag
+from typing import (
+    Optional,
+    Tuple,
+)
 
 import docker  # type: ignore
-from docker.models.networks import Network # type: ignore
+from docker.models.networks import Network  # type: ignore
+from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
+    LATEST_DB_VERSION,  # type: ignore
+)
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
-from exasol_integration_test_docker_environment.lib.data.container_info import ContainerInfo  # type: ignore
-from exasol_integration_test_docker_environment.lib.data.environment_info import EnvironmentInfo    # type: ignore
-from exasol_integration_test_docker_environment.cli.options.test_environment_options import LATEST_DB_VERSION   # type: ignore
+from exasol_integration_test_docker_environment.lib.data.container_info import (
+    ContainerInfo,  # type: ignore
+)
+from exasol_integration_test_docker_environment.lib.data.environment_info import (
+    EnvironmentInfo,  # type: ignore
+)
 from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
     ContextDockerClient,
 )
@@ -22,7 +31,10 @@ from exasol_integration_test_docker_environment.lib.docker.volumes.utils import 
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig
-from exasol.nb_connector.container_by_ip import ContainerByIp, IPRetriever
+from exasol.nb_connector.container_by_ip import (
+    ContainerByIp,
+    IPRetriever,
+)
 from exasol.nb_connector.secret_store import Secrets
 
 ENVIRONMENT_NAME = "DemoDb"
@@ -142,7 +154,9 @@ def _is_current_container_visible(network_name: str) -> bool:
         return _is_container_connected_to_network(container, network)
 
 
-def _get_docker_network(docker_client: docker.DockerClient, network_name: str) -> Optional[Network]:
+def _get_docker_network(
+    docker_client: docker.DockerClient, network_name: str
+) -> Optional[Network]:
     networks = docker_client.networks.list(names=[network_name])
     if len(networks) == 1:
         network = networks[0]
@@ -165,8 +179,9 @@ def _remove_current_container_from_db_network(conf: Secrets):
 
 
 def _get_ipv4_addresses():
-    ip_addresses = [ip.ip for ip in IPRetriever().ips()
-                    if ip.is_IPv4 and isinstance(ip.ip, str)]
+    ip_addresses = [
+        ip.ip for ip in IPRetriever().ips() if ip.is_IPv4 and isinstance(ip.ip, str)
+    ]
     return ip_addresses
 
 
@@ -192,7 +207,7 @@ def get_itde_status(conf: Secrets) -> ItdeContainerStatus:
     with ContextDockerClient() as docker_client:
         if docker_client.containers.list(all=True, filters={"name": container_name}):
             container = docker_client.containers.get(container_name)
-            if container.status != 'running':
+            if container.status != "running":
                 return ItdeContainerStatus.STOPPED
             status = ItdeContainerStatus.RUNNING
             if _is_current_container_visible(network_name):
@@ -216,13 +231,13 @@ def restart_itde(conf: Secrets) -> None:
     if status is ItdeContainerStatus.ABSENT:
         raise RuntimeError("The Docker-DB container doesn't exist.")
 
-    if ItdeContainerStatus.RUNNING not in status: # type: ignore[operator]
+    if ItdeContainerStatus.RUNNING not in status:  # type: ignore[operator]
         container_name = conf.get(AILabConfig.itde_container)
         with ContextDockerClient() as docker_client:
             container = docker_client.containers.get(container_name)
             container.start()
 
-    if ItdeContainerStatus.VISIBLE not in status: # type: ignore[operator]
+    if ItdeContainerStatus.VISIBLE not in status:  # type: ignore[operator]
         network_name = conf.get(AILabConfig.itde_network)
         if network_name:
             _add_current_container_to_db_network(network_name)
