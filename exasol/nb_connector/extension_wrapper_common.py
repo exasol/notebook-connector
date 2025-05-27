@@ -129,7 +129,7 @@ def deploy_language_container(
                 allow_override=allow_override,
                 wait_for_completion=True,
             )
-        elif container_url:
+        elif container_url and container_name is not None:
             deployer.download_and_run(
                 container_url,
                 container_name,
