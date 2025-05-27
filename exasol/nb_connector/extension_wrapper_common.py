@@ -132,7 +132,7 @@ def deploy_language_container(
         elif container_url:
             deployer.download_and_run(
                 container_url,
-                container_name,                 # type: ignore
+                container_name,
                 alter_system=False,
                 allow_override=allow_override,
                 wait_for_completion=True,
@@ -142,7 +142,7 @@ def deploy_language_container(
 
         # Install the language container.
         # Save the activation SQL in the secret store.
-        language_def = deployer.get_language_definition(container_name)     # type: ignore
+        language_def = deployer.get_language_definition(container_name)
         conf.save(activation_key, language_def)
 
 
