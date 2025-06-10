@@ -8,15 +8,19 @@ jobs:
   fast-checks:
     name: Fast
     uses: ./.github/workflows/checks.yml
+    permissions:
+      contents: read
 
   slow-checks-approval:
     name: Slow Check Approval
     runs-on: ubuntu-24.04
     environment: manual-approval
-    # Replace the steps below with the required actions 
+    permissions:
+      contents: read
+    # Replace the steps below with the required actions
     # and/or add additional jobs if required
-    # Note: 
-    #   If you add additional jobs, make sure they are added as a requirement 
+    # Note:
+    #   If you add additional jobs, make sure they are added as a requirement
     #   to the approve-merge job's input requirements (needs).
     steps:
       - run: echo "Manual Approval"
@@ -25,6 +29,8 @@ jobs:
     name: SaaS Tests
     runs-on: ubuntu-24.04
     needs: [ slow-checks-approval ]
+    permissions:
+      contents: read
 
     steps:
       - name: SCM Checkout
@@ -33,9 +39,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
-        with:
-          poetry-version: 2.1.2
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
 
       - name: Allow unprivileged user namespaces
         run: |
@@ -54,6 +58,8 @@ jobs:
       labels: int-linux-x64-4core-ubuntu24.04-1
     environment: text-ai-prerelease
     needs: [ slow-checks-approval ]
+    permissions:
+      contents: read
 
     steps:
       - name: SCM Checkout
@@ -77,7 +83,7 @@ jobs:
           sudo rm -rf /opt/ghc
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
         with:
           poetry-version: 2.1.2
 
@@ -95,6 +101,8 @@ jobs:
   approve-merge:
     name: Allow Merge
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     # If you need additional jobs to be part of the merge gate, add them below
     needs: [ fast-checks, saas-tests, large-runner-tests ]
 
