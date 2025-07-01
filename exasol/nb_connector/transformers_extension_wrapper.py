@@ -1,3 +1,5 @@
+from importlib.metadata import version
+
 from exasol_transformers_extension.deployment.scripts_deployer import ScriptsDeployer
 from exasol_transformers_extension.deployment.te_language_container_deployer import (
     TeLanguageContainerDeployer,
@@ -22,7 +24,7 @@ PATH_IN_BUCKET = "TE"
 
 LANGUAGE_ALIAS = "PYTHON3_TE"
 
-LATEST_KNOWN_VERSION = "0.9.0"
+LATEST_KNOWN_VERSION = version("exasol_transformers_extension")
 
 # Activation SQL for the Transformers Extension will be saved in the secret
 # store with this key.
@@ -69,14 +71,14 @@ def deploy_scripts(conf: Secrets, language_alias: str) -> None:
 
 
 def initialize_te_extension(
-    conf: Secrets,
-    version: str = LATEST_KNOWN_VERSION,
-    language_alias: str = LANGUAGE_ALIAS,
-    run_deploy_container: bool = True,
-    run_deploy_scripts: bool = True,
-    run_encapsulate_bfs_credentials: bool = True,
-    run_encapsulate_hf_token: bool = True,
-    allow_override: bool = True,
+        conf: Secrets,
+        version: str = LATEST_KNOWN_VERSION,
+        language_alias: str = LANGUAGE_ALIAS,
+        run_deploy_container: bool = True,
+        run_deploy_scripts: bool = True,
+        run_encapsulate_bfs_credentials: bool = True,
+        run_encapsulate_hf_token: bool = True,
+        allow_override: bool = True,
 ) -> None:
     """
     Performs all necessary operations to get the Transformers Extension
