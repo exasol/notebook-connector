@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from pathlib import Path
-from typing import Optional
 
 import exasol.bucketfs as bfs
 from exasol.python_extension_common.deployment.extract_validator import ExtractValidator

@@ -106,10 +106,7 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = [
-    "exasol.toolbox.nox.tasks",
-    "exasol/nb_connector/connections",
     "exasol/nb_connector/extension_wrapper_common",
-    "test.conftest.*",
     "test.*",
     ]
 ignore_errors = true

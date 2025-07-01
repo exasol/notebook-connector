@@ -277,7 +277,7 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
         # Connect to the BucketFS service and navigate to the bucket of choice.
         bucketfs = bfs.Service(
             bucketfs_url,
-            bucketfs_credentials,
+            bucketfs_credentials, # type: ignore
             verify,  # type: ignore
             conf.get(CKey.bfs_service),
         )
@@ -293,8 +293,8 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
             url=saas_url,  # type: ignore
             account_id=saas_account_id,  # type: ignore
             database_id=saas_database_id,  # type: ignore
-            pat=saas_token,
-        )  # type: ignore
+            pat=saas_token,  # type: ignore
+        )
 
 
 def open_bucketfs_location(conf: Secrets) -> bfs.path.PathLike:
