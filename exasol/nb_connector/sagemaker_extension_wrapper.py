@@ -4,7 +4,7 @@ from exasol_sagemaker_extension.deployment.deploy_create_statements import (
 from exasol_sagemaker_extension.deployment.sme_language_container_deployer import (
     SmeLanguageContainerDeployer,
 )
-
+from importlib.metadata import version
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.extension_wrapper_common import (
@@ -23,7 +23,7 @@ PATH_IN_BUCKET = "SME"
 
 LANGUAGE_ALIAS = "PYTHON3_SME"
 
-LATEST_KNOWN_VERSION = "0.7.0"
+LATEST_KNOWN_VERSION = version("exasol_sagemaker_extension")
 
 # Activation SQL for the Sagemaker Extension will be saved in the secret
 # store with this key.
