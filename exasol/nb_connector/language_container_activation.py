@@ -23,21 +23,21 @@ def get_registered_languages_string(conf: Secrets) -> str:
         return query_result[0][0]
 
 
-def get_registered_languages(conf: Secrets) -> Dict[str, str]:
+def get_registered_languages(conf: Secrets) -> dict[str, str]:
     """
     Collects the existing, session level, language definitions from the database.
     Returns them as a dictionary {alias: language_url}
     """
 
     lang_definitions_str = get_registered_languages_string(conf)
-    result: Dict[str, str] = {}
+    result: dict[str, str] = {}
     for lang_definition in lang_definitions_str.split():
         alias, lang_url = lang_definition.split("=", maxsplit=1)
         result[alias] = lang_url
     return result
 
 
-def get_requested_languages(conf: Secrets) -> Dict[str, str]:
+def get_requested_languages(conf: Secrets) -> dict[str, str]:
     """
     Collects language definitions from the secret store. Returns them as a
     dictionary {alias: language_url}.
@@ -46,7 +46,7 @@ def get_requested_languages(conf: Secrets) -> Dict[str, str]:
     different language definitions (i.e. URLs).
     """
 
-    result: Dict[str, str] = {}
+    result: dict[str, str] = {}
     # Iterate over all entries that look like language definitions.
     for key, value in conf.items():
         if key.startswith(ACTIVATION_KEY_PREFIX):

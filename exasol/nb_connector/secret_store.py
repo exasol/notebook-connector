@@ -1,9 +1,9 @@
 import contextlib
 import logging
+from collections.abc import Iterable
 from inspect import cleandoc
 from pathlib import Path
 from typing import (
-    Iterable,
     Optional,
     Tuple,
     Union,
@@ -154,7 +154,7 @@ class Secrets:
             for row in res:
                 yield row[0]
 
-    def items(self) -> Iterable[Tuple[str, str]]:
+    def items(self) -> Iterable[tuple[str, str]]:
         """Iterator over keys and values akin to dict.items()"""
         with self._cursor() as cur:
             res = cur.execute(f"SELECT key, value FROM {TABLE_NAME}")

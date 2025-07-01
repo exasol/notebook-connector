@@ -55,7 +55,7 @@ def itde(slc_secrets: Secrets):
 
 
 @pytest.fixture
-def custom_packages() -> List[Tuple[str, str, str]]:
+def custom_packages() -> list[tuple[str, str, str]]:
     return [("xgboost", "2.0.3", "xgboost"), ("scikit-learn", "1.5.0", "sklearn")]
 
 
@@ -103,7 +103,7 @@ def test_upload(slct_manager: SlctManager, itde):
 
 @pytest.mark.dependency(name="append_custom_packages", depends=["upload_slc"])
 def test_append_custom_packages(
-    slct_manager: SlctManager, custom_packages: List[Tuple[str, str, str]]
+    slct_manager: SlctManager, custom_packages: list[tuple[str, str, str]]
 ):
     slct_manager.append_custom_packages(
         [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
@@ -120,7 +120,7 @@ def test_append_custom_packages(
 def test_upload_slc_with_new_packages(
     slc_secrets: Secrets,
     slct_manager: SlctManager,
-    custom_packages: List[Tuple[str, str, str]],
+    custom_packages: list[tuple[str, str, str]],
 ):
     slct_manager.language_alias = "my_new_python"
     slct_manager.upload()
@@ -136,7 +136,7 @@ def test_upload_slc_with_new_packages(
 def test_udf_with_new_packages(
     slc_secrets: Secrets,
     slct_manager: SlctManager,
-    custom_packages: List[Tuple[str, str, str]],
+    custom_packages: list[tuple[str, str, str]],
 ):
     import_statements = "\n".join(
         f"    import {module}" for pkg, version, module in custom_packages

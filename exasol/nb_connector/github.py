@@ -26,7 +26,7 @@ class Project(enum.Enum):
     KAFKA_CONNECTOR_EXTENSION = "kafka-connector-extension"
 
 
-def get_latest_version_and_jar_url(project: Project) -> Tuple[str, str]:
+def get_latest_version_and_jar_url(project: Project) -> tuple[str, str]:
     """
     Retrieves the latest version of stable project release
     and url with jar file from the release.

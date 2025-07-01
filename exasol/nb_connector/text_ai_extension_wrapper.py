@@ -1,10 +1,10 @@
 import subprocess
 import tempfile
+from collections.abc import Generator
 from contextlib import contextmanager
 from os import PathLike
 from pathlib import Path
 from typing import (
-    Generator,
     Optional,
 )
 
