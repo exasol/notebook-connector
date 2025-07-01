@@ -277,7 +277,7 @@ def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
         # Connect to the BucketFS service and navigate to the bucket of choice.
         bucketfs = bfs.Service(
             bucketfs_url,
-            bucketfs_credentials, # type: ignore
+            bucketfs_credentials,  # type: ignore
             verify,  # type: ignore
             conf.get(CKey.bfs_service),
         )

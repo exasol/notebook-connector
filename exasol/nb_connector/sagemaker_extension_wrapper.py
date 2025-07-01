@@ -1,10 +1,12 @@
+from importlib.metadata import version
+
 from exasol_sagemaker_extension.deployment.deploy_create_statements import (
     DeployCreateStatements,
 )
 from exasol_sagemaker_extension.deployment.sme_language_container_deployer import (
     SmeLanguageContainerDeployer,
 )
-from importlib.metadata import version
+
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.extension_wrapper_common import (
