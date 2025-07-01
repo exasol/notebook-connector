@@ -11,7 +11,7 @@ from docker.models.containers import Container  # type: ignore
 
 
 class IPRetriever:
-    def ips(self) -> List[ifaddr.IP]:
+    def ips(self) -> list[ifaddr.IP]:
         adapters = ifaddr.get_adapters()
         ips = [ip for adapter in adapters for ip in adapter.ips]
         return ips
@@ -19,7 +19,7 @@ class IPRetriever:
 
 def retrieve_networks_of_container(
     container: docker.models.containers.Container,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     container.reload()
     network_settings = container.attrs["NetworkSettings"]
     networks = network_settings["Networks"].values()
@@ -36,7 +36,7 @@ class ContainerByIp:
     def __init__(self, docker_client: docker.DockerClient):
         self._docker_client = docker_client
 
-    def find(self, ip_addresses: List[str]) -> Optional[Container]:
+    def find(self, ip_addresses: list[str]) -> Optional[Container]:
         candidates = {
             container
             for container in self._docker_client.containers.list()

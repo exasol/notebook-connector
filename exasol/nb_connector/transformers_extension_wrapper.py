@@ -1,3 +1,5 @@
+from importlib.metadata import version
+
 from exasol_transformers_extension.deployment.scripts_deployer import ScriptsDeployer
 from exasol_transformers_extension.deployment.te_language_container_deployer import (
     TeLanguageContainerDeployer,
@@ -22,7 +24,7 @@ PATH_IN_BUCKET = "TE"
 
 LANGUAGE_ALIAS = "PYTHON3_TE"
 
-LATEST_KNOWN_VERSION = "0.9.0"
+LATEST_KNOWN_VERSION = version("exasol_transformers_extension")
 
 # Activation SQL for the Transformers Extension will be saved in the secret
 # store with this key.

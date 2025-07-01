@@ -19,9 +19,9 @@ from exasol.nb_connector.container_by_ip import ContainerByIp
 
 
 def create_docker_client_mock(
-    containers: Dict[str, Dict[str, str]],
-) -> Tuple[
-    Union[docker.DockerClient, MagicMock], Dict[str, Union[MagicMock, Container]]
+    containers: dict[str, dict[str, str]],
+) -> tuple[
+    Union[docker.DockerClient, MagicMock], dict[str, Union[MagicMock, Container]]
 ]:
     docker_client_mock: Union[MagicMock, docker.DockerClient] = create_autospec(
         docker.DockerClient
@@ -36,7 +36,7 @@ def create_docker_client_mock(
     return docker_client_mock, container_mocks
 
 
-def create_container_mock(networks: Dict[str, str]) -> Union[MagicMock, Container]:
+def create_container_mock(networks: dict[str, str]) -> Union[MagicMock, Container]:
     container_mock: Union[MagicMock, Container] = create_autospec(Container)
     type(container_mock).attrs = PropertyMock(
         return_value={
@@ -51,7 +51,7 @@ def create_container_mock(networks: Dict[str, str]) -> Union[MagicMock, Containe
 class TestSetup:
     __test__ = False
 
-    def __init__(self, containers: Dict[str, Dict[str, str]]):
+    def __init__(self, containers: dict[str, dict[str, str]]):
         self.docker_client_mock, self.container_mocks = create_docker_client_mock(
             containers
         )

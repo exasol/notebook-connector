@@ -235,7 +235,7 @@ class SlctManager:
         """
         self._secrets.save(AILabConfig.slc_alias, alias)
 
-    def append_custom_packages(self, pip_packages: List[PipPackageDefinition]):
+    def append_custom_packages(self, pip_packages: list[PipPackageDefinition]):
         """
         Appends packages to the custom pip file.
         Note: This method is not idempotent: Multiple calls with the same package definitions will result in duplicated entries.

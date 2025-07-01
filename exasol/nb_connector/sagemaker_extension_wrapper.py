@@ -1,3 +1,5 @@
+from importlib.metadata import version
+
 from exasol_sagemaker_extension.deployment.deploy_create_statements import (
     DeployCreateStatements,
 )
@@ -23,7 +25,7 @@ PATH_IN_BUCKET = "SME"
 
 LANGUAGE_ALIAS = "PYTHON3_SME"
 
-LATEST_KNOWN_VERSION = "0.7.0"
+LATEST_KNOWN_VERSION = version("exasol_sagemaker_extension")
 
 # Activation SQL for the Sagemaker Extension will be saved in the secret
 # store with this key.
