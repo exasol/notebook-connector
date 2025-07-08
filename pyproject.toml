@@ -40,7 +40,7 @@ sqlalchemy-exasol = "^5.0.0"
 pyexasol = ">=0.26.0, < 1"
 exasol-bucketfs = "^1.0.0"
 exasol-transformers-extension = "^2.2.1"
-transformers = {extras = ["torch"], version = "^4.50.0"}
+transformers = {extras = ["torch"], version = "^4.52.1"}
 exasol-sagemaker-extension = ">=0.11.5"
 
 exasol-integration-test-docker-environment = "^3.2.0"
