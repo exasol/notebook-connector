@@ -98,8 +98,6 @@ force_grid_wrap = 2
 
 
 [tool.pylint.master]
-errors-only = true
-output-format = "colorized,json:.lint.json,text:.lint.txt"
 
 [tool.mypy]
 ignore_missing_imports = true
