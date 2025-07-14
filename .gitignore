@@ -7,4 +7,6 @@ __pycache__/
 /.lint.json
 /.lint.txt
 /.html-documentation/
+/.security.json
+/.sonar
 .build_output

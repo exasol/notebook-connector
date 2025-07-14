@@ -65,7 +65,7 @@ build-backend = "poetry.core.masonry.api"
 pytest = "^7.1.1"
 pytest-mock = "^3.7.0"
 pytest_dependency = ">=0.6.0"
-exasol-toolbox = "^1.4.0"
+exasol-toolbox = "^1.6.0"
 pytest-exasol-backend = ">=0.3.2,<1"
 
 
@@ -114,3 +114,8 @@ ignore_errors = true
 [tool.pylint.format]
 max-line-length = 88
 max-module-lines = 800
+
+[tool.sonar]
+projectKey = "com.exasol:notebook-connector"
+hostUrl = "https://sonarcloud.io"
+organization = "exasol"
