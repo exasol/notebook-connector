@@ -39,7 +39,9 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.6.0
+        with:
+          python-version: '3.10'
 
       - name: Allow unprivileged user namespaces
         run: |
@@ -50,7 +52,15 @@ jobs:
           SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
           SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
           SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
-        run: poetry run -- pytest -rA --setup-show --backend=saas test/integration/test_cloud_storage.py
+        run: |
+            poetry run -- coverage run -a --rcfile=pyproject.toml -m pytest -rA --setup-show --backend=saas test/integration/test_cloud_storage.py
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: coverage-python3.10-slow-saas
+          path: .coverage
+          include-hidden-files: true
 
   large-runner-tests:
     name: Text AI Tests
@@ -83,9 +93,9 @@ jobs:
           sudo rm -rf /opt/ghc
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.6.0
         with:
-          poetry-version: 2.1.2
+          python-version: '3.10'
 
       - name: Allow unprivileged user namespaces
         run: |
@@ -95,7 +105,14 @@ jobs:
         env:
           TXAIE_PRE_RELEASE_URL: ${{ vars.ZIP_URL }}
           TXAIE_PRE_RELEASE_PASSWORD: ${{ secrets.ZIP_PASSWORD }}
-        run: poetry run -- pytest -rA --setup-show test/integration/test_text_ai_extension_wrapper.py
+        run: poetry run -- coverage run -a --rcfile=pyproject.toml -m pytest -rA --setup-show test/integration/test_text_ai_extension_wrapper.py
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: coverage-python3.10-slow-text-ai
+          path: .coverage
+          include-hidden-files: true
 
   # This job ensures inputs have been executed successfully.
   approve-merge:
