@@ -238,10 +238,11 @@ def initialize_text_ai_extension(
         )
 
     # Create the name of the Exasol connection to the BucketFS
-    db_user = str(conf.get(CKey.db_user))
-    bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, db_user])
+    db_user = conf.get(CKey.db_user)
+    bfs_conn_name = f"{BFS_CONNECTION_PREFIX}_{db_user}"
 
     if run_deploy_container:
+        print("Text AI: Downloading and installing Script Language Container (SLC)")
         if version:
             install_slc(version)
             # Can run_upload_models, run_deploy_scripts,
@@ -276,9 +277,11 @@ def initialize_text_ai_extension(
         )
 
     # Update configuration
+    print(f"Text AI: Updating Secure Configuration Storage")
     conf.save(CKey.txaie_bfs_connection, bfs_conn_name)
     conf.save(CKey.txaie_models_bfs_dir, BFS_MODELS_DIR)
     conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
+    print(f"Text AI: Installation finished.")
 
 
 class Extraction(AbstractExtraction):
