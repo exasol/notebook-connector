@@ -2,74 +2,18 @@
 
 ## How to Release?
 
-Creating a new release of the NC requires 4 steps
+Creating a new release of the NC requires 3 steps
 
-1. [Prepare the release](#prepare-the-release)
+1. Prepare the release
 2. Merge your pull request to the default branch
-3. [Switch to main branch and update it from remote](#switching-to-the-default-branch)
-4. [Create and push a tag to GitHub](#creating-a-git-tag-and-pushing-it-to-github)
-
-### Prepare the Release
+3. Trigger the release process
 
 ```shell
-poetry run -- nox -s release:prepare -- <additional-options> <version>
+poetry run -- nox -s release:prepare -- --type {major,minor,patch} <additional-options>
+poetry run -- nox -s release:trigger
 ```
 
-`<additional-options>` include
-* `--no-branch` if already working on a branch
-* `--no-pr` if you already created a pull request or plan to do so manually after preparing the release
-
-The command uses the nox task `project:fix` of the [Python Tool
-Box](https://github.com/exasol/python-toolbox/) (PTB) and
-* Optionally creates a branch
-* Optionally creates a pull request
-* Updates the [version number](#updating-the-version-number-without-preparing-a-release) and the Change Log
-
-Updating the Change Log includes
-* Moving file `doc/changes/unreleased.md` to a filename reflecting the specified version, e.g. `doc/changes/changes_1.2.3.md`
-* Updating the list of changes files in `doc/changes/changelog.md`
-* Adding the current date at the top of the changelog as the date of the release
-* Creating a new file `doc/changes/unreleased.md`
-
-### Switching to the default Branch
-
-You can find out the default branch with
-
-```shell
-git remote show origin | sed -n '/HEAD branch/s/.*: //p'
-```
-
-The following commands switches to branch `main` and updates it from remote
-
-```shell
-git checkout main
-git pull
-```
-
-### Creating a Git Tag and Pushing it to GitHub
-
-Use the following commands to create a Git Tag and push it to GitHub:
-
-```shell
-TAG=<version>
-git tag "$TAG"
-git push origin "$TAG"
-```
-
-Pushing the new tag to GitHub will trigger GitHub workflow `ci-cd.yml`.
-
-The workflow completely automates the release process, incl.
-* Creating a release on GitHub and
-* Publishing the release to [PyPi](https://pypi.org/)
-
-## Updating the Version Number Without Preparing a Release
-
-You can use the following commands to manually update the version number without preparing a release:
-
-1. Update version in file `pyproject.toml` or call `poetry version <version>`
-2. Call `poetry run -- version-check version.py --fix`
-
-The second command will update the version number in file `version.py`.
+For further information, please refer to section [How to Release](https://exasol.github.io/python-toolbox/main/user_guide/how_to_release.html) in the PTB's User Guide.
 
 ## Selecting the Versions for SLCT and SLCR
 

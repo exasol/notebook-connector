@@ -20,6 +20,7 @@ from exasol.nb_connector.text_ai_extension_wrapper import (
 
 
 def test_download_pre_release(secrets):
+    # TODO: Replace download_pre_release by ...
     secrets.save(
         CKey.text_ai_pre_release_url,
         "https://dut5tonqye28.cloudfront.net/ai_lab/text_ai/prerelease_test.zip",
@@ -44,6 +45,7 @@ def test_text_ai_extension_with_container_file(secrets: Secrets, setup_itde):
         CKey.text_ai_zip_password, os.environ.get("TXAIE_PRE_RELEASE_PASSWORD")
     )
 
+    # TODO: Replace download_pre_release by ...
     with download_pre_release(secrets) as unzipped_files:
         project_wheel, container_file = unzipped_files
         try:

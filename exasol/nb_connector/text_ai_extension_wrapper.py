@@ -1,21 +1,43 @@
-import subprocess
-import tempfile
-from collections.abc import Generator
-from contextlib import contextmanager
-from os import PathLike
+import importlib.metadata
+from dataclasses import dataclass
 from pathlib import Path
-from typing import (
-    Optional,
-)
+from typing import Any, Optional
 
-import requests
+import exasol.bucketfs as bfs  # type: ignore
+from exasol.ai.text.deployment.script_deployer import create_scripts
+from exasol.ai.text.deployment.txaie_language_container_deployer import TXAIELanguageContainerDeployer
+from exasol.ai.text.deployment import license_deployment as txai_licenses
+from exasol.ai.text.extraction.abstract_extraction import Output
+from exasol.ai.text.extraction.extraction import (
+    AbstractExtraction,
+    Extraction as TextAiExtraction,
+)
+from exasol.ai.text.extractors.default_models import (
+    DEFAULT_FEATURE_EXTRACTION_MODEL,
+    DEFAULT_NAMED_ENTITY_MODEL,
+    DEFAULT_NLI_MODEL,
+)
+from exasol.ai.text.impl.utils.transformers_utils import download_transformers_model
+from transformers import (
+    AutoModel,
+    AutoModelForSequenceClassification,
+    AutoModelForTokenClassification,
+)
+from yaspin import yaspin
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.connections import (
+    open_bucketfs_location,
+    open_pyexasol_connection,
+)
 from exasol.nb_connector.extension_wrapper_common import (
     deploy_language_container,
     encapsulate_bucketfs_credentials,
 )
-from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
+from exasol.nb_connector.language_container_activation import (
+    ACTIVATION_KEY_PREFIX,
+    get_activation_sql,
+)
 from exasol.nb_connector.secret_store import Secrets
 
 # Models will be uploaded into directory BFS_MODELS_DIR in BucketFS.
@@ -35,8 +57,6 @@ PATH_IN_BUCKET = "TXAIE"
 """ Location in BucketFS bucket to upload data for TXAIE, e.g. its language container. """
 
 LANGUAGE_ALIAS = "PYTHON3_TXAIE"
-
-LATEST_KNOWN_VERSION = "???"
 
 ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "txaie"
 """
@@ -58,59 +78,61 @@ Prefix for Exasol CONNECTION objects containing a BucketFS location and
 credentials.
 """
 
+CHECKMARK = "\u2705"
+"""
+Checkmark symbol for signalling success after an operation using an
+animated spinner from https://github.com/pavdmyt/yaspin.
+"""
 
-@contextmanager
-def download_pre_release(conf: Secrets) -> Generator[tuple[Path, Path], None, None]:
+@dataclass
+class TransformerModel:
+    name: str
+    task_type: str
+    factory: Any
+
+
+class ModelInstaller:
     """
-    Downloads and unzips the pre-release archive. Returns the paths to the temporary
-    files of the project wheel and the SLC.
-
-    Usage:
-    with download_pre_release(conf) as unzipped_files:
-        project_wheel, slc_tar_gz = unzipped_files
-        ...
+    Download Huggingface models and deploy them to Exasol BucketFS.
     """
+    def __init__(self, bucketfs_location: bfs.path.PathLike, bfs_subdir: str):
+        self.bucketfs_location = bucketfs_location
+        self.bfs_subdir = bfs_subdir
+        self.models = [
+            TransformerModel(
+                DEFAULT_FEATURE_EXTRACTION_MODEL,
+                "feature-extraction",
+                AutoModel,
+            ),
+            TransformerModel(
+                DEFAULT_NAMED_ENTITY_MODEL,
+                "token-classification",
+                AutoModelForTokenClassification,
+            ),
+            TransformerModel(
+                DEFAULT_NLI_MODEL,
+                "zero-shot-classification",
+                AutoModelForSequenceClassification,
+            ),
+        ]
 
-    zip_url = conf.get(CKey.text_ai_pre_release_url)
-    if not zip_url:
-        raise ValueError("Pre-release URL is not set.")
-    zip_password = conf.get(CKey.text_ai_zip_password)
-    if not zip_password:
-        raise ValueError("Pre-release zip password is not set.")
-
-    # Download the file
-    response = requests.get(zip_url, stream=True)
-    response.raise_for_status()
-
-    with tempfile.NamedTemporaryFile() as tmp_file:
-        # Save the downloaded zip in a temporary file
-        for chunk in response.iter_content(chunk_size=1048576):
-            tmp_file.write(chunk)
-        tmp_file.flush()
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            # Unzip the file into a temporary directory
-            unzip_cmd = [
-                "unzip",
-                "-q",
-                "-P",
-                zip_password,
-                tmp_file.name,
-                "-d",
-                tmp_dir,
-            ]
-            subprocess.run(unzip_cmd, check=True, capture_output=True)
-            tmp_path = Path(tmp_dir)
-            # Find and return the project wheel and the SLC
-            project_wheel = next(tmp_path.glob("*.whl"))
-            slc_tar_gz = next(tmp_path.glob("*.tar.gz"))
-            conf.save(CKey.txaie_slc_file_local_path, str(slc_tar_gz))
-            yield project_wheel, slc_tar_gz
+    def download_and_install(self) -> None:
+        for model in self.models:
+            with yaspin(text=f"- Huggingface model {model}") as spinner:
+                download_transformers_model(
+                    bucketfs_location=self.bucketfs_location,
+                    sub_dir=self.bfs_subdir,
+                    task_type=model.task_type,
+                    model_name=model.name,
+                    model_factory=model.factory
+                )
+            spinner.ok(CHECKMARK)
 
 
-def deploy_licence(
+def deploy_license(
     conf: Secrets,
-    licence_file: Optional[Path] = None,
-    licence_content: Optional[str] = None,
+    # license_file: Optional[Path] = None,
+    license_content: Optional[str] = None,
 ) -> None:
     """
     Deploys the given license and saves its identifier to the secret store. The licence can either be
@@ -124,10 +146,25 @@ def deploy_licence(
             Optional. Content of a licence given as a string.
 
     """
-    raise NotImplementedError(
-        "Currently this is not implemented, "
-        "will be changed once the licensing process is finalized."
-    )
+
+    license_content = license_content or txai_licenses.COMMUNITY_LICENSE
+    # if license_content:
+    #     pass
+    # elif license_file:
+    #     license_content = license_file.read_text()
+    # else:
+    #     license_content = txai_licenses.COMMUNITY_LICENSE
+
+    pyexasol_connection = open_pyexasol_connection(conf)
+    txai_licenses.create_connection(pyexasol_connection, license_content)
+
+
+@dataclass
+class InstallOptions:
+    slc: bool = True
+    udf_scripts: bool = False
+    models: bool = False
+    bfs_credentials: bool = True
 
 
 def initialize_text_ai_extension(
@@ -135,10 +172,11 @@ def initialize_text_ai_extension(
     container_file: Optional[Path] = None,
     version: Optional[str] = None,
     language_alias: str = LANGUAGE_ALIAS,
-    run_deploy_container: bool = True,
-    run_deploy_scripts: bool = False,
-    run_upload_models: bool = False,
-    run_encapsulate_bfs_credentials: bool = True,
+    run_deploy_container: bool = True, # proposal: rename to install_slc
+    run_deploy_scripts: bool = False, # proposal: rename to install_udf_scripts
+    run_upload_models: bool = False, # proposal: rename to install_models
+    run_encapsulate_bfs_credentials: bool = True, # proposal: rename to install_bfs_credentials
+    # alternatively we could pass an instance of InstallOptions
     allow_override: bool = True,
 ) -> None:
     """
@@ -186,63 +224,74 @@ def initialize_text_ai_extension(
             If True allows overriding the language definition.
     """
 
-    # Create the name of the Exasol connection object
+    def install_slc(version=None, container_file=None):
+        container_url = version and TXAIELanguageContainerDeployer.slc_download_url(version)
+        deploy_language_container(
+            conf,
+            container_name=TXAIELanguageContainerDeployer.SLC_NAME,
+            container_file=container_file,
+            container_url=container_url,
+            language_alias=language_alias,
+            activation_key=ACTIVATION_KEY,
+            path_in_bucket=PATH_IN_BUCKET,
+            allow_override=allow_override,
+        )
+
+    # Create the name of the Exasol connection to the BucketFS
     db_user = str(conf.get(CKey.db_user))
     bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, db_user])
-    # As soon as the official release of TXAIE is available, the hard-coded value for
-    # container_name can be replaced by TXAIELanguageContainerDeployer.SLC_NAME,
-    # see https://github.com/exasol/notebook-connector/issues/179.
-    container_name = "exasol_text_ai_extension_container_release.tar.gz"
-
-    def from_ai_lab_config(key: CKey) -> Path | None:
-        entry = conf.get(key)
-        return Path(entry) if entry else None
 
     if run_deploy_container:
         if version:
-            install_text_ai_extension(version)
+            install_slc(version)
             # Can run_upload_models, run_deploy_scripts,
             # run_encapsulate_bfs_credentials, etc. be ignored here?
             return
 
-        container_file = container_file or from_ai_lab_config(
-            CKey.txaie_slc_file_local_path
-        )
-        if not container_file:
-            install_text_ai_extension(LATEST_KNOWN_VERSION)
+        if container_file:
+            install_slc(container_file=container_file)
         else:
-            deploy_language_container(
-                conf=conf,
-                path_in_bucket=PATH_IN_BUCKET,
-                language_alias=language_alias,
-                activation_key=ACTIVATION_KEY,
-                container_file=container_file,
-                container_name=container_name,
-                allow_override=allow_override,
-            )
+            version = importlib.metadata.version("exasol_text_ai_extension")
+            install_slc(version)
 
     if run_upload_models:
         #  Install default Hugging Face models into the Bucketfs using
         #  Transformers Extensions upload model functionality.
-        raise NotImplementedError("Implementation is waiting for TE release.")
+        print("Text AI: Downloading and installing Huggingface models to BucketFS:")
+        bucketfs_location = open_bucketfs_location(conf) / PATH_IN_BUCKET
+        ModelInstaller(
+            bucketfs_location=bucketfs_location,
+            bfs_subdir=conf.txaie_models_bfs_dir,
+        ).download_and_install()
 
     if run_deploy_scripts:
-        raise NotImplementedError(
-            "Currently there are no Text-AI specific scripts to deploy."
-        )
+        print("Text AI: Creating UDF scripts")
+        pyexasol_connection = open_pyexasol_connection(conf, schema=conf.get(CKey.db_schema))
+        create_scripts(pyexasol_connection)
 
     if run_encapsulate_bfs_credentials:
+        print(f"Text AI: Creating BFS connection {bfs_conn_name}")
         encapsulate_bucketfs_credentials(
             conf, path_in_bucket=PATH_IN_BUCKET, connection_name=bfs_conn_name
         )
 
-    # Update secret store
+    # Update configuration
     conf.save(CKey.txaie_bfs_connection, bfs_conn_name)
     conf.save(CKey.txaie_models_bfs_dir, BFS_MODELS_DIR)
     conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
 
 
-def install_text_ai_extension(version: str) -> None:
-    raise NotImplementedError(
-        "Implementation is waiting for decision on where the releases will be hosted."
-    )
+class Extraction(AbstractExtraction):
+    def run(self, conf: Secrets) -> None:
+        activation_sql = get_activation_sql(conf)
+        with open_pyexasol_connection(conf, compression=True) as connection:
+            connection.execute(query=activation_sql)
+            TextAiExtraction(
+                extractor=self.extractor,
+                output=self.output,
+                defaults=self.defaults,
+            ).run(
+                pyexasol_con=connection,
+                temporary_db_object_schema=conf.db_schema,
+                language_alias=LANGUAGE_ALIAS,
+            )

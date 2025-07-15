@@ -1,7 +1,7 @@
 [project]
 name = "exasol-notebook-connector"
 version = "0.5.1"
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.10,<3.13"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [ {include = "exasol"}, ]
 authors = [
@@ -40,7 +40,6 @@ sqlalchemy-exasol = "^5.0.0"
 pyexasol = ">=0.26.0, < 1"
 exasol-bucketfs = "^1.0.0"
 exasol-transformers-extension = "^2.2.1"
-transformers = {extras = ["torch"], version = "^4.50.0"}
 exasol-sagemaker-extension = ">=0.11.5"
 
 exasol-integration-test-docker-environment = "^3.2.0"
@@ -54,6 +53,8 @@ ifaddr = "^0.2.0"
 exasol-saas-api = ">=0.9.0,<1.0.0"
 ibis-framework = {extras = ["exasol"], version = "^9.1.0"}
 GitPython = ">=2.1.0"
+yaspin = "^3.1.0"
+exasol-text-ai-extension = "^0.1.0"
 
 
 [build-system]
