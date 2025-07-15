@@ -138,40 +138,32 @@ class ModelInstaller:
 
 def deploy_license(
     conf: Secrets,
-    # license_file: Optional[Path] = None,
     license_content: Optional[str] = None,
+    license_file: Optional[Path] = None,
 ) -> None:
     """
     Deploys the given license and saves its identifier to the secret store. The licence can either be
     defined by a path pointing to a licence file, or by the licence content given as a string.
     Parameters:
-         conf:
+        conf:
             The secret store.
-        licence_file:
-            Optional. Path of a licence file.
         licence_content:
             Optional. Content of a licence given as a string.
+        licence_file:
+            Optional. Path of a licence file.
 
     """
 
     license_content = license_content or txai_licenses.COMMUNITY_LICENSE
-    # if license_content:
-    #     pass
-    # elif license_file:
-    #     license_content = license_file.read_text()
-    # else:
-    #     license_content = txai_licenses.COMMUNITY_LICENSE
+    if license_content:
+        pass
+    elif license_file:
+        license_content = license_file.read_text()
+    else:
+        license_content = txai_licenses.COMMUNITY_LICENSE
 
     pyexasol_connection = open_pyexasol_connection(conf)
     txai_licenses.create_connection(pyexasol_connection, license_content)
-
-
-@dataclass
-class InstallOptions:
-    slc: bool = True
-    udf_scripts: bool = False
-    models: bool = False
-    bfs_credentials: bool = True
 
 
 def initialize_text_ai_extension(
@@ -179,12 +171,11 @@ def initialize_text_ai_extension(
     container_file: Optional[Path] = None,
     version: Optional[str] = None,
     language_alias: str = LANGUAGE_ALIAS,
-    run_deploy_container: bool = True,  # proposal: rename to install_slc
-    install_udf_scripts: bool = True, 
-    install_models: bool = True, 
-    run_encapsulate_bfs_credentials: bool = True,  # proposal: rename to install_bfs_credentials
-    # alternatively we could pass an instance of InstallOptions
-    allow_override: bool = True,
+    install_slc: bool = True,
+    install_udf_scripts: bool = True,
+    install_models: bool = True,
+    install_bfs_credentials: bool = True,
+    allow_override_language_alias: bool = True,
 ) -> None:
     """
     Depending on which flags are set, runs different steps to install Text-AI Extension in the DB.
@@ -218,20 +209,20 @@ def initialize_text_ai_extension(
             Optional. Text-AI extension version.
         language_alias:
             The language alias of the extension's language container.
-        run_deploy_container:
+        install_slc:
             If True runs deployment of the locally stored Script Language Container file for the Text-AI Extension.
-        run_deploy_scripts:
+        install_udf_scripts:
             If True runs deployment of Text-AI Extension scripts.
-        run_upload_models:
+        install_models:
             If True uploads default Transformers models to the BucketFS.
-        run_encapsulate_bfs_credentials:
+        install_bfs_credentials:
             If set to False will skip the creation of the text ai specific database connection
             object encapsulating the BucketFS credentials.
-        allow_override:
+        allow_override_language_alias:
             If True allows overriding the language definition.
     """
 
-    def install_slc(container_file=None, version=None):
+    def deploy_slc(container_file=None, version=None):
         container_url = version and TXAIELanguageContainerDeployer.slc_download_url(
             version
         )
@@ -243,22 +234,22 @@ def initialize_text_ai_extension(
             language_alias=language_alias,
             activation_key=ACTIVATION_KEY,
             path_in_bucket=PATH_IN_BUCKET,
-            allow_override=allow_override,
+            allow_override=allow_override_language_alias,
         )
 
     # Create the name of the Exasol connection to the BucketFS
     db_user = conf.get(CKey.db_user)
     bfs_conn_name = f"{BFS_CONNECTION_PREFIX}_{db_user}"
 
-    if run_deploy_container:
+    if install_slc:
         print("Text AI: Downloading and installing Script Language Container (SLC)")
         if container_file:
-            install_slc(container_file=container_file)
+            deploy_slc(container_file=container_file)
         else:
             version = version or importlib.metadata.version("exasol_text_ai_extension")
-            install_slc(version=version)
+            deploy_slc(version=version)
 
-    if run_upload_models:
+    if install_models:
         #  Install default Hugging Face models into the Bucketfs using
         #  Transformers Extensions upload model functionality.
         print("Text AI: Downloading and installing Huggingface models to BucketFS:")
@@ -268,14 +259,14 @@ def initialize_text_ai_extension(
             bfs_subdir=conf.txaie_models_bfs_dir,
         ).download_and_install()
 
-    if run_deploy_scripts:
+    if install_udf_scripts:
         print("Text AI: Creating UDF scripts")
         pyexasol_connection = open_pyexasol_connection(
             conf, schema=conf.get(CKey.db_schema)
         )
         create_scripts(pyexasol_connection)
 
-    if run_encapsulate_bfs_credentials:
+    if install_bfs_credentials:
         print(f"Text AI: Creating BFS connection {bfs_conn_name}")
         encapsulate_bucketfs_credentials(
             conf, path_in_bucket=PATH_IN_BUCKET, connection_name=bfs_conn_name
@@ -303,8 +294,6 @@ class Extraction(AbstractExtraction):
                 temporary_db_object_schema=conf.db_schema,
                 language_alias=LANGUAGE_ALIAS,
             )
-
-
 
 
 if __name__ == "__main__":
