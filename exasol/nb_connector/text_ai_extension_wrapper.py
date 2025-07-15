@@ -13,7 +13,7 @@ from exasol.ai.text.deployment.txaie_language_container_deployer import (
     TXAIELanguageContainerDeployer,
 )
 from exasol.ai.text.extraction.abstract_extraction import Output
-from exasol.ai.text.extraction.extraction import (
+from exasol.ai.text.extraction import (
     AbstractExtraction,
 )
 from exasol.ai.text.extraction.extraction import Extraction as TextAiExtraction
@@ -231,7 +231,7 @@ def initialize_text_ai_extension(
             If True allows overriding the language definition.
     """
 
-    def install_slc(version=None, container_file=None):
+    def install_slc(container_file=None, version=None):
         container_url = version and TXAIELanguageContainerDeployer.slc_download_url(
             version
         )
@@ -252,17 +252,11 @@ def initialize_text_ai_extension(
 
     if run_deploy_container:
         print("Text AI: Downloading and installing Script Language Container (SLC)")
-        if version:
-            install_slc(version)
-            # Can run_upload_models, run_deploy_scripts,
-            # run_encapsulate_bfs_credentials, etc. be ignored here?
-            return
-
         if container_file:
             install_slc(container_file=container_file)
         else:
-            version = importlib.metadata.version("exasol_text_ai_extension")
-            install_slc(version)
+            version = version or importlib.metadata.version("exasol_text_ai_extension")
+            install_slc(version=version)
 
     if run_upload_models:
         #  Install default Hugging Face models into the Bucketfs using
@@ -309,3 +303,10 @@ class Extraction(AbstractExtraction):
                 temporary_db_object_schema=conf.db_schema,
                 language_alias=LANGUAGE_ALIAS,
             )
+
+
+
+
+if __name__ == "__main__":
+    create_scripts(None)
+
