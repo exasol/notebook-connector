@@ -1,17 +1,22 @@
 import importlib.metadata
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import (
+    Any,
+    Optional,
+)
 
 import exasol.bucketfs as bfs  # type: ignore
-from exasol.ai.text.deployment.script_deployer import create_scripts
-from exasol.ai.text.deployment.txaie_language_container_deployer import TXAIELanguageContainerDeployer
 from exasol.ai.text.deployment import license_deployment as txai_licenses
+from exasol.ai.text.deployment.script_deployer import create_scripts
+from exasol.ai.text.deployment.txaie_language_container_deployer import (
+    TXAIELanguageContainerDeployer,
+)
 from exasol.ai.text.extraction.abstract_extraction import Output
 from exasol.ai.text.extraction.extraction import (
     AbstractExtraction,
-    Extraction as TextAiExtraction,
 )
+from exasol.ai.text.extraction.extraction import Extraction as TextAiExtraction
 from exasol.ai.text.extractors.default_models import (
     DEFAULT_FEATURE_EXTRACTION_MODEL,
     DEFAULT_NAMED_ENTITY_MODEL,
@@ -84,6 +89,7 @@ Checkmark symbol for signalling success after an operation using an
 animated spinner from https://github.com/pavdmyt/yaspin.
 """
 
+
 @dataclass
 class TransformerModel:
     name: str
@@ -95,6 +101,7 @@ class ModelInstaller:
     """
     Download Huggingface models and deploy them to Exasol BucketFS.
     """
+
     def __init__(self, bucketfs_location: bfs.path.PathLike, bfs_subdir: str):
         self.bucketfs_location = bucketfs_location
         self.bfs_subdir = bfs_subdir
@@ -124,7 +131,7 @@ class ModelInstaller:
                     sub_dir=self.bfs_subdir,
                     task_type=model.task_type,
                     model_name=model.name,
-                    model_factory=model.factory
+                    model_factory=model.factory,
                 )
             spinner.ok(CHECKMARK)
 
@@ -172,10 +179,10 @@ def initialize_text_ai_extension(
     container_file: Optional[Path] = None,
     version: Optional[str] = None,
     language_alias: str = LANGUAGE_ALIAS,
-    run_deploy_container: bool = True, # proposal: rename to install_slc
-    run_deploy_scripts: bool = False, # proposal: rename to install_udf_scripts
-    run_upload_models: bool = False, # proposal: rename to install_models
-    run_encapsulate_bfs_credentials: bool = True, # proposal: rename to install_bfs_credentials
+    run_deploy_container: bool = True,  # proposal: rename to install_slc
+    run_deploy_scripts: bool = False,  # proposal: rename to install_udf_scripts
+    run_upload_models: bool = False,  # proposal: rename to install_models
+    run_encapsulate_bfs_credentials: bool = True,  # proposal: rename to install_bfs_credentials
     # alternatively we could pass an instance of InstallOptions
     allow_override: bool = True,
 ) -> None:
@@ -225,7 +232,9 @@ def initialize_text_ai_extension(
     """
 
     def install_slc(version=None, container_file=None):
-        container_url = version and TXAIELanguageContainerDeployer.slc_download_url(version)
+        container_url = version and TXAIELanguageContainerDeployer.slc_download_url(
+            version
+        )
         deploy_language_container(
             conf,
             container_name=TXAIELanguageContainerDeployer.SLC_NAME,
@@ -267,7 +276,9 @@ def initialize_text_ai_extension(
 
     if run_deploy_scripts:
         print("Text AI: Creating UDF scripts")
-        pyexasol_connection = open_pyexasol_connection(conf, schema=conf.get(CKey.db_schema))
+        pyexasol_connection = open_pyexasol_connection(
+            conf, schema=conf.get(CKey.db_schema)
+        )
         create_scripts(pyexasol_connection)
 
     if run_encapsulate_bfs_credentials:
