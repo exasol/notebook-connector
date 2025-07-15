@@ -180,8 +180,8 @@ def initialize_text_ai_extension(
     version: Optional[str] = None,
     language_alias: str = LANGUAGE_ALIAS,
     run_deploy_container: bool = True,  # proposal: rename to install_slc
-    run_deploy_scripts: bool = False,  # proposal: rename to install_udf_scripts
-    run_upload_models: bool = False,  # proposal: rename to install_models
+    install_udf_scripts: bool = True, 
+    install_models: bool = True, 
     run_encapsulate_bfs_credentials: bool = True,  # proposal: rename to install_bfs_credentials
     # alternatively we could pass an instance of InstallOptions
     allow_override: bool = True,
