@@ -21,6 +21,7 @@ from exasol.ai.text.extraction.abstract_extraction import (
     Output,
 )
 from exasol.ai.text.extraction.extraction import Extraction as TextAiExtraction
+from exasol.ai.text.extractors.bucketfs_model_repository import BucketFSRepository
 from exasol.ai.text.extractors.default_models import (
     DEFAULT_FEATURE_EXTRACTION_MODEL,
     DEFAULT_NAMED_ENTITY_MODEL,
