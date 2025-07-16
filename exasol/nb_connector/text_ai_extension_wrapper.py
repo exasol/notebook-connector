@@ -257,7 +257,8 @@ def initialize_text_ai_extension(
         bucketfs_location = open_bucketfs_location(conf) / PATH_IN_BUCKET
         ModelInstaller(
             bucketfs_location=bucketfs_location,
-            bfs_subdir=conf.txaie_models_bfs_dir,
+            # bfs_subdir=conf.txaie_models_bfs_dir,
+            bfs_subdir=conf.get(BFS_MODELS_DIR),
         ).download_and_install()
 
     if install_udf_scripts:
