@@ -10,7 +10,6 @@ from exasol.ai.text.extraction.abstract_extraction import (
     Defaults,
     Output,
 )
-from exasol.ai.text.extraction.extraction import Extraction
 from exasol.ai.text.extractors.extractor import PipelineExtractor
 from exasol.ai.text.extractors.source_table_extractor import (
     NameSelector,
@@ -35,7 +34,10 @@ from exasol.analytics.schema import (
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.text_ai_extension_wrapper import initialize_text_ai_extension
+from exasol.nb_connector.text_ai_extension_wrapper import (
+    initialize_text_ai_extension,
+    Extraction as WrappedExtraction,
+)
 
 
 def test_text_ai_extension_1(secrets: Secrets, setup_itde):
@@ -114,12 +116,9 @@ def test_text_ai_extension_2(secrets: Secrets, setup_itde):
         )
 
     initialize_text_ai_extension(conf)
-    defaults = Defaults(
-        parallelism_per_node=1,
-        batch_size=10,
-        # model_repository is None by default and will be replaced by
-        # text_ai_extension_wrapper.py
-    )
+    # model_repository is None by default and will be replaced by
+    # text_ai_extension_wrapper.py
+    defaults = Defaults(parallelism_per_node=1, batch_size=10)
     src_extractor = SourceTableExtractor(
         name="DOCUMENTS",
         sources=[
@@ -138,7 +137,7 @@ def test_text_ai_extension_2(secrets: Secrets, setup_itde):
     p_extractor = PipelineExtractor(
         steps=[src_extractor, StandardExtractor(topics=topics)]
     )
-    extraction = Extraction(
+    extraction = WrappedExtraction(
         extractor=p_extractor,
         output=Output(db_schema=schema.name),
         defaults=defaults,
