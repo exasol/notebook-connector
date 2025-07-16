@@ -288,7 +288,7 @@ class Extraction(AbstractExtraction):
             model_repository=BucketFSRepository(
                 connection_name=conf.te_bfs_connection,
                 sub_dir=conf.te_models_bfs_dir,
-            )
+            ),
         )
 
     def run(self, conf: Secrets) -> None:
