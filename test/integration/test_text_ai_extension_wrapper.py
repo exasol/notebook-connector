@@ -11,7 +11,8 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.text_ai_extension_wrapper import initialize_text_ai_extension
 
 
-def test_text_ai_extension(conf: Secrets, setup_itde):
+def test_text_ai_extension(secrets: Secrets, setup_itde):
+    conf = secrets
     # this test is very slow and downloads and unpacks a 6 GB file, so we only
     # execute it in the manually triggered slow tests
     language_alias = f"PYTHON3_TXAIE_TEST"
