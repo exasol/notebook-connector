@@ -278,8 +278,7 @@ def initialize_text_ai_extension(
 
 
 class Extraction(AbstractExtraction):
-    @property
-    def defaults_with_model_repository(self) -> Defaults:
+    def defaults_with_model_repository(self, conf: Secrets) -> Defaults:
         if self.defaults.model_repository:
             return self.defaults
         return Defaults(
@@ -293,12 +292,13 @@ class Extraction(AbstractExtraction):
 
     def run(self, conf: Secrets) -> None:
         activation_sql = get_activation_sql(conf)
+        defaults = self.defaults_with_model_repository(conf)
         with open_pyexasol_connection(conf, compression=True) as connection:
             connection.execute(query=activation_sql)
             TextAiExtraction(
                 extractor=self.extractor,
                 output=self.output,
-                defaults=self.defaults_with_model_repository,
+                defaults=defaults,
             ).run(
                 pyexasol_con=connection,
                 temporary_db_object_schema=conf.db_schema,
