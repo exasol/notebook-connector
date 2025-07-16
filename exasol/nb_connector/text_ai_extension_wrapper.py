@@ -289,7 +289,7 @@ class Extraction(AbstractExtraction):
     def defaults_with_model_repository(self, conf: Secrets) -> Defaults:
         if self.defaults.model_repository:
             return self.defaults
-        model_repository=BucketFSRepository(
+        model_repository = BucketFSRepository(
             connection_name=conf.txaie_bfs_connection,
             sub_dir=conf.txaie_models_bfs_dir,
             # connection_name=conf.te_bfs_connection,
