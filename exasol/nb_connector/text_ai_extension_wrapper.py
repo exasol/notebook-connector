@@ -58,6 +58,7 @@ from exasol.nb_connector.transformers_extension_wrapper import (
     BFS_MODELS_DIR,
     MODELS_CACHE_DIR,
 )
+from exasol.ai.text.extraction.abstract_extraction import Defaults
 
 PATH_IN_BUCKET = "TXAIE"
 """ Location in BucketFS bucket to upload data for TXAIE, e.g. its language container. """
@@ -98,43 +99,21 @@ class TransformerModel:
     factory: Any
 
 
-class ModelInstaller:
+def install_model(conf: Secrets, model: TransformerModel) -> None:
     """
-    Download Huggingface models and deploy them to Exasol BucketFS.
+    Download and install the specified Huggingface model.
     """
-
-    def __init__(self, bucketfs_location: bfs.path.PathLike, bfs_subdir: str):
-        self.bucketfs_location = bucketfs_location
-        self.bfs_subdir = bfs_subdir
-        self.models = [
-            TransformerModel(
-                DEFAULT_FEATURE_EXTRACTION_MODEL,
-                "feature-extraction",
-                AutoModel,
-            ),
-            TransformerModel(
-                DEFAULT_NAMED_ENTITY_MODEL,
-                "token-classification",
-                AutoModelForTokenClassification,
-            ),
-            TransformerModel(
-                DEFAULT_NLI_MODEL,
-                "zero-shot-classification",
-                AutoModelForSequenceClassification,
-            ),
-        ]
-
-    def download_and_install(self) -> None:
-        for model in self.models:
-            with yaspin(text=f"- Huggingface model {model}") as spinner:
-                download_transformers_model(
-                    bucketfs_location=self.bucketfs_location,
-                    sub_dir=self.bfs_subdir,
-                    task_type=model.task_type,
-                    model_name=model.name,
-                    model_factory=model.factory,
-                )
-            spinner.ok(CHECKMARK)
+    bucketfs_location = open_bucketfs_location(conf) / PATH_IN_BUCKET
+    bfs_subdir = conf.txaie_models_bfs_dir
+    with yaspin(text=f"- Huggingface model {model.name}") as spinner:
+        download_transformers_model(
+            bucketfs_location=self.bucketfs_location,
+            sub_dir=self.bfs_subdir,
+            task_type=model.task_type,
+            model_name=model.name,
+            model_factory=model.factory,
+        )
+    spinner.ok(CHECKMARK)
 
 
 def deploy_license(
@@ -238,9 +217,13 @@ def initialize_text_ai_extension(
             allow_override=allow_override_language_alias,
         )
 
-    # Create the name of the Exasol connection to the BucketFS
     db_user = conf.get(CKey.db_user)
     bfs_conn_name = f"{BFS_CONNECTION_PREFIX}_{db_user}"
+
+    print(f"Text AI: Updating Secure Configuration Storage")
+    conf.save(CKey.txaie_bfs_connection, bfs_conn_name)
+    conf.save(CKey.txaie_models_bfs_dir, BFS_MODELS_DIR)
+    conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
 
     if install_slc:
         print("Text AI: Downloading and installing Script Language Container (SLC)")
@@ -254,18 +237,13 @@ def initialize_text_ai_extension(
         #  Install default Hugging Face models into the Bucketfs using
         #  Transformers Extensions upload model functionality.
         print("Text AI: Downloading and installing Huggingface models to BucketFS:")
-        bucketfs_location = open_bucketfs_location(conf) / PATH_IN_BUCKET
-        ModelInstaller(
-            bucketfs_location=bucketfs_location,
-            # bfs_subdir=conf.txaie_models_bfs_dir,
-            bfs_subdir=conf.get(BFS_MODELS_DIR),
-        ).download_and_install()
+        install_model(conf, TransformerModel(DEFAULT_FEATURE_EXTRACTION_MODEL, "feature-extraction", AutoModel))
+        install_model(conf, TransformerModel(DEFAULT_NAMED_ENTITY_MODEL, "token-classification", AutoModelForTokenClassification))
+        install_model(conf, TransformerModel(DEFAULT_NLI_MODEL, "zero-shot-classification", AutoModelForSequenceClassification))
 
     if install_udf_scripts:
         print("Text AI: Creating UDF scripts")
-        pyexasol_connection = open_pyexasol_connection(
-            conf, schema=conf.get(CKey.db_schema)
-        )
+        pyexasol_connection = open_pyexasol_connection(conf, schema=conf.get(CKey.db_schema))
         create_scripts(pyexasol_connection)
 
     if install_bfs_credentials:
@@ -273,30 +251,30 @@ def initialize_text_ai_extension(
         encapsulate_bucketfs_credentials(
             conf, path_in_bucket=PATH_IN_BUCKET, connection_name=bfs_conn_name
         )
-
-    # Update configuration
-    print(f"Text AI: Updating Secure Configuration Storage")
-    conf.save(CKey.txaie_bfs_connection, bfs_conn_name)
-    conf.save(CKey.txaie_models_bfs_dir, BFS_MODELS_DIR)
-    conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
     print(f"Text AI: Installation finished.")
 
 
 class Extraction(AbstractExtraction):
     def run(self, conf: Secrets) -> None:
         activation_sql = get_activation_sql(conf)
+        defaults = self.defaults
+        if self.defaults.model_repository is None:
+            defaults = Defaults(
+                parallelism_per_node=self.defaults.parallelism_per_node,
+                batch_size=self.defaults.batch_size,
+                model_repository=BucketFSRepository(
+                    connection_name=ai_lab_config.te_bfs_connection,
+                    sub_dir=ai_lab_config.te_models_bfs_dir
+                )
+            )
         with open_pyexasol_connection(conf, compression=True) as connection:
             connection.execute(query=activation_sql)
             TextAiExtraction(
                 extractor=self.extractor,
                 output=self.output,
-                defaults=self.defaults,
+                defaults=defaults,
             ).run(
                 pyexasol_con=connection,
                 temporary_db_object_schema=conf.db_schema,
                 language_alias=LANGUAGE_ALIAS,
             )
-
-
-if __name__ == "__main__":
-    create_scripts(None)
