@@ -1,5 +1,6 @@
 # pylint: skip-file
 import importlib.metadata
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
@@ -102,6 +103,10 @@ class TransformerModel:
     factory: Any
 
 
+def interactive_usage() -> bool:
+    return os.environ.get("INTERACTIVE", "True").lower() == "true"
+
+
 def install_model(conf: Secrets, model: TransformerModel) -> None:
     """
     Download and install the specified Huggingface model.
@@ -109,6 +114,8 @@ def install_model(conf: Secrets, model: TransformerModel) -> None:
     bucketfs_location = open_bucketfs_location(conf) / PATH_IN_BUCKET
     bfs_subdir = conf.txaie_models_bfs_dir
     with yaspin(text=f"- Huggingface model {model.name}") as spinner:
+        if not interactive_usage():
+            spinner.hide()
         download_transformers_model(
             bucketfs_location=bucketfs_location,
             sub_dir=bfs_subdir,
