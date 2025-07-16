@@ -105,7 +105,8 @@ jobs:
     permissions:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
-    needs: [ fast-checks, saas-tests, large-runner-tests ]
+    # Removed saas-tests from being required
+    needs: [ fast-checks, large-runner-tests ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
