@@ -289,13 +289,16 @@ class Extraction(AbstractExtraction):
     def defaults_with_model_repository(self, conf: Secrets) -> Defaults:
         if self.defaults.model_repository:
             return self.defaults
+        model_repository=BucketFSRepository(
+            connection_name=conf.txaie_bfs_connection,
+            sub_dir=conf.txaie_models_bfs_dir,
+            # connection_name=conf.te_bfs_connection,
+            # sub_dir=conf.te_models_bfs_dir,
+        )
         return Defaults(
             parallelism_per_node=self.defaults.parallelism_per_node,
             batch_size=self.defaults.batch_size,
-            model_repository=BucketFSRepository(
-                connection_name=conf.te_bfs_connection,
-                sub_dir=conf.te_models_bfs_dir,
-            ),
+            model_repository=model_repository,
         )
 
     def run(self, conf: Secrets) -> None:
