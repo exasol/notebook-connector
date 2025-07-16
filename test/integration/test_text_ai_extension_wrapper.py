@@ -1,3 +1,4 @@
+# pylint: skip-file
 from test.utils.integration_test_utils import (
     activate_languages,
     assert_connection_exists,
@@ -57,14 +58,12 @@ class TxaiTest:
         self.key_column = integer_column_spec(name="key").to_column()
         self.text_column = varchar_column_spec(name="text").to_column()
         self.table = Table(
-            name=self.input_table_name(),
-            columns=[self.key_column, self.text_column]
+            name=self.input_table_name(), columns=[self.key_column, self.text_column]
         )
 
     def input_table_name(self, id: int = 0) -> TableName:
         suffix = f"_{id}" if id else ""
         return TableNameImpl(table_name=f"INPUT_TABLE{suffix}", schema=self.schema)
-
 
 
 # import pytest
@@ -80,7 +79,9 @@ def x1_test_x1(pyexasol_connection):
     scenario = TxaiTest("INPUT_SCHEMA")
     schema = scenario.schema
     table = scenario.table
-    pyexasol_connection.execute(f"DROP SCHEMA IF EXISTS {schema.fully_qualified} CASCADE")
+    pyexasol_connection.execute(
+        f"DROP SCHEMA IF EXISTS {schema.fully_qualified} CASCADE"
+    )
     pyexasol_connection.execute(f"CREATE SCHEMA {schema.fully_qualified}")
     pyexasol_connection.execute(table.create_statement)
     pyexasol_connection.execute(
@@ -88,7 +89,7 @@ def x1_test_x1(pyexasol_connection):
         " (1, 'This is a test.'),"
         " (2, 'Exasol is awesome.')"
     )
-    print(f'{table.name.name} {scenario.text_column.name.name} {schema.name}')
+    print(f"{table.name.name} {scenario.text_column.name.name} {schema.name}")
 
 
 def new_test_text_ai_extension(secrets: Secrets, setup_itde):
@@ -100,7 +101,9 @@ def new_test_text_ai_extension(secrets: Secrets, setup_itde):
     key_column = scenario.key_column.name.name
 
     with open_pyexasol_connection(conf) as pyexasol_connection:
-        pyexasol_connection.execute(f"DROP SCHEMA IF EXISTS {schema.fully_qualified} CASCADE")
+        pyexasol_connection.execute(
+            f"DROP SCHEMA IF EXISTS {schema.fully_qualified} CASCADE"
+        )
         pyexasol_connection.execute(f"CREATE SCHEMA {schema.fully_qualified}")
         pyexasol_connection.execute(table.create_statement)
         pyexasol_connection.execute(
@@ -118,7 +121,7 @@ def new_test_text_ai_extension(secrets: Secrets, setup_itde):
         # text_ai_extension_wrapper.py
     )
     src_extractor = SourceTableExtractor(
-        name='DOCUMENTS',
+        name="DOCUMENTS",
         sources=[
             SchemaSource(
                 db_schema=NameSelector(pattern=schema.name),
@@ -126,17 +129,14 @@ def new_test_text_ai_extension(secrets: Secrets, setup_itde):
                     TableSource(
                         table=NameSelector(pattern=table.name.name),
                         columns=[NameSelector(pattern=text_column)],
-                        keys=[NameSelector(pattern=key_column)]
+                        keys=[NameSelector(pattern=key_column)],
                     )
-                ]
+                ],
             )
-        ]
+        ],
     )
     p_extractor = PipelineExtractor(
-        steps=[
-            src_extractor,
-            StandardExtractor(topics=topics)
-        ]
+        steps=[src_extractor, StandardExtractor(topics=topics)]
     )
     extraction = Extraction(
         extractor=p_extractor,

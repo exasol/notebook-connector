@@ -16,7 +16,10 @@ from exasol.ai.text.deployment.txaie_language_container_deployer import (
 from exasol.ai.text.extraction import (
     AbstractExtraction,
 )
-from exasol.ai.text.extraction.abstract_extraction import Output
+from exasol.ai.text.extraction.abstract_extraction import (
+    Defaults,
+    Output,
+)
 from exasol.ai.text.extraction.extraction import Extraction as TextAiExtraction
 from exasol.ai.text.extractors.default_models import (
     DEFAULT_FEATURE_EXTRACTION_MODEL,
@@ -58,7 +61,6 @@ from exasol.nb_connector.transformers_extension_wrapper import (
     BFS_MODELS_DIR,
     MODELS_CACHE_DIR,
 )
-from exasol.ai.text.extraction.abstract_extraction import Defaults
 
 PATH_IN_BUCKET = "TXAIE"
 """ Location in BucketFS bucket to upload data for TXAIE, e.g. its language container. """
@@ -237,13 +239,34 @@ def initialize_text_ai_extension(
         #  Install default Hugging Face models into the Bucketfs using
         #  Transformers Extensions upload model functionality.
         print("Text AI: Downloading and installing Huggingface models to BucketFS:")
-        install_model(conf, TransformerModel(DEFAULT_FEATURE_EXTRACTION_MODEL, "feature-extraction", AutoModel))
-        install_model(conf, TransformerModel(DEFAULT_NAMED_ENTITY_MODEL, "token-classification", AutoModelForTokenClassification))
-        install_model(conf, TransformerModel(DEFAULT_NLI_MODEL, "zero-shot-classification", AutoModelForSequenceClassification))
+        install_model(
+            conf,
+            TransformerModel(
+                DEFAULT_FEATURE_EXTRACTION_MODEL, "feature-extraction", AutoModel
+            ),
+        )
+        install_model(
+            conf,
+            TransformerModel(
+                DEFAULT_NAMED_ENTITY_MODEL,
+                "token-classification",
+                AutoModelForTokenClassification,
+            ),
+        )
+        install_model(
+            conf,
+            TransformerModel(
+                DEFAULT_NLI_MODEL,
+                "zero-shot-classification",
+                AutoModelForSequenceClassification,
+            ),
+        )
 
     if install_udf_scripts:
         print("Text AI: Creating UDF scripts")
-        pyexasol_connection = open_pyexasol_connection(conf, schema=conf.get(CKey.db_schema))
+        pyexasol_connection = open_pyexasol_connection(
+            conf, schema=conf.get(CKey.db_schema)
+        )
         create_scripts(pyexasol_connection)
 
     if install_bfs_credentials:
@@ -264,8 +287,8 @@ class Extraction(AbstractExtraction):
                 batch_size=self.defaults.batch_size,
                 model_repository=BucketFSRepository(
                     connection_name=ai_lab_config.te_bfs_connection,
-                    sub_dir=ai_lab_config.te_models_bfs_dir
-                )
+                    sub_dir=ai_lab_config.te_models_bfs_dir,
+                ),
             )
         with open_pyexasol_connection(conf, compression=True) as connection:
             connection.execute(query=activation_sql)
