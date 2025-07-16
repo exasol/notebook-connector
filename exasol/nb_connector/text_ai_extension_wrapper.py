@@ -278,24 +278,26 @@ def initialize_text_ai_extension(
 
 
 class Extraction(AbstractExtraction):
+    @property
+    def defaults_with_model_repository(self) -> Defaults:
+        if self.defaults.model_repository:
+            return self.defaults
+        return Defaults(
+            parallelism_per_node=self.defaults.parallelism_per_node,
+            batch_size=self.defaults.batch_size,
+            model_repository=BucketFSRepository(
+                connection_name=conf.te_bfs_connection,
+                sub_dir=conf.te_models_bfs_dir,
+            ),
+
     def run(self, conf: Secrets) -> None:
         activation_sql = get_activation_sql(conf)
-        defaults = self.defaults
-        if self.defaults.model_repository is None:
-            defaults = Defaults(
-                parallelism_per_node=self.defaults.parallelism_per_node,
-                batch_size=self.defaults.batch_size,
-                model_repository=BucketFSRepository(
-                    connection_name=ai_lab_config.te_bfs_connection,
-                    sub_dir=ai_lab_config.te_models_bfs_dir,
-                ),
-            )
         with open_pyexasol_connection(conf, compression=True) as connection:
             connection.execute(query=activation_sql)
             TextAiExtraction(
                 extractor=self.extractor,
                 output=self.output,
-                defaults=defaults,
+                defaults=self.defaults_with_model_repository,
             ).run(
                 pyexasol_con=connection,
                 temporary_db_object_schema=conf.db_schema,
