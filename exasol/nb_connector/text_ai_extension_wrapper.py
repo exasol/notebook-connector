@@ -109,8 +109,8 @@ def install_model(conf: Secrets, model: TransformerModel) -> None:
     bfs_subdir = conf.txaie_models_bfs_dir
     with yaspin(text=f"- Huggingface model {model.name}") as spinner:
         download_transformers_model(
-            bucketfs_location=self.bucketfs_location,
-            sub_dir=self.bfs_subdir,
+            bucketfs_location=bucketfs_location,
+            sub_dir=bfs_subdir,
             task_type=model.task_type,
             model_name=model.name,
             model_factory=model.factory,
