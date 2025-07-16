@@ -93,6 +93,7 @@ def x1_test_x1(pyexasol_connection):
 
 
 def test_text_ai_extension_2(secrets: Secrets, setup_itde):
+    conf = secrets
     topics = {"urgent", "not urgent"}
     scenario = TxaiTest("INPUT_SCHEMA")
     schema = scenario.schema
@@ -112,7 +113,6 @@ def test_text_ai_extension_2(secrets: Secrets, setup_itde):
             " (2, 'Exasol is awesome.')"
         )
 
-    conf = secrets
     initialize_text_ai_extension(conf)
     defaults = Defaults(
         parallelism_per_node=1,
