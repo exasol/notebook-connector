@@ -12,10 +12,10 @@ from exasol.ai.text.deployment.script_deployer import create_scripts
 from exasol.ai.text.deployment.txaie_language_container_deployer import (
     TXAIELanguageContainerDeployer,
 )
-from exasol.ai.text.extraction.abstract_extraction import Output
 from exasol.ai.text.extraction import (
     AbstractExtraction,
 )
+from exasol.ai.text.extraction.abstract_extraction import Output
 from exasol.ai.text.extraction.extraction import Extraction as TextAiExtraction
 from exasol.ai.text.extractors.default_models import (
     DEFAULT_FEATURE_EXTRACTION_MODEL,
@@ -298,4 +298,3 @@ class Extraction(AbstractExtraction):
 
 if __name__ == "__main__":
     create_scripts(None)
-
