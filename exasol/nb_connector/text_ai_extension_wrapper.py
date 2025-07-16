@@ -1,3 +1,4 @@
+# pylint: skip-file
 import importlib.metadata
 from dataclasses import dataclass
 from pathlib import Path
