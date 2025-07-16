@@ -38,7 +38,7 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.text_ai_extension_wrapper import initialize_text_ai_extension
 
 
-def test_text_ai_extension(secrets: Secrets, setup_itde):
+def test_text_ai_extension_1(secrets: Secrets, setup_itde):
     conf = secrets
     # this test is very slow and downloads and unpacks a 6 GB file, so we only
     # execute it in the manually triggered slow tests
@@ -92,7 +92,7 @@ def x1_test_x1(pyexasol_connection):
     print(f"{table.name.name} {scenario.text_column.name.name} {schema.name}")
 
 
-def new_test_text_ai_extension(secrets: Secrets, setup_itde):
+def test_text_ai_extension_2(secrets: Secrets, setup_itde):
     topics = {"urgent", "not urgent"}
     scenario = TxaiTest("INPUT_SCHEMA")
     schema = scenario.schema
