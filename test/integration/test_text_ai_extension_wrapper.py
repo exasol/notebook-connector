@@ -35,8 +35,10 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.text_ai_extension_wrapper import (
-    initialize_text_ai_extension,
     Extraction as WrappedExtraction,
+)
+from exasol.nb_connector.text_ai_extension_wrapper import (
+    initialize_text_ai_extension,
 )
 
 
