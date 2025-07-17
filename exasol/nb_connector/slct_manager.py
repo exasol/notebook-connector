@@ -6,7 +6,6 @@ import shutil
 from collections import namedtuple
 from pathlib import Path
 from typing import (
-    List,
     Optional,
 )
 
