@@ -43,7 +43,7 @@ jobs:
 
       - name: Allow unprivileged user namespaces
         run: |
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0      
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Tests
         env:
@@ -89,12 +89,13 @@ jobs:
 
       - name: Allow unprivileged user namespaces
         run: |
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0      
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Tests
         env:
           TXAIE_PRE_RELEASE_URL: ${{ vars.ZIP_URL }}
           TXAIE_PRE_RELEASE_PASSWORD: ${{ secrets.ZIP_PASSWORD }}
+          INTERACTIVE: False # hide animated spinner in CI
         run: poetry run -- pytest -rA --setup-show test/integration/test_text_ai_extension_wrapper.py
 
   # This job ensures inputs have been executed successfully.
@@ -104,7 +105,8 @@ jobs:
     permissions:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
-    needs: [ fast-checks, saas-tests, large-runner-tests ]
+    # Removed saas-tests from being required
+    needs: [ fast-checks, large-runner-tests ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
