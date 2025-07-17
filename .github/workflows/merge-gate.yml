@@ -98,6 +98,32 @@ jobs:
           INTERACTIVE: False # hide animated spinner in CI
         run: poetry run -- pytest -rA --setup-show test/integration/test_text_ai_extension_wrapper.py
 
+  gpu-test:
+    name: GPU Test
+    runs-on:
+      labels: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
+    needs: [ slow-checks-approval ]
+    permissions:
+      contents: read
+
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
+        with:
+          poetry-version: 2.1.2
+
+      - name: Allow unprivileged user namespaces
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0      
+
+      - name: Tests
+        run: poetry run -- pytest -rA --setup-show test/integration/test_itde_manager_with_gpu.py
+
   # This job ensures inputs have been executed successfully.
   approve-merge:
     name: Allow Merge
@@ -106,7 +132,7 @@ jobs:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
     # Removed saas-tests from being required
-    needs: [ fast-checks, large-runner-tests ]
+    needs: [ fast-checks, large-runner-tests, gpu-test ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
