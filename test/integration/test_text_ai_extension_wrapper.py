@@ -1,5 +1,7 @@
 # pylint: skip-file
 # Importing cython packages causes import erros in pylint, we need to investigate this later
+# see https://github.com/exasol/notebook-connector/issues/206
+
 from test.utils.integration_test_utils import (
     activate_languages,
     assert_connection_exists,

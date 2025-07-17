@@ -1,5 +1,7 @@
 # pylint: skip-file
 # Importing cython packages causes import erros in pylint, we need to investigate this later
+# see https://github.com/exasol/notebook-connector/issues/206
+
 import importlib.metadata
 import os
 from dataclasses import dataclass
@@ -193,11 +195,9 @@ def initialize_text_ai_extension(
             Optional. Path pointing to the locally stored Script Language Container file for the Text-AI Extension.
         version:
             Optional. Text-AI extension version.
-        language_alias:
-            The language alias of the extension's language container.
         install_slc:
             If True runs deployment of the locally stored Script Language Container file for the Text-AI Extension.
-        install_udf_scripts:
+        install_scripts:
             If True runs deployment of Text-AI Extension scripts.
         install_models:
             If True uploads default Transformers models to the BucketFS.
