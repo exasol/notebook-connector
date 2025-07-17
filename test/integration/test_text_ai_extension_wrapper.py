@@ -1,4 +1,5 @@
 # pylint: skip-file
+# Importing cython packages causes import erros in pylint, we need to investigate this later
 from test.utils.integration_test_utils import (
     activate_languages,
     assert_connection_exists,

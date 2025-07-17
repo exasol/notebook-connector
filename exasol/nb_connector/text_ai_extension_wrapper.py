@@ -1,4 +1,5 @@
 # pylint: skip-file
+# Importing cython packages causes import erros in pylint, we need to investigate this later
 import importlib.metadata
 import os
 from dataclasses import dataclass
@@ -145,12 +146,8 @@ def deploy_license(
     """
 
     license_content = license_content or txai_licenses.COMMUNITY_LICENSE
-    if license_content:
-        pass
-    elif license_file:
+    if license_file:
         license_content = license_file.read_text()
-    else:
-        license_content = txai_licenses.COMMUNITY_LICENSE
 
     pyexasol_connection = open_pyexasol_connection(conf)
     txai_licenses.create_connection(pyexasol_connection, license_content)
@@ -160,9 +157,8 @@ def initialize_text_ai_extension(
     conf: Secrets,
     container_file: Optional[Path] = None,
     version: Optional[str] = None,
-    language_alias: str = LANGUAGE_ALIAS,
     install_slc: bool = True,
-    install_udf_scripts: bool = True,
+    install_scripts: bool = True,
     install_models: bool = True,
     install_bfs_credentials: bool = True,
     allow_override_language_alias: bool = True,
@@ -221,7 +217,7 @@ def initialize_text_ai_extension(
             container_name=TXAIELanguageContainerDeployer.SLC_NAME,
             container_file=container_file,
             container_url=container_url,
-            language_alias=language_alias,
+            language_alias=LANGUAGE_ALIAS,
             activation_key=ACTIVATION_KEY,
             path_in_bucket=PATH_IN_BUCKET,
             allow_override=allow_override_language_alias,
@@ -270,8 +266,8 @@ def initialize_text_ai_extension(
             ),
         )
 
-    if install_udf_scripts:
-        print("Text AI: Creating UDF scripts")
+    if install_scripts:
+        print("Text AI: Creating Scripts")
         pyexasol_connection = open_pyexasol_connection(
             conf, schema=conf.get(CKey.db_schema)
         )
@@ -292,8 +288,6 @@ class Extraction(AbstractExtraction):
         model_repository = BucketFSRepository(
             connection_name=conf.txaie_bfs_connection,
             sub_dir=conf.txaie_models_bfs_dir,
-            # connection_name=conf.te_bfs_connection,
-            # sub_dir=conf.te_models_bfs_dir,
         )
         return Defaults(
             parallelism_per_node=self.defaults.parallelism_per_node,
