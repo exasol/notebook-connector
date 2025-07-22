@@ -12,6 +12,7 @@ class Config:
     version_file: Path = ROOT_DIR / "version.py"
     path_filters: Iterable[str] = ("dist", ".eggs", "venv")
     python_versions = ["3.10"]
+    source: Path = Path("exasol/nb_connector")
 
 
 PROJECT_CONFIG = Config()
