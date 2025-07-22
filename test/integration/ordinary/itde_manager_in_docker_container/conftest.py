@@ -351,32 +351,3 @@ def docker_container(
             yield container
         finally:
             remove_docker_container([container.id])
-
-
-def test_itde_connect(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/itde_connect_test_impl.py")
-    assert exec_result.exit_code == 0, exec_result.output
-
-
-def test_itde_recreation_after_take_down(docker_container):
-    exec_result = docker_container.exec_run(
-        "python3 /tmp/itde_recreation_after_take_down.py"
-    )
-    assert exec_result.exit_code == 0, exec_result.output
-
-
-def test_itde_recreation_without_take_down(docker_container):
-    exec_result = docker_container.exec_run(
-        "python3 /tmp/itde_recreation_without_take_down.py"
-    )
-    assert exec_result.exit_code == 0, exec_result.output
-
-
-def test_itde_stop_and_restart(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/itde_stop_and_restart.py")
-    assert exec_result.exit_code == 0, exec_result.output
-
-
-def test_itde_external(docker_container):
-    exec_result = docker_container.exec_run("python3 /tmp/itde_external_test.py")
-    assert exec_result.exit_code == 0, exec_result.output

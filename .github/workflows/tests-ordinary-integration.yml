@@ -15,10 +15,15 @@ jobs:
       matrix:
         file:
           - test_itde_manager.py
-          - test_itde_manager_in_docker_container.py
           - test_sagemaker_extension_wrapper.py
           - test_slct_manager.py
           - test_transformers_extension_wrapper.py
+          - itde_manager_in_docker_container/test_itde_connect.py
+          - itde_manager_in_docker_container/test_itde_external.py
+          - itde_manager_in_docker_container/test_itde_manager_in_docker_container.py
+          - itde_manager_in_docker_container/test_itde_recreation_after_take_down.py
+          - itde_manager_in_docker_container/test_itde_recreation_without_take_down.py
+          - itde_manager_in_docker_container/test_itde_stop_and_restart.py
 
     steps:
 
