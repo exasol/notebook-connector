@@ -38,6 +38,7 @@ def filled_saas_secrets(secrets) -> Secrets:
     secrets.save(CKey.saas_database_name, "faked_saas_database")
     secrets.save(CKey.saas_token, "faked_saas_access_token")
     secrets.save(CKey.storage_backend, "saas")
+    secrets.save(CKey.saas_database_id, "faked_saas_database_id")
     return secrets
 
 
