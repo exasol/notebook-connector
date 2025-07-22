@@ -40,6 +40,9 @@ jobs:
           - test_sagemaker_extension_wrapper.py
           - test_slct_manager.py
           - test_transformers_extension_wrapper.py
+
+    steps:
+
       - name: SCM Checkout
         uses: actions/checkout@v4
         with:
