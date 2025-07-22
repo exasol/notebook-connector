@@ -28,7 +28,7 @@ jobs:
   ordinary-itests:
     name: Ordinary Integration Tests
     runs-on: ubuntu-24.04
-    # needs: [ slow-checks-approval ]
+    needs: [ slow-checks-approval ]
     permissions:
       contents: read
     strategy:
@@ -40,19 +40,6 @@ jobs:
           - test_sagemaker_extension_wrapper.py
           - test_slct_manager.py
           - test_transformers_extension_wrapper.py
-    steps:
-      - name: Sample Step
-        run: echo pytest ${{ matrix.file }}
-
-
-  ordinary-itests-old:
-    name: Ordinary Integration Tests
-    runs-on: ubuntu-24.04
-    needs: [ slow-checks-approval ]
-    permissions:
-      contents: read
-
-    steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
         with:
@@ -66,7 +53,30 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Pytest
-        run: poetry run -- pytest -rA --setup-show test/integration/ordinary
+        run: poetry run -- pytest -rA --setup-show test/integration/ordinary/${{ matrix.file }}
+
+#  ordinary-itests-old:
+#    name: Ordinary Integration Tests
+#    runs-on: ubuntu-24.04
+#    needs: [ slow-checks-approval ]
+#    permissions:
+#      contents: read
+#
+#    steps:
+#      - name: SCM Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Setup Python & Poetry Environment
+#        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
+#
+#      - name: Allow unprivileged user namespaces
+#        run: |
+#          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+#
+#      - name: Pytest
+#         run: poetry run -- pytest -rA --setup-show test/integration/ordinary
 
   saas-tests:
     name: SaaS Tests
