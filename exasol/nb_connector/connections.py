@@ -94,7 +94,7 @@ def _get_params_from_secret_store(conf: Secrets, *args) -> tuple[str, ...]:
     """
     Gets the values from Secret Store identified by the list of keys (*args) and verifies they are not empty.
     """
-    res: tuple[str,...] = tuple()
+    res: tuple[str, ...] = tuple()
     for arg in args:
         val = conf.get(arg)
         if not val:
