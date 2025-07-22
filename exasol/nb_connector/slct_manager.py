@@ -36,8 +36,8 @@ FLAVOR_PATH_IN_SLC_REPO = Path("flavors") / REQUIRED_FLAVOR
 
 PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
 
-# Using the SLC_RELEASE 9.1.0 because we are limited to slc-tool 1.*.
-SLC_RELEASE_TAG = "9.1.0"
+# Using the SLC_RELEASE 9.6.0 because we are limited to slc-tool 3.*.
+SLC_RELEASE_TAG = "9.6.0"
 
 
 class SlcDir:
