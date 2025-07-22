@@ -149,10 +149,16 @@ def test_open_pyexasol_connection_error(mock_connect, conf):
 
 @unittest.mock.patch("pyexasol.connect")
 @unittest.mock.patch("exasol.saas.client.api_access.get_connection_params")
+@unittest.mock.patch("exasol.saas.client.api_access.get_database_id")
 def test_open_pyexasol_connection_saas(
-    mock_connection_params, mock_connect, conf_saas, saas_connection_params
+    mock_data_base_id,
+    mock_connection_params,
+    mock_connect,
+    conf_saas,
+    saas_connection_params,
 ):
     mock_connection_params.return_value = saas_connection_params
+    mock_data_base_id.return_value = "fake_database_id"
     open_pyexasol_connection(conf_saas)
     mock_connect.assert_called_once_with(
         dsn=saas_connection_params["dsn"],
@@ -163,6 +169,7 @@ def test_open_pyexasol_connection_saas(
 
 @unittest.mock.patch("sqlalchemy.create_engine")
 def test_open_sqlalchemy_connection(mock_create_engine, conf):
+    conf.save(CKey.saas_database_id, "fake_database_id")
     setattr(conf, CKey.db_port.name, conf.get(CKey.db_port))
     open_sqlalchemy_connection(conf)
     mock_create_engine.assert_called_once_with(
@@ -189,10 +196,16 @@ def test_open_sqlalchemy_connection_ssl(mock_create_engine, conf):
 
 @unittest.mock.patch("sqlalchemy.create_engine")
 @unittest.mock.patch("exasol.saas.client.api_access.get_connection_params")
+@unittest.mock.patch("exasol.saas.client.api_access.get_database_id")
 def test_open_sqlalchemy_connection_saas(
-    mock_connection_params, mock_create_engine, conf_saas, saas_connection_params
+    mock_data_base_id,
+    mock_connection_params,
+    mock_create_engine,
+    conf_saas,
+    saas_connection_params,
 ):
     mock_connection_params.return_value = saas_connection_params
+    mock_data_base_id.return_value = "fake_database_id"
     open_sqlalchemy_connection(conf_saas)
     mock_create_engine.assert_called_once_with(
         make_url(
