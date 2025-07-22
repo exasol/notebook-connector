@@ -25,78 +25,34 @@ jobs:
     steps:
       - run: echo "Manual Approval"
 
-  saas-tests:
-    name: SaaS Tests
-    runs-on: ubuntu-24.04
+  ordinary-itests:
+    name: Ordinary iTests
     needs: [ slow-checks-approval ]
+    uses: ./.github/workflows/tests-ordinary-integration.yml
     permissions:
       contents: read
 
-    steps:
-      - name: SCM Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
-
-      - name: Allow unprivileged user namespaces
-        run: |
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      - name: Tests
-        env:
-          SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
-          SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
-          SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
-        run: poetry run -- pytest -rA --setup-show --backend=saas test/integration/test_cloud_storage.py
+  saas-tests:
+    name: SaaS
+    needs: [ slow-checks-approval ]
+    uses: ./.github/workflows/tests-saas.yml
+    secrets: inherit
+    permissions:
+      contents: read
 
   large-runner-tests:
-    name: Text AI Tests
-    runs-on:
-      labels: int-linux-x64-4core-ubuntu24.04-1
-    environment: text-ai-prerelease
+    name: Large Runner
     needs: [ slow-checks-approval ]
+    uses: ./.github/workflows/tests-large-runner.yml
     permissions:
       contents: read
 
-    steps:
-      - name: SCM Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          large-packages: false
-
-      - name: Free disk space by removing large directories
-        run: |
-          sudo rm -rf /usr/local/graalvm/
-          sudo rm -rf /usr/local/.ghcup/
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/local/share/chromium
-          sudo rm -rf /usr/local/lib/node_modules
-          sudo rm -rf /opt/ghc
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
-        with:
-          poetry-version: 2.1.2
-
-      - name: Allow unprivileged user namespaces
-        run: |
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      - name: Tests
-        env:
-          TXAIE_PRE_RELEASE_URL: ${{ vars.ZIP_URL }}
-          TXAIE_PRE_RELEASE_PASSWORD: ${{ secrets.ZIP_PASSWORD }}
-          INTERACTIVE: False # hide animated spinner in CI
-        run: poetry run -- pytest -rA --setup-show test/integration/test_text_ai_extension_wrapper.py
+  gpu-tests:
+    name: GPU
+    needs: [ slow-checks-approval ]
+    uses: ./.github/workflows/tests-gpu.yml
+    permissions:
+      contents: read
 
   # This job ensures inputs have been executed successfully.
   approve-merge:
@@ -106,10 +62,9 @@ jobs:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
     # Removed saas-tests from being required
-    needs: [ fast-checks, large-runner-tests ]
+    needs: [ fast-checks, large-runner-tests, ordinary-itests, gpu-tests ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
       - name: Approve
-        run: |
-          echo "Merge Approved"
+        run: echo "Merge Approved"

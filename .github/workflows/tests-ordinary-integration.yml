@@ -1,0 +1,57 @@
+name: Ordinary iTests
+
+on:
+  workflow_call:
+
+jobs:
+
+  ordinary-itests:
+    name: iTests
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        file:
+          - test_itde_manager.py
+          - test_sagemaker_extension_wrapper.py
+          - test_slct_manager.py
+          - test_transformers_extension_wrapper.py
+          - itde_mgr_in_container/test_itde_connect.py
+          - itde_mgr_in_container/test_itde_external.py
+          - itde_mgr_in_container/test_itde_recreation_after_take_down.py
+          - itde_mgr_in_container/test_itde_recreation_without_take_down.py
+          - itde_mgr_in_container/test_itde_stop_and_restart.py
+
+    steps:
+
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          large-packages: false
+
+      - name: Free disk space by removing large directories
+        run: |
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/.ghcup/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/lib/node_modules
+          sudo rm -rf /opt/ghc
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
+
+      - name: Allow unprivileged user namespaces
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Pytest
+        run: poetry run -- pytest -rA --setup-show test/integration/ordinary/${{ matrix.file }}

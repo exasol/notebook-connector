@@ -1,0 +1,51 @@
+name: Large Runner
+
+on:
+  workflow_call:
+
+jobs:
+
+  large-runner-tests:
+    name: Text AI Tests
+    runs-on:
+      labels: int-linux-x64-4core-ubuntu24.04-1
+    environment: text-ai-prerelease
+    permissions:
+      contents: read
+
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          large-packages: false
+
+      - name: Free disk space by removing large directories
+        run: |
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/.ghcup/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/lib/node_modules
+          sudo rm -rf /opt/ghc
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
+        with:
+          poetry-version: 2.1.2
+
+      - name: Allow unprivileged user namespaces
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Tests
+        env:
+          TXAIE_PRE_RELEASE_URL: ${{ vars.ZIP_URL }}
+          TXAIE_PRE_RELEASE_PASSWORD: ${{ secrets.ZIP_PASSWORD }}
+          INTERACTIVE: False # hide animated spinner in CI
+        run: poetry run -- pytest -rA --setup-show test/integration/large_runner
