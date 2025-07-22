@@ -46,7 +46,7 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Pytest
-        run: poetry run -- pytest -rA --setup-show --backend=saas test/integration/ordinary
+        run: poetry run -- pytest -rA --setup-show test/integration/ordinary
 
   saas-tests:
     name: SaaS Tests
