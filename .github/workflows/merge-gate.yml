@@ -26,151 +26,31 @@ jobs:
       - run: echo "Manual Approval"
 
   ordinary-itests:
-    name: iTests
-    runs-on: ubuntu-24.04
+    name: Ordinary iTests
     needs: [ slow-checks-approval ]
+    uses: ./.github/workflows/tests-ordinary-integration.yml
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        file:
-          - test_itde_manager.py
-          - test_itde_manager_in_docker_container.py
-          - test_sagemaker_extension_wrapper.py
-          - test_slct_manager.py
-          - test_transformers_extension_wrapper.py
-
-    steps:
-
-      - name: SCM Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
-
-      - name: Allow unprivileged user namespaces
-        run: |
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      - name: Pytest
-        run: poetry run -- pytest -rA --setup-show test/integration/ordinary/${{ matrix.file }}
 
   saas-tests:
-    name: SaaS Tests
-    runs-on: ubuntu-24.04
+    name: SaaS
     needs: [ slow-checks-approval ]
+    uses: ./.github/workflows/tests-saas.yml
     permissions:
       contents: read
-
-    steps:
-      - name: SCM Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
-
-      - name: Allow unprivileged user namespaces
-        run: |
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      - name: Tests
-        env:
-          SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
-          SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
-          SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
-        run: poetry run -- pytest -rA --setup-show --backend=saas test/integration/saas_instance
 
   large-runner-tests:
-    name: Text AI Tests
-    runs-on:
-      labels: int-linux-x64-4core-ubuntu24.04-1
-    environment: text-ai-prerelease
+    name: Large Runner
     needs: [ slow-checks-approval ]
+    uses: ./.github/workflows/tests-large-runner.yml
     permissions:
       contents: read
-
-    steps:
-      - name: SCM Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          large-packages: false
-
-      - name: Free disk space by removing large directories
-        run: |
-          sudo rm -rf /usr/local/graalvm/
-          sudo rm -rf /usr/local/.ghcup/
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/local/share/chromium
-          sudo rm -rf /usr/local/lib/node_modules
-          sudo rm -rf /opt/ghc
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
-        with:
-          poetry-version: 2.1.2
-
-      - name: Allow unprivileged user namespaces
-        run: |
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      - name: Tests
-        env:
-          TXAIE_PRE_RELEASE_URL: ${{ vars.ZIP_URL }}
-          TXAIE_PRE_RELEASE_PASSWORD: ${{ secrets.ZIP_PASSWORD }}
-          INTERACTIVE: False # hide animated spinner in CI
-        run: poetry run -- pytest -rA --setup-show test/integration/large_runner
 
   gpu-tests:
-    name: GPU Tests
-    runs-on:
-      labels: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
-    environment: gpu-approval
+    name: GPU
+    uses: ./.github/workflows/tests-gpu.yml
     permissions:
       contents: read
-
-    steps:
-      - name: SCM Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          large-packages: false
-
-      - name: Free disk space by removing large directories
-        run: |
-          sudo rm -rf /usr/local/graalvm/
-          sudo rm -rf /usr/local/.ghcup/
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/local/share/chromium
-          sudo rm -rf /usr/local/lib/node_modules
-          sudo rm -rf /opt/ghc
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@1.4.0
-        with:
-          poetry-version: 2.1.2
-
-      - name: Allow unprivileged user namespaces
-        run: |
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      - name: Tests
-        run: poetry run -- pytest -rA --setup-show test/integration/gpu
 
   # This job ensures inputs have been executed successfully.
   approve-merge:
@@ -185,5 +65,4 @@ jobs:
     # Each job requires a step, so we added this dummy step.
     steps:
       - name: Approve
-        run: |
-          echo "Merge Approved"
+        run: echo "Merge Approved"
