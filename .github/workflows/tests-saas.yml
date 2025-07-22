@@ -8,7 +8,6 @@ jobs:
   saas-tests:
     name: SaaS Tests
     runs-on: ubuntu-24.04
-    needs: [ slow-checks-approval ]
     permissions:
       contents: read
 
