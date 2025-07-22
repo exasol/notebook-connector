@@ -1,7 +1,7 @@
 import textwrap
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from test.integration.test_itde_manager import remove_itde
+from test.integration.ordinary.test_itde_manager import remove_itde
 from typing import (
     List,
     Tuple,
