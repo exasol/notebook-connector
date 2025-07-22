@@ -11,12 +11,6 @@ from exasol_integration_test_docker_environment.cli.options.test_environment_opt
     LATEST_DB_VERSION,  # type: ignore
 )
 from exasol_integration_test_docker_environment.lib import api  # type: ignore
-from exasol_integration_test_docker_environment.lib.models.data.container_info import (
-    ContainerInfo,  # type: ignore
-)
-from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
-    EnvironmentInfo,  # type: ignore
-)
 from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
     ContextDockerClient,
 )
@@ -28,6 +22,12 @@ from exasol_integration_test_docker_environment.lib.docker.networks.utils import
 )
 from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (  # type: ignore
     remove_docker_volumes,
+)
+from exasol_integration_test_docker_environment.lib.models.data.container_info import (
+    ContainerInfo,  # type: ignore
+)
+from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
+    EnvironmentInfo,  # type: ignore
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig
