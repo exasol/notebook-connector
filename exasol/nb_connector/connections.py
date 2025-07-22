@@ -97,8 +97,8 @@ def _get_params_from_secret_store(conf: Secrets, *args) -> tuple[str, ...]:
     res: tuple[str, ...] = tuple()
     for arg in args:
         val = conf.get(arg)
-        if not val:
-            raise ValueError(f"Secret store value for key {arg} is empty.")
+        if val is None:
+            raise ValueError(f"Secret store value for key {arg} is None.")
         res += (val,)
     return res
 
