@@ -140,6 +140,12 @@ class Secrets:
             raise AttributeError(f'Unknown key "{key}"')
         return val
 
+    def __getitem__(self, item) -> str:
+        val = self.get(item)
+        if val is None:
+            raise AttributeError(f'Unknown key "{item}"')
+        return val
+
     def keys(self) -> Iterable[str]:
         """Iterator over keys akin to dict.keys()"""
         with self._cursor() as cur:

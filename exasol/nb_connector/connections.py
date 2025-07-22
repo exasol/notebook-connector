@@ -90,19 +90,6 @@ def get_udf_bucket_path(conf: Secrets) -> str:
     return bucket.udf_path
 
 
-def _get_params_from_secret_store(conf: Secrets, *args) -> tuple[str, ...]:
-    """
-    Gets the values from Secret Store identified by the list of keys (*args) and verifies they are not empty.
-    """
-    res: tuple[str, ...] = tuple()
-    for arg in args:
-        val = conf.get(arg)
-        if val is None:
-            raise ValueError(f"Secret store value for key {arg} is None.")
-        res += (val,)
-    return res
-
-
 def get_saas_database_id(conf: Secrets) -> str:
     """
     Gets the SaaS database id using the available configuration elements.
@@ -112,19 +99,11 @@ def get_saas_database_id(conf: Secrets) -> str:
     if saas_database_id:
         return saas_database_id
 
-    host, account_id, pat, database_name = _get_params_from_secret_store(
-        conf,
-        CKey.saas_url,
-        CKey.saas_account_id,
-        CKey.saas_token,
-        CKey.saas_database_name,
-    )
-
     return saas_api.get_database_id(
-        host=host,
-        account_id=account_id,
-        pat=pat,
-        database_name=database_name,
+        host=conf[CKey.saas_url],
+        account_id=conf[CKey.saas_account_id],
+        pat=conf[CKey.saas_token],
+        database_name=conf[CKey.saas_database_name],
     )
 
 
@@ -137,22 +116,12 @@ def _get_pyexasol_connection_params(conf: Secrets, **kwargs) -> dict[str, Any]:
             "password": conf.get(CKey.db_password),
         }
     else:
-        host, account_id, pat, database_name, saas_database_id = (
-            _get_params_from_secret_store(
-                conf,
-                CKey.saas_url,
-                CKey.saas_account_id,
-                CKey.saas_token,
-                CKey.saas_database_name,
-                CKey.saas_database_id,
-            )
-        )
         conn_params = saas_api.get_connection_params(
-            host=host,
-            account_id=account_id,
-            pat=pat,
-            database_id=saas_database_id,
-            database_name=database_name,
+            host=conf[CKey.saas_url],
+            account_id=conf[CKey.saas_account_id],
+            pat=conf[CKey.saas_token],
+            database_id=get_saas_database_id(conf),
+            database_name=conf[CKey.saas_database_name],
         )
 
     encryption = _optional_encryption(conf)
@@ -237,22 +206,12 @@ def open_sqlalchemy_connection(conf: Secrets):
             "password": conf.get(CKey.db_password),
         }
     else:
-        host, account_id, pat, database_name, saas_database_id = (
-            _get_params_from_secret_store(
-                conf,
-                CKey.saas_url,
-                CKey.saas_account_id,
-                CKey.saas_token,
-                CKey.saas_database_name,
-                CKey.saas_database_id,
-            )
-        )
         conn_params = saas_api.get_connection_params(
-            host=host,
-            account_id=account_id,
-            pat=pat,
-            database_id=saas_database_id,
-            database_name=database_name,
+            host=conf[CKey.saas_url],
+            account_id=conf[CKey.saas_account_id],
+            pat=conf[CKey.saas_token],
+            database_id=get_saas_database_id(conf),
+            database_name=conf[CKey.saas_database_name],
         )
         host, port = str(conn_params["dsn"]).split(":")
         conn_params = {
