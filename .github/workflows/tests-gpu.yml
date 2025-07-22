@@ -9,7 +9,6 @@ jobs:
     name: GPU Tests
     runs-on:
       labels: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
-    environment: gpu-approval
     permissions:
       contents: read
 

@@ -36,6 +36,7 @@ jobs:
     name: SaaS
     needs: [ slow-checks-approval ]
     uses: ./.github/workflows/tests-saas.yml
+    secrets: inherit
     permissions:
       contents: read
 
@@ -48,6 +49,7 @@ jobs:
 
   gpu-tests:
     name: GPU
+    needs: [ slow-checks-approval ]
     uses: ./.github/workflows/tests-gpu.yml
     permissions:
       contents: read
@@ -60,7 +62,7 @@ jobs:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
     # Removed saas-tests from being required
-    needs: [ fast-checks, large-runner-tests, ordinary-itests ]
+    needs: [ fast-checks, large-runner-tests, ordinary-itests, gpu-tests ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
