@@ -97,7 +97,12 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
     "accelerator, expected_docker_runtime, expected_docker_environment_variable, expected_additional_db_parameter",
     [
         (Accelerator.none.value, None, (), ()),
-        (Accelerator.nvidia.value, "nvidia", ("NVIDIA_VISIBLE_DEVICES=all",), ("-enableAcceleratorDeviceDetection=1",)),
+        (
+            Accelerator.nvidia.value,
+            "nvidia",
+            ("NVIDIA_VISIBLE_DEVICES=all",),
+            ("-enableAcceleratorDeviceDetection=1",),
+        ),
     ],
 )
 def test_bring_itde_up_with_accelerator(
