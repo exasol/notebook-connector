@@ -82,8 +82,8 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
         accelerator = conf.get(AILabConfig.accelerator, Accelerator.none.value)
 
         docker_runtime = None
-        docker_environment_variable: tuple[str,...] = ()
-        additional_db_parameter: tuple[str,...] = ()
+        docker_environment_variable: tuple[str, ...] = ()
+        additional_db_parameter: tuple[str, ...] = ()
         if accelerator == Accelerator.nvidia.value:
             docker_runtime = "nvidia"
             docker_environment_variable = ("NVIDIA_VISIBLE_DEVICES=all",)
