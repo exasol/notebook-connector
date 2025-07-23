@@ -61,13 +61,16 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
 
     bring_itde_up(secrets)
 
-    mock_spawn_env.assert_called_once_with(
+    assert mock_spawn_env.mock_calls == [mock.call(
         environment_name=ENVIRONMENT_NAME,
         nameserver=(NAME_SERVER_ADDRESS,),
         db_mem_size="4 GiB",
         db_disk_size="10 GiB",
         docker_db_image_version=db_image_version,
-    )
+        docker_runtime=None,
+        docker_environment_variable = (),
+        additional_db_parameter = (),
+    )]
 
     assert secrets.get(CKey.itde_container) == TEST_CONTAINER_NAME
     assert secrets.get(CKey.itde_volume) == TEST_VOLUME_NAME
