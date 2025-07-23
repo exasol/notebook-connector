@@ -120,8 +120,8 @@ def _get_pyexasol_connection_params(conf: Secrets, **kwargs) -> dict[str, Any]:
             host=conf[CKey.saas_url],
             account_id=conf[CKey.saas_account_id],
             pat=conf[CKey.saas_token],
-            database_id=get_saas_database_id(conf),
-            database_name=conf[CKey.saas_database_name],
+            database_id=conf.get(CKey.saas_database_id),
+            database_name=conf.get(CKey.saas_database_name),
         )
 
     encryption = _optional_encryption(conf)
@@ -210,8 +210,8 @@ def open_sqlalchemy_connection(conf: Secrets):
             host=conf[CKey.saas_url],
             account_id=conf[CKey.saas_account_id],
             pat=conf[CKey.saas_token],
-            database_id=get_saas_database_id(conf),
-            database_name=conf[CKey.saas_database_name],
+            database_id=conf.get(CKey.saas_database_id),
+            database_name=conf.get(CKey.saas_database_name),
         )
         host, port = str(conn_params["dsn"]).split(":")
         conn_params = {
