@@ -166,7 +166,6 @@ def test_open_pyexasol_connection_saas(
 
 @unittest.mock.patch("sqlalchemy.create_engine")
 def test_open_sqlalchemy_connection(mock_create_engine, conf):
-    conf.save(CKey.saas_database_id, "fake_database_id")
     setattr(conf, CKey.db_port.name, conf.get(CKey.db_port))
     open_sqlalchemy_connection(conf)
     mock_create_engine.assert_called_once_with(
