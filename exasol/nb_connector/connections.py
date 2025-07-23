@@ -95,13 +95,15 @@ def get_saas_database_id(conf: Secrets) -> str:
     Gets the SaaS database id using the available configuration elements.
     """
     saas_database_id = conf.get(CKey.saas_database_id)
+
     if saas_database_id:
         return saas_database_id
+
     return saas_api.get_database_id(
-        host=conf.get(CKey.saas_url),
-        account_id=conf.get(CKey.saas_account_id),
-        pat=conf.get(CKey.saas_token),
-        database_name=conf.get(CKey.saas_database_name),
+        host=conf[CKey.saas_url],
+        account_id=conf[CKey.saas_account_id],
+        pat=conf[CKey.saas_token],
+        database_name=conf[CKey.saas_database_name],
     )
 
 
@@ -115,9 +117,9 @@ def _get_pyexasol_connection_params(conf: Secrets, **kwargs) -> dict[str, Any]:
         }
     else:
         conn_params = saas_api.get_connection_params(
-            host=conf.get(CKey.saas_url),
-            account_id=conf.get(CKey.saas_account_id),
-            pat=conf.get(CKey.saas_token),
+            host=conf[CKey.saas_url],
+            account_id=conf[CKey.saas_account_id],
+            pat=conf[CKey.saas_token],
             database_id=conf.get(CKey.saas_database_id),
             database_name=conf.get(CKey.saas_database_name),
         )
@@ -205,9 +207,9 @@ def open_sqlalchemy_connection(conf: Secrets):
         }
     else:
         conn_params = saas_api.get_connection_params(
-            host=conf.get(CKey.saas_url),
-            account_id=conf.get(CKey.saas_account_id),
-            pat=conf.get(CKey.saas_token),
+            host=conf[CKey.saas_url],
+            account_id=conf[CKey.saas_account_id],
+            pat=conf[CKey.saas_token],
             database_id=conf.get(CKey.saas_database_id),
             database_name=conf.get(CKey.saas_database_name),
         )
