@@ -72,9 +72,6 @@ pytest-exasol-backend = ">=1.1.0,<2"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-markers = [
-    "gpu: tests which require a GPU (deselect with '-m \"not gpu\"')",
-]
 
 testpaths = [
     "test"
