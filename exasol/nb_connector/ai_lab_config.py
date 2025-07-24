@@ -5,6 +5,7 @@ from enum import (
 
 
 class AILabConfig(Enum):
+    accelerator = auto()
     aws_access_key_id = auto()
     aws_region = auto()
     aws_secret_access_key = auto()
@@ -63,3 +64,8 @@ class AILabConfig(Enum):
 class StorageBackend(Enum):
     onprem = auto()
     saas = auto()
+
+
+class Accelerator(Enum):
+    none = "none"
+    nvidia = "nvidia"
