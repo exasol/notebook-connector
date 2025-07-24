@@ -11,7 +11,6 @@ from typing import (
     Optional,
 )
 
-import exasol.bucketfs as bfs  # type: ignore
 from exasol.ai.text.deployment import license_deployment as txai_licenses
 from exasol.ai.text.deployment.script_deployer import create_scripts
 from exasol.ai.text.deployment.txaie_language_container_deployer import (
@@ -22,7 +21,6 @@ from exasol.ai.text.extraction import (
 )
 from exasol.ai.text.extraction.abstract_extraction import (
     Defaults,
-    Output,
 )
 from exasol.ai.text.extraction.extraction import Extraction as TextAiExtraction
 from exasol.ai.text.extractors.bucketfs_model_repository import BucketFSRepository
@@ -53,7 +51,6 @@ from exasol.nb_connector.language_container_activation import (
     get_activation_sql,
 )
 from exasol.nb_connector.secret_store import Secrets
-
 # Models will be uploaded into directory BFS_MODELS_DIR in BucketFS.
 #
 # Models downloaded from the Huggingface archive to a local drive will be
@@ -130,9 +127,9 @@ def install_model(conf: Secrets, model: TransformerModel) -> None:
 
 
 def deploy_license(
-    conf: Secrets,
-    license_content: Optional[str] = None,
-    license_file: Optional[Path] = None,
+        conf: Secrets,
+        license_content: Optional[str] = None,
+        license_file: Optional[Path] = None,
 ) -> None:
     """
     Deploys the given license and saves its identifier to the secret store. The licence can either be
@@ -156,14 +153,14 @@ def deploy_license(
 
 
 def initialize_text_ai_extension(
-    conf: Secrets,
-    container_file: Optional[Path] = None,
-    version: Optional[str] = None,
-    install_slc: bool = True,
-    install_scripts: bool = True,
-    install_models: bool = True,
-    install_bfs_credentials: bool = True,
-    allow_override_language_alias: bool = True,
+        conf: Secrets,
+        container_file: Optional[Path] = None,
+        version: Optional[str] = None,
+        install_slc: bool = True,
+        install_scripts: bool = True,
+        install_models: bool = True,
+        install_bfs_credentials: bool = True,
+        allow_override_language_alias: bool = True,
 ) -> None:
     """
     Depending on which flags are set, runs different steps to install Text-AI Extension in the DB.

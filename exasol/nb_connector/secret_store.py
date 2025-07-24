@@ -5,7 +5,6 @@ from inspect import cleandoc
 from pathlib import Path
 from typing import (
     Optional,
-    Tuple,
     Union,
 )
 
@@ -35,7 +34,7 @@ class Secrets:
     # disable error messages about unresolved types in type hints as
     # sqlcipher is a c library and does not provide this information.
     def connection(
-        self,
+            self,
     ) -> sqlcipher.Connection:  # pylint: disable=E1101
         if self._con is None:
             db_file_found = self.db_file.exists()
@@ -71,7 +70,7 @@ class Secrets:
             with self._cursor() as cur:
                 cur.execute("SELECT * FROM sqlite_master")
         # fmt: off
-        except (sqlcipher.DatabaseError) as ex: # pylint: disable=E1101
+        except (sqlcipher.DatabaseError) as ex:  # pylint: disable=E1101
             # fmt: on
             print(f"exception {ex}")
             if str(ex) == "file is not a database":
@@ -88,7 +87,7 @@ class Secrets:
 
     @contextlib.contextmanager
     def _cursor(
-        self,
+            self,
     ) -> sqlcipher.Cursor:  # pylint: disable=E1101
         cur = self.connection().cursor()
         try:
@@ -124,7 +123,7 @@ class Secrets:
         return self
 
     def get(
-        self, key: Union[str, CKey], default_value: Optional[str] = None
+            self, key: Union[str, CKey], default_value: Optional[str] = None
     ) -> Optional[str]:
 
         key = key.name if isinstance(key, CKey) else key

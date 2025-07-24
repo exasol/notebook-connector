@@ -5,7 +5,7 @@ Bucketfs-related functions.
 import logging
 import pathlib
 
-import exasol.bucketfs as bfs  # type: ignore
+import exasol.bucketfs as bfs
 
 _logger = logging.getLogger(__name__)
 

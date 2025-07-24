@@ -194,7 +194,7 @@ def upload_model(conf: Secrets, model_name: str, cache_dir: str, **kwargs) -> No
             methods of the AutoTokenizer and AutoModel. The user token, if specified
             here, will be used instead of the one in the secret store.
     """
-    from transformers import (  # type: ignore
+    from transformers import (
         AutoModel,
         AutoTokenizer,
     )

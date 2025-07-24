@@ -1,4 +1,4 @@
-import pyexasol  # type: ignore
+import pyexasol
 
 _SETUP_SQL = [
     "OPEN SCHEMA {schema!i}",

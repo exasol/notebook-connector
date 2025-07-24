@@ -4,15 +4,14 @@ import ssl
 from pathlib import Path
 from typing import (
     Any,
-    Optional,
 )
 
-import exasol.bucketfs as bfs  # type: ignore
-import exasol.saas.client.api_access as saas_api  # type: ignore
-import ibis  # type: ignore
-import pyexasol  # type: ignore
-import sqlalchemy  # type: ignore
-from sqlalchemy.engine.url import URL  # type: ignore
+import exasol.bucketfs as bfs
+import exasol.saas.client.api_access as saas_api
+import ibis
+import pyexasol
+import sqlalchemy
+from sqlalchemy.engine.url import URL
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ai_lab_config import StorageBackend
@@ -108,7 +107,6 @@ def get_saas_database_id(conf: Secrets) -> str:
 
 
 def _get_pyexasol_connection_params(conf: Secrets, **kwargs) -> dict[str, Any]:
-
     if get_backend(conf) == StorageBackend.onprem:
         conn_params: dict[str, Any] = {
             "dsn": get_external_host(conf),

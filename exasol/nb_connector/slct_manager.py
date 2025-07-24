@@ -6,13 +6,12 @@ import shutil
 from collections import namedtuple
 from pathlib import Path
 from typing import (
-    List,
     Optional,
 )
 
-from exasol.slc import api as exaslct_api  # type: ignore
+from exasol.slc import api as exaslct_api
 from exasol_integration_test_docker_environment.lib.docker import (
-    ContextDockerClient,  # type: ignore
+    ContextDockerClient,
 )
 from git import Repo
 
@@ -62,10 +61,10 @@ class SlcDir:
         Returns the path to the custom pip file of the flavor
         """
         return (
-            self.flavor_dir
-            / "flavor_customization"
-            / "packages"
-            / "python3_pip_packages"
+                self.flavor_dir
+                / "flavor_customization"
+                / "packages"
+                / "python3_pip_packages"
         )
 
     @contextlib.contextmanager

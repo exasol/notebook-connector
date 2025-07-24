@@ -10,13 +10,13 @@ import pytest
 from docker.models.images import Image
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.container.utils import (
-    remove_docker_container,  # type: ignore
+    remove_docker_container,
 )
 from exasol_integration_test_docker_environment.lib.docker.networks.utils import (
-    remove_docker_networks,  # type: ignore
+    remove_docker_networks,
 )
 from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
-    remove_docker_volumes,  # type: ignore
+    remove_docker_volumes,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import (
     DockerContainerCopy,
@@ -228,14 +228,14 @@ def itde_stop_and_restart():
         bring_itde_up(secrets)
         status = get_itde_status(secrets)
         assert (
-            status is ItdeContainerStatus.READY
+                status is ItdeContainerStatus.READY
         ), f"The status after bringing itde up is {status.name}"
 
         # Disconnect calling container from Docker-DB network
         _remove_current_container_from_db_network(secrets)
         status = get_itde_status(secrets)
         assert (
-            status is ItdeContainerStatus.RUNNING
+                status is ItdeContainerStatus.RUNNING
         ), f"The status after disconnecting the container is {status.name}"
 
         # Stop the Docker-DB container.
@@ -244,13 +244,13 @@ def itde_stop_and_restart():
             docker_client.api.stop(container_name)
         status = get_itde_status(secrets)
         assert (
-            status is ItdeContainerStatus.STOPPED
+                status is ItdeContainerStatus.STOPPED
         ), f"The status after stopping ITDE is {status.name}"
 
         restart_itde(secrets)
         status = get_itde_status(secrets)
         assert (
-            status is ItdeContainerStatus.READY
+                status is ItdeContainerStatus.READY
         ), f"The status after restarting ITDE is {status.name}"
 
     function_source_code = textwrap.dedent(dill.source.getsource(run_test))
@@ -284,7 +284,7 @@ def itde_external_test():
         )
         try:
             with patch(
-                "exasol_integration_test_docker_environment.lib.api.spawn_test_environment"
+                    "exasol_integration_test_docker_environment.lib.api.spawn_test_environment"
             ):
                 # We have effectively disabled the spawn_test_environment(). The bring_itde_up()
                 # should use the provided instance of the DockerDB. If it tries to create a new
@@ -305,13 +305,13 @@ def itde_external_test():
 
 @pytest.fixture
 def docker_container(
-    wheel_path,
-    docker_image,
-    itde_connect_test_impl,
-    itde_recreation_after_take_down,
-    itde_recreation_without_take_down,
-    itde_stop_and_restart,
-    itde_external_test,
+        wheel_path,
+        docker_image,
+        itde_connect_test_impl,
+        itde_recreation_after_take_down,
+        itde_recreation_without_take_down,
+        itde_stop_and_restart,
+        itde_external_test,
 ):
     """
     Create a Docker container named TEST_CONTAINER to manage an instance of ITDE.

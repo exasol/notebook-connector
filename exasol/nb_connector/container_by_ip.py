@@ -1,13 +1,11 @@
 from typing import (
     Any,
-    Dict,
-    List,
     Optional,
 )
 
-import docker  # type: ignore
+import docker
 import ifaddr
-from docker.models.containers import Container  # type: ignore
+from docker.models.containers import Container
 
 
 class IPRetriever:
@@ -18,7 +16,7 @@ class IPRetriever:
 
 
 def retrieve_networks_of_container(
-    container: docker.models.containers.Container,
+        container: docker.models.containers.Container,
 ) -> list[dict[str, Any]]:
     container.reload()
     network_settings = container.attrs["NetworkSettings"]
