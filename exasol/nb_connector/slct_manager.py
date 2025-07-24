@@ -253,7 +253,7 @@ class SlctManager:
         bucketfs_password = self._secrets.get(CKey.bfs_password)
 
         with self.slc_dir.enter():
-            print(f'flavor path: {self.flavor_path}, tuple: {tuple(self.flavor_path)}')
+            print(f"flavor path: {self.flavor_path}, tuple: {tuple(self.flavor_path)}")
             exaslct_api.upload(
                 flavor_path=tuple(self.flavor_path),
                 database_host=database_host,
