@@ -39,5 +39,5 @@ value = secrets.get(key)
 
 ## Additional Information
 
-* [Developer Guide](doc/developer_guide/developer-guide.md)
 * [User Guide](doc/user_guide/user-guide.md)
+* [Developer Guide](doc/developer_guide/developer-guide.md)
