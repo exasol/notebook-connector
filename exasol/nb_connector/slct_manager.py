@@ -234,7 +234,7 @@ class SlctManager:
         """
         with self.slc_dir.enter():
             exaslct_api.export(
-                flavor_path=tuple(self.flavor_path),
+                flavor_path=(self.flavor_path,),
                 export_path=str(self.working_path.export_path),
                 output_directory=str(self.working_path.output_path),
                 release_name=self.language_alias,
@@ -253,9 +253,8 @@ class SlctManager:
         bucketfs_password = self._secrets.get(CKey.bfs_password)
 
         with self.slc_dir.enter():
-            print(f"flavor path: {self.flavor_path}, tuple: {tuple(self.flavor_path)}")
             exaslct_api.upload(
-                flavor_path=tuple(self.flavor_path),
+                flavor_path=(self.flavor_path,),
                 database_host=database_host,
                 bucketfs_name=bucketfs_name,
                 bucket_name=bucket_name,
