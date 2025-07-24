@@ -5,6 +5,7 @@ import pytest
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slct_manager import (
+    FLAVORS_PATH_IN_SLC_REPO,
     SlcSession,
     SlctManager,
     SlctManagerError,
@@ -37,7 +38,8 @@ def test_existing_flavor(
     testee = SlctManager(populated_secrets, slc_session=session)
     # this test is redundant
     # assert testee.slc_dir.flavor_name == expected_flavor
-    assert testee.flavor_path == f"flavors/{expected_flavor}"
+    expected = FLAVORS_PATH_IN_SLC_REPO / expected_flavor
+    assert testee.flavor_path == str(expected)
 
 
 def test_undefined_flavor(secrets: Secrets):

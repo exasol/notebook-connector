@@ -34,13 +34,8 @@ PATH_IN_BUCKET = "container"
 # store with this key.
 SLC_ACTIVATION_KEY_PREFIX = ACTIVATION_KEY_PREFIX + "slc_"
 
-# To be removed
-#
-# # This is the flavor customers are supposed to use for modifications.
-# REQUIRED_FLAVOR = "template-Exasol-all-python-3.10"
-#
-# # Path to the used flavor within the script-languages-release repository
-# FLAVOR_PATH_IN_SLC_REPO = Path("flavors") / REQUIRED_FLAVOR
+# Path to flavors within the script-languages-release repository
+FLAVORS_PATH_IN_SLC_REPO = Path("flavors")
 
 PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
 
@@ -67,7 +62,7 @@ class SlcDir:
         Path to the used flavor within the script-languages-release
         repository
         """
-        return Path("flavors") / self.flavor_name
+        return FLAVORS_PATH_IN_SLC_REPO / self.flavor_name
 
     @property
     def flavor_dir(self) -> Path:
