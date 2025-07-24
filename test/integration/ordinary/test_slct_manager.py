@@ -39,6 +39,7 @@ def slc_secrets(secrets_file, working_path) -> Secrets:
     secrets.save(
         AILabConfig.slc_target_dir, str(working_path / "script_languages_release")
     )
+    secrets.save(AILabConfig.slc_flavor_non_cuda, "template-Exasol-all-python-3.10")
     return secrets
 
 
