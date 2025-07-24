@@ -2,32 +2,28 @@ import os
 from enum import IntFlag
 from typing import (
     Optional,
-    Tuple,
 )
 
-import docker  # type: ignore
-from docker.models.networks import Network  # type: ignore
+import docker
+from docker.models.networks import Network
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
-    LATEST_DB_VERSION,  # type: ignore
+    LATEST_DB_VERSION,
 )
-from exasol_integration_test_docker_environment.lib import api  # type: ignore
-from exasol_integration_test_docker_environment.lib.docker import (  # type: ignore
+from exasol_integration_test_docker_environment.lib import api
+from exasol_integration_test_docker_environment.lib.docker import (
     ContextDockerClient,
 )
-from exasol_integration_test_docker_environment.lib.docker.container.utils import (  # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.container.utils import (
     remove_docker_container,
 )
-from exasol_integration_test_docker_environment.lib.docker.networks.utils import (  # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.networks.utils import (
     remove_docker_networks,
 )
-from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (  # type: ignore
+from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
     remove_docker_volumes,
 )
-from exasol_integration_test_docker_environment.lib.models.data.container_info import (
-    ContainerInfo,  # type: ignore
-)
 from exasol_integration_test_docker_environment.lib.models.data.environment_info import (
-    EnvironmentInfo,  # type: ignore
+    EnvironmentInfo,
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig

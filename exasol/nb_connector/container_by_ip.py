@@ -1,13 +1,11 @@
 from typing import (
     Any,
-    Dict,
-    List,
     Optional,
 )
 
-import docker  # type: ignore
+import docker
 import ifaddr
-from docker.models.containers import Container  # type: ignore
+from docker.models.containers import Container
 
 
 class IPRetriever:
