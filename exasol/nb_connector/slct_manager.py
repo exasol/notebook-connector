@@ -9,9 +9,9 @@ from typing import (
     Optional,
 )
 
-from exasol.slc import api as exaslct_api  # type: ignore
+from exasol.slc import api as exaslct_api
 from exasol_integration_test_docker_environment.lib.docker import (
-    ContextDockerClient,  # type: ignore
+    ContextDockerClient,
 )
 from git import Repo
 

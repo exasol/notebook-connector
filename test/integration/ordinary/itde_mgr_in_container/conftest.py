@@ -10,13 +10,13 @@ import pytest
 from docker.models.images import Image
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.docker.container.utils import (
-    remove_docker_container,  # type: ignore
+    remove_docker_container,
 )
 from exasol_integration_test_docker_environment.lib.docker.networks.utils import (
-    remove_docker_networks,  # type: ignore
+    remove_docker_networks,
 )
 from exasol_integration_test_docker_environment.lib.docker.volumes.utils import (
-    remove_docker_volumes,  # type: ignore
+    remove_docker_volumes,
 )
 from exasol_integration_test_docker_environment.lib.test_environment.docker_container_copy import (
     DockerContainerCopy,
