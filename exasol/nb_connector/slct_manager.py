@@ -1,3 +1,4 @@
+from __future__ import annotations
 import contextlib
 import logging
 import os
@@ -32,11 +33,13 @@ PATH_IN_BUCKET = "container"
 # store with this key.
 SLC_ACTIVATION_KEY_PREFIX = ACTIVATION_KEY_PREFIX + "slc_"
 
-# This is the flavor customers are supposed to use for modifications.
-REQUIRED_FLAVOR = "template-Exasol-all-python-3.10"
-
-# Path to the used flavor within the script-languages-release repository
-FLAVOR_PATH_IN_SLC_REPO = Path("flavors") / REQUIRED_FLAVOR
+# To be removed
+#
+# # This is the flavor customers are supposed to use for modifications.
+# REQUIRED_FLAVOR = "template-Exasol-all-python-3.10"
+#
+# # Path to the used flavor within the script-languages-release repository
+# FLAVOR_PATH_IN_SLC_REPO = Path("flavors") / REQUIRED_FLAVOR
 
 PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
 
@@ -45,20 +48,29 @@ PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
 SLC_RELEASE_TAG = "9.6.0"
 
 
+# Maybe we could find a better name for this class?
+#
+# E.g.
+# - SlcCoordinates
+# - SlcMetadata
+# - SlcLocation
 class SlcDir:
-    def __init__(self, secrets: Secrets):
-        self._secrets = secrets
+
+    def __init__(self, flavor_name: str, root_dir: Path):
+        self.flavor_name = flavor_name
+        self.root_dir = root_dir
 
     @property
-    def root_dir(self) -> Path:
-        target_dir = self._secrets.get(AILabConfig.slc_target_dir)
-        if not target_dir:
-            raise RuntimeError("slc target dir is not defined in secrets.")
-        return Path(target_dir)
+    def flavor_path_in_slc_repo(self) -> Path:
+        """
+        Path to the used flavor within the script-languages-release
+        repository
+        """
+        return Path("flavors") / self.flavor_name
 
     @property
     def flavor_dir(self) -> Path:
-        return self.root_dir / FLAVOR_PATH_IN_SLC_REPO
+        return self.root_dir / self.flavor_path_in_slc_repo
 
     @property
     def custom_pip_file(self) -> Path:
@@ -84,6 +96,24 @@ class SlcDir:
 
     def __str__(self):
         return str(self.root_dir)
+
+    @classmethod
+    def from_secrets(cls, secrets: Secrets, slc_session: SlcSession) -> SlcDir:
+        key = slc_session.value
+        try:
+            flavor_name = secrets[key]
+        except AttributeError as ex:
+            raise SlctManagerError(
+                f"Secret store does not contain an SLC flavor for session {key}"
+            ) from ex
+
+        try:
+            root_dir = secrets[AILabConfig.slc_target_dir]
+        except AttributeError as ex:
+            raise SlctManagerError(
+                f"Secret store does not contain an SLC target directory"
+            )
+        return cls(flavor_name, Path(root_dir))
 
 
 class WorkingDir:
@@ -125,21 +155,29 @@ class SlcSession(Enum):
     NON_CUDA = CKey.slc_flavor_non_cuda
 
 
-class SlcSessionError(Exception):
+class SlctManagerError(Exception):
     """
-    In case the SLC session is not specified.
+    In case the Secure Configuration Storage (SCS / secrets / conf)
+    does not contain specific data required for using the SlctManager.
+
+    E.g. the flavor for the specified SLC session or the SLC target directory.
     """
 
 
 class SlctManager:
     """
     Support building different flavors of Exasol Script Language
-    Containers (SLCs), uses SLCT internally.
+    Containers (SLCs) using the SLCT.
 
     * The name of the SLC flavor must be provided in secrets
 
-    * Additionally slc_session must specify the *key* in the
-      SCS for finding the flavor name.
+    * Additionally slc_session must specify the key for retrieving
+      the flavor name from the SCS
+
+    The caller needs ensure the flavor name is stored in the Secure
+    Configuration Storage (SCS / secrets / conf) using the keys
+    AILabConfig.slc_flavor_cuda and AILabConfig.slc_flavor_non_cuda.
+    Otherwise SlctManager will raise an SlcFlavorNotFoundError.
     """
     def __init__(
         self,
@@ -147,20 +185,9 @@ class SlctManager:
         working_path: Optional[Path] = None,
         slc_session: SlcSession = SlcSession.NON_CUDA,
     ):
-        self.working_path = WorkingDir(working_path)
-        self.slc_dir = SlcDir(secrets)
         self._secrets = secrets
-        self._slc_session = slc_session
-
-    @property
-    def flavor_name(self) -> str:
-        key = self._slc_session.value
-        try:
-            return self._secrets[key]
-        except AttributeError as ex:
-            raise SlcSessionError(
-                f"Secret store does not contain an SLC flavor for session {key}"
-            ) from ex
+        self.working_path = WorkingDir(working_path)
+        self.slc_dir = SlcDir.from_secrets(secrets, slc_session)
 
     def check_slc_repo_complete(self) -> bool:
         """
@@ -190,13 +217,17 @@ class SlctManager:
                 f"Directory '{self.slc_dir}' already exists. Skipping cloning...."
             )
 
+    @property
+    def flavor_path(self) -> str:
+        return str(self.slc_dir.flavor_path_in_slc_repo)
+
     def export(self):
         """
         Exports the current script-languages-container to the export directory.
         """
         with self.slc_dir.enter():
             exaslct_api.export(
-                flavor_path=(str(FLAVOR_PATH_IN_SLC_REPO),),
+                flavor_path=tuple(self.flavor_path),
                 export_path=str(self.working_path.export_path),
                 output_directory=str(self.working_path.output_path),
                 release_name=self.language_alias,
@@ -216,7 +247,7 @@ class SlctManager:
 
         with self.slc_dir.enter():
             exaslct_api.upload(
-                flavor_path=(str(FLAVOR_PATH_IN_SLC_REPO),),
+                flavor_path=tuple(self.flavor_path),
                 database_host=database_host,
                 bucketfs_name=bucketfs_name,
                 bucket_name=bucket_name,
@@ -227,9 +258,9 @@ class SlctManager:
                 release_name=self.language_alias,
                 output_directory=str(self.working_path.output_path),
             )
-            container_name = f"{REQUIRED_FLAVOR}-release-{self.language_alias}"
+            container_name = f"{self.slc_dir.flavor_name}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(
-                flavor_path=str(FLAVOR_PATH_IN_SLC_REPO),
+                flavor_path=self.flavor_path,
                 bucketfs_name=bucketfs_name,
                 bucket_name=bucket_name,
                 container_name=container_name,

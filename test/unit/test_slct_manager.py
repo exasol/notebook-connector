@@ -1,11 +1,13 @@
+from pathlib import Path
+
 import pytest
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slct_manager import (
     SlcSession,
-    SlcSessionError,
     SlctManager,
+    SlctManagerError,
 )
 
 CUDA_FLAVOR = "cuda-flavor-1.0"
@@ -13,9 +15,10 @@ NON_CUDA_FLAVOR = "non-cuda-flavor-2.2"
 
 
 @pytest.fixture
-def secrets_with_slc_flavors(secrets) -> Secrets:
+def populated_secrets(secrets) -> Secrets:
     secrets.save(CKey.slc_flavor_cuda, CUDA_FLAVOR)
     secrets.save(CKey.slc_flavor_non_cuda, NON_CUDA_FLAVOR)
+    secrets.save(CKey.slc_target_dir, "slc/target/dir")
     return secrets
 
 
@@ -24,20 +27,20 @@ def secrets_with_slc_flavors(secrets) -> Secrets:
     (SlcSession.NON_CUDA, NON_CUDA_FLAVOR),
 ])
 def test_existing_flavor(
-    secrets_with_slc_flavors: Secrets,
+    populated_secrets: Secrets,
     session: SlcSession,
     expected_flavor: str,
 ):
-    testee = SlctManager(secrets_with_slc_flavors, slc_session=session)
-    flavor_name = testee.flavor_name
-    assert flavor_name == expected_flavor
+    testee = SlctManager(populated_secrets, slc_session=session)
+    # this test is redundant
+    # assert testee.slc_dir.flavor_name == expected_flavor
+    assert testee.flavor_path == f"flavors/{expected_flavor}"
 
 
 def test_undefined_flavor(secrets: Secrets):
     """
     secrets does not contain value for the key SlcSession.CUDA.
-    Tests expects SlctManager to raise an SlcSessionError
+    Tests expects SlctManager to raise an SlcFlavorNotFoundError
     """
-    testee = SlctManager(secrets, SlcSession.CUDA)
-    with pytest.raises(SlcSessionError) as ex:
-        flavor = testee.flavor_name
+    with pytest.raises(SlctManagerError, match="does not contain an SLC flavor"):
+        SlctManager(secrets, SlcSession.CUDA)
