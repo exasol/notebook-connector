@@ -26,7 +26,10 @@ from exasol_integration_test_docker_environment.lib.models.data.environment_info
     EnvironmentInfo,
 )
 
-from exasol.nb_connector.ai_lab_config import AILabConfig
+from exasol.nb_connector.ai_lab_config import (
+    Accelerator,
+    AILabConfig,
+)
 from exasol.nb_connector.container_by_ip import (
     ContainerByIp,
     IPRetriever,
@@ -76,12 +79,25 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
         mem_size = f'{conf.get(AILabConfig.mem_size, "4")} GiB'
         disk_size = f'{conf.get(AILabConfig.disk_size, "10")} GiB'
         db_version = os.getenv(TEST_DB_VERSION_ENV_VAR, LATEST_DB_VERSION)
+        accelerator = conf.get(AILabConfig.accelerator, Accelerator.none.value)
+
+        docker_runtime = None
+        docker_environment_variable: tuple[str, ...] = ()
+        additional_db_parameter: tuple[str, ...] = ()
+        if accelerator == Accelerator.nvidia.value:
+            docker_runtime = "nvidia"
+            docker_environment_variable = ("NVIDIA_VISIBLE_DEVICES=all",)
+            additional_db_parameter = ("-enableAcceleratorDeviceDetection=1",)
+
         env_info, _ = api.spawn_test_environment(
             environment_name=ENVIRONMENT_NAME,
             nameserver=(NAME_SERVER_ADDRESS,),
             db_mem_size=mem_size,
             db_disk_size=disk_size,
             docker_db_image_version=db_version,
+            docker_runtime=docker_runtime,
+            docker_environment_variable=docker_environment_variable,
+            additional_db_parameter=additional_db_parameter,
         )
 
     db_info = env_info.database_info

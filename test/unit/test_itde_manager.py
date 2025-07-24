@@ -15,6 +15,7 @@ from exasol_integration_test_docker_environment.lib.models.data.environment_info
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
+from exasol.nb_connector.ai_lab_config import Accelerator
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.itde_manager import (
     ENVIRONMENT_NAME,
@@ -61,13 +62,18 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
 
     bring_itde_up(secrets)
 
-    mock_spawn_env.assert_called_once_with(
-        environment_name=ENVIRONMENT_NAME,
-        nameserver=(NAME_SERVER_ADDRESS,),
-        db_mem_size="4 GiB",
-        db_disk_size="10 GiB",
-        docker_db_image_version=db_image_version,
-    )
+    assert mock_spawn_env.mock_calls == [
+        mock.call(
+            environment_name=ENVIRONMENT_NAME,
+            nameserver=(NAME_SERVER_ADDRESS,),
+            db_mem_size="4 GiB",
+            db_disk_size="10 GiB",
+            docker_db_image_version=db_image_version,
+            docker_runtime=None,
+            docker_environment_variable=(),
+            additional_db_parameter=(),
+        )
+    ]
 
     assert secrets.get(CKey.itde_container) == TEST_CONTAINER_NAME
     assert secrets.get(CKey.itde_volume) == TEST_VOLUME_NAME
@@ -84,6 +90,49 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
     assert secrets.get(CKey.bfs_encryption) == "False"
     assert secrets.get(CKey.bfs_user) == "w"
     assert secrets.get(CKey.bfs_password) == "write"
+
+
+@mock.patch("exasol_integration_test_docker_environment.lib.api.spawn_test_environment")
+@pytest.mark.parametrize(
+    "accelerator, expected_docker_runtime, expected_docker_environment_variable, expected_additional_db_parameter",
+    [
+        (Accelerator.none.value, None, (), ()),
+        (
+            Accelerator.nvidia.value,
+            "nvidia",
+            ("NVIDIA_VISIBLE_DEVICES=all",),
+            ("-enableAcceleratorDeviceDetection=1",),
+        ),
+    ],
+)
+def test_bring_itde_up_with_accelerator(
+    mock_spawn_env,
+    secrets,
+    env_info,
+    db_image_version,
+    accelerator,
+    expected_docker_runtime,
+    expected_docker_environment_variable,
+    expected_additional_db_parameter,
+):
+    mock_spawn_env.return_value = (env_info, None)
+
+    secrets.save(CKey.accelerator, accelerator)
+
+    bring_itde_up(secrets)
+
+    assert mock_spawn_env.mock_calls == [
+        mock.call(
+            environment_name=ENVIRONMENT_NAME,
+            nameserver=(NAME_SERVER_ADDRESS,),
+            db_mem_size="4 GiB",
+            db_disk_size="10 GiB",
+            docker_db_image_version=db_image_version,
+            docker_runtime=expected_docker_runtime,
+            docker_environment_variable=expected_docker_environment_variable,
+            additional_db_parameter=expected_additional_db_parameter,
+        )
+    ]
 
 
 @mock.patch(

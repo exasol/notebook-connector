@@ -56,8 +56,14 @@ class AILabConfig(Enum):
     slc_alias = auto()
     text_ai_pre_release_url = auto()
     text_ai_zip_password = auto()
+    accelerator = auto()
 
 
 class StorageBackend(Enum):
     onprem = auto()
     saas = auto()
+
+
+class Accelerator(Enum):
+    none = "none"
+    nvidia = "nvidia"
