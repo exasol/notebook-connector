@@ -4,6 +4,10 @@ import os
 import re
 import shutil
 from collections import namedtuple
+from enum import (
+    Enum,
+    auto,
+)
 from pathlib import Path
 from typing import (
     List,
@@ -115,11 +119,44 @@ class WorkingDir:
         shutil.rmtree(self.export_path)
 
 
+class SlcSession(Enum):
+    CUDA = CKey.slc_flavor_cuda
+    NON_CUDA = CKey.slc_flavor_non_cuda
+
+
+class SlcSessionError(Exception):
+    """
+    In case the SLC session is not specified.
+    """
+
+
 class SlctManager:
-    def __init__(self, secrets: Secrets, working_path: Optional[Path] = None):
+    """
+    Support building different flavors of Exasol Script Language
+    Containers (SLCs), uses SLCT internally.
+
+    * The name of the SLC flavor must be provided in secrets
+
+    * Additionally slc_session must specify the *key* in the
+      SCS for finding the flavor name.
+    """
+    def __init__(
+        self,
+        secrets: Secrets,
+        working_path: Optional[Path] = None,
+        slc_session: SlcSession = SlcSession.NON_CUDA,
+    ):
         self.working_path = WorkingDir(working_path)
         self.slc_dir = SlcDir(secrets)
         self._secrets = secrets
+        self._slc_session = slc_session
+
+    def flavor_name(self) -> str:
+        key = self._slc_session.value
+        try:
+            return self._secrets[key]
+        except KeyError as ex:
+            raise SlcSessionError("") from ex
 
     def check_slc_repo_complete(self) -> bool:
         """
@@ -132,7 +169,8 @@ class SlctManager:
 
     def clone_slc_repo(self):
         """
-        Clones the script-languages-release repository from Github into the target dir configured in the secret store.
+        Clones the script-languages-release repository from Github into
+        the target dir configured in the secret store.
         """
         if not self.slc_dir.root_dir.is_dir():
             logging.info(f"Cloning into {self.slc_dir}...")
@@ -238,7 +276,9 @@ class SlctManager:
     def append_custom_packages(self, pip_packages: list[PipPackageDefinition]):
         """
         Appends packages to the custom pip file.
-        Note: This method is not idempotent: Multiple calls with the same package definitions will result in duplicated entries.
+
+        Note: This method is not idempotent: Multiple calls with the same
+        package definitions will result in duplicated entries.
         """
         with open(self.slc_dir.custom_pip_file, "a") as f:
             for p in pip_packages:

@@ -51,9 +51,11 @@ class AILabConfig(Enum):
     saas_database_id = auto()
     saas_database_name = auto()
     storage_backend = auto()
-    slc_target_dir = auto()
-    slc_source = auto()
     slc_alias = auto()
+    slc_source = auto()
+    slc_target_dir = auto()
+    slc_flavor_cuda = auto()
+    slc_flavor_non_cuda = auto()
     text_ai_pre_release_url = auto()
     text_ai_zip_password = auto()
 
