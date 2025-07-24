@@ -145,6 +145,17 @@ class WorkingDir:
         shutil.rmtree(self.export_path)
 
 
+# currently:
+# SlctManager(secrets, SlcSession.NON_CUDA)
+# proposal
+# SlctManager(secrets, "SLC_SESSION_NON_CUDA")
+# -> requires secrets to contain an entry with key "SLC_SESSION_NON_CUDA"
+# -> requires secrets to contain an entry with key "SLC_FLAVOR_NON_CUDA"
+# Benefit:
+# supporting additional sessions, in application (e.g. Ai Lab) does not
+# require changes to NC
+
+
 class SlcSession(Enum):
     CUDA = CKey.slc_flavor_cuda
     NON_CUDA = CKey.slc_flavor_non_cuda
