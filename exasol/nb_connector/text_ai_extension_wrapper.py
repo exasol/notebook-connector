@@ -11,7 +11,6 @@ from typing import (
     Optional,
 )
 
-import exasol.bucketfs as bfs  # type: ignore
 from exasol.ai.text.deployment import license_deployment as txai_licenses
 from exasol.ai.text.deployment.script_deployer import create_scripts
 from exasol.ai.text.deployment.txaie_language_container_deployer import (
@@ -22,7 +21,6 @@ from exasol.ai.text.extraction import (
 )
 from exasol.ai.text.extraction.abstract_extraction import (
     Defaults,
-    Output,
 )
 from exasol.ai.text.extraction.extraction import Extraction as TextAiExtraction
 from exasol.ai.text.extractors.bucketfs_model_repository import BucketFSRepository
