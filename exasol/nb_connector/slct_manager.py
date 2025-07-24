@@ -152,12 +152,15 @@ class SlctManager:
         self._secrets = secrets
         self._slc_session = slc_session
 
+    @property
     def flavor_name(self) -> str:
         key = self._slc_session.value
         try:
             return self._secrets[key]
-        except KeyError as ex:
-            raise SlcSessionError("") from ex
+        except AttributeError as ex:
+            raise SlcSessionError(
+                f"Secret store does not contain an SLC flavor for session {key}"
+            ) from ex
 
     def check_slc_repo_complete(self) -> bool:
         """
