@@ -151,7 +151,7 @@ def _is_current_container_visible(network_name: str) -> bool:
 
 
 def _get_docker_network(
-        docker_client: docker.DockerClient, network_name: str
+    docker_client: docker.DockerClient, network_name: str
 ) -> Optional[Network]:
     networks = docker_client.networks.list(names=[network_name])
     if len(networks) == 1:

@@ -61,10 +61,10 @@ class SlcDir:
         Returns the path to the custom pip file of the flavor
         """
         return (
-                self.flavor_dir
-                / "flavor_customization"
-                / "packages"
-                / "python3_pip_packages"
+            self.flavor_dir
+            / "flavor_customization"
+            / "packages"
+            / "python3_pip_packages"
         )
 
     @contextlib.contextmanager

@@ -94,7 +94,7 @@ def get_activation_sql(conf: Secrets) -> str:
 
 
 def open_pyexasol_connection_with_lang_definitions(
-        conf: Secrets, **kwargs
+    conf: Secrets, **kwargs
 ) -> pyexasol.ExaConnection:
     """
     Opens a `pyexasol` connection and applies the `ALTER SESSION` command using all registered languages.
