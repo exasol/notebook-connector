@@ -150,7 +150,10 @@ def test_open_pyexasol_connection_error(mock_connect, conf):
 @unittest.mock.patch("pyexasol.connect")
 @unittest.mock.patch("exasol.saas.client.api_access.get_connection_params")
 def test_open_pyexasol_connection_saas(
-    mock_connection_params, mock_connect, conf_saas, saas_connection_params
+    mock_connection_params,
+    mock_connect,
+    conf_saas,
+    saas_connection_params,
 ):
     mock_connection_params.return_value = saas_connection_params
     open_pyexasol_connection(conf_saas)
@@ -190,7 +193,10 @@ def test_open_sqlalchemy_connection_ssl(mock_create_engine, conf):
 @unittest.mock.patch("sqlalchemy.create_engine")
 @unittest.mock.patch("exasol.saas.client.api_access.get_connection_params")
 def test_open_sqlalchemy_connection_saas(
-    mock_connection_params, mock_create_engine, conf_saas, saas_connection_params
+    mock_connection_params,
+    mock_create_engine,
+    conf_saas,
+    saas_connection_params,
 ):
     mock_connection_params.return_value = saas_connection_params
     open_sqlalchemy_connection(conf_saas)
