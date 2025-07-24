@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import contextlib
 import logging
 import os
@@ -117,7 +118,7 @@ class SlcDir:
 
 
 class WorkingDir:
-    def __init__(self, p: Optional[Path]):
+    def __init__(self, p: Path | None):
         if p is None:
             self.root_dir = Path.cwd()
         else:
@@ -179,10 +180,11 @@ class SlctManager:
     AILabConfig.slc_flavor_cuda and AILabConfig.slc_flavor_non_cuda.
     Otherwise SlctManager will raise an SlcFlavorNotFoundError.
     """
+
     def __init__(
         self,
         secrets: Secrets,
-        working_path: Optional[Path] = None,
+        working_path: Path | None = None,
         slc_session: SlcSession = SlcSession.NON_CUDA,
     ):
         self._secrets = secrets

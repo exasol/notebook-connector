@@ -22,10 +22,13 @@ def populated_secrets(secrets) -> Secrets:
     return secrets
 
 
-@pytest.mark.parametrize ("session, expected_flavor", [
-    (SlcSession.CUDA, CUDA_FLAVOR),
-    (SlcSession.NON_CUDA, NON_CUDA_FLAVOR),
-])
+@pytest.mark.parametrize(
+    "session, expected_flavor",
+    [
+        (SlcSession.CUDA, CUDA_FLAVOR),
+        (SlcSession.NON_CUDA, NON_CUDA_FLAVOR),
+    ],
+)
 def test_existing_flavor(
     populated_secrets: Secrets,
     session: SlcSession,
