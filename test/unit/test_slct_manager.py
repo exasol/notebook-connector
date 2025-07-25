@@ -48,8 +48,8 @@ def test_existing_flavor(
 
 def test_undefined_flavor(slc_secrets: Secrets):
     """
-    secrets does not contain the key SlcSession.CUDA.  Tests expects
-    SlctManager to raise an SlcFlavorNotFoundError
+    secrets does not contain the key for SLC session "CUDA".  The test
+    expects SlctManager to raise an SlctManagerMissingScsEntry.
     """
     with pytest.raises(
         SlctManagerMissingScsEntry, match="does not contain an SLC flavor"
@@ -59,8 +59,9 @@ def test_undefined_flavor(slc_secrets: Secrets):
 
 def test_default_flavor(slc_secrets: Secrets):
     """
-    secrets does not contain any key.  The test case still expects
-    the SlctManager to return the default flavor for the default session.
+    secrets does not contain the key for any SLC flavor.  The test still
+    expects the SlctManager to return the default flavor for the default
+    session.
     """
     testee = SlctManager(slc_secrets, slc_session=SlcSession.DEFAULT)
     assert testee.flavor_name == SlcSession.DEFAULT_FLAVOR
