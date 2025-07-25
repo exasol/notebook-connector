@@ -36,8 +36,6 @@ def test_existing_flavor(
     expected_flavor: str,
 ):
     testee = SlctManager(populated_secrets, slc_session=session)
-    # this test is redundant
-    # assert testee.slc_dir.flavor_name == expected_flavor
     expected = FLAVORS_PATH_IN_SLC_REPO / expected_flavor
     assert testee.flavor_path == str(expected)
 
