@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 from collections import namedtuple
+from dataclasses import dataclass
 from pathlib import Path
 from typing import (
     Optional,
@@ -53,11 +54,13 @@ def slc_flavor_key(slc_session: str):
     return f"SLC_FLAVOR_{slc_session}"
 
 
+@dataclass
 class SlcPaths:
-
-    def __init__(self, flavor_name: str, root_dir: Path):
-        self.flavor_name = flavor_name
-        self.root_dir = root_dir
+    """
+    Central properties for managing an SLC.
+    """
+    flavor_name: str
+    root_dir: Path
 
     @property
     def flavor_path_in_slc_repo(self) -> Path:
