@@ -111,7 +111,7 @@ def test_append_custom_packages(
     slct_manager.append_custom_packages(
         [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
     )
-    with open(slct_manager.slc_dir.custom_pip_file) as f:
+    with open(slct_manager.slc_paths.custom_pip_file) as f:
         pip_content = f.read()
         for custom_package, version, _ in custom_packages:
             assert f"{custom_package}|{version}" in pip_content
