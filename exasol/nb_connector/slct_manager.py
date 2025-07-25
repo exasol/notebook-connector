@@ -53,12 +53,6 @@ def slc_flavor_key(slc_session: str):
     return f"SLC_FLAVOR_{slc_session}"
 
 
-# Maybe we could find a better name for this class?
-#
-# E.g.
-# - SlcCoordinates
-# - SlcMetadata
-# - SlcLocation
 class SlcPaths:
 
     def __init__(self, flavor_name: str, root_dir: Path):
