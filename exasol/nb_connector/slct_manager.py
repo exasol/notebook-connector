@@ -187,15 +187,15 @@ class SlctManager:
         slc_session: str = DEFAULT_SLC_SESSION,
     ):
         self._secrets = secrets
-        self.working_path = WorkingDir(working_path)
-        self.slc_dir = SlcPaths.from_secrets(secrets, slc_session)
+        self.working_dir = WorkingDir(working_path)
+        self.slc_paths = SlcPaths.from_secrets(secrets, slc_session)
 
     def check_slc_repo_complete(self) -> bool:
         """
         Checks if the target dir for the script-languages repository is present and correct.
         """
-        print(f"Script-languages repository path is '{self.slc_dir}'")
-        if not self.slc_dir.flavor_dir.is_dir():
+        print(f"Script-languages repository path is '{self.slc_paths}'")
+        if not self.slc_paths.flavor_dir.is_dir():
             return False
         return True
 
@@ -204,33 +204,33 @@ class SlctManager:
         Clones the script-languages-release repository from Github into
         the target dir configured in the secret store.
         """
-        if not self.slc_dir.root_dir.is_dir():
-            logging.info(f"Cloning into {self.slc_dir}...")
+        if not self.slc_paths.root_dir.is_dir():
+            logging.info(f"Cloning into {self.slc_paths}...")
             repo = Repo.clone_from(
                 "https://github.com/exasol/script-languages-release",
-                self.slc_dir.root_dir,
+                self.slc_paths.root_dir,
                 branch=SLC_RELEASE_TAG,
             )
             logging.info("Fetching submodules...")
             repo.submodule_update(recursive=True)
         else:
             logging.warning(
-                f"Directory '{self.slc_dir}' already exists. Skipping cloning...."
+                f"Directory '{self.slc_paths}' already exists. Skipping cloning...."
             )
 
     @property
     def flavor_path(self) -> str:
-        return str(self.slc_dir.flavor_path_in_slc_repo)
+        return str(self.slc_paths.flavor_path_in_slc_repo)
 
     def export(self):
         """
         Exports the current script-languages-container to the export directory.
         """
-        with self.slc_dir.enter():
+        with self.slc_paths.enter():
             exaslct_api.export(
                 flavor_path=(self.flavor_path,),
-                export_path=str(self.working_path.export_path),
-                output_directory=str(self.working_path.output_path),
+                export_path=str(self.working_dir.export_path),
+                output_directory=str(self.working_dir.output_path),
                 release_name=self.language_alias,
             )
 
@@ -246,7 +246,7 @@ class SlctManager:
         bucketfs_username = self._secrets.get(CKey.bfs_user)
         bucketfs_password = self._secrets.get(CKey.bfs_password)
 
-        with self.slc_dir.enter():
+        with self.slc_paths.enter():
             exaslct_api.upload(
                 flavor_path=(self.flavor_path,),
                 database_host=database_host,
@@ -257,9 +257,9 @@ class SlctManager:
                 bucketfs_password=bucketfs_password,
                 path_in_bucket=PATH_IN_BUCKET,
                 release_name=self.language_alias,
-                output_directory=str(self.working_path.output_path),
+                output_directory=str(self.working_dir.output_path),
             )
-            container_name = f"{self.slc_dir.flavor_name}-release-{self.language_alias}"
+            container_name = f"{self.slc_paths.flavor_name}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(
                 flavor_path=self.flavor_path,
                 bucketfs_name=bucketfs_name,
@@ -316,7 +316,7 @@ class SlctManager:
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
-        with open(self.slc_dir.custom_pip_file, "a") as f:
+        with open(self.slc_paths.custom_pip_file, "a") as f:
             for p in pip_packages:
                 print(f"{p.pkg}|{p.version}", file=f)
 
@@ -332,5 +332,5 @@ class SlctManager:
         Deletes all local docker images.
         """
         exaslct_api.clean_all_images(
-            output_directory=str(self.working_path.output_path)
+            output_directory=str(self.working_dir.output_path)
         )
