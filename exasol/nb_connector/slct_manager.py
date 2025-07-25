@@ -174,7 +174,7 @@ class SlctManager:
     Configuration Storage (SCS / secrets / conf) using the key
     slc_flavor_key(slc_session), e.g. "SLC_FLAVOR_NON_CUDA".
 
-    Otherwise SlctManager will raise an SlcSessionError.
+    Otherwise SlctManager will raise an SlctManagerMissingScsEntry.
 
     Additionally, the caller needs to ensure, that a flavor with this name is
     contained in the SLC release specified in variable SLC_RELEASE_TAG.
