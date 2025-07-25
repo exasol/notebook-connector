@@ -47,5 +47,7 @@ def test_undefined_flavor(secrets: Secrets):
     secrets does not contain value for the key SlcSession.CUDA.
     Tests expects SlctManager to raise an SlcFlavorNotFoundError
     """
-    with pytest.raises(SlctManagerMissingScsEntry, match="does not contain an SLC flavor"):
+    with pytest.raises(
+        SlctManagerMissingScsEntry, match="does not contain an SLC flavor"
+    ):
         SlctManager(secrets, slc_session="CUDA")
