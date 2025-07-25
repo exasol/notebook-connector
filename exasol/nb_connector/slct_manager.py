@@ -56,6 +56,7 @@ class SlcPaths:
     """
     Central properties for managing an SLC.
     """
+
     flavor_name: str
     root_dir: Path
 
