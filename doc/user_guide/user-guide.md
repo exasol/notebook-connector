@@ -9,5 +9,5 @@ Class `SlctManager` in the Notebook Connector (NC) supports building different f
 
 The constructor therefore supports the additional optional parameter `session`:
 
-![](slct-manager-parameters.png)
+![](slct-manager-parameters.drawio.png)
 
