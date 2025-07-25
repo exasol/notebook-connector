@@ -1,5 +1,9 @@
 # Unreleased
 
+## Features
+
+* #213: Added Support to specify the SLC flavor via a session parameter
+
 ## Refactorings
 
 * #211: Modularized execution of integration tests in CI
