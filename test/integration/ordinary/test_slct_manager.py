@@ -20,7 +20,6 @@ from exasol.nb_connector.slct_manager import (
     DEFAULT_SLC_SESSION,
     PipPackageDefinition,
     SlctManager,
-    slc_flavor_key,
 )
 
 
@@ -41,7 +40,7 @@ def slc_secrets(secrets_file, working_path) -> Secrets:
     secrets.save(
         AILabConfig.slc_target_dir, str(working_path / "script_languages_release")
     )
-    secrets.save(slc_flavor_key(DEFAULT_SLC_SESSION), "template-Exasol-all-python-3.10")
+    DEFAULT_SLC_SESSION.save_flavor(secrets, "template-Exasol-all-python-3.10")
     return secrets
 
 
@@ -76,7 +75,7 @@ def test_check_slc_config(slct_manager):
 @pytest.mark.dependency(name="export_slc", depends=["check_config"])
 def test_export_slc(slct_manager):
     slct_manager.export()
-    export_path = slct_manager.working_dir.export_path
+    export_path = slct_manager.workspace.export_path
     assert export_path.exists()
     tgz = [f for f in export_path.glob("*.tar.gz")]
     assert len(tgz) == 1
@@ -200,13 +199,13 @@ def test_clean_up_images(slct_manager: SlctManager):
 
 @pytest.mark.dependency(name="clean_up_output_path", depends=["clean_up_images"])
 def test_clean_output(slct_manager: SlctManager):
-    slct_manager.working_dir.cleanup_output_path()
-    p = Path(slct_manager.working_dir.output_path)
+    slct_manager.workspace.cleanup_output_path()
+    p = Path(slct_manager.workspace.output_path)
     assert not p.is_dir()
 
 
 @pytest.mark.dependency(name="clean_up_export_path", depends=["clean_up_images"])
 def test_clean_export(slct_manager: SlctManager):
-    slct_manager.working_dir.cleanup_export_path()
-    p = Path(slct_manager.working_dir.export_path)
+    slct_manager.workspace.cleanup_export_path()
+    p = Path(slct_manager.workspace.export_path)
     assert not p.is_dir()

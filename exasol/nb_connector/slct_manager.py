@@ -40,15 +40,50 @@ Using the SLC_RELEASE 9.6.0 because we are limited to slc-tool 3.*. (see pyproje
 Check the developer guide (./doc/developer-guide.md) for more information.
 """
 
-DEFAULT_SLC_SESSION = "NON_CUDA"
+
+class SlcSession:
+    DEFAULT = "DEFAULT"
+    DEFAULT_FLAVOR = "template-Exasol-all-python-3.10"
+    """
+    This flavor is used if SlcSession.DEFAULT is used and still the Secure
+    Configuration Storage (SCS / secrets / conf) does not contain any flavor
+    for this session.
+    """
+
+    def __init__(self, name: str):
+        self.name = name
+
+    @property
+    def flavor_key(self) -> str:
+        """
+        Return the key in SCS for looking up the name of the SLC flavor.
+        """
+        return f"SLC_FLAVOR_{self.name}"
+
+    def flavor_name(self, secrets: Secrets) -> str:
+        """
+        Read the flavor name associated with the current session from the
+        SCS.
+        """
+        try:
+            return secrets[self.flavor_key]
+        except AttributeError as ex:
+            if self.name == self.DEFAULT:
+                return self.DEFAULT_FLAVOR
+            raise SlctManagerMissingScsEntry(
+                "Secret store does not contain an"
+                f" SLC flavor for session {self.name}"
+            ) from ex
+
+    def save_flavor(self, secrets: Secrets, flavor_name: str) -> None:
+        """
+        Save the specified flavor_name into the SCS using the slc_session
+        name as key.
+        """
+        secrets.save(self.flavor_key, flavor_name)
 
 
-def slc_flavor_key(slc_session: str):
-    """
-    Returns the key in Secure Configuration Storage (SCS / secrets / conf)
-    for looking up the name of the SLC flavor.
-    """
-    return f"SLC_FLAVOR_{slc_session}"
+DEFAULT_SLC_SESSION = SlcSession(SlcSession.DEFAULT)
 
 
 @dataclass
@@ -99,15 +134,7 @@ class SlcPaths:
 
     @classmethod
     def from_secrets(cls, secrets: Secrets, slc_session: str) -> SlcPaths:
-        key = slc_flavor_key(slc_session)
-        try:
-            flavor_name = secrets[key]
-        except AttributeError as ex:
-            raise SlctManagerMissingScsEntry(
-                "Secret store does not contain an"
-                f" SLC flavor for session {slc_session}"
-            ) from ex
-
+        flavor_name = SlcSession(slc_session).flavor_name(secrets)
         try:
             root_dir = secrets[AILabConfig.slc_target_dir]
         except AttributeError as ex:
@@ -117,7 +144,7 @@ class SlcPaths:
         return cls(flavor_name, Path(root_dir))
 
 
-class WorkingDir:
+class Workspace:
     def __init__(self, p: Path | None):
         if p is None:
             self.root_dir = Path.cwd()
@@ -172,7 +199,7 @@ class SlctManager:
 
     The caller needs ensure the flavor name is stored in the Secure
     Configuration Storage (SCS / secrets / conf) using the key
-    slc_flavor_key(slc_session), e.g. "SLC_FLAVOR_NON_CUDA".
+    SlcSession(slc_session).flavor_key, e.g. "SLC_FLAVOR_NON_CUDA".
 
     Otherwise SlctManager will raise an SlctManagerMissingScsEntry.
 
@@ -184,11 +211,15 @@ class SlctManager:
         self,
         secrets: Secrets,
         working_path: Path | None = None,
-        slc_session: str = DEFAULT_SLC_SESSION,
+        slc_session: str = SlcSession.DEFAULT,
     ):
         self._secrets = secrets
-        self.working_dir = WorkingDir(working_path)
+        self.workspace = Workspace(working_path)
         self.slc_paths = SlcPaths.from_secrets(secrets, slc_session)
+
+    @property
+    def flavor_name(self) -> str:
+        return self.slc_paths.flavor_name
 
     def check_slc_repo_complete(self) -> bool:
         """
@@ -229,8 +260,8 @@ class SlctManager:
         with self.slc_paths.enter():
             exaslct_api.export(
                 flavor_path=(self.flavor_path,),
-                export_path=str(self.working_dir.export_path),
-                output_directory=str(self.working_dir.output_path),
+                export_path=str(self.workspace.export_path),
+                output_directory=str(self.workspace.output_path),
                 release_name=self.language_alias,
             )
 
@@ -257,11 +288,9 @@ class SlctManager:
                 bucketfs_password=bucketfs_password,
                 path_in_bucket=PATH_IN_BUCKET,
                 release_name=self.language_alias,
-                output_directory=str(self.working_dir.output_path),
+                output_directory=str(self.workspace.output_path),
             )
-            container_name = (
-                f"{self.slc_paths.flavor_name}-release-{self.language_alias}"
-            )
+            container_name = f"{self.flavor_name}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(
                 flavor_path=self.flavor_path,
                 bucketfs_name=bucketfs_name,
@@ -333,4 +362,4 @@ class SlctManager:
         """
         Deletes all local docker images.
         """
-        exaslct_api.clean_all_images(output_directory=str(self.working_dir.output_path))
+        exaslct_api.clean_all_images(output_directory=str(self.workspace.output_path))
