@@ -259,7 +259,9 @@ class SlctManager:
                 release_name=self.language_alias,
                 output_directory=str(self.working_dir.output_path),
             )
-            container_name = f"{self.slc_paths.flavor_name}-release-{self.language_alias}"
+            container_name = (
+                f"{self.slc_paths.flavor_name}-release-{self.language_alias}"
+            )
             result = exaslct_api.generate_language_activation(
                 flavor_path=self.flavor_path,
                 bucketfs_name=bucketfs_name,
@@ -331,6 +333,4 @@ class SlctManager:
         """
         Deletes all local docker images.
         """
-        exaslct_api.clean_all_images(
-            output_directory=str(self.working_dir.output_path)
-        )
+        exaslct_api.clean_all_images(output_directory=str(self.working_dir.output_path))
