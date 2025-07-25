@@ -1,15 +1,5 @@
 # Unreleased
 
-## Summary
-
-<!--
-Current implementation no longer requires a breaking change.
-
-This release comes with a breaking change in class `SlctManager`.  Since version 1.0.0 the constructor of `SlctManager` requires to specify the additional parameter `session`.
-
-Please see the [Notebook Connector User Guide](https://github.com/exasol/notebook-connector/blob/main/doc/user_guide/user-guide.md) for details.
--->
-
 ## Features
 
 * #213: Added Support to specify the SLC flavor via a session parameter

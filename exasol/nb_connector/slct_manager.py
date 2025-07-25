@@ -6,10 +6,6 @@ import os
 import re
 import shutil
 from collections import namedtuple
-from enum import (
-    Enum,
-    auto,
-)
 from pathlib import Path
 from typing import (
     Optional,
@@ -43,13 +39,24 @@ PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
 SLC_RELEASE_TAG = "9.6.0"
 
 
+DEFAULT_SLC_SESSION = "NON_CUDA"
+
+
+def slc_flavor_key(slc_session: str):
+    """
+    Returns the key in Secure Configuration Storage (SCS / secrets / conf)
+    for looking up the name of the SLC flavor.
+    """
+    return f"SLC_FLAVOR_{slc_session}"
+
+
 # Maybe we could find a better name for this class?
 #
 # E.g.
 # - SlcCoordinates
 # - SlcMetadata
 # - SlcLocation
-class SlcDir:
+class SlcPaths:
 
     def __init__(self, flavor_name: str, root_dir: Path):
         self.flavor_name = flavor_name
@@ -93,19 +100,20 @@ class SlcDir:
         return str(self.root_dir)
 
     @classmethod
-    def from_secrets(cls, secrets: Secrets, slc_session: SlcSession) -> SlcDir:
-        key = slc_session.value
+    def from_secrets(cls, secrets: Secrets, slc_session: str) -> SlcPaths:
+        key = slc_flavor_key(slc_session)
         try:
             flavor_name = secrets[key]
         except AttributeError as ex:
-            raise SlctManagerError(
-                f"Secret store does not contain an SLC flavor for session {key}"
+            raise SlctManagerMissingScsEntry(
+                "Secret store does not contain an"
+                f" SLC flavor for session {slc_session}"
             ) from ex
 
         try:
             root_dir = secrets[AILabConfig.slc_target_dir]
         except AttributeError as ex:
-            raise SlctManagerError(
+            raise SlctManagerMissingScsEntry(
                 "Secret store does not contain an SLC target directory"
             ) from ex
         return cls(flavor_name, Path(root_dir))
@@ -145,23 +153,7 @@ class WorkingDir:
         shutil.rmtree(self.export_path)
 
 
-# currently:
-# SlctManager(secrets, SlcSession.NON_CUDA)
-# proposal
-# SlctManager(secrets, "SLC_SESSION_NON_CUDA")
-# -> requires secrets to contain an entry with key "SLC_SESSION_NON_CUDA"
-# -> requires secrets to contain an entry with key "SLC_FLAVOR_NON_CUDA"
-# Benefit:
-# supporting additional sessions, in application (e.g. Ai Lab) does not
-# require changes to NC
-
-
-class SlcSession(Enum):
-    CUDA = CKey.slc_flavor_cuda
-    NON_CUDA = CKey.slc_flavor_non_cuda
-
-
-class SlctManagerError(Exception):
+class SlctManagerMissingScsEntry(Exception):
     """
     In case the Secure Configuration Storage (SCS / secrets / conf)
     does not contain specific data required for using the SlctManager.
@@ -181,20 +173,24 @@ class SlctManager:
       the flavor name from the SCS
 
     The caller needs ensure the flavor name is stored in the Secure
-    Configuration Storage (SCS / secrets / conf) using the keys
-    AILabConfig.slc_flavor_cuda and AILabConfig.slc_flavor_non_cuda.
-    Otherwise SlctManager will raise an SlcFlavorNotFoundError.
+    Configuration Storage (SCS / secrets / conf) using the key
+    slc_flavor_key(slc_session), e.g. "SLC_FLAVOR_NON_CUDA".
+
+    Otherwise SlctManager will raise an SlcSessionError.
+
+    Additionally, the caller needs to ensure, that a flavor with this name is
+    contained in the SLC release specified in variable SLC_RELEASE_TAG.
     """
 
     def __init__(
         self,
         secrets: Secrets,
         working_path: Path | None = None,
-        slc_session: SlcSession = SlcSession.NON_CUDA,
+        slc_session: str = DEFAULT_SLC_SESSION,
     ):
         self._secrets = secrets
         self.working_path = WorkingDir(working_path)
-        self.slc_dir = SlcDir.from_secrets(secrets, slc_session)
+        self.slc_dir = SlcPaths.from_secrets(secrets, slc_session)
 
     def check_slc_repo_complete(self) -> bool:
         """

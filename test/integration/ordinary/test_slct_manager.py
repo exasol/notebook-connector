@@ -17,8 +17,10 @@ from exasol.nb_connector.language_container_activation import (
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slct_manager import (
+    DEFAULT_SLC_SESSION,
     PipPackageDefinition,
     SlctManager,
+    slc_flavor_key,
 )
 
 
@@ -39,7 +41,7 @@ def slc_secrets(secrets_file, working_path) -> Secrets:
     secrets.save(
         AILabConfig.slc_target_dir, str(working_path / "script_languages_release")
     )
-    secrets.save(AILabConfig.slc_flavor_non_cuda, "template-Exasol-all-python-3.10")
+    secrets.save(slc_flavor_key(DEFAULT_SLC_SESSION), "template-Exasol-all-python-3.10")
     return secrets
 
 
