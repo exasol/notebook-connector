@@ -41,6 +41,7 @@ Using the SLC_RELEASE 9.6.0 because we are limited to slc-tool 3.*. (see pyproje
 Check the developer guide (./doc/developer-guide.md) for more information.
 """
 
+
 @dataclass(frozen=True)
 class SlcSession:
     name: str
@@ -216,7 +217,7 @@ class SlctManager:
         self,
         secrets: Secrets,
         working_path: Path | None = None,
-        slc_session = DEFAULT_SLC_SESSION,
+        slc_session=DEFAULT_SLC_SESSION,
     ):
         self._secrets = secrets
         self.workspace = Workspace(working_path)
