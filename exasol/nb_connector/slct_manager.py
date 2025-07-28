@@ -8,6 +8,7 @@ import shutil
 from collections import namedtuple
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 from exasol.slc import api as exaslct_api
 from exasol_integration_test_docker_environment.lib.docker import (
@@ -40,18 +41,17 @@ Using the SLC_RELEASE 9.6.0 because we are limited to slc-tool 3.*. (see pyproje
 Check the developer guide (./doc/developer-guide.md) for more information.
 """
 
-
+@dataclass(frozen=True)
 class SlcSession:
-    DEFAULT = "DEFAULT"
+    name: str
+
+    DEFAULT_NAME = "DEFAULT"
     DEFAULT_FLAVOR = "template-Exasol-all-python-3.10"
     """
     This flavor is used if SlcSession.DEFAULT is used and still the Secure
     Configuration Storage (SCS / secrets / conf) does not contain any flavor
     for this session.
     """
-
-    def __init__(self, name: str):
-        self.name = name
 
     @property
     def flavor_key(self) -> str:
@@ -68,7 +68,12 @@ class SlcSession:
         try:
             return secrets[self.flavor_key]
         except AttributeError as ex:
-            if self.name == self.DEFAULT:
+            if self.name == self.DEFAULT_NAME:
+                logging.warning(
+                    "Secret store does not contain an"
+                    f" SLC flavor for session {self.name}. "
+                    f"Using default flavor {self.DEFAULT_FLAVOR}."
+                )
                 return self.DEFAULT_FLAVOR
             raise SlctManagerMissingScsEntry(
                 "Secret store does not contain an"
@@ -83,7 +88,7 @@ class SlcSession:
         secrets.save(self.flavor_key, flavor_name)
 
 
-DEFAULT_SLC_SESSION = SlcSession(SlcSession.DEFAULT)
+DEFAULT_SLC_SESSION = SlcSession(SlcSession.DEFAULT_NAME)
 
 
 @dataclass
@@ -133,8 +138,8 @@ class SlcPaths:
         return str(self.root_dir)
 
     @classmethod
-    def from_secrets(cls, secrets: Secrets, slc_session: str) -> SlcPaths:
-        flavor_name = SlcSession(slc_session).flavor_name(secrets)
+    def from_secrets(cls, secrets: Secrets, slc_session: SlcSession) -> SlcPaths:
+        flavor_name = slc_session.flavor_name(secrets)
         try:
             root_dir = secrets[AILabConfig.slc_target_dir]
         except AttributeError as ex:
@@ -211,7 +216,7 @@ class SlctManager:
         self,
         secrets: Secrets,
         working_path: Path | None = None,
-        slc_session: str = SlcSession.DEFAULT,
+        slc_session = DEFAULT_SLC_SESSION,
     ):
         self._secrets = secrets
         self.workspace = Workspace(working_path)

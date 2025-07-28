@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import pytest
@@ -30,7 +31,7 @@ def populated_secrets(slc_secrets) -> Secrets:
 
 
 @pytest.mark.parametrize(
-    "session, expected_flavor",
+    "session_name, expected_flavor",
     [
         ("CUDA", CUDA_FLAVOR),
         ("NON_CUDA", NON_CUDA_FLAVOR),
@@ -38,10 +39,11 @@ def populated_secrets(slc_secrets) -> Secrets:
 )
 def test_existing_flavor(
     populated_secrets: Secrets,
-    session: str,
+    session_name: str,
     expected_flavor: str,
 ):
-    testee = SlctManager(populated_secrets, slc_session=session)
+    slc_session = SlcSession(session_name)
+    testee = SlctManager(populated_secrets, slc_session=slc_session)
     expected = FLAVORS_PATH_IN_SLC_REPO / expected_flavor
     assert testee.flavor_path == str(expected)
 
@@ -54,17 +56,18 @@ def test_undefined_flavor(slc_secrets: Secrets):
     with pytest.raises(
         SlctManagerMissingScsEntry, match="does not contain an SLC flavor"
     ):
-        SlctManager(slc_secrets, slc_session="CUDA")
+        SlctManager(slc_secrets, slc_session=SlcSession("CUDA"))
 
 
-def test_default_flavor(slc_secrets: Secrets):
+def test_default_flavor(slc_secrets: Secrets, caplog):
     """
     secrets does not contain the key for any SLC flavor.  The test still
     expects the SlctManager to return the default flavor for the default
     session.
     """
-    testee = SlctManager(slc_secrets, slc_session=SlcSession.DEFAULT)
+    testee = SlctManager(slc_secrets)
     assert testee.flavor_name == SlcSession.DEFAULT_FLAVOR
+    assert re.match("WARNING .* Using default flavor", caplog.text)
 
 
 def test_save_flavor(slc_secrets):
