@@ -203,7 +203,7 @@ class SlctManager:
     * Additionally slc_session must specify the key for retrieving
       the flavor name from the SCS
 
-    The caller needs ensure the flavor name is stored in the Secure
+    The caller needs to ensure the flavor name is stored in the Secure
     Configuration Storage (SCS / secrets / conf) using the key
     SlcSession(slc_session).flavor_key, e.g. "SLC_FLAVOR_NON_CUDA".
 
