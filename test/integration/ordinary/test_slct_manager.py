@@ -17,6 +17,7 @@ from exasol.nb_connector.language_container_activation import (
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slct_manager import (
+    DEFAULT_SLC_SESSION,
     PipPackageDefinition,
     SlctManager,
 )
@@ -39,6 +40,7 @@ def slc_secrets(secrets_file, working_path) -> Secrets:
     secrets.save(
         AILabConfig.slc_target_dir, str(working_path / "script_languages_release")
     )
+    DEFAULT_SLC_SESSION.save_flavor(secrets, "template-Exasol-all-python-3.10")
     return secrets
 
 
@@ -73,7 +75,7 @@ def test_check_slc_config(slct_manager):
 @pytest.mark.dependency(name="export_slc", depends=["check_config"])
 def test_export_slc(slct_manager):
     slct_manager.export()
-    export_path = slct_manager.working_path.export_path
+    export_path = slct_manager.workspace.export_path
     assert export_path.exists()
     tgz = [f for f in export_path.glob("*.tar.gz")]
     assert len(tgz) == 1
@@ -108,7 +110,7 @@ def test_append_custom_packages(
     slct_manager.append_custom_packages(
         [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
     )
-    with open(slct_manager.slc_dir.custom_pip_file) as f:
+    with open(slct_manager.slc_paths.custom_pip_file) as f:
         pip_content = f.read()
         for custom_package, version, _ in custom_packages:
             assert f"{custom_package}|{version}" in pip_content
@@ -197,13 +199,13 @@ def test_clean_up_images(slct_manager: SlctManager):
 
 @pytest.mark.dependency(name="clean_up_output_path", depends=["clean_up_images"])
 def test_clean_output(slct_manager: SlctManager):
-    slct_manager.working_path.cleanup_output_path()
-    p = Path(slct_manager.working_path.output_path)
+    slct_manager.workspace.cleanup_output_path()
+    p = Path(slct_manager.workspace.output_path)
     assert not p.is_dir()
 
 
 @pytest.mark.dependency(name="clean_up_export_path", depends=["clean_up_images"])
 def test_clean_export(slct_manager: SlctManager):
-    slct_manager.working_path.cleanup_export_path()
-    p = Path(slct_manager.working_path.export_path)
+    slct_manager.workspace.cleanup_export_path()
+    p = Path(slct_manager.workspace.export_path)
     assert not p.is_dir()

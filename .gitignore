@@ -9,3 +9,5 @@ __pycache__/
 /.html-documentation/
 /.security.json
 .build_output
+# drawio backup files
+/doc/user_guide/*.bkp
