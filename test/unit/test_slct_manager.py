@@ -75,7 +75,7 @@ def test_empty_session_name(name):
     """
     Verify empty string or None are not accepted as name of a session.
     """
-    with pytest.raises(AssertionError):
+    with pytest.raises(RuntimeError):
         SlcSession(name=name)
 
 

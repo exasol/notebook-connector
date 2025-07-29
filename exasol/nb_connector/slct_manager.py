@@ -55,7 +55,10 @@ class SlcSession:
     """
 
     def __post_init__(self):
-        assert self.name
+        if not self.name:
+            raise RuntimeError(
+                f'{type(self)}.name = "{self.name}" must not be empty.'
+            )
 
     @property
     def flavor_key(self) -> str:
