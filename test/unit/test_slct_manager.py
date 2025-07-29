@@ -70,6 +70,15 @@ def test_default_flavor(slc_secrets: Secrets, caplog):
     assert re.match("WARNING .* Using default flavor", caplog.text)
 
 
+@pytest.mark.parametrize ("name", ["", None])
+def test_empty_session_name(name):
+    """
+    Verify empty string or None are not accepted as name of a session.
+    """
+    with pytest.raises(AssertionError):
+        SlcSession(name=name)
+
+
 def test_save_flavor(slc_secrets):
     DEFAULT_SLC_SESSION.save_flavor(slc_secrets, "abc")
     testee = SlctManager(slc_secrets)

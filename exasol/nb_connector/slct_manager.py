@@ -54,6 +54,9 @@ class SlcSession:
     for this session.
     """
 
+    def __post_init__(self):
+        assert self.name
+
     @property
     def flavor_key(self) -> str:
         """
