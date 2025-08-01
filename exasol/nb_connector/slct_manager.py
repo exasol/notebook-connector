@@ -26,8 +26,8 @@ PATH_IN_BUCKET = "container"
 
 SLC_ACTIVATION_KEY_PREFIX = ACTIVATION_KEY_PREFIX + "slc_"
 """
-Activation SQL for the Custom SLC will be saved in the secret store with
-this key.
+Activation SQL for the Custom SLC will be saved in the Secure
+Configuration Storage with this key.
 """
 
 FLAVORS_PATH_IN_SLC_REPO = Path("flavors")
@@ -75,13 +75,13 @@ class SlcSession:
         except AttributeError as ex:
             if self.name == self.DEFAULT_NAME:
                 logging.warning(
-                    "Secret store does not contain an"
+                    "Secure Configuration Storage does not contain an"
                     f" SLC flavor for session {self.name}. "
                     f"Using default flavor {self.DEFAULT_FLAVOR}."
                 )
                 return self.DEFAULT_FLAVOR
             raise SlctManagerMissingScsEntry(
-                "Secret store does not contain an"
+                "Secure Configuration Storage does not contain an"
                 f" SLC flavor for session {self.name}"
             ) from ex
 
@@ -149,7 +149,8 @@ class SlcPaths:
             root_dir = secrets[AILabConfig.slc_target_dir]
         except AttributeError as ex:
             raise SlctManagerMissingScsEntry(
-                "Secret store does not contain an SLC target directory"
+                "Secure Configuration Storage does"
+                " not contain an SLC target directory"
             ) from ex
         return cls(flavor_name, Path(root_dir))
 
@@ -190,8 +191,8 @@ class Workspace:
 
 class SlctManagerMissingScsEntry(Exception):
     """
-    In case the Secure Configuration Storage (SCS / secrets / conf)
-    does not contain specific data required for using the SlctManager.
+    In case the Secure Configuration Storage (SCS / secrets / conf) does
+    not contain specific data required for using the SlctManager.
 
     E.g. the flavor for the specified SLC session or the SLC target directory.
     """
@@ -243,7 +244,7 @@ class SlctManager:
     def clone_slc_repo(self):
         """
         Clones the script-languages-release repository from Github into
-        the target dir configured in the secret store.
+        the target dir configured in the Secure Configuration Storage.
         """
         if not self.slc_paths.root_dir.is_dir():
             logging.info(f"Cloning into {self.slc_paths}...")
@@ -277,8 +278,8 @@ class SlctManager:
 
     def upload(self):
         """
-        Uploads the current script-languages-container to the database
-        and stores the activation string in the secret store.
+        Uploads the current script-languages-container to the database and
+        stores the activation string in the Secure Configuration Storage.
         """
         bucketfs_name = self._secrets.get(CKey.bfs_service)
         bucket_name = self._secrets.get(CKey.bfs_bucket)
@@ -346,7 +347,7 @@ class SlctManager:
     @language_alias.setter
     def language_alias(self, alias: str):
         """
-        Stores the language alias in the secret store.
+        Stores the language alias in the Secure Configuration Storage.
         """
         self._secrets.save(AILabConfig.slc_alias, alias)
 

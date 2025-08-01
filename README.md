@@ -9,7 +9,7 @@ Connection configuration management and additional tools for Jupyter notebook ap
 
 ## Features
 
-Exasol Notebook Connector (ENC) currently contains a **Secret Store** that can be used in Jupyter notebook applications to store arbitrary credentials and configuration items, such as user names, passwords, URLs, etc.
+Exasol Notebook Connector (ENC) currently contains a **Secure Configuration Storage** that can be used in Jupyter notebook applications to store arbitrary credentials and configuration items, such as user names, passwords, URLs, etc.
 
 By that users of such notebook applications
 * need to enter their credentials and configuration items only once
@@ -31,10 +31,10 @@ value = secrets.get(key)
 
 #### Constraints and Special Situations
 
-* If file does not exist then SecretStore will create it.
-* If password is wrong then SecretStore will throw an exception.
+* If file does not exist then class `Secrets` will create it.
+* If password is wrong then `Secrets` will throw an exception.
 * If file contains key from a session in the past then method `secrets.save()` will overwrite the value for this key.
-* If key is not contained in file then SecretStore returns `None`.
+* If key is not contained in file then method `get()` returns `None`.
 * Saving multiple keys can be chained: `secrets.save("key-1", "A").save("key-2", "B")`
 
 ## Additional Information
