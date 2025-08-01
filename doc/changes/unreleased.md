@@ -7,7 +7,7 @@
 
 ## Documentation
 
-* Updated wording and figure in User Guide.
+* #217: Used defined term "Secure Configuration Storage" throughout all documents
 
 ## Refactorings
 
