@@ -8,7 +8,6 @@ import shutil
 from collections import namedtuple
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 from exasol.slc import api as exaslct_api
 from exasol_integration_test_docker_environment.lib.docker import (
@@ -34,6 +33,7 @@ FLAVORS_PATH_IN_SLC_REPO = Path("flavors")
 """Path to flavors within the script-languages-release repository"""
 
 PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
+CondaPackageDefinition = namedtuple("CondaPackageDefinition", ["pkg", "version"])
 
 SLC_RELEASE_TAG = "9.6.0"
 """
@@ -118,16 +118,25 @@ class SlcPaths:
         return self.root_dir / self.flavor_path_in_slc_repo
 
     @property
+    def custom_packages_dir(self):
+        """
+        Returns the path to the custom packages directory of the flavor
+        """
+        return self.flavor_dir / "flavor_customization" / "packages"
+
+    @property
     def custom_pip_file(self) -> Path:
         """
-        Returns the path to the custom pip file of the flavor
+        Returns the path to the custom pip packages file of the flavor
         """
-        return (
-            self.flavor_dir
-            / "flavor_customization"
-            / "packages"
-            / "python3_pip_packages"
-        )
+        return self.custom_packages_dir / "python3_pip_packages"
+
+    @property
+    def custom_conda_file(self) -> Path:
+        """
+        Returns the path to the custom conda packages file of the flavor
+        """
+        return self.custom_packages_dir / "conda_packages"
 
     @contextlib.contextmanager
     def enter(self):
@@ -196,6 +205,17 @@ class SlctManagerMissingScsEntry(Exception):
 
     E.g. the flavor for the specified SLC session or the SLC target directory.
     """
+
+
+def _append_packages(
+    file_path: Path, packages: list[PipPackageDefinition] | list[CondaPackageDefinition]
+):
+    """
+    Appends packages to the custom packages file.
+    """
+    with open(file_path, "a") as f:
+        for p in packages:
+            print(f"{p.pkg}|{p.version}", file=f)
 
 
 class SlctManager:
@@ -351,16 +371,25 @@ class SlctManager:
         """
         self._secrets.save(AILabConfig.slc_alias, alias)
 
-    def append_custom_packages(self, pip_packages: list[PipPackageDefinition]):
+    def append_custom_pip_packages(self, pip_packages: list[PipPackageDefinition]):
         """
-        Appends packages to the custom pip file.
+        Appends packages to the custom pip packages file.
 
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
-        with open(self.slc_paths.custom_pip_file, "a") as f:
-            for p in pip_packages:
-                print(f"{p.pkg}|{p.version}", file=f)
+        _append_packages(self.slc_paths.custom_pip_file, pip_packages)
+
+    def append_custom_conda_packages(
+        self, conda_packages: list[CondaPackageDefinition]
+    ):
+        """
+        Appends packages to the custom conda packages file.
+
+        Note: This method is not idempotent: Multiple calls with the same
+        package definitions will result in duplicated entries.
+        """
+        _append_packages(self.slc_paths.custom_conda_file, conda_packages)
 
     @property
     def slc_docker_images(self):
