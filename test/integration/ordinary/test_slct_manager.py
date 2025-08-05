@@ -52,9 +52,7 @@ def secrets_file(working_path: Path) -> Path:
 
 @pytest.fixture(scope="module")
 def slc_session(package_manager) -> SlcSession:
-    return (
-        DEFAULT_SLC_SESSION
-    )
+    return DEFAULT_SLC_SESSION
 
 
 @pytest.fixture(scope="module")
