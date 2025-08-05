@@ -54,8 +54,6 @@ def secrets_file(working_path: Path) -> Path:
 def slc_session(package_manager) -> SlcSession:
     return (
         DEFAULT_SLC_SESSION
-        if package_manager == PackageManager.PIP
-        else SlcSession("conda_session")
     )
 
 
