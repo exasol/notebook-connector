@@ -68,6 +68,7 @@ def test_create(secrets):
     assert secrets.SLC_FLAVOR_CUDA == my_flavor
     assert secrets.SLC_LANGUAGE_ALIAS_CUDA == my_language
     assert Path(secrets.SLC_DIR_CUDA).parts[-2:] == (".slc_checkout", "CUDA")
+    assert testee.flavor_path.endswith(my_flavor)
 
 
 @pytest.mark.parametrize ("key_prefix, description", SESSION_ATTS.items())
