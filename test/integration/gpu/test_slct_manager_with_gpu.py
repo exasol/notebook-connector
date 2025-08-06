@@ -65,8 +65,8 @@ def itde(slc_secrets: Secrets):
 
 
 @pytest.fixture
-def custom_packages() -> list[tuple[str, str, str]]:
-    return [("pytorch", "2.7.0=cuda126_generic_py310_hd77d226_200", "pytorch")]
+def custom_packages() -> list[tuple[str, str]]:
+    return [("numba", "0.61.2")]
 
 
 @pytest.mark.dependency(name="clone")
@@ -77,10 +77,10 @@ def test_clone_slc(slct_manager):
 @pytest.mark.dependency(name="test_append_custom_packages", depends=["clone"])
 def test_append_custom_packages(
     slct_manager: SlctManager,
-    custom_packages: list[tuple[str, str, str]],
+    custom_packages: list[tuple[str, str]],
 ):
     slct_manager.append_custom_conda_packages(
-        [CondaPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
+        [CondaPackageDefinition(pkg, version) for pkg, version in custom_packages]
     )
 
 
@@ -91,24 +91,22 @@ def test_upload_slc_with_new_packages(
     slc_secrets: Secrets,
     itde,
     slct_manager: SlctManager,
-    custom_packages: list[tuple[str, str, str]],
     flavor,
 ):
-    slct_manager.language_alias = "my_new_python_with_pytorch"
+    slct_manager.language_alias = "my_new_python_with_numba"
     slct_manager.deploy()
     assert (
         slct_manager.activation_key
-        == f"my_new_python=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-my_new_python_with_pytorch?lang=python#buckets/bfsdefault/default/container/{flavor}-release-my_new_python_with_pytorch/exaudf/exaudfclient"
+        == f"my_new_python_with_numba=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-8-python-3.10-cuda-conda-release-my_new_python_with_numba?lang=python#buckets/bfsdefault/default/container/template-Exasol-8-python-3.10-cuda-conda-release-my_new_python_with_numba/exaudf/exaudfclient=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-my_new_python_with_numba?lang=python#buckets/bfsdefault/default/container/{flavor}-release-my_new_python_with_numba/exaudf/exaudfclient"
     )
 
 
 @pytest.mark.dependency(
     name="udf_with_new_packages", depends=["upload_slc_with_new_packages"]
 )
-def test_pytorch(
+def test_numba(
     slc_secrets: Secrets,
     slct_manager: SlctManager,
-    custom_packages: list[tuple[str, str, str]],
 ):
     udf = textwrap.dedent(
         f"""
@@ -117,10 +115,10 @@ test_gpu_available()
 RETURNS VARCHAR(1000) AS
  %perInstanceRequiredAcceleratorDevices GpuNvidia;
 
-import torch
+from numba import cuda
 
 def run(ctx):
-    if torch.cuda.is_available():
+    if cuda.is_available():
         return "GPU Found"
     else:
         return "GPU Not Found"
@@ -131,7 +129,7 @@ def run(ctx):
     try:
         con.execute("CREATE SCHEMA TEST")
         con.execute(udf)
-        res = con.execute("select test_pytorch()")
+        res = con.execute("select test_numba()")
         rows = res.fetchall()
         assert rows == [("GPU Found",)]
     finally:
