@@ -128,12 +128,14 @@ class ScriptLanguageContainer:
         name: str,
         verify: bool = True,
     ):
-        self.session = SlcSession(secrets, name, verify)
+        self.session = SlcSession(secrets, name)
         self.workspace = Workspace(Path.cwd())
-        if verify and not self.session.flavor_dir.is_dir():
-            raise SlcSessionError(
-                f"SLC Git repository not checked out to {self.session.checkout_dir}."
-            )
+        if verify:
+            self.session.verify()
+            if not self.session.flavor_dir.is_dir():
+                raise SlcSessionError(
+                    f"SLC Git repository not checked out to {self.session.checkout_dir}."
+                )
 
     @classmethod
     def create(
@@ -143,7 +145,7 @@ class ScriptLanguageContainer:
         flavor: str,
         language_alias: str,
     ) -> ScriptLanguageContainer:
-        session = SlcSession(secrets=secrets, name=name, verify=False)
+        session = SlcSession(secrets=secrets, name=name)
         checkout_dir = Path.cwd() / constants.SLC_CHECKOUT_DIR / name
         session.save(
             flavor=flavor,

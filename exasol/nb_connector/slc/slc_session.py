@@ -49,7 +49,7 @@ class ConfigurationItem:
 
 
 class SlcSession:
-    def __init__(self, secrets: Secrets, name: str, verify: bool = True):
+    def __init__(self, secrets: Secrets, name: str):
         self.secrets = secrets
         self.name = name
         if not name:
@@ -62,9 +62,6 @@ class SlcSession:
                 ("checkout_dir", "SLC_DIR", "SLC working directory"),
             ]
         }
-        if verify:
-            for a in self._atts.values():
-                a.value
 
     def __getattr__(self, property: str) -> str:
         return self._atts[property].value
@@ -113,3 +110,7 @@ class SlcSession:
             "checkout_dir": str(checkout_dir),
         }.items():
             self._atts[k].save(v)
+
+    def verify(self) -> None:
+        for a in self._atts.values():
+            a.value

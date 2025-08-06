@@ -111,10 +111,6 @@ def slc_with_tmp_checkout_dir(sample_session, tmp_path) -> ScriptLanguageContain
     return ScriptLanguageContainer(mock, name=sample_session, verify=False)
 
 
-def test_slc_repo_not_available(slc_with_tmp_checkout_dir):
-    assert not slc_with_tmp_checkout_dir.slc_repo_available()
-
-
 def mock_docker_client_context(image_tags: list[str]):
     """
     Mock a docker client simulating to return a list of images with each

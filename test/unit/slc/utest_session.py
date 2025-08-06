@@ -16,15 +16,16 @@ from exasol.nb_connector.slc.slc_session import (
 @pytest.mark.parametrize("prefix, description", SESSION_ATTS.items())
 def test_missing_properties(sample_session, prefix, description):
     secrets = secrets_without(sample_session, prefix)
+    testee = SlcSession(secrets=secrets, name=sample_session)
     with pytest.raises(
         SlcSessionError,
         match=f"does not contain an {description}",
     ):
-        SlcSession(secrets=secrets, name=sample_session)
+        testee.verify()
 
 
 def test_properties(secrets):
-    session = SlcSession(secrets=secrets, name="my_session", verify=False)
+    session = SlcSession(secrets=secrets, name="my_session")
     my_flavor = "Vanilla"
     my_language = "Spanish"
     my_dir = Path("xtest")
