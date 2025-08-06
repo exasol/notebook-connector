@@ -36,14 +36,6 @@ LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.INFO)
 
 
-def is_empty(path: Path) -> bool:
-    try:
-        next(path.iterdir())
-        return False
-    except StopIteration:
-        return True
-
-
 @contextlib.contextmanager
 def current_directory(dir: Path):
     """
