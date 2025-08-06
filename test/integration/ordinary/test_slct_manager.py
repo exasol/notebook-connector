@@ -117,7 +117,7 @@ def test_slc_images(slct_manager):
 @pytest.mark.dependency(name="upload_slc", depends=["check_config"])
 def test_upload(slct_manager: SlctManager, itde, flavor):
     slct_manager.language_alias = "my_python"
-    slct_manager.upload()
+    slct_manager.deploy()
     assert (
         slct_manager.activation_key
         == f"my_python=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-my_python?lang=python#buckets/bfsdefault/default/container/{flavor}-release-my_python/exaudf/exaudfclient"

@@ -295,11 +295,11 @@ class SlctManager:
                 export_path=str(self.workspace.export_path),
                 output_directory=str(self.workspace.output_path),
                 release_name=self.language_alias,
-                cleanup_docker_images=True,
+                cleanup_docker_images=False,
                 compression_strategy=CompressionStrategy.NONE,
             )
 
-    def upload(self):
+    def deploy(self):
         """
         Uploads the current script-languages-container to the database and
         stores the activation string in the Secure Configuration Storage.
@@ -312,7 +312,7 @@ class SlctManager:
         bucketfs_password = self._secrets.get(CKey.bfs_password)
 
         with self.slc_paths.enter():
-            exaslct_api.upload(
+            exaslct_api.deploy(
                 flavor_path=(self.flavor_path,),
                 database_host=database_host,
                 bucketfs_name=bucketfs_name,
@@ -323,6 +323,7 @@ class SlctManager:
                 path_in_bucket=PATH_IN_BUCKET,
                 release_name=self.language_alias,
                 output_directory=str(self.workspace.output_path),
+                compression_strategy=CompressionStrategy.NONE,
             )
             container_name = f"{self.flavor_name}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(
