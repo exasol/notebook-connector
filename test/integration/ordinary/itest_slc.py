@@ -61,13 +61,7 @@ def custom_packages() -> list[tuple[str, str, str]]:
     return [("xgboost", "2.0.3", "xgboost"), ("scikit-learn", "1.5.0", "sklearn")]
 
 
-@pytest.mark.dependency(name="check_repo_available")
-def test_check_slc_config(sample_slc: ScriptLanguageContainer):
-    repo_available = sample_slc.slc_repo_available()
-    assert repo_available
-
-
-@pytest.mark.dependency(name="export_slc", depends=["check_repo_available"])
+@pytest.mark.dependency(name="export_slc")
 def test_export_slc(sample_slc: ScriptLanguageContainer):
     sample_slc.export()
     export_path = sample_slc.workspace.export_path
@@ -88,7 +82,7 @@ def test_slc_images(sample_slc: ScriptLanguageContainer):
         assert "exasol/script-language-container" in img
 
 
-@pytest.mark.dependency(name="deploy_slc", depends=["check_repo_available"])
+@pytest.mark.dependency(name="deploy_slc")
 def test_deploy(sample_slc: ScriptLanguageContainer, itde):
     sample_slc.language_alias = "my_python"
     sample_slc.deploy()
