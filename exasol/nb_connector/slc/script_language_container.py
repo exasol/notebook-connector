@@ -33,6 +33,7 @@ from exasol.nb_connector.slc.slc_session import (
 )
 
 LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.INFO)
 
 
 def is_empty(path: Path) -> bool:
@@ -154,7 +155,7 @@ class ScriptLanguageContainer:
         """
         Checks if the target dir for the script-languages repository is present and correct.
         """
-        print(
+        LOG.info(
             "Directory for cloning repository"
             f" script-languages-release: '{self.session.checkout_dir}'"
         )
@@ -169,8 +170,8 @@ class ScriptLanguageContainer:
         """
         dir = self.session.checkout_dir
         dir.mkdir(parents=True, exist_ok=True)
-        if slc_repo_available():
-            logging.warning(f"Directory '{dir}' is not empty. Skipping cloning....")
+        if self.slc_repo_available():
+            LOG.warning(f"Directory '{dir}' is not empty. Skipping cloning....")
         else:
             LOG.info(f"Cloning into {dir}...")
             repo = Repo.clone_from(
@@ -178,7 +179,7 @@ class ScriptLanguageContainer:
                 dir,
                 branch=SLC_RELEASE_TAG,
             )
-            logging.info("Fetching submodules...")
+            LOG.info("Fetching submodules...")
             repo.submodule_update(recursive=True)
 
     def export(self):
@@ -265,11 +266,14 @@ class ScriptLanguageContainer:
 
     @property
     def docker_images(self) -> list[str]:
+        image_name = "exasol/script-language-container"
         with ContextDockerClient() as docker_client:
-            images = docker_client.images.list(name="exasol/script-language-container")
+            images = docker_client.images.list(name=image_name)
             image_tags = [img.tags[0] for img in images]
-            prefix = self.flavor
-            return [tag for tag in image_tags if tag.startswith(prefix)]
+            return [
+                tag for tag in image_tags
+                if tag.startswith(f"{image_name}:{self.flavor}")
+            ]
 
     def clean_all_images(self):
         """

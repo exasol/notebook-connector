@@ -1,58 +1,29 @@
-
-
+import contextlib
 from pathlib import Path
 from test.unit.slc.util import (
     SESSION_ATTS,
     secrets_without,
 )
-from unittest.mock import Mock
+from unittest.mock import (
+    Mock,
+    call,
+    create_autospec,
+)
 
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
+from git import Repo
 
-# from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-# from exasol.nb_connector.secret_store import Secrets
-# from exasol.nb_connector.slc.constants import FLAVORS_PATH_IN_SLC_REPO
+from test.unit.slc.util import SecretsMock
+
+import exasol.nb_connector.slc.script_language_container
+from exasol.nb_connector.secret_store import Secrets
+
+from exasol.nb_connector.slc.constants import SLC_RELEASE_TAG
 from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
     SlcSessionError,
 )
-
-# CUDA_FLAVOR = "cuda-flavor-1.0"
-# NON_CUDA_FLAVOR = "non-cuda-flavor-2.2"
-#
-#
-# # obsolete
-# @pytest.fixture
-# def slc_secrets(secrets) -> Secrets:
-#     secrets.save(CKey.slc_target_dir, "slc/target/dir")
-#     return secrets
-#
-#
-# # obsolete
-# @pytest.fixture
-# def populated_secrets(slc_secrets) -> Secrets:
-#     SlcSession("CUDA").save_flavor(slc_secrets, CUDA_FLAVOR)
-#     SlcSession("NON_CUDA").save_flavor(slc_secrets, NON_CUDA_FLAVOR)
-#     return slc_secrets
-#
-#
-# @pytest.mark.skip
-# @pytest.mark.parametrize(
-#     "session_name, expected_flavor",
-#     [
-#         ("CUDA", CUDA_FLAVOR),
-#         ("NON_CUDA", NON_CUDA_FLAVOR),
-#     ],
-# )
-# def test_existing_flavor(
-#     populated_secrets: Secrets,
-#     session_name: str,
-#     expected_flavor: str,
-# ):
-#     slc_session = SlcSession(session_name)
-#     testee = ScriptLanguageContainer(populated_secrets, slc_session=slc_session)
-#     expected = FLAVORS_PATH_IN_SLC_REPO / expected_flavor
-#     assert testee.flavor_path == str(expected)
 
 
 def test_create(secrets):
@@ -71,19 +42,18 @@ def test_create(secrets):
     assert testee.flavor_path.endswith(my_flavor)
 
 
-@pytest.mark.parametrize ("key_prefix, description", SESSION_ATTS.items())
-def test_missing_property(key_prefix, description):
+@pytest.mark.parametrize ("prefix, description", SESSION_ATTS.items())
+def test_missing_property(sample_session, prefix, description):
     """
     Secrets does not contain the specified property for the current SLC
     session.  The test expects ScriptLanguageContainer to raise an
     SlcSessionError.
     """
-    session = "CUDA"
-    secrets = secrets_without(f"{key_prefix}_{session}")
+    secrets = secrets_without(sample_session, prefix)
     with pytest.raises(
         SlcSessionError, match=f"does not contain an {description}"
     ):
-        ScriptLanguageContainer(secrets, session)
+        ScriptLanguageContainer(secrets, sample_session)
 
 
 @pytest.mark.parametrize("name", ["", None])
@@ -95,3 +65,90 @@ def test_empty_session_name(name):
     secrets = Mock()
     with pytest.raises(SlcSessionError):
         ScriptLanguageContainer(secrets, name=name)
+
+
+@pytest.fixture
+def slc_with_tmp_checkout_dir(sample_session, tmp_path) -> ScriptLanguageContainer:
+    mock = SecretsMock(
+        sample_session, {
+            "SLC_DIR": str(tmp_path),
+            "SLC_FLAVOR": "Vanilla",
+        }
+    )
+    return ScriptLanguageContainer(mock, name=sample_session, verify=False)
+
+
+def test_slc_repo_not_available(slc_with_tmp_checkout_dir):
+    assert not slc_with_tmp_checkout_dir.slc_repo_available()
+
+
+def test_clone_repo(
+    slc_with_tmp_checkout_dir: ScriptLanguageContainer,
+    monkeypatch: MonkeyPatch,
+    caplog,
+):
+    repo_mock = create_autospec(Repo)
+    monkeypatch.setattr(
+        exasol.nb_connector.slc.script_language_container,
+        "Repo",
+        repo_mock,
+    )
+    testee = slc_with_tmp_checkout_dir
+    testee.clone_slc_repo()
+    assert repo_mock.clone_from.called
+    assert "Cloning into" in caplog.text
+    assert "Fetching submodules" in caplog.text
+
+
+def mock_docker_client_context(image_tags: list[str]):
+    """
+    Mock a docker client simulating to return a list of images with each
+    image's first tag set to one of the specified image_tags.
+
+    Return a context initializing and providing the mocked docker client.
+    """
+    def image_mock(tag: str):
+        return Mock(tags=[tag])
+
+    client = Mock()
+    client.images = Mock()
+    client.images.list = Mock()
+    client.images.list.return_value = [
+        image_mock(tag) for tag in image_tags
+    ]
+
+    @contextlib.contextmanager
+    def context():
+        yield client
+
+    return context
+
+
+def test_docker_images(sample_session, monkeypatch):
+    """
+    This test mocks the Docker client simulating to return a list of
+    Docker images to be available on the current system.
+
+    The test then verifies the ScriptLanguageContainer under test to return
+    only the Docker images with each image's first tag starting with the
+    expected image name and the flavor.
+    """
+    image_name = "exasol/script-language-container"
+    flavor = "template-Exasol-all-python-3.10-conda"
+    secrets = SecretsMock(sample_session, {"SLC_FLAVOR": flavor})
+    prefix = f"{image_name}:{flavor}"
+    expected = [
+        f"{prefix}-build_run_123",
+        f"{prefix}-test_456",
+    ]
+    image_tags = expected + [
+        f"{image_name}:other_tag-x-1",
+        f"exasol/other-image:{flavor}-suffix-1"
+    ]
+    monkeypatch.setattr(
+        exasol.nb_connector.slc.script_language_container,
+        "ContextDockerClient",
+        mock_docker_client_context(image_tags),
+    )
+    testee = ScriptLanguageContainer(secrets, name=sample_session, verify=False)
+    assert testee.docker_images == expected
