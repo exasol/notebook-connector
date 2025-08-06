@@ -161,7 +161,7 @@ def test_upload_slc_with_new_packages(
     flavor,
 ):
     slct_manager.language_alias = "my_new_python"
-    slct_manager.upload()
+    slct_manager.deploy()
     assert (
         slct_manager.activation_key
         == f"my_new_python=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-my_new_python?lang=python#buckets/bfsdefault/default/container/{flavor}-release-my_new_python/exaudf/exaudfclient"

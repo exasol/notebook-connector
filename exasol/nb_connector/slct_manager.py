@@ -314,11 +314,11 @@ class SlctManager:
         with self.slc_paths.enter():
             exaslct_api.deploy(
                 flavor_path=(self.flavor_path,),
-                database_host=database_host,
+                bucketfs_host=database_host,
                 bucketfs_name=bucketfs_name,
-                bucket_name=bucket_name,
+                bucket=bucket_name,
                 bucketfs_port=int(bucketfs_port),
-                bucketfs_username=bucketfs_username,
+                bucketfs_user=bucketfs_username,
                 bucketfs_password=bucketfs_password,
                 path_in_bucket=PATH_IN_BUCKET,
                 release_name=self.language_alias,
