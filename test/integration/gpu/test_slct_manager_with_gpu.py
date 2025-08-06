@@ -89,6 +89,7 @@ def test_append_custom_packages(
 )
 def test_upload_slc_with_new_packages(
     slc_secrets: Secrets,
+    itde,
     slct_manager: SlctManager,
     custom_packages: list[tuple[str, str, str]],
     flavor,
