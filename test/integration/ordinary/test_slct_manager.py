@@ -102,19 +102,18 @@ def test_upload(sample_slc: ScriptLanguageContainer, itde):
     sample_slc.language_alias = "my_python"
     sample_slc.upload()
     assert sample_slc.activation_key == (
-         "my_python=localzmq+protobuf:///bfsdefault/default/container/"
-         "template-Exasol-all-python-3.10-release-my_python"
-         "?lang=python"
-         "#buckets/bfsdefault/default/container/"
-         "template-Exasol-all-python-3.10-release-my_python/"
-         "exaudf/exaudfclient"
+        "my_python=localzmq+protobuf:///bfsdefault/default/container/"
+        "template-Exasol-all-python-3.10-release-my_python"
+        "?lang=python"
+        "#buckets/bfsdefault/default/container/"
+        "template-Exasol-all-python-3.10-release-my_python/"
+        "exaudf/exaudfclient"
     )
 
 
 @pytest.mark.dependency(name="append_custom_packages", depends=["upload_slc"])
 def test_append_custom_packages(
-    sample_slc: ScriptLanguageContainer,
-    custom_packages: list[tuple[str, str, str]]
+    sample_slc: ScriptLanguageContainer, custom_packages: list[tuple[str, str, str]]
 ):
     sample_slc.append_custom_packages(
         [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
