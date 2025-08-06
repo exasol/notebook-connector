@@ -11,10 +11,7 @@ class SecretsMock(Secrets):
     ):
         self.session = session
         if initial:
-            self._mock = {
-                f"{prefix}_{session}": v
-                for prefix, v in initial.items()
-            }
+            self._mock = {f"{prefix}_{session}": v for prefix, v in initial.items()}
         else:
             self._mock = {}
 
@@ -34,6 +31,7 @@ SESSION_ATTS = {
     "SLC_LANGUAGE_ALIAS": "SLC language alias",
     "SLC_DIR": "SLC working directory",
 }
+
 
 def secrets_without(session: str, key_prefix: str):
     atts = dict(SESSION_ATTS)

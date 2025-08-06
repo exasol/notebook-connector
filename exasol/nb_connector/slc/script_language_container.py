@@ -271,7 +271,8 @@ class ScriptLanguageContainer:
             images = docker_client.images.list(name=image_name)
             image_tags = [img.tags[0] for img in images]
             return [
-                tag for tag in image_tags
+                tag
+                for tag in image_tags
                 if tag.startswith(f"{image_name}:{self.flavor}")
             ]
 

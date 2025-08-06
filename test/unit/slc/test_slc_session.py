@@ -12,13 +12,13 @@ from exasol.nb_connector.slc.slc_session import (
     SlcSessionError,
 )
 
-@pytest.mark.parametrize(
-    "prefix, description", SESSION_ATTS.items()
-)
+
+@pytest.mark.parametrize("prefix, description", SESSION_ATTS.items())
 def test_missing_properties(sample_session, prefix, description):
     secrets = secrets_without(sample_session, prefix)
     with pytest.raises(
-        SlcSessionError, match=f"does not contain an {description}",
+        SlcSessionError,
+        match=f"does not contain an {description}",
     ):
         SlcSession(secrets=secrets, name=sample_session)
 

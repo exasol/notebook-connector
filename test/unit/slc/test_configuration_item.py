@@ -1,4 +1,7 @@
-from unittest.mock import Mock, call
+from unittest.mock import (
+    Mock,
+    call,
+)
 
 import pytest
 
@@ -28,14 +31,14 @@ def test_key():
 
 
 def test_save_success():
-    secrets = Mock(get = Mock(return_value=None))
+    secrets = Mock(get=Mock(return_value=None))
     ci = configuration_item(secrets)
     ci.save(value="xxx")
     assert secrets.save.call_args == call(ci.key, "xxx")
 
 
 def test_save_failure():
-    secrets = Mock(get = Mock(return_value=True))
+    secrets = Mock(get=Mock(return_value=True))
     ci = configuration_item(secrets)
     with pytest.raises(
         SlcSessionError,

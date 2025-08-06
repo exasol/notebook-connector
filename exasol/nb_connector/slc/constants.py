@@ -1,5 +1,5 @@
-from pathlib import Path
 from collections import namedtuple
+from pathlib import Path
 
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 

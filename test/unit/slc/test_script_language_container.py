@@ -2,6 +2,7 @@ import contextlib
 from pathlib import Path
 from test.unit.slc.util import (
     SESSION_ATTS,
+    SecretsMock,
     secrets_without,
 )
 from unittest.mock import (
@@ -14,11 +15,8 @@ import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from git import Repo
 
-from test.unit.slc.util import SecretsMock
-
 import exasol.nb_connector.slc.script_language_container
 from exasol.nb_connector.secret_store import Secrets
-
 from exasol.nb_connector.slc.constants import SLC_RELEASE_TAG
 from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
@@ -42,7 +40,7 @@ def test_create(secrets):
     assert testee.flavor_path.endswith(my_flavor)
 
 
-@pytest.mark.parametrize ("prefix, description", SESSION_ATTS.items())
+@pytest.mark.parametrize("prefix, description", SESSION_ATTS.items())
 def test_missing_property(sample_session, prefix, description):
     """
     Secrets does not contain the specified property for the current SLC
@@ -50,9 +48,7 @@ def test_missing_property(sample_session, prefix, description):
     SlcSessionError.
     """
     secrets = secrets_without(sample_session, prefix)
-    with pytest.raises(
-        SlcSessionError, match=f"does not contain an {description}"
-    ):
+    with pytest.raises(SlcSessionError, match=f"does not contain an {description}"):
         ScriptLanguageContainer(secrets, sample_session)
 
 
@@ -70,10 +66,11 @@ def test_empty_session_name(name):
 @pytest.fixture
 def slc_with_tmp_checkout_dir(sample_session, tmp_path) -> ScriptLanguageContainer:
     mock = SecretsMock(
-        sample_session, {
+        sample_session,
+        {
             "SLC_DIR": str(tmp_path),
             "SLC_FLAVOR": "Vanilla",
-        }
+        },
     )
     return ScriptLanguageContainer(mock, name=sample_session, verify=False)
 
@@ -107,15 +104,14 @@ def mock_docker_client_context(image_tags: list[str]):
 
     Return a context initializing and providing the mocked docker client.
     """
+
     def image_mock(tag: str):
         return Mock(tags=[tag])
 
     client = Mock()
     client.images = Mock()
     client.images.list = Mock()
-    client.images.list.return_value = [
-        image_mock(tag) for tag in image_tags
-    ]
+    client.images.list.return_value = [image_mock(tag) for tag in image_tags]
 
     @contextlib.contextmanager
     def context():
@@ -143,7 +139,7 @@ def test_docker_images(sample_session, monkeypatch):
     ]
     image_tags = expected + [
         f"{image_name}:other_tag-x-1",
-        f"exasol/other-image:{flavor}-suffix-1"
+        f"exasol/other-image:{flavor}-suffix-1",
     ]
     monkeypatch.setattr(
         exasol.nb_connector.slc.script_language_container,
