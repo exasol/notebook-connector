@@ -98,12 +98,12 @@ def test_export_slc(slct_manager):
     slct_manager.export()
     export_path = slct_manager.workspace.export_path
     assert export_path.exists()
-    tgz = [f for f in export_path.glob("*.tar.gz")]
-    assert len(tgz) == 1
-    assert tgz[0].is_file()
-    tgz_sum = [f for f in export_path.glob("*.tar.gz.sha512sum")]
-    assert len(tgz_sum) == 1
-    assert tgz_sum[0].is_file()
+    tar = [f for f in export_path.glob("*.tar")]
+    assert len(tar) == 1
+    assert tar[0].is_file()
+    tar_sum = [f for f in export_path.glob("*.tar.sha512sum")]
+    assert len(tar_sum) == 1
+    assert tar_sum[0].is_file()
 
 
 @pytest.mark.dependency(name="slc_images", depends=["export_slc"])

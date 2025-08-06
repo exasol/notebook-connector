@@ -66,7 +66,7 @@ def itde(slc_secrets: Secrets):
 
 @pytest.fixture
 def custom_packages() -> list[tuple[str, str, str]]:
-    return [("pytorch", "2.7.1=cuda129_generic_py310_h919abc8_203", "pytorch")]
+    return [("pytorch", "2.7.0=cuda126_generic_py310_hd77d226_200", "pytorch")]
 
 
 @pytest.mark.dependency(name="clone")
