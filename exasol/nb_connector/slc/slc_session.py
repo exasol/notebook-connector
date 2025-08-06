@@ -54,6 +54,8 @@ class SlcSession:
     def __init__(self, secrets: Secrets, name: str, verify: bool = True):
         self.secrets = secrets
         self.name = name
+        if not name:
+            raise SlcSessionError("SLC session name must not be empty")
         self._atts = {
             key: ConfigurationItem(secrets, prefix, name, description)
             for key, prefix, description in [
