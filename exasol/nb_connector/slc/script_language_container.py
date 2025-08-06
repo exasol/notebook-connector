@@ -93,15 +93,16 @@ class ScriptLanguageContainer:
     Support building different flavors of Exasol Script Language
     Containers (SLCs) using the SLCT.
 
-    The caller needs to ensure the related properties are stored in the Secure
-    Configuration Storage (SCS / secrets / conf) using the keys
-    derived from the ScriptLanguageContainer's name:
+    Parameter name serves as a key for different SLC sessions. Each session is
+    associated with SLC-related properties stored in the Secure Configuration
+    Storage (SCS / secrets / conf):
 
-    * flavor_name
+    * flavor
     * language_alias
     * checkout_dir
 
-    Otherwise an SlcSessionError will be raised.
+    If parameter verify is True, and one of these properties is missing in the
+    SCS, then the constructor will raise an SlcSessionError.
 
     Additionally, the caller needs to ensure, that a flavor with this name is
     contained in the SLC release specified in variable SLC_RELEASE_TAG.
@@ -111,8 +112,9 @@ class ScriptLanguageContainer:
         self,
         secrets: Secrets,
         name: str,
+        verify: bool = True,
     ):
-        self.session = SlcSession(secrets, name)
+        self.session = SlcSession(secrets, name, verify)
         self.workspace = Workspace(Path.cwd())
 
     @classmethod
@@ -123,14 +125,13 @@ class ScriptLanguageContainer:
         flavor: str,
         language_alias: str,
     ) -> ScriptLanguageContainer:
-        session = SlcSession(secrets=secrets, name=name)
+        session = SlcSession(secrets=secrets, name=name, verify=False)
         checkout_dir = Path.cwd() / ".slc_checkout" / name
         session.save(
-            flavor_name=flavor_name,
+            flavor=flavor,
             language_alias=language_alias,
             checkout_dir=checkout_dir,
         )
-        # Alternatively we could change the constructor to contain the session
         return cls(secrets=secrets, name=name)
 
     @property
@@ -138,16 +139,16 @@ class ScriptLanguageContainer:
         return self.session.name
 
     @property
-    def flavor_name(self) -> str:
-        return self.session.flavor_name
-
-    @property
-    def flavor_path(self) -> str:
-        return str(self.session.flavor_path_in_slc_repo)
+    def flavor(self) -> str:
+        return self.session.flavor
 
     @property
     def language_alias(self) -> str:
         return self.session.language_alias
+
+    @property
+    def flavor_path(self) -> str:
+        return str(self.session.flavor_path_in_slc_repo)
 
     def slc_repo_available(self) -> bool:
         """
@@ -166,9 +167,6 @@ class ScriptLanguageContainer:
         Clones the script-languages-release repository from Github into
         the target dir configured in the Secure Configuration Storage.
         """
-        # should be called implicitly in future during create()
-        # Does dir already exist?
-        # Can user specify sub directories?
         dir = self.session.checkout_dir
         dir.mkdir(parents=True, exist_ok=True)
         if slc_repo_available():
@@ -220,7 +218,7 @@ class ScriptLanguageContainer:
                 release_name=self.language_alias,
                 output_directory=str(self.workspace.output_path),
             )
-            container_name = f"{self.flavor_name}-release-{self.language_alias}"
+            container_name = f"{self.flavor}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(
                 flavor_path=self.flavor_path,
                 bucketfs_name=bucketfs_name,
@@ -270,7 +268,7 @@ class ScriptLanguageContainer:
         with ContextDockerClient() as docker_client:
             images = docker_client.images.list(name="exasol/script-language-container")
             image_tags = [img.tags[0] for img in images]
-            prefix = self.flavor_name
+            prefix = self.flavor
             return [tag for tag in image_tags if tag.startswith(prefix)]
 
     def clean_all_images(self):
@@ -279,5 +277,5 @@ class ScriptLanguageContainer:
         """
         exaslct_api.clean_all_images(
             output_directory=str(self.workspace.output_path),
-            docker_tag_prefix=self.flavor_name,
+            docker_tag_prefix=self.flavor,
         )

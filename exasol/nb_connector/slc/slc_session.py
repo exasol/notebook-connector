@@ -13,7 +13,8 @@ class SlcSessionError(Exception):
     In case the Secure Configuration Storage (SCS / secrets / conf) does
     not contain specific data required for using the ScriptLanguageContainer.
 
-    E.g. the flavor for the specified SLC session or the SLC target directory.
+    I.e. the flavor, language_alias, or checkout_dir for the specified SLC
+    session.
     """
 
 
@@ -48,30 +49,29 @@ class ConfigurationItem:
 
 
 class SlcSession:
-    # DEFAULT_NAME = "DEFAULT"
     # DEFAULT_FLAVOR = "template-Exasol-all-python-3.10"
 
-    def __init__(self, secrets: Secrets, name: str):
+    def __init__(self, secrets: Secrets, name: str, verify: bool = True):
         self.secrets = secrets
         self.name = name
-        self._checkout_dir = ConfigurationItem(
-            secrets, "SLC_DIR", name, "SLC target directory")
-        self._flavor = ConfigurationItem(
-            secrets, "SLC_FLAVOR", name, "SLC flavor")
-        self._language_alias = ConfigurationItem(
-            secrets, "SLC_LANGUAGE_ALIAS", name, "SLC language alias")
+        self._atts = {
+            key: ConfigurationItem(secrets, prefix, name, description)
+            for key, prefix, description in [
+                ("flavor", "SLC_FLAVOR", "SLC flavor"),
+                ("language_alias", "SLC_LANGUAGE_ALIAS", "SLC language alias"),
+                ("checkout_dir", "SLC_DIR", "SLC working directory"),
+            ]
+        }
+        if verify:
+            for a in self._atts.values():
+                a.value
 
-    @property
-    def flavor_name(self) -> str:
-        return self._flavor.value
+    def __getattr__(self, property: str) -> str:
+        return self._atts[property].value
 
     @property
     def checkout_dir(self) -> Path:
-        return Path(self._checkout_dir.value)
-
-    @property
-    def language_alias(self) -> Path:
-        return self._language_alias.value
+        return Path(self._atts["checkout_dir"].value)
 
     @property
     def flavor_path_in_slc_repo(self) -> Path:
@@ -79,7 +79,7 @@ class SlcSession:
         Path to the used flavor within the script-languages-release
         repository
         """
-        return FLAVORS_PATH_IN_SLC_REPO / self.flavor_name
+        return FLAVORS_PATH_IN_SLC_REPO / self.flavor
 
     @property
     def flavor_dir(self) -> Path:
@@ -99,14 +99,17 @@ class SlcSession:
 
     def save(
         self,
-        flavor_name: str,
+        flavor: str,
         language_alias: str,
         checkout_dir: Path,
     ) -> None:
         """
-        Save the specified flavor_name into the SCS using the slc_session
-        name as key.
+        Save the specified flavor, language_alias, and checkout_dir into
+        the Secure Configuration Storage.
         """
-        self._flavor.save(flavor_name)
-        self._language_alias.save(language_alias)
-        self._checkout_dir.save(str(checkout_dir))
+        for k, v in {
+            "flavor": flavor,
+            "language_alias": language_alias,
+            "checkout_dir": str(checkout_dir),
+        }.items():
+            self._atts[k].save(v)

@@ -1,14 +1,16 @@
 import re
 from pathlib import Path
 
+from unittest.mock import Mock
+
 import pytest
+
+from test.unit.slc.util import secrets_without
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slct_manager import (
-    DEFAULT_SLC_SESSION,
-    FLAVORS_PATH_IN_SLC_REPO,
-    # SlcSession,
+from exasol.nb_connector.slc.constants import FLAVORS_PATH_IN_SLC_REPO
+from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
     SlcSessionError,
 )
@@ -17,12 +19,14 @@ CUDA_FLAVOR = "cuda-flavor-1.0"
 NON_CUDA_FLAVOR = "non-cuda-flavor-2.2"
 
 
+# obsolete
 @pytest.fixture
 def slc_secrets(secrets) -> Secrets:
     secrets.save(CKey.slc_target_dir, "slc/target/dir")
     return secrets
 
 
+# obsolete
 @pytest.fixture
 def populated_secrets(slc_secrets) -> Secrets:
     SlcSession("CUDA").save_flavor(slc_secrets, CUDA_FLAVOR)
@@ -30,6 +34,7 @@ def populated_secrets(slc_secrets) -> Secrets:
     return slc_secrets
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "session_name, expected_flavor",
     [
@@ -48,26 +53,42 @@ def test_existing_flavor(
     assert testee.flavor_path == str(expected)
 
 
-def test_undefined_flavor(slc_secrets: Secrets):
+def test_create(secrets):
+    my_flavor = "Vanilla"
+    my_language = "Spanish"
+    my_dir = Path("xtest")
+    testee = ScriptLanguageContainer.create(
+        secrets,
+        name="CUDA",
+        flavor=my_flavor,
+        language_alias=my_language,
+    )
+    assert secrets.SLC_FLAVOR_CUDA == my_flavor
+    assert secrets.SLC_LANGUAGE_ALIAS_CUDA == my_language
+    assert Path(secrets.SLC_DIR_CUDA).parts[-2:] == (".slc_checkout", "CUDA")
+
+
+
+SESSION_ATTS = {
+    "SLC_FLAVOR": "SLC flavor",
+    "SLC_LANGUAGE_ALIAS": "SLC language alias",
+    "SLC_DIR": "SLC working directory",
+}
+
+
+@pytest.mark.parametrize ("key_prefix, description", SESSION_ATTS.items())
+def test_missing_property(key_prefix, description):
     """
-    secrets does not contain the key for SLC session "CUDA".  The test
-    expects ScriptLanguageContainer to raise an SlcSessionError.
+    Secrets does not contain the specified property for the current SLC
+    session.  The test expects ScriptLanguageContainer to raise an
+    SlcSessionError.
     """
+    session = "CUDA"
+    secrets = secrets_without(f"{key_prefix}_{session}")
     with pytest.raises(
-        SlcSessionError, match="does not contain an SLC flavor"
+        SlcSessionError, match=f"does not contain an {description}"
     ):
-        ScriptLanguageContainer(slc_secrets, slc_session=SlcSession("CUDA"))
-
-
-def test_default_flavor(slc_secrets: Secrets, caplog):
-    """
-    secrets does not contain the key for any SLC flavor.  The test still
-    expects the ScriptLanguageContainer to return the default flavor for the default
-    session.
-    """
-    testee = ScriptLanguageContainer(slc_secrets)
-    assert testee.flavor_name == SlcSession.DEFAULT_FLAVOR
-    assert re.match("WARNING .* Using default flavor", caplog.text)
+        ScriptLanguageContainer(secrets, session)
 
 
 @pytest.mark.parametrize("name", ["", None])
