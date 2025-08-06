@@ -16,10 +16,9 @@ from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slct_manager import (
-    DEFAULT_SLC_SESSION,
-    PipPackageDefinition,
-    SlctManager,
+from exasol.nb_connector.slc.constants import PipPackageDefinition
+from exasol.nb_connector.slc.script_language_container import (
+    ScriptLanguageContainer,
 )
 
 
@@ -37,16 +36,21 @@ def secrets_file(working_path: Path) -> Path:
 @pytest.fixture(scope="module")
 def slc_secrets(secrets_file, working_path) -> Secrets:
     secrets = Secrets(secrets_file, master_password="abc")
-    secrets.save(
-        AILabConfig.slc_target_dir, str(working_path / "script_languages_release")
-    )
-    DEFAULT_SLC_SESSION.save_flavor(secrets, "template-Exasol-all-python-3.10")
+    # secrets.save(
+    #     AILabConfig.slc_target_dir, str(working_path / "script_languages_release")
+    # )
+    # DEFAULT_SLC_SESSION.save_flavor(secrets, "template-Exasol-all-python-3.10")
     return secrets
 
 
 @pytest.fixture(scope="module")
-def slct_manager(slc_secrets: Secrets, working_path: Path) -> SlctManager:
-    return SlctManager(slc_secrets, working_path)
+def sample_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
+    return ScriptLanguageContainer.create(
+        slc_secrets,
+        name="my_session",
+        flavor="template-Exasol-all-python-3.10",
+        language_alias="my_python",
+    )
 
 
 @pytest.fixture(scope="module")
@@ -62,20 +66,20 @@ def custom_packages() -> list[tuple[str, str, str]]:
 
 
 @pytest.mark.dependency(name="clone")
-def test_clone_slc(slct_manager):
-    slct_manager.clone_slc_repo()
+def test_clone_slc(sample_slc: ScriptLanguageContainer):
+    sample_slc.clone_slc_repo()
 
 
-@pytest.mark.dependency(name="check_config", depends=["clone"])
-def test_check_slc_config(slct_manager):
-    config_ok = slct_manager.check_slc_repo_complete()
-    assert config_ok
+@pytest.mark.dependency(name="check_repo_available", depends=["clone"])
+def test_check_slc_config(sample_slc: ScriptLanguageContainer):
+    repo_available = sample_slc.slc_repo_available()
+    assert repo_available
 
 
-@pytest.mark.dependency(name="export_slc", depends=["check_config"])
-def test_export_slc(slct_manager):
-    slct_manager.export()
-    export_path = slct_manager.workspace.export_path
+@pytest.mark.dependency(name="export_slc", depends=["check_repo_available"])
+def test_export_slc(sample_slc: ScriptLanguageContainer):
+    sample_slc.export()
+    export_path = sample_slc.workspace.export_path
     assert export_path.exists()
     tgz = [f for f in export_path.glob("*.tar.gz")]
     assert len(tgz) == 1
@@ -86,31 +90,37 @@ def test_export_slc(slct_manager):
 
 
 @pytest.mark.dependency(name="slc_images", depends=["export_slc"])
-def test_slc_images(slct_manager):
-    images = slct_manager.slc_docker_images
+def test_slc_images(sample_slc: ScriptLanguageContainer):
+    images = sample_slc.slc_docker_images
     assert len(images) > 0
     for img in images:
         assert "exasol/script-language-container" in img
 
 
-@pytest.mark.dependency(name="upload_slc", depends=["check_config"])
-def test_upload(slct_manager: SlctManager, itde):
-    slct_manager.language_alias = "my_python"
-    slct_manager.upload()
-    assert (
-        slct_manager.activation_key
-        == "my_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_python?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_python/exaudf/exaudfclient"
+@pytest.mark.dependency(name="upload_slc", depends=["check_repo_available"])
+def test_upload(sample_slc: ScriptLanguageContainer, itde):
+    sample_slc.language_alias = "my_python"
+    sample_slc.upload()
+    assert sample_slc.activation_key == (
+         "my_python=localzmq+protobuf:///bfsdefault/default/container/"
+         "template-Exasol-all-python-3.10-release-my_python"
+         "?lang=python"
+         "#buckets/bfsdefault/default/container/"
+         "template-Exasol-all-python-3.10-release-my_python/"
+         "exaudf/exaudfclient"
     )
 
 
 @pytest.mark.dependency(name="append_custom_packages", depends=["upload_slc"])
 def test_append_custom_packages(
-    slct_manager: SlctManager, custom_packages: list[tuple[str, str, str]]
+    sample_slc: ScriptLanguageContainer,
+    custom_packages: list[tuple[str, str, str]]
 ):
-    slct_manager.append_custom_packages(
+    sample_slc.append_custom_packages(
         [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
     )
-    with open(slct_manager.slc_paths.custom_pip_file) as f:
+    # Would we like to move custom_pip_file from SlcSession to ScriptLanguageContainer?
+    with open(sample_slc.session.custom_pip_file) as f:
         pip_content = f.read()
         for custom_package, version, _ in custom_packages:
             assert f"{custom_package}|{version}" in pip_content
@@ -121,14 +131,25 @@ def test_append_custom_packages(
 )
 def test_upload_slc_with_new_packages(
     slc_secrets: Secrets,
-    slct_manager: SlctManager,
+    # sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str, str]],
 ):
-    slct_manager.language_alias = "my_new_python"
-    slct_manager.upload()
-    assert (
-        slct_manager.activation_key
-        == "my_new_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_new_python?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_new_python/exaudf/exaudfclient"
+    slc = ScriptLanguageContainer.create(
+        slc_secrets,
+        name="session_2",
+        flavor="template-Exasol-all-python-3.10",
+        language_alias="my_new_python",
+    )
+    # Do we still need a save method for single attribute, e.g. save
+    # language_alias?
+    slc.upload()
+    assert slc.activation_key == (
+        "my_new_python=localzmq+protobuf:///bfsdefault/default/container/"
+        "template-Exasol-all-python-3.10-release-my_new_python"
+        "?lang=python"
+        "#buckets/bfsdefault/default/container/"
+        "template-Exasol-all-python-3.10-release-my_new_python/"
+        "exaudf/exaudfclient"
     )
 
 
@@ -137,7 +158,7 @@ def test_upload_slc_with_new_packages(
 )
 def test_udf_with_new_packages(
     slc_secrets: Secrets,
-    slct_manager: SlctManager,
+    sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str, str]],
 ):
     import_statements = "\n".join(
@@ -145,7 +166,7 @@ def test_udf_with_new_packages(
     )
     udf = textwrap.dedent(
         f"""
-CREATE OR REPLACE {slct_manager.language_alias} SET SCRIPT test_custom_packages(i integer)
+CREATE OR REPLACE {sample_slc.language_alias} SET SCRIPT test_custom_packages(i integer)
 EMITS (o VARCHAR(2000000)) AS
 def run(ctx):
 {import_statements}
@@ -166,7 +187,7 @@ def run(ctx):
 
 
 @pytest.mark.dependency(name="test_old_alias", depends=["udf_with_new_packages"])
-def test_old_alias(slc_secrets: Secrets, slct_manager: SlctManager):
+def test_old_alias(slc_secrets: Secrets, sample_slc: ScriptLanguageContainer):
 
     udf = textwrap.dedent(
         f"""
@@ -190,22 +211,22 @@ def run(ctx):
 @pytest.mark.dependency(
     name="clean_up_images", depends=["upload_slc_with_new_packages"]
 )
-def test_clean_up_images(slct_manager: SlctManager):
-    slct_manager.clean_all_images()
+def test_clean_up_images(sample_slc: ScriptLanguageContainer):
+    sample_slc.clean_all_images()
     with ContextDockerClient() as docker_client:
         images = docker_client.images.list(name="exasol/script-language-container")
         assert len(images) == 0
 
 
 @pytest.mark.dependency(name="clean_up_output_path", depends=["clean_up_images"])
-def test_clean_output(slct_manager: SlctManager):
-    slct_manager.workspace.cleanup_output_path()
-    p = Path(slct_manager.workspace.output_path)
+def test_clean_output(sample_slc: ScriptLanguageContainer):
+    sample_slc.workspace.cleanup_output_path()
+    p = Path(sample_slc.workspace.output_path)
     assert not p.is_dir()
 
 
 @pytest.mark.dependency(name="clean_up_export_path", depends=["clean_up_images"])
-def test_clean_export(slct_manager: SlctManager):
-    slct_manager.workspace.cleanup_export_path()
-    p = Path(slct_manager.workspace.export_path)
+def test_clean_export(sample_slc: ScriptLanguageContainer):
+    sample_slc.workspace.cleanup_export_path()
+    p = Path(sample_slc.workspace.export_path)
     assert not p.is_dir()

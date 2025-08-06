@@ -49,8 +49,6 @@ class ConfigurationItem:
 
 
 class SlcSession:
-    # DEFAULT_FLAVOR = "template-Exasol-all-python-3.10"
-
     def __init__(self, secrets: Secrets, name: str, verify: bool = True):
         self.secrets = secrets
         self.name = name
