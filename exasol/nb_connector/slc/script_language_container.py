@@ -85,11 +85,11 @@ def clone_slc_repo(session: SlcSession):
     Clones the script-languages-release repository from Github into
     the target dir configured in the Secure Configuration Storage.
     """
-    if session.flavor_dir.is_dir():
+    dir = session.checkout_dir
+    if dir.is_dir():
         LOG.warning(f"Directory '{dir}' is not empty. Skipping cloning....")
         return
 
-    dir = session.checkout_dir
     dir.mkdir(parents=True, exist_ok=True)
     LOG.info(f"Cloning into {dir}...")
     repo = Repo.clone_from(
