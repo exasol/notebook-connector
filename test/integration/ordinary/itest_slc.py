@@ -36,10 +36,6 @@ def secrets_file(working_path: Path) -> Path:
 @pytest.fixture(scope="module")
 def slc_secrets(secrets_file, working_path) -> Secrets:
     secrets = Secrets(secrets_file, master_password="abc")
-    # secrets.save(
-    #     AILabConfig.slc_target_dir, str(working_path / "script_languages_release")
-    # )
-    # DEFAULT_SLC_SESSION.save_flavor(secrets, "template-Exasol-all-python-3.10")
     return secrets
 
 
@@ -65,12 +61,7 @@ def custom_packages() -> list[tuple[str, str, str]]:
     return [("xgboost", "2.0.3", "xgboost"), ("scikit-learn", "1.5.0", "sklearn")]
 
 
-@pytest.mark.dependency(name="clone")
-def test_clone_slc(sample_slc: ScriptLanguageContainer):
-    sample_slc.clone_slc_repo()
-
-
-@pytest.mark.dependency(name="check_repo_available", depends=["clone"])
+@pytest.mark.dependency(name="check_repo_available")
 def test_check_slc_config(sample_slc: ScriptLanguageContainer):
     repo_available = sample_slc.slc_repo_available()
     assert repo_available
@@ -97,10 +88,10 @@ def test_slc_images(sample_slc: ScriptLanguageContainer):
         assert "exasol/script-language-container" in img
 
 
-@pytest.mark.dependency(name="upload_slc", depends=["check_repo_available"])
-def test_upload(sample_slc: ScriptLanguageContainer, itde):
+@pytest.mark.dependency(name="deploy_slc", depends=["check_repo_available"])
+def test_deploy(sample_slc: ScriptLanguageContainer, itde):
     sample_slc.language_alias = "my_python"
-    sample_slc.upload()
+    sample_slc.deploy()
     assert sample_slc.activation_key == (
         "my_python=localzmq+protobuf:///bfsdefault/default/container/"
         "template-Exasol-all-python-3.10-release-my_python"
@@ -111,7 +102,7 @@ def test_upload(sample_slc: ScriptLanguageContainer, itde):
     )
 
 
-@pytest.mark.dependency(name="append_custom_packages", depends=["upload_slc"])
+@pytest.mark.dependency(name="append_custom_packages", depends=["deploy_slc"])
 def test_append_custom_packages(
     sample_slc: ScriptLanguageContainer, custom_packages: list[tuple[str, str, str]]
 ):
@@ -126,9 +117,9 @@ def test_append_custom_packages(
 
 
 @pytest.mark.dependency(
-    name="upload_slc_with_new_packages", depends=["append_custom_packages"]
+    name="deploy_slc_with_new_packages", depends=["append_custom_packages"]
 )
-def test_upload_slc_with_new_packages(
+def test_deploy_slc_with_new_packages(
     slc_secrets: Secrets,
     # sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str, str]],
@@ -141,7 +132,7 @@ def test_upload_slc_with_new_packages(
     )
     # Do we still need a save method for single attribute, e.g. save
     # language_alias?
-    slc.upload()
+    slc.deploy()
     assert slc.activation_key == (
         "my_new_python=localzmq+protobuf:///bfsdefault/default/container/"
         "template-Exasol-all-python-3.10-release-my_new_python"
@@ -153,7 +144,7 @@ def test_upload_slc_with_new_packages(
 
 
 @pytest.mark.dependency(
-    name="udf_with_new_packages", depends=["upload_slc_with_new_packages"]
+    name="udf_with_new_packages", depends=["deploy_slc_with_new_packages"]
 )
 def test_udf_with_new_packages(
     slc_secrets: Secrets,
@@ -208,7 +199,7 @@ def run(ctx):
 
 
 @pytest.mark.dependency(
-    name="clean_up_images", depends=["upload_slc_with_new_packages"]
+    name="clean_up_images", depends=["deploy_slc_with_new_packages"]
 )
 def test_clean_up_images(sample_slc: ScriptLanguageContainer):
     sample_slc.clean_all_images()

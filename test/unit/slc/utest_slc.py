@@ -1,4 +1,5 @@
 import contextlib
+import logging
 from pathlib import Path
 from test.unit.slc.util import (
     SESSION_ATTS,
@@ -13,31 +14,66 @@ from unittest.mock import (
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
-from git import Repo
+import git
 
-import exasol.nb_connector.slc.script_language_container
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slc.constants import SLC_RELEASE_TAG
+from exasol.nb_connector.slc import (
+    constants,
+    script_language_container,
+)
 from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
     SlcSessionError,
 )
 
 
-def test_create(secrets):
+@pytest.fixture
+def git_repo_mock(monkeypatch: MonkeyPatch):
+    mock = create_autospec(git.Repo)
+    monkeypatch.setattr(script_language_container, "Repo", mock)
+    return mock
+
+
+def test_create(
+    sample_session,
+    git_repo_mock,
+    monkeypatch: MonkeyPatch,
+    tmp_path,
+    caplog,
+):
+    secrets = SecretsMock(sample_session)
     my_flavor = "Vanilla"
     my_language = "Spanish"
-    my_dir = Path("xtest")
+    monkeypatch.setattr(Path, "cwd", Mock(return_value=tmp_path))
+    checkout_dir = tmp_path / constants.SLC_CHECKOUT_DIR / sample_session
+    flavor_dir = checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / my_flavor
+    def create_dir(url, dir, branch):
+        flavor_dir.mkdir(parents=True)
+        return Mock()
+
+    git_repo_mock.clone_from.side_effect = create_dir
+    # Only required if ScriptLanguageContainer doesnt set this to INFO
+    # already.
+    script_language_container.LOG.setLevel(logging.INFO)
     testee = ScriptLanguageContainer.create(
         secrets,
-        name="CUDA",
+        name=sample_session,
         flavor=my_flavor,
         language_alias=my_language,
     )
     assert secrets.SLC_FLAVOR_CUDA == my_flavor
     assert secrets.SLC_LANGUAGE_ALIAS_CUDA == my_language
-    assert Path(secrets.SLC_DIR_CUDA).parts[-2:] == (".slc_checkout", "CUDA")
+    assert Path(secrets.SLC_DIR_CUDA).parts[-2:] == checkout_dir.parts[-2:]
     assert testee.flavor_path.endswith(my_flavor)
+    assert git_repo_mock.clone_from.called
+    assert "Cloning into" in caplog.text
+    assert "Fetching submodules" in caplog.text
+
+
+def test_repo_missing(sample_session):
+    secrets = secrets_without(sample_session, "none")
+    with pytest.raises(SlcSessionError, match="SLC Git repository not checked out"):
+        ScriptLanguageContainer(secrets, sample_session)
 
 
 @pytest.mark.parametrize("prefix, description", SESSION_ATTS.items())
@@ -77,24 +113,6 @@ def slc_with_tmp_checkout_dir(sample_session, tmp_path) -> ScriptLanguageContain
 
 def test_slc_repo_not_available(slc_with_tmp_checkout_dir):
     assert not slc_with_tmp_checkout_dir.slc_repo_available()
-
-
-def test_clone_repo(
-    slc_with_tmp_checkout_dir: ScriptLanguageContainer,
-    monkeypatch: MonkeyPatch,
-    caplog,
-):
-    repo_mock = create_autospec(Repo)
-    monkeypatch.setattr(
-        exasol.nb_connector.slc.script_language_container,
-        "Repo",
-        repo_mock,
-    )
-    testee = slc_with_tmp_checkout_dir
-    testee.clone_slc_repo()
-    assert repo_mock.clone_from.called
-    assert "Cloning into" in caplog.text
-    assert "Fetching submodules" in caplog.text
 
 
 def mock_docker_client_context(image_tags: list[str]):
@@ -142,7 +160,7 @@ def test_docker_images(sample_session, monkeypatch):
         f"exasol/other-image:{flavor}-suffix-1",
     ]
     monkeypatch.setattr(
-        exasol.nb_connector.slc.script_language_container,
+        script_language_container,
         "ContextDockerClient",
         mock_docker_client_context(image_tags),
     )

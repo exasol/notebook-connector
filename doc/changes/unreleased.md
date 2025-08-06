@@ -4,12 +4,14 @@
 
 This release of the Notebook Connector comes with breaking changes in the `SlctManager`:
 * The class has been renamed to `ScriptLanguageContainer`.
-* Some public methods have been renamed.
-  * `upload()` to `deploy()`
-  * `slc_docker_images()` to `docker_images()`
-  * `clean_all_images()` to `clean_docker_images()`
-  * `check_slc_repo_complete()` to `slc_repo_available()`
-
+* Some public methods have been
+  * renamed
+    * `upload()` to `deploy()`
+    * `slc_docker_images()` to `docker_images()`
+    * `clean_all_images()` to `clean_docker_images()`
+  * removed
+    * `check_slc_repo_complete()`
+    * `clone_slc_repo()`
 * The handling of Secure Configuration Storage and the SlcSession have been changed.
 
 See the NC User Guide for details.

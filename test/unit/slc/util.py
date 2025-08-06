@@ -15,6 +15,9 @@ class SecretsMock(Secrets):
         else:
             self._mock = {}
 
+    def get(self, key: str) -> str:
+        return self._mock.get(key)
+
     def __getitem__(self, key: str) -> str:
         val = self._mock.get(key)
         if val is None:

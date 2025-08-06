@@ -7,6 +7,7 @@ import re
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
+from collections import namedtuple
 from typing import Optional
 
 from exasol.slc import api as exaslct_api
@@ -19,21 +20,19 @@ from exasol.nb_connector.ai_lab_config import AILabConfig
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slc.constants import (
-    DEFAULT_ALIAS,
-    FLAVORS_PATH_IN_SLC_REPO,
-    PATH_IN_BUCKET,
-    SLC_ACTIVATION_KEY_PREFIX,
-    SLC_RELEASE_TAG,
-    PipPackageDefinition,
-)
+from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.slc_session import (
     SlcSession,
     SlcSessionError,
 )
 
 LOG = logging.getLogger(__name__)
+# Can also be set in tests
+# But actuall
 LOG.setLevel(logging.INFO)
+
+
+PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
 
 
 @contextlib.contextmanager
@@ -81,6 +80,27 @@ class Workspace:
         shutil.rmtree(self.export_path)
 
 
+def clone_slc_repo(session: SlcSession):
+    """
+    Clones the script-languages-release repository from Github into
+    the target dir configured in the Secure Configuration Storage.
+    """
+    if session.flavor_dir.is_dir():
+        LOG.warning(f"Directory '{dir}' is not empty. Skipping cloning....")
+        return
+
+    dir = session.checkout_dir
+    dir.mkdir(parents=True, exist_ok=True)
+    LOG.info(f"Cloning into {dir}...")
+    repo = Repo.clone_from(
+        "https://github.com/exasol/script-languages-release",
+        dir,
+        branch=constants.SLC_RELEASE_TAG,
+    )
+    LOG.info("Fetching submodules...")
+    repo.submodule_update(recursive=True)
+
+
 class ScriptLanguageContainer:
     """
     Support building different flavors of Exasol Script Language
@@ -98,7 +118,8 @@ class ScriptLanguageContainer:
     SCS, then the constructor will raise an SlcSessionError.
 
     Additionally, the caller needs to ensure, that a flavor with this name is
-    contained in the SLC release specified in variable SLC_RELEASE_TAG.
+    contained in the SLC release specified in variable
+    constants.SLC_RELEASE_TAG.
     """
 
     def __init__(
@@ -109,6 +130,10 @@ class ScriptLanguageContainer:
     ):
         self.session = SlcSession(secrets, name, verify)
         self.workspace = Workspace(Path.cwd())
+        if verify and not self.session.flavor_dir.is_dir():
+            raise SlcSessionError(
+                f"SLC Git repository not checked out to {self.session.checkout_dir}."
+            )
 
     @classmethod
     def create(
@@ -119,12 +144,13 @@ class ScriptLanguageContainer:
         language_alias: str,
     ) -> ScriptLanguageContainer:
         session = SlcSession(secrets=secrets, name=name, verify=False)
-        checkout_dir = Path.cwd() / ".slc_checkout" / name
+        checkout_dir = Path.cwd() / constants.SLC_CHECKOUT_DIR / name
         session.save(
             flavor=flavor,
             language_alias=language_alias,
             checkout_dir=checkout_dir,
         )
+        clone_slc_repo(session)
         return cls(secrets=secrets, name=name)
 
     @property
@@ -142,37 +168,6 @@ class ScriptLanguageContainer:
     @property
     def flavor_path(self) -> str:
         return str(self.session.flavor_path_in_slc_repo)
-
-    def slc_repo_available(self) -> bool:
-        """
-        Checks if the target dir for the script-languages repository is present and correct.
-        """
-        LOG.info(
-            "Directory for cloning repository"
-            f" script-languages-release: '{self.session.checkout_dir}'"
-        )
-        if not self.session.flavor_dir.is_dir():
-            return False
-        return True
-
-    def clone_slc_repo(self):
-        """
-        Clones the script-languages-release repository from Github into
-        the target dir configured in the Secure Configuration Storage.
-        """
-        dir = self.session.checkout_dir
-        dir.mkdir(parents=True, exist_ok=True)
-        if self.slc_repo_available():
-            LOG.warning(f"Directory '{dir}' is not empty. Skipping cloning....")
-        else:
-            LOG.info(f"Cloning into {dir}...")
-            repo = Repo.clone_from(
-                "https://github.com/exasol/script-languages-release",
-                dir,
-                branch=SLC_RELEASE_TAG,
-            )
-            LOG.info("Fetching submodules...")
-            repo.submodule_update(recursive=True)
 
     def export(self):
         """
@@ -207,7 +202,7 @@ class ScriptLanguageContainer:
             exaslct_api.deploy(
                 flavor_path=(self.flavor_path,),
                 **bfs_params,
-                path_in_bucket=PATH_IN_BUCKET,
+                path_in_bucket=constants.PATH_IN_BUCKET,
                 release_name=self.language_alias,
                 output_directory=str(self.workspace.output_path),
             )
@@ -217,7 +212,7 @@ class ScriptLanguageContainer:
                 bucketfs_name=bucketfs_name,
                 bucket_name=bucket_name,
                 container_name=container_name,
-                path_in_bucket=PATH_IN_BUCKET,
+                path_in_bucket=constants.PATH_IN_BUCKET,
             )
             alter_session_cmd = result[0]
             re_res = re.search(
@@ -229,7 +224,7 @@ class ScriptLanguageContainer:
 
     @property
     def _alias_key(self):
-        return SLC_ACTIVATION_KEY_PREFIX + self.language_alias
+        return constants.SLC_ACTIVATION_KEY_PREFIX + self.language_alias
 
     @property
     def activation_key(self) -> str:
@@ -268,11 +263,11 @@ class ScriptLanguageContainer:
                 if tag.startswith(f"{image_name}:{self.flavor}")
             ]
 
-    def clean_all_images(self):
+    def clean_docker_images(self):
         """
         Deletes local docker images related to the current flavor.
         """
-        exaslct_api.clean_all_images(
+        exaslct_api.clean_flavor_images(
+            flavor_path=(self.flavor_path,),
             output_directory=str(self.workspace.output_path),
-            docker_tag_prefix=self.flavor,
         )
