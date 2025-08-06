@@ -199,22 +199,22 @@ class ScriptLanguageContainer:
         Deploys the current script-languages-container to the database and
         stores the activation string in the Secure Configuration Storage.
         """
-        bucketfs_name = self._secrets.get(CKey.bfs_service)
-        bucket_name = self._secrets.get(CKey.bfs_bucket)
-        database_host = self._secrets.get(CKey.bfs_host_name)
-        bucketfs_port = self._secrets.get(CKey.bfs_port)
-        bucketfs_username = self._secrets.get(CKey.bfs_user)
-        bucketfs_password = self._secrets.get(CKey.bfs_password)
+        bfs_params = {
+            k: self.session.secrets.get(v)
+            for k, v in {
+                "database_host": CKey.bfs_host_name,
+                "bucketfs_name": CKey.bfs_service,
+                "bucket_name": CKey.bfs_bucket,
+                "bucketfs_port": CKey.bfs_port,
+                "bucketfs_username": CKey.bfs_user,
+                "bucketfs_password": CKey.bfs_password,
+            }
+        }
 
         with current_directory(self.session.checkout_dir):
             exaslct_api.deploy(
                 flavor_path=(self.flavor_path,),
-                database_host=database_host,
-                bucketfs_name=bucketfs_name,
-                bucket_name=bucket_name,
-                bucketfs_port=int(bucketfs_port),
-                bucketfs_username=bucketfs_username,
-                bucketfs_password=bucketfs_password,
+                **bfs_params,
                 path_in_bucket=PATH_IN_BUCKET,
                 release_name=self.language_alias,
                 output_directory=str(self.workspace.output_path),
@@ -233,7 +233,7 @@ class ScriptLanguageContainer:
             )
             activation_key = re_res.groups()[0]
             _, url = activation_key.split("=", maxsplit=1)
-            self._secrets.save(self._alias_key, f"{self.language_alias}={url}")
+            self.session.secrets.save(self._alias_key, f"{self.language_alias}={url}")
 
     @property
     def _alias_key(self):
@@ -247,7 +247,7 @@ class ScriptLanguageContainer:
         the language of the uploaded script-language-container.
         """
         try:
-            return self._secrets[self._alias_key]
+            return self.session.secrets[self._alias_key]
         except AttributeError as ex:
             raise SlcSessionError(
                 "Secure Configuration Storage does not contains an activation key."
