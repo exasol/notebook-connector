@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from exasol.slc import api as exaslct_api
+from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import (
     ContextDockerClient,
 )
@@ -294,6 +295,8 @@ class SlctManager:
                 export_path=str(self.workspace.export_path),
                 output_directory=str(self.workspace.output_path),
                 release_name=self.language_alias,
+                cleanup_docker_images=True,
+                compression_strategy=CompressionStrategy.NONE,
             )
 
     def upload(self):
