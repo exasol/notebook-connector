@@ -78,7 +78,6 @@ def test_clone_slc(slct_manager):
 def test_append_custom_packages(
     slct_manager: SlctManager,
     custom_packages: list[tuple[str, str, str]],
-    package_manager,
 ):
     slct_manager.append_custom_conda_packages(
         [CondaPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
