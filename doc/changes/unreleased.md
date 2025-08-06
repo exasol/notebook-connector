@@ -23,6 +23,7 @@ See the NC User Guide for details.
 ## Documentation
 
 * #217: Used defined term "Secure Configuration Storage" throughout all documents
+* Updated figure on SLC flavor
 
 ## Refactorings
 
