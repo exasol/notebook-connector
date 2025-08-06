@@ -5,9 +5,9 @@ import logging
 import os
 import re
 import shutil
+from collections import namedtuple
 from dataclasses import dataclass
 from pathlib import Path
-from collections import namedtuple
 from typing import Optional
 
 from exasol.slc import api as exaslct_api

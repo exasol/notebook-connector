@@ -12,9 +12,9 @@ from unittest.mock import (
     create_autospec,
 )
 
+import git
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
-import git
 
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import (
@@ -47,6 +47,7 @@ def test_create(
     monkeypatch.setattr(Path, "cwd", Mock(return_value=tmp_path))
     checkout_dir = tmp_path / constants.SLC_CHECKOUT_DIR / sample_session
     flavor_dir = checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / my_flavor
+
     def create_dir(url, dir, branch):
         flavor_dir.mkdir(parents=True)
         return Mock()
