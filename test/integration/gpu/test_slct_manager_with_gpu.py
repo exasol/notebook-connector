@@ -97,7 +97,7 @@ def test_upload_slc_with_new_packages(
     slct_manager.deploy()
     assert (
         slct_manager.activation_key
-        == f"my_new_python_with_numba=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-8-python-3.10-cuda-conda-release-my_new_python_with_numba?lang=python#buckets/bfsdefault/default/container/template-Exasol-8-python-3.10-cuda-conda-release-my_new_python_with_numba/exaudf/exaudfclient=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-my_new_python_with_numba?lang=python#buckets/bfsdefault/default/container/{flavor}-release-my_new_python_with_numba/exaudf/exaudfclient"
+        == f"my_new_python_with_numba=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-my_new_python_with_numba?lang=python#buckets/bfsdefault/default/container/{flavor}-release-my_new_python_with_numba/exaudf/exaudfclient"
     )
 
 
