@@ -66,7 +66,7 @@ def itde(slc_secrets: Secrets):
 
 @pytest.fixture
 def custom_packages() -> list[tuple[str, str]]:
-    return [("numba", "0.61.2")]
+    return [("pycuda", "2024.1")]
 
 
 @pytest.mark.dependency(name="clone")
@@ -93,11 +93,11 @@ def test_upload_slc_with_new_packages(
     slct_manager: SlctManager,
     flavor,
 ):
-    slct_manager.language_alias = "my_new_python_with_numba"
+    slct_manager.language_alias = "my_new_python_with_pycuda"
     slct_manager.deploy()
     assert (
         slct_manager.activation_key
-        == f"my_new_python_with_numba=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-my_new_python_with_numba?lang=python#buckets/bfsdefault/default/container/{flavor}-release-my_new_python_with_numba/exaudf/exaudfclient"
+        == f"my_new_python_with_pycuda=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-my_new_python_with_pycuda?lang=python#buckets/bfsdefault/default/container/{flavor}-release-my_new_python_with_pycuda/exaudf/exaudfclient"
     )
 
 
@@ -115,10 +115,11 @@ test_gpu_available()
 RETURNS VARCHAR(1000) AS
  %perInstanceRequiredAcceleratorDevices GpuNvidia;
 
-from numba import cuda
+import pycuda.driver as cuda
 
 def run(ctx):
-    if cuda.is_available():
+    cuda.init()
+    if cuda.Device.count() > 0:
         return "GPU Found"
     else:
         return "GPU Not Found"
@@ -129,7 +130,7 @@ def run(ctx):
     try:
         con.execute("CREATE SCHEMA TEST")
         con.execute(udf)
-        res = con.execute("select test_numba()")
+        res = con.execute("select test_gpu_available()")
         rows = res.fetchall()
         assert rows == [("GPU Found",)]
     finally:
