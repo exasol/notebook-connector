@@ -55,9 +55,9 @@ class SecretsMock(Secrets):
 
 
 SESSION_ARGS = {
-    "checkout_dir": "SLC checkout directory",
-    "flavor": "SLC flavor",
-    "language_alias": "SLC language alias",
+    "checkout_dir": "checkout directory",
+    "flavor": "flavor",
+    "language_alias": "language alias",
 }
 
 

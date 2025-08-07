@@ -1,27 +1,8 @@
 from pathlib import Path
-from test.unit.slc.util import (
-    SESSION_ARGS,
-    secrets_without,
-)
-
 import pytest
 
 from exasol.nb_connector.slc import constants
-from exasol.nb_connector.slc.slc_session import (
-    SlcError,
-    SlcSession,
-)
-
-
-@pytest.mark.parametrize("arg, description", SESSION_ARGS.items())
-def test_missing_slc_options(sample_session, arg, description):
-    secrets = secrets_without(sample_session, arg)
-    testee = SlcSession(secrets=secrets, name=sample_session)
-    with pytest.raises(
-        SlcError,
-        match=f"does not contain an {description}",
-    ):
-        testee.verify()
+from exasol.nb_connector.slc.slc_session import SlcSession
 
 
 def test_properties(secrets):

@@ -14,20 +14,20 @@ from exasol.nb_connector.slc.slc_session import (
 def configuration_item(
     secrets: Mock,
     key_prefix="SLC_P",
-    session_name="Strange",
-    description="SLC color",
+    slc_name="STRANGE",
+    description="color",
 ) -> ConfigurationItem:
     return ConfigurationItem(
         secrets=secrets,
         key_prefix=key_prefix,
-        session_name=session_name,
+        slc_name=slc_name,
         description=description,
     )
 
 
 def test_key():
     ci = configuration_item(Mock())
-    assert ci.key == "SLC_P_Strange"
+    assert ci.key == "SLC_P_STRANGE"
 
 
 def test_save_success():
@@ -42,7 +42,7 @@ def test_save_failure():
     ci = configuration_item(secrets)
     with pytest.raises(
         SlcError,
-        match="SLC color for session Strange",
+        match="color for SLC name STRANGE",
     ):
         ci.save(value="xxx")
 
@@ -58,6 +58,6 @@ def test_value_failure():
     ci = configuration_item(secrets)
     with pytest.raises(
         SlcError,
-        match="does not contain an SLC color for session Strange",
+        match="does not contain a color for SLC name STRANGE",
     ):
         ci.value

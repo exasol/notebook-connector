@@ -17,7 +17,7 @@ class SlcError(Exception):
     not contain specific data required for using the ScriptLanguageContainer.
 
     I.e. the flavor, language_alias, or checkout_dir for the specified SLC
-    session.
+    name.
     """
 
 
@@ -25,18 +25,18 @@ class SlcError(Exception):
 class ConfigurationItem:
     secrets: Secrets
     key_prefix: str
-    session_name: str
+    slc_name: str
     description: str
 
     @property
     def key(self) -> str:
-        return f"{self.key_prefix}_{self.session_name}"
+        return f"{self.key_prefix}_{self.slc_name}"
 
     def save(self, value: str) -> None:
         if self.secrets.get(self.key) is not None:
             raise SlcError(
-                "Secure Configuration Storage already contains an"
-                f" {self.description} for session {self.session_name}."
+                "Secure Configuration Storage already contains a"
+                f" {self.description} for SLC name {self.slc_name}."
             )
         self.secrets.save(self.key, value)
 
@@ -46,8 +46,8 @@ class ConfigurationItem:
             return self.secrets[self.key]
         except AttributeError as ex:
             raise SlcError(
-                "Secure Configuration Storage does not contain an"
-                f" {self.description} for session {self.session_name}."
+                "Secure Configuration Storage does not contain a"
+                f" {self.description} for SLC name {self.slc_name}."
             ) from ex
 
 
@@ -55,18 +55,17 @@ class SlcSession:
     def __init__(self, secrets: Secrets, name: str):
         self.secrets = secrets
         self.name = name
-        # if not name:
         if not NAME_PATTERN.match(name):
             raise SlcError(
-                f'SLC session name "{name}" doesn\'t match'
+                f'SLC name "{name}" doesn\'t match'
                 f' regular expression "{NAME_PATTERN}".'
             )
         self._atts = {
             key: ConfigurationItem(secrets, prefix, name, description)
             for key, prefix, description in [
-                ("flavor", "SLC_FLAVOR", "SLC flavor"),
-                ("language_alias", "SLC_LANGUAGE_ALIAS", "SLC language alias"),
-                ("checkout_dir", "SLC_DIR", "SLC checkout directory"),
+                ("flavor", "SLC_FLAVOR", "flavor"),
+                ("language_alias", "SLC_LANGUAGE_ALIAS", "language alias"),
+                ("checkout_dir", "SLC_DIR", "checkout directory"),
             ]
         }
 

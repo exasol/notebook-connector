@@ -87,7 +87,7 @@ def test_missing_slc_option(sample_session, arg, description):
     SlcError.
     """
     secrets = secrets_without(sample_session, arg)
-    with pytest.raises(SlcError, match=f"does not contain an {description}"):
+    with pytest.raises(SlcError, match=f"does not contain a {description}"):
         ScriptLanguageContainer(secrets, sample_session)
 
 
@@ -132,7 +132,7 @@ def test_non_unique_name(slc_with_tmp_checkout_dir):
     name = slc_with_tmp_checkout_dir.session.name
     with pytest.raises(
         SlcError,
-        match="already contains an SLC flavor for session",
+        match="already contains a flavor for SLC name",
     ):
         ScriptLanguageContainer.create(
             secrets,
