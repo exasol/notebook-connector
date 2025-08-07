@@ -76,7 +76,7 @@ class SlcSession:
 
     @property
     def language_alias(self) -> str:
-        return self.name
+        return f"CUSTOM_SLC_{self.name}"
 
     @property
     def checkout_dir(self) -> Path:

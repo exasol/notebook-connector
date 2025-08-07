@@ -201,8 +201,8 @@ class ScriptLanguageContainer:
             container_name = f"{self.flavor}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(
                 flavor_path=self.flavor_path,
-                bucketfs_name=bucketfs_name,
-                bucket_name=bucket_name,
+                bucketfs_name=bfs_params["bucketfs_name"],
+                bucket_name=bfs_params["bucket"],
                 container_name=container_name,
                 path_in_bucket=constants.PATH_IN_BUCKET,
             )
