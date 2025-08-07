@@ -4,8 +4,9 @@
 
 This release of the Notebook Connector comes with breaking changes in the `SlctManager`:
 * The class has been renamed to `ScriptLanguageContainer`.
-* Some public methods have been
+* Some public methods or and attributes have been
   * renamed
+    * `flavor_name` to `flavor`
     * `upload()` to `deploy()`
     * `slc_docker_images()` to `docker_images()`
     * `clean_all_images()` to `clean_docker_images()`

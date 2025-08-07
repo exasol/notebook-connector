@@ -1,4 +1,5 @@
 import logging
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -7,8 +8,10 @@ from exasol.nb_connector.slc.constants import FLAVORS_PATH_IN_SLC_REPO
 
 LOG = logging.getLogger(__name__)
 
+NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
-class SlcSessionError(Exception):
+
+class SlcError(Exception):
     """
     In case the Secure Configuration Storage (SCS / secrets / conf) does
     not contain specific data required for using the ScriptLanguageContainer.
@@ -31,7 +34,7 @@ class ConfigurationItem:
 
     def save(self, value: str) -> None:
         if self.secrets.get(self.key) is not None:
-            raise SlcSessionError(
+            raise SlcError(
                 "Secure Configuration Storage already contains an"
                 f" {self.description} for session {self.session_name}."
             )
@@ -42,7 +45,7 @@ class ConfigurationItem:
         try:
             return self.secrets[self.key]
         except AttributeError as ex:
-            raise SlcSessionError(
+            raise SlcError(
                 "Secure Configuration Storage does not contain an"
                 f" {self.description} for session {self.session_name}."
             ) from ex
@@ -52,8 +55,12 @@ class SlcSession:
     def __init__(self, secrets: Secrets, name: str):
         self.secrets = secrets
         self.name = name
-        if not name:
-            raise SlcSessionError("SLC session name must not be empty")
+        # if not name:
+        if not NAME_PATTERN.match(name):
+            raise SlcError(
+                f'SLC session name "{name}" doesn\'t match'
+                f' regular expression "{NAME_PATTERN}".'
+            )
         self._atts = {
             key: ConfigurationItem(secrets, prefix, name, description)
             for key, prefix, description in [

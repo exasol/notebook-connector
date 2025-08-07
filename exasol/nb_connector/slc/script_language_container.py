@@ -23,7 +23,7 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.slc_session import (
     SlcSession,
-    SlcSessionError,
+    SlcError,
 )
 
 LOG = logging.getLogger(__name__)
@@ -115,7 +115,7 @@ class ScriptLanguageContainer:
     * checkout_dir
 
     If parameter verify is True, and one of these properties is missing in the
-    SCS, then the constructor will raise an SlcSessionError.
+    SCS, then the constructor will raise an SlcError.
 
     Additionally, the caller needs to ensure, that a flavor with this name is
     contained in the SLC release specified in variable
@@ -131,7 +131,7 @@ class ScriptLanguageContainer:
         self.workspace = Workspace(Path.cwd())
         self.session.verify()
         if not self.session.flavor_dir.is_dir():
-            raise SlcSessionError(
+            raise SlcError(
                 f"SLC Git repository not checked out to {self.session.checkout_dir}."
             )
 
@@ -189,7 +189,7 @@ class ScriptLanguageContainer:
         bfs_params = {
             k: self.session.secrets.get(v)
             for k, v in [
-                ("database_host", CKey.bfs_host_name),
+                ("bucketfs_host", CKey.bfs_host_name),
                 ("bucketfs_name", CKey.bfs_service),
                 ("bucket_name", CKey.bfs_bucket),
                 ("bucketfs_port", CKey.bfs_port),
@@ -236,7 +236,7 @@ class ScriptLanguageContainer:
         try:
             return self.session.secrets[self._alias_key]
         except AttributeError as ex:
-            raise SlcSessionError(
+            raise SlcError(
                 "Secure Configuration Storage does not contains an activation key."
             ) from ex
 

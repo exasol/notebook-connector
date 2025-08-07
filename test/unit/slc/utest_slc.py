@@ -24,7 +24,7 @@ from exasol.nb_connector.slc import (
 from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
     SlcSession,
-    SlcSessionError,
+    SlcError,
 )
 
 
@@ -74,7 +74,7 @@ def test_create(
 
 def test_repo_missing(sample_session):
     secrets = SecretsMock.for_slc(sample_session, Path())
-    with pytest.raises(SlcSessionError, match="SLC Git repository not checked out"):
+    with pytest.raises(SlcError, match="SLC Git repository not checked out"):
         ScriptLanguageContainer(secrets, sample_session)
 
 
@@ -83,28 +83,55 @@ def test_missing_slc_option(sample_session, arg, description):
     """
     Secrets does not contain the specified property for the current SLC
     session.  The test expects ScriptLanguageContainer to raise an
-    SlcSessionError.
+    SlcError.
     """
     secrets = secrets_without(sample_session, arg)
-    with pytest.raises(SlcSessionError, match=f"does not contain an {description}"):
+    with pytest.raises(SlcError, match=f"does not contain an {description}"):
         ScriptLanguageContainer(secrets, sample_session)
 
 
-@pytest.mark.parametrize("name", ["", None])
-def test_empty_session_name(name):
-    """
-    Verify empty string or None are not accepted as name of a
-    ScriptLanguageContainer.
-    """
+# @pytest.mark.parametrize("name", ["", None])
+# def test_empty_name(name):
+#     """
+#     Verify empty string or None are not accepted as name of a
+#     ScriptLanguageContainer.
+#     """
+#     secrets = Mock()
+#     with pytest.raises(SlcError):
+#         ScriptLanguageContainer(secrets, name=name)
+
+
+@pytest.mark.parametrize( "name", [
+    "", "LoWERCASE", "SPACE CHARACTER",
+    "SPECIAL-", "/", ":", "&",
+])
+def test_name(name):
     secrets = Mock()
-    with pytest.raises(SlcSessionError):
+    with pytest.raises(
+        SlcError, match='name ".*" doesn\'t match regular expression',
+    ):
         ScriptLanguageContainer(secrets, name=name)
 
 
 @pytest.fixture
 def slc_with_tmp_checkout_dir(sample_session, tmp_path) -> ScriptLanguageContainer:
-    mock = SecretsMock.for_slc(sample_session, tmp_path).simulate_checkout()
-    return ScriptLanguageContainer(mock, name=sample_session)
+    secrets = SecretsMock.for_slc(sample_session, tmp_path).simulate_checkout()
+    return ScriptLanguageContainer(secrets, name=sample_session)
+
+
+def test_non_unique_name(slc_with_tmp_checkout_dir):
+    secrets = slc_with_tmp_checkout_dir.session.secrets
+    name = slc_with_tmp_checkout_dir.session.name
+    with pytest.raises(
+        SlcError,
+        match="already contains an SLC flavor for session",
+    ):
+        ScriptLanguageContainer.create(
+            secrets,
+            name,
+            flavor="flavor",
+            language_alias="alias",
+        )
 
 
 def mock_docker_client_context(image_tags: list[str]):

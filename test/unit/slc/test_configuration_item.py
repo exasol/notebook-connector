@@ -7,7 +7,7 @@ import pytest
 
 from exasol.nb_connector.slc.slc_session import (
     ConfigurationItem,
-    SlcSessionError,
+    SlcError,
 )
 
 
@@ -41,7 +41,7 @@ def test_save_failure():
     secrets = Mock(get=Mock(return_value=True))
     ci = configuration_item(secrets)
     with pytest.raises(
-        SlcSessionError,
+        SlcError,
         match="SLC color for session Strange",
     ):
         ci.save(value="xxx")
@@ -57,7 +57,7 @@ def test_value_failure():
     secrets = Mock(__getitem__=Mock(side_effect=AttributeError))
     ci = configuration_item(secrets)
     with pytest.raises(
-        SlcSessionError,
+        SlcError,
         match="does not contain an SLC color for session Strange",
     ):
         ci.value

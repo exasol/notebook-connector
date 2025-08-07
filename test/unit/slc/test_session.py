@@ -9,7 +9,7 @@ import pytest
 from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.slc_session import (
     SlcSession,
-    SlcSessionError,
+    SlcError,
 )
 
 
@@ -18,14 +18,14 @@ def test_missing_slc_options(sample_session, arg, description):
     secrets = secrets_without(sample_session, arg)
     testee = SlcSession(secrets=secrets, name=sample_session)
     with pytest.raises(
-        SlcSessionError,
+        SlcError,
         match=f"does not contain an {description}",
     ):
         testee.verify()
 
 
 def test_properties(secrets):
-    session = SlcSession(secrets=secrets, name="my_session")
+    session = SlcSession(secrets=secrets, name="MY_SESSION")
     my_flavor = "Vanilla"
     my_language = "Spanish"
     my_dir = Path("xtest")

@@ -43,7 +43,7 @@ def slc_secrets(secrets_file, working_path) -> Secrets:
 def sample_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
     return ScriptLanguageContainer.create(
         slc_secrets,
-        name="my_session",
+        name="MY_SESSION",
         flavor="template-Exasol-all-python-3.10",
         language_alias="my_python",
     )
@@ -86,7 +86,7 @@ def test_slc_images(sample_slc: ScriptLanguageContainer):
 def test_deploy(slc_secrets: Secrets, itde):
     slc = ScriptLanguageContainer.create(
         slc_secrets,
-        name="session_3",
+        name="SESSION_3",
         flavor="template-Exasol-all-python-3.10",
         language_alias="my_python",
     )
@@ -125,7 +125,7 @@ def test_deploy_slc_with_new_packages(
 ):
     slc = ScriptLanguageContainer.create(
         slc_secrets,
-        name="session_2",
+        name="SESSION_2",
         flavor="template-Exasol-all-python-3.10",
         language_alias="my_new_python",
     )
