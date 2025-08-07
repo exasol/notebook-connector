@@ -21,8 +21,3 @@ Before returning an instance of class `ScriptLanguageContainer` method `create()
 Method `create()` raises an error if the SCS already contains one of the SLC options as this indicates the session name to be non-unique.
 
 The constructor of class `ScriptLanguageContainer` verifies the SCS to contain the SLC options for the current session and the SLC repository to be checked out (cloned) in the local file system.
-
-
-<!--
-![](slct-manager-parameters.drawio.png)
--->
