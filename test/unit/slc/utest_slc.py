@@ -54,9 +54,6 @@ def test_create(
         return Mock()
 
     git_repo_mock.clone_from.side_effect = create_dir
-    # Only required if ScriptLanguageContainer doesn't set this to INFO
-    # already.
-    script_language_container.LOG.setLevel(logging.INFO)
     testee = ScriptLanguageContainer.create(
         secrets,
         name=sample_session,

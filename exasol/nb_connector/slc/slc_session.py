@@ -73,7 +73,7 @@ class SlcSession:
         return self._atts[property].value
 
     @property
-    def language_alias(self) -> Path:
+    def language_alias(self) -> str:
         return self.name
 
     @property

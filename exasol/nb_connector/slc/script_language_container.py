@@ -27,8 +27,6 @@ from exasol.nb_connector.slc.slc_session import (
 )
 
 LOG = logging.getLogger(__name__)
-# Can also be set in tests
-# But actuall
 LOG.setLevel(logging.INFO)
 
 
@@ -141,13 +139,11 @@ class ScriptLanguageContainer:
         secrets: Secrets,
         name: str,
         flavor: str,
-        # language_alias: str,
     ) -> ScriptLanguageContainer:
         session = SlcSession(secrets=secrets, name=name)
         checkout_dir = Path.cwd() / constants.SLC_CHECKOUT_DIR / name
         session.save(
             flavor=flavor,
-            # language_alias=language_alias,
             checkout_dir=checkout_dir,
         )
         clone_slc_repo(session)
