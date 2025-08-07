@@ -91,10 +91,10 @@ def test_deploy(slc_secrets: Secrets, itde):
     slc.deploy()
     assert slc.activation_key == (
         "CUSTOM_SLC_SESSION_3=localzmq+protobuf:///bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-my_python"
+        "template-Exasol-all-python-3.10-release-CUSTOM_SLC_SESSION_3"
         "?lang=python"
         "#buckets/bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-my_python/"
+        "template-Exasol-all-python-3.10-release-CUSTOM_SLC_SESSION_3/"
         "exaudf/exaudfclient"
     )
 
@@ -127,10 +127,10 @@ def test_deploy_slc_with_new_packages(
     slc.deploy()
     assert slc.activation_key == (
         "CUSTOM_SLC_SESSION_2=localzmq+protobuf:///bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-my_new_python"
+        "template-Exasol-all-python-3.10-release-CUSTOM_SLC_SESSION_2"
         "?lang=python"
         "#buckets/bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-my_new_python/"
+        "template-Exasol-all-python-3.10-release-CUSTOM_SLC_SESSION_2/"
         "exaudf/exaudfclient"
     )
 
