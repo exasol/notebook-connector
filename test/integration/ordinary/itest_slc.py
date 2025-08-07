@@ -85,12 +85,12 @@ def test_slc_images(sample_slc: ScriptLanguageContainer):
 def test_deploy(slc_secrets: Secrets, itde):
     slc = ScriptLanguageContainer.create(
         slc_secrets,
-        name="SESSION_3",
+        name="session_3",
         flavor="template-Exasol-all-python-3.10",
     )
     slc.deploy()
     assert slc.activation_key == (
-        "my_python=localzmq+protobuf:///bfsdefault/default/container/"
+        "CUSTOM_SLC_SESSION_3=localzmq+protobuf:///bfsdefault/default/container/"
         "template-Exasol-all-python-3.10-release-my_python"
         "?lang=python"
         "#buckets/bfsdefault/default/container/"
@@ -121,12 +121,12 @@ def test_deploy_slc_with_new_packages(
 ):
     slc = ScriptLanguageContainer.create(
         slc_secrets,
-        name="SESSION_2",
+        name="session_2",
         flavor="template-Exasol-all-python-3.10",
     )
     slc.deploy()
     assert slc.activation_key == (
-        "my_new_python=localzmq+protobuf:///bfsdefault/default/container/"
+        "CUSTOM_SLC_SESSION_2=localzmq+protobuf:///bfsdefault/default/container/"
         "template-Exasol-all-python-3.10-release-my_new_python"
         "?lang=python"
         "#buckets/bfsdefault/default/container/"
