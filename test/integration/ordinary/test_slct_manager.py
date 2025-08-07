@@ -1,11 +1,11 @@
+import enum
 import textwrap
+from collections.abc import (
+    Iterator,
+)
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from test.integration.ordinary.test_itde_manager import remove_itde
-from typing import (
-    List,
-    Tuple,
-)
 
 import pytest
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
@@ -18,13 +18,29 @@ from exasol.nb_connector.language_container_activation import (
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slct_manager import (
     DEFAULT_SLC_SESSION,
+    CondaPackageDefinition,
     PipPackageDefinition,
+    SlcSession,
     SlctManager,
 )
 
 
+class PackageManager(enum.Enum):
+    """
+    Supported Python package managers.
+    """
+
+    PIP = "pip"
+    CONDA = "conda"
+
+
 @pytest.fixture(scope="module")
-def working_path() -> Path:
+def package_manager(flavor: str) -> PackageManager:
+    return PackageManager.CONDA if "conda" in flavor.lower() else PackageManager.PIP
+
+
+@pytest.fixture(scope="module")
+def working_path() -> Iterator[Path]:
     with TemporaryDirectory() as d:
         yield Path(d)
 
@@ -35,12 +51,17 @@ def secrets_file(working_path: Path) -> Path:
 
 
 @pytest.fixture(scope="module")
-def slc_secrets(secrets_file, working_path) -> Secrets:
+def slc_session(package_manager) -> SlcSession:
+    return DEFAULT_SLC_SESSION
+
+
+@pytest.fixture(scope="module")
+def slc_secrets(secrets_file, working_path, flavor, slc_session) -> Secrets:
     secrets = Secrets(secrets_file, master_password="abc")
     secrets.save(
         AILabConfig.slc_target_dir, str(working_path / "script_languages_release")
     )
-    DEFAULT_SLC_SESSION.save_flavor(secrets, "template-Exasol-all-python-3.10")
+    slc_session.save_flavor(secrets, flavor)
     return secrets
 
 
@@ -77,12 +98,12 @@ def test_export_slc(slct_manager):
     slct_manager.export()
     export_path = slct_manager.workspace.export_path
     assert export_path.exists()
-    tgz = [f for f in export_path.glob("*.tar.gz")]
-    assert len(tgz) == 1
-    assert tgz[0].is_file()
-    tgz_sum = [f for f in export_path.glob("*.tar.gz.sha512sum")]
-    assert len(tgz_sum) == 1
-    assert tgz_sum[0].is_file()
+    tar = [f for f in export_path.glob("*.tar")]
+    assert len(tar) == 1
+    assert tar[0].is_file()
+    tar_sum = [f for f in export_path.glob("*.tar.sha512sum")]
+    assert len(tar_sum) == 1
+    assert tar_sum[0].is_file()
 
 
 @pytest.mark.dependency(name="slc_images", depends=["export_slc"])
@@ -94,41 +115,56 @@ def test_slc_images(slct_manager):
 
 
 @pytest.mark.dependency(name="upload_slc", depends=["check_config"])
-def test_upload(slct_manager: SlctManager, itde):
+def test_upload(slct_manager: SlctManager, itde, flavor):
     slct_manager.language_alias = "my_python"
-    slct_manager.upload()
+    slct_manager.deploy()
     assert (
         slct_manager.activation_key
-        == "my_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_python?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_python/exaudf/exaudfclient"
+        == f"my_python=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-my_python?lang=python#buckets/bfsdefault/default/container/{flavor}-release-my_python/exaudf/exaudfclient"
     )
 
 
-@pytest.mark.dependency(name="append_custom_packages", depends=["upload_slc"])
+@pytest.mark.dependency(name="test_append_custom_packages", depends=["upload_slc"])
 def test_append_custom_packages(
-    slct_manager: SlctManager, custom_packages: list[tuple[str, str, str]]
+    slct_manager: SlctManager,
+    custom_packages: list[tuple[str, str, str]],
+    package_manager,
 ):
-    slct_manager.append_custom_packages(
-        [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
-    )
-    with open(slct_manager.slc_paths.custom_pip_file) as f:
-        pip_content = f.read()
-        for custom_package, version, _ in custom_packages:
-            assert f"{custom_package}|{version}" in pip_content
+    if package_manager == PackageManager.PIP:
+        slct_manager.append_custom_pip_packages(
+            [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
+        )
+        with open(slct_manager.slc_paths.custom_pip_file) as f:
+            pip_content = f.read()
+            for custom_package, version, _ in custom_packages:
+                assert f"{custom_package}|{version}" in pip_content
+    elif package_manager == PackageManager.CONDA:
+        slct_manager.append_custom_conda_packages(
+            [
+                CondaPackageDefinition(pkg, version)
+                for pkg, version, _ in custom_packages
+            ]
+        )
+        with open(slct_manager.slc_paths.custom_conda_file) as f:
+            conda_content = f.read()
+            for custom_package, version, _ in custom_packages:
+                assert f"{custom_package}|{version}" in conda_content
 
 
 @pytest.mark.dependency(
-    name="upload_slc_with_new_packages", depends=["append_custom_packages"]
+    name="upload_slc_with_new_packages", depends=["test_append_custom_packages"]
 )
 def test_upload_slc_with_new_packages(
     slc_secrets: Secrets,
     slct_manager: SlctManager,
     custom_packages: list[tuple[str, str, str]],
+    flavor,
 ):
     slct_manager.language_alias = "my_new_python"
-    slct_manager.upload()
+    slct_manager.deploy()
     assert (
         slct_manager.activation_key
-        == "my_new_python=localzmq+protobuf:///bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_new_python?lang=python#buckets/bfsdefault/default/container/template-Exasol-all-python-3.10-release-my_new_python/exaudf/exaudfclient"
+        == f"my_new_python=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-my_new_python?lang=python#buckets/bfsdefault/default/container/{flavor}-release-my_new_python/exaudf/exaudfclient"
     )
 
 

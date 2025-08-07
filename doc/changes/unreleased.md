@@ -4,6 +4,7 @@
 
 * #213: Added Support to specify the SLC flavor via a session parameter
 * #205: Added GPU support to ITDE manager
+* #219: Notebook-Connector can add Conda-Packages to SLCs
 
 ## Documentation
 
