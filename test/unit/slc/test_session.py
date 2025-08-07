@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import pytest
 
 from exasol.nb_connector.slc import constants
