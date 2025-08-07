@@ -49,7 +49,7 @@ class SecretsMock(Secrets):
                 ("DIR", checkout_dir),
             ]:
                 if value:
-                    yield f"SLC_{key}_{session}", str(value)
+                    yield f"SLC_{key}_{session.upper()}", str(value)
 
         return cls(session, dict(slc_options()))
 

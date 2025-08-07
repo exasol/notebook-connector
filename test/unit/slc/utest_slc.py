@@ -88,7 +88,6 @@ def test_missing_slc_option(sample_session, option, description):
     "name",
     [
         "",
-        "LoWERCASE",
         "SPACE CHARACTER",
         "SPECIAL-",
         "/",
@@ -107,11 +106,12 @@ def test_illegal_names(name):
         ScriptLanguageContainer(secrets, name=name)
 
 
-@pytest.mark.parametrize("name", ["ABC", "ABC_123"])
+@pytest.mark.parametrize("name", ["ABC", "ABC_123", "abc", "abc_123"])
 def test_legal_names(sample_session, tmp_path, name):
     secrets = SecretsMock.for_slc(name, tmp_path).simulate_checkout()
     with not_raises(SlcError):
-        ScriptLanguageContainer(secrets, name=name)
+        testee = ScriptLanguageContainer(secrets, name=name)
+    assert testee.name == name.upper()
 
 
 def test_non_unique_name(slc_with_tmp_checkout_dir):

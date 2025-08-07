@@ -8,7 +8,7 @@ from exasol.nb_connector.slc.constants import FLAVORS_PATH_IN_SLC_REPO
 
 LOG = logging.getLogger(__name__)
 
-NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$")
+NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$", flags=re.IGNORECASE)
 
 
 class SlcError(Exception):
@@ -56,13 +56,14 @@ class ConfigurationItem:
 
 class SlcSession:
     def __init__(self, secrets: Secrets, name: str):
-        self.secrets = secrets
-        self.name = name
         if not NAME_PATTERN.match(name):
             raise SlcError(
                 f'SLC name "{name}" doesn\'t match'
                 f' regular expression "{NAME_PATTERN}".'
             )
+        self.secrets = secrets
+        name = name.upper()
+        self.name = name
         self._atts = {
             key: ConfigurationItem(secrets, prefix, name, description)
             for key, prefix, description in [
