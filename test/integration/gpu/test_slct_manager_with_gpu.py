@@ -118,7 +118,6 @@ RETURNS VARCHAR(1000) AS
 from numba import cuda
 
 def run(ctx):
-    cuda.init()
     if cuda.is_available():
         return "GPU Found"
     else:
