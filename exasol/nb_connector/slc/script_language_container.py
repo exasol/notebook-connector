@@ -183,7 +183,7 @@ class ScriptLanguageContainer:
             for k, v in [
                 ("bucketfs_host", CKey.bfs_host_name),
                 ("bucketfs_port", CKey.bfs_port),
-                ("bucketfs_username", CKey.bfs_user),
+                ("bucketfs_user", CKey.bfs_user),
                 ("bucketfs_password", CKey.bfs_password),
                 ("bucketfs_name", CKey.bfs_service),
                 ("bucket", CKey.bfs_bucket),
