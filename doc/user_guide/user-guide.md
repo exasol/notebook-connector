@@ -1,13 +1,30 @@
 # Notebook Connector User Guide
 
-## SlctManager
+## Managing Script Language Containers (SLCs)
 
-Class `SlctManager` in the Notebook Connector (NC) supports building different flavors of [Exasol Script Language Containers](https://github.com/exasol/script-languages-release) (SLCs). SlctManager uses [script-languages-container-tool](https://github.com/exasol/script-languages-container-tool) internally.
+The Notebook Connector (NC) supports building different flavors of [Exasol Script Language Containers](https://github.com/exasol/script-languages-release) (SLCs) using the [script-languages-container-tool](https://github.com/exasol/script-languages-container-tool).
 
-* The name of the SLC flavor must be provided in the Secure Configuration Storage (SCS) passed as parameter `secrets` to the constructor of SlctManager.
-* Additionally the caller must specify the *key* in the SCS for finding the flavor name.
+NC supports managing multiple SLCs, each with its specific parameters, clustered in so-called _SLC Sessions_ and stored in the Secure Configuration Storage (SCS).
 
-The constructor therefore supports the additional optional parameter `session`:
+Each SCL session is identified by an arbitrary unique name used as index into the SCS for finding the SLC parameters related to the session.
 
+You can save these parameters using the class method `ScriptLanguageContainer.create()`, which expects the following parameters
+* `secrets`: The SCS
+* `name`: The name of the SLC session.
+* `flavor`: The name of a template as provided by the [Exasol Script Language Containers](https://github.com/exasol/script-languages-release).
+* `language_alias`: Used for executing UDF scripts inside the SLC, see section _Define your own script aliases_ on [docs.exasol.com](https://docs.exasol.com/db/latest/database_concepts/udf_scripts/adding_new_packages_script_languages.htm).
+
+Method `create()` additionally will select `checkout_dir`&mdash;a unique path in the local file system for cloning the SLC Git repository.
+
+Before returning an instance of class `ScriptLanguageContainer` method `create()` will
+* Save the parameters `flavor`, `language_alias`, and `checkout_dir` in the SCS&mdash;all indexed by the session name.
+* Checkout (i.e. `git clone`) the SLC Git repository to the `checkout_dir` in the local file system.
+
+Method `create()` raises an error if the SCS already contains one of the parameters as this indicates the session name to be non-unique.
+
+The constructor of class `ScriptLanguageContainer` verifies the SCS to contain the parameters for the current session and the SLC repository to be checked out (cloned) in the local file system.
+
+
+<!--
 ![](slct-manager-parameters.drawio.png)
-
+-->
