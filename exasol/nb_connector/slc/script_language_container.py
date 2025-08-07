@@ -188,14 +188,14 @@ class ScriptLanguageContainer:
         """
         bfs_params = {
             k: self.session.secrets.get(v)
-            for k, v in {
-                "database_host": CKey.bfs_host_name,
-                "bucketfs_name": CKey.bfs_service,
-                "bucket_name": CKey.bfs_bucket,
-                "bucketfs_port": CKey.bfs_port,
-                "bucketfs_username": CKey.bfs_user,
-                "bucketfs_password": CKey.bfs_password,
-            }
+            for k, v in [
+                ("database_host", CKey.bfs_host_name),
+                ("bucketfs_name", CKey.bfs_service),
+                ("bucket_name", CKey.bfs_bucket),
+                ("bucketfs_port", CKey.bfs_port),
+                ("bucketfs_username", CKey.bfs_user),
+                ("bucketfs_password", CKey.bfs_password),
+            ]
         }
 
         with current_directory(self.session.checkout_dir):
