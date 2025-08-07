@@ -1,5 +1,5 @@
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc.slc_session import SlcSession
@@ -47,6 +47,7 @@ class SecretsMock(Secrets):
             ]:
                 if value:
                     yield f"SLC_{key}_{session}", str(value)
+
         return cls(session, dict(slc_options()))
 
 

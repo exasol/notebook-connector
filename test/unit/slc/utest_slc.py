@@ -162,10 +162,3 @@ def test_docker_images(sample_session, monkeypatch, tmp_path):
     )
     testee = ScriptLanguageContainer(secrets, name=sample_session)
     assert testee.docker_images == expected
-
-
-def test_x1(tmp_path):
-    secrets = SecretsMock.for_slc("session", None, "Strawberry", "Russian")
-    secrets = SecretsMock.for_slc("session", checkout_dir=None, flavor=None)
-    secrets = SecretsMock.for_slc("session", Path.cwd())
-    print(f'{secrets._mock}')
