@@ -64,13 +64,17 @@ class SlcSession:
             key: ConfigurationItem(secrets, prefix, name, description)
             for key, prefix, description in [
                 ("flavor", "SLC_FLAVOR", "flavor"),
-                ("language_alias", "SLC_LANGUAGE_ALIAS", "language alias"),
+                # ("language_alias", "SLC_LANGUAGE_ALIAS", "language alias"),
                 ("checkout_dir", "SLC_DIR", "checkout directory"),
             ]
         }
 
     def __getattr__(self, property: str) -> str:
         return self._atts[property].value
+
+    @property
+    def language_alias(self) -> Path:
+        return self.name
 
     @property
     def checkout_dir(self) -> Path:
@@ -103,16 +107,16 @@ class SlcSession:
     def save(
         self,
         flavor: str,
-        language_alias: str,
+        # language_alias: str,
         checkout_dir: Path,
     ) -> None:
         """
-        Save the specified flavor, language_alias, and checkout_dir into
-        the Secure Configuration Storage.
+        Save the specified flavor and checkout_dir to the Secure
+        Configuration Storage.
         """
         for k, v in {
             "flavor": flavor,
-            "language_alias": language_alias,
+            # "language_alias": language_alias,
             "checkout_dir": str(checkout_dir),
         }.items():
             self._atts[k].save(v)

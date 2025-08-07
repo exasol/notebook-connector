@@ -6,17 +6,16 @@ from exasol.nb_connector.slc.slc_session import SlcSession
 
 
 def test_properties(secrets):
-    session = SlcSession(secrets=secrets, name="MY_SESSION")
+    my_slc_name = "MY_SLC"
+    session = SlcSession(secrets=secrets, name=my_slc_name)
     my_flavor = "Vanilla"
-    my_language = "Spanish"
     my_dir = Path("xtest")
     session.save(
         flavor=my_flavor,
-        language_alias=my_language,
         checkout_dir=my_dir,
     )
     assert session.flavor == my_flavor
-    assert session.language_alias == my_language
+    assert session.language_alias == my_slc_name
     assert session.checkout_dir == my_dir
     expected_flavor_path = constants.FLAVORS_PATH_IN_SLC_REPO / my_flavor
     assert session.flavor_path_in_slc_repo == expected_flavor_path

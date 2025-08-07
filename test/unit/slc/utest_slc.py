@@ -45,7 +45,6 @@ def test_create(
 ):
     secrets = SecretsMock(sample_session, {})
     my_flavor = "Strawberry"
-    my_language = "French"
     monkeypatch.setattr(Path, "cwd", Mock(return_value=tmp_path))
     checkout_dir = tmp_path / constants.SLC_CHECKOUT_DIR / sample_session
     flavor_dir = checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / my_flavor
@@ -62,10 +61,8 @@ def test_create(
         secrets,
         name=sample_session,
         flavor=my_flavor,
-        language_alias=my_language,
     )
     assert secrets.SLC_FLAVOR_CUDA == my_flavor
-    assert secrets.SLC_LANGUAGE_ALIAS_CUDA == my_language
     assert Path(secrets.SLC_DIR_CUDA).parts[-2:] == checkout_dir.parts[-2:]
     assert testee.flavor_path.endswith(my_flavor)
     assert git_repo_mock.clone_from.called
@@ -138,7 +135,6 @@ def test_non_unique_name(slc_with_tmp_checkout_dir):
             secrets,
             name,
             flavor="flavor",
-            language_alias="alias",
         )
 
 

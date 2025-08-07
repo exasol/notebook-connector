@@ -45,7 +45,7 @@ def sample_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContai
         slc_secrets,
         name="MY_SESSION",
         flavor="template-Exasol-all-python-3.10",
-        language_alias="my_python",
+        # language_alias="my_python",
     )
 
 
@@ -88,10 +88,8 @@ def test_deploy(slc_secrets: Secrets, itde):
         slc_secrets,
         name="SESSION_3",
         flavor="template-Exasol-all-python-3.10",
-        language_alias="my_python",
+        # language_alias="my_python",
     )
-    # Do we still need a save method for single attribute, e.g. save
-    # language_alias?
     slc.deploy()
     assert slc.activation_key == (
         "my_python=localzmq+protobuf:///bfsdefault/default/container/"
@@ -127,10 +125,8 @@ def test_deploy_slc_with_new_packages(
         slc_secrets,
         name="SESSION_2",
         flavor="template-Exasol-all-python-3.10",
-        language_alias="my_new_python",
+        # language_alias="my_new_python",
     )
-    # Do we still need a save method for single attribute, e.g. save
-    # language_alias?
     slc.deploy()
     assert slc.activation_key == (
         "my_new_python=localzmq+protobuf:///bfsdefault/default/container/"
