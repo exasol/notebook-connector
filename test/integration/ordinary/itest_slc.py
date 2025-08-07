@@ -83,7 +83,7 @@ def test_slc_images(sample_slc: ScriptLanguageContainer):
 
 
 @pytest.mark.dependency(name="deploy_slc")
-def test_deploy(itde):
+def test_deploy(slc_secrets: Secrets, itde):
     slc = ScriptLanguageContainer.create(
         slc_secrets,
         name="session_3",
