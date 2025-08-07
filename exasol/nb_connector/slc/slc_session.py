@@ -59,7 +59,7 @@ class SlcSession:
             for key, prefix, description in [
                 ("flavor", "SLC_FLAVOR", "SLC flavor"),
                 ("language_alias", "SLC_LANGUAGE_ALIAS", "SLC language alias"),
-                ("checkout_dir", "SLC_DIR", "SLC working directory"),
+                ("checkout_dir", "SLC_DIR", "SLC checkout directory"),
             ]
         }
 

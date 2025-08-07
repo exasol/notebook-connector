@@ -2,7 +2,7 @@ import contextlib
 import logging
 from pathlib import Path
 from test.unit.slc.util import (
-    SESSION_ATTS,
+    SESSION_ARGS,
     SecretsMock,
     secrets_without,
 )
@@ -42,7 +42,7 @@ def test_create(
     tmp_path,
     caplog,
 ):
-    secrets = SecretsMock(sample_session)
+    secrets = SecretsMock(sample_session, {})
     my_flavor = "Strawberry"
     my_language = "French"
     monkeypatch.setattr(Path, "cwd", Mock(return_value=tmp_path))
@@ -73,19 +73,19 @@ def test_create(
 
 
 def test_repo_missing(sample_session):
-    secrets = secrets_without(sample_session, "none")
+    secrets = SecretsMock.for_slc(sample_session, Path())
     with pytest.raises(SlcSessionError, match="SLC Git repository not checked out"):
         ScriptLanguageContainer(secrets, sample_session)
 
 
-@pytest.mark.parametrize("prefix, description", SESSION_ATTS.items())
-def test_missing_property(sample_session, prefix, description):
+@pytest.mark.parametrize("arg, description", SESSION_ARGS.items())
+def test_missing_slc_option(sample_session, arg, description):
     """
     Secrets does not contain the specified property for the current SLC
     session.  The test expects ScriptLanguageContainer to raise an
     SlcSessionError.
     """
-    secrets = secrets_without(sample_session, prefix)
+    secrets = secrets_without(sample_session, arg)
     with pytest.raises(SlcSessionError, match=f"does not contain an {description}"):
         ScriptLanguageContainer(secrets, sample_session)
 
@@ -103,7 +103,7 @@ def test_empty_session_name(name):
 
 @pytest.fixture
 def slc_with_tmp_checkout_dir(sample_session, tmp_path) -> ScriptLanguageContainer:
-    mock = SecretsMock.create(sample_session, tmp_path).simulate_checkout()
+    mock = SecretsMock.for_slc(sample_session, tmp_path).simulate_checkout()
     return ScriptLanguageContainer(mock, name=sample_session)
 
 
@@ -141,7 +141,7 @@ def test_docker_images(sample_session, monkeypatch, tmp_path):
     """
     image_name = "exasol/script-language-container"
     flavor = "template-Exasol-all-python-3.10-conda"
-    secrets = SecretsMock.create(
+    secrets = SecretsMock.for_slc(
         sample_session,
         tmp_path,
         flavor=flavor,
@@ -162,3 +162,10 @@ def test_docker_images(sample_session, monkeypatch, tmp_path):
     )
     testee = ScriptLanguageContainer(secrets, name=sample_session)
     assert testee.docker_images == expected
+
+
+def test_x1(tmp_path):
+    secrets = SecretsMock.for_slc("session", None, "Strawberry", "Russian")
+    secrets = SecretsMock.for_slc("session", checkout_dir=None, flavor=None)
+    secrets = SecretsMock.for_slc("session", Path.cwd())
+    print(f'{secrets._mock}')

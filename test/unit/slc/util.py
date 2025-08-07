@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import Mock
+from typing import Iterator
 
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc.slc_session import SlcSession
@@ -9,14 +9,10 @@ class SecretsMock(Secrets):
     def __init__(
         self,
         session: str,
-        initial: dict[str, str] | None = None,
+        initial: dict[str, str],
     ):
         self.session = session
-        self._mock = initial or {}
-        # if initial:
-        #     self._mock = {f"{prefix}_{session}": v for prefix, v in initial.items()}
-        # else:
-        #     self._mock = {}
+        self._mock = initial
 
     def get(self, key: str) -> str:
         return self._mock.get(key)
@@ -43,22 +39,25 @@ class SecretsMock(Secrets):
         flavor: str | None = "Vanilla",
         language_alias: str | None = "Spanish",
     ):
-        slc_options = {
-            "FLAVOR": flavor,
-            "LANGUAGE_ALIAS": language_alias,
-            "DIR": str(checkout_dir),
-        }
-        return cls(session, {f"SLC_{k}_{session}": v for k.v in slc_options.items()})
+        def slc_options() -> Iterator[list[tuple[str, str]]]:
+            for key, value in [
+                ("FLAVOR", flavor),
+                ("LANGUAGE_ALIAS", language_alias),
+                ("DIR", checkout_dir),
+            ]:
+                if value:
+                    yield f"SLC_{key}_{session}", str(value)
+        return cls(session, dict(slc_options()))
 
 
-SESSION_ATTS = {
-    "SLC_FLAVOR": "SLC flavor",
-    "SLC_LANGUAGE_ALIAS": "SLC language alias",
-    "SLC_DIR": "SLC working directory",
+SESSION_ARGS = {
+    "checkout_dir": "SLC checkout directory",
+    "flavor": "SLC flavor",
+    "language_alias": "SLC language alias",
 }
 
 
-def secrets_without(session: str, key_prefix: str):
-    atts = dict(SESSION_ATTS)
-    atts.pop(key_prefix, None)
-    return SecretsMock(session, atts)
+def secrets_without(session: str, argument: str):
+    args = dict(SESSION_ARGS)
+    args[argument] = None
+    return SecretsMock.for_slc(session, **args)

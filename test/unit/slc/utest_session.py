@@ -1,6 +1,6 @@
 from pathlib import Path
 from test.unit.slc.util import (
-    SESSION_ATTS,
+    SESSION_ARGS,
     secrets_without,
 )
 
@@ -13,9 +13,9 @@ from exasol.nb_connector.slc.slc_session import (
 )
 
 
-@pytest.mark.parametrize("prefix, description", SESSION_ATTS.items())
-def test_missing_properties(sample_session, prefix, description):
-    secrets = secrets_without(sample_session, prefix)
+@pytest.mark.parametrize("arg, description", SESSION_ARGS.items())
+def test_missing_slc_options(sample_session, arg, description):
+    secrets = secrets_without(sample_session, arg)
     testee = SlcSession(secrets=secrets, name=sample_session)
     with pytest.raises(
         SlcSessionError,
