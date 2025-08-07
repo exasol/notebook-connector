@@ -126,16 +126,14 @@ class ScriptLanguageContainer:
         self,
         secrets: Secrets,
         name: str,
-        verify: bool = True,
     ):
         self.session = SlcSession(secrets, name)
         self.workspace = Workspace(Path.cwd())
-        if verify:
-            self.session.verify()
-            if not self.session.flavor_dir.is_dir():
-                raise SlcSessionError(
-                    f"SLC Git repository not checked out to {self.session.checkout_dir}."
-                )
+        self.session.verify()
+        if not self.session.flavor_dir.is_dir():
+            raise SlcSessionError(
+                f"SLC Git repository not checked out to {self.session.checkout_dir}."
+            )
 
     @classmethod
     def create(

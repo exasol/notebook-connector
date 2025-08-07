@@ -23,6 +23,7 @@ from exasol.nb_connector.slc import (
 )
 from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
+    SlcSession,
     SlcSessionError,
 )
 
@@ -42,8 +43,8 @@ def test_create(
     caplog,
 ):
     secrets = SecretsMock(sample_session)
-    my_flavor = "Vanilla"
-    my_language = "Spanish"
+    my_flavor = "Strawberry"
+    my_language = "French"
     monkeypatch.setattr(Path, "cwd", Mock(return_value=tmp_path))
     checkout_dir = tmp_path / constants.SLC_CHECKOUT_DIR / sample_session
     flavor_dir = checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / my_flavor
@@ -53,7 +54,7 @@ def test_create(
         return Mock()
 
     git_repo_mock.clone_from.side_effect = create_dir
-    # Only required if ScriptLanguageContainer doesnt set this to INFO
+    # Only required if ScriptLanguageContainer doesn't set this to INFO
     # already.
     script_language_container.LOG.setLevel(logging.INFO)
     testee = ScriptLanguageContainer.create(
@@ -102,14 +103,8 @@ def test_empty_session_name(name):
 
 @pytest.fixture
 def slc_with_tmp_checkout_dir(sample_session, tmp_path) -> ScriptLanguageContainer:
-    mock = SecretsMock(
-        sample_session,
-        {
-            "SLC_DIR": str(tmp_path),
-            "SLC_FLAVOR": "Vanilla",
-        },
-    )
-    return ScriptLanguageContainer(mock, name=sample_session, verify=False)
+    mock = SecretsMock.create(sample_session, tmp_path).simulate_checkout()
+    return ScriptLanguageContainer(mock, name=sample_session)
 
 
 def mock_docker_client_context(image_tags: list[str]):
@@ -135,7 +130,7 @@ def mock_docker_client_context(image_tags: list[str]):
     return context
 
 
-def test_docker_images(sample_session, monkeypatch):
+def test_docker_images(sample_session, monkeypatch, tmp_path):
     """
     This test mocks the Docker client simulating to return a list of
     Docker images to be available on the current system.
@@ -146,7 +141,11 @@ def test_docker_images(sample_session, monkeypatch):
     """
     image_name = "exasol/script-language-container"
     flavor = "template-Exasol-all-python-3.10-conda"
-    secrets = SecretsMock(sample_session, {"SLC_FLAVOR": flavor})
+    secrets = SecretsMock.create(
+        sample_session,
+        tmp_path,
+        flavor=flavor,
+    ).simulate_checkout()
     prefix = f"{image_name}:{flavor}"
     expected = [
         f"{prefix}-build_run_123",
@@ -161,5 +160,5 @@ def test_docker_images(sample_session, monkeypatch):
         "ContextDockerClient",
         mock_docker_client_context(image_tags),
     )
-    testee = ScriptLanguageContainer(secrets, name=sample_session, verify=False)
+    testee = ScriptLanguageContainer(secrets, name=sample_session)
     assert testee.docker_images == expected

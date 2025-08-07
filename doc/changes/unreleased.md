@@ -20,7 +20,7 @@ See the NC User Guide for details.
 
 * #213: Added Support to specify the SLC flavor via a session parameter
 * #205: Added GPU support to ITDE manager
-* #220: Refactored class `SlctManager`
+* #220: Replaced implementation on using SLCs by Gen.2
 
 ## Documentation
 

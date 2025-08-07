@@ -1,6 +1,8 @@
+from pathlib import Path
 from unittest.mock import Mock
 
 from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.slc.slc_session import SlcSession
 
 
 class SecretsMock(Secrets):
@@ -27,6 +29,25 @@ class SecretsMock(Secrets):
     def save(self, key: str, value: str) -> "Secrets":
         self._mock[key] = value
         return self
+
+    def simulate_checkout(self):
+        SlcSession(self, self.session).flavor_dir.mkdir(parents=True)
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        session: str,
+        checkout_dir: Path,
+        flavor: str = "Vanilla",
+        language_alias: str = "Spanish",
+    ):
+        initial = {
+            "FLAVOR": flavor,
+            "LANGUAGE_ALIAS": language_alias,
+            "DIR": str(checkout_dir),
+        }
+        return cls(session, {f"SLC_{k}_{session}": v for k.v in initial.items()})
 
 
 SESSION_ATTS = {
