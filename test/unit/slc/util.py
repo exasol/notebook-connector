@@ -12,10 +12,11 @@ class SecretsMock(Secrets):
         initial: dict[str, str] | None = None,
     ):
         self.session = session
-        if initial:
-            self._mock = {f"{prefix}_{session}": v for prefix, v in initial.items()}
-        else:
-            self._mock = {}
+        self._mock = initial or {}
+        # if initial:
+        #     self._mock = {f"{prefix}_{session}": v for prefix, v in initial.items()}
+        # else:
+        #     self._mock = {}
 
     def get(self, key: str) -> str:
         return self._mock.get(key)
@@ -35,19 +36,19 @@ class SecretsMock(Secrets):
         return self
 
     @classmethod
-    def create(
+    def for_slc(
         cls,
         session: str,
-        checkout_dir: Path,
-        flavor: str = "Vanilla",
-        language_alias: str = "Spanish",
+        checkout_dir: Path | None,
+        flavor: str | None = "Vanilla",
+        language_alias: str | None = "Spanish",
     ):
-        initial = {
+        slc_options = {
             "FLAVOR": flavor,
             "LANGUAGE_ALIAS": language_alias,
             "DIR": str(checkout_dir),
         }
-        return cls(session, {f"SLC_{k}_{session}": v for k.v in initial.items()})
+        return cls(session, {f"SLC_{k}_{session}": v for k.v in slc_options.items()})
 
 
 SESSION_ATTS = {
