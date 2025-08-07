@@ -13,11 +13,14 @@ NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
 class SlcError(Exception):
     """
-    In case the Secure Configuration Storage (SCS / secrets / conf) does
-    not contain specific data required for using the ScriptLanguageContainer.
+    Signals errors related to ScriptLanguageContainer:
 
-    I.e. the flavor, language_alias, or checkout_dir for the specified SLC
-    name.
+    * The name of the SLC is not unique
+
+    * the Secure Configuration Storage (SCS / secrets / conf) does not contain
+      a required option
+
+    * The SLC Git repository has not been checked out (cloned)
     """
 
 
@@ -64,7 +67,6 @@ class SlcSession:
             key: ConfigurationItem(secrets, prefix, name, description)
             for key, prefix, description in [
                 ("flavor", "SLC_FLAVOR", "flavor"),
-                # ("language_alias", "SLC_LANGUAGE_ALIAS", "language alias"),
                 ("checkout_dir", "SLC_DIR", "checkout directory"),
             ]
         }
@@ -107,7 +109,6 @@ class SlcSession:
     def save(
         self,
         flavor: str,
-        # language_alias: str,
         checkout_dir: Path,
     ) -> None:
         """
@@ -116,7 +117,6 @@ class SlcSession:
         """
         for k, v in {
             "flavor": flavor,
-            # "language_alias": language_alias,
             "checkout_dir": str(checkout_dir),
         }.items():
             self._atts[k].save(v)

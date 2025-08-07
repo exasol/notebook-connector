@@ -45,7 +45,6 @@ def sample_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContai
         slc_secrets,
         name="MY_SESSION",
         flavor="template-Exasol-all-python-3.10",
-        # language_alias="my_python",
     )
 
 
@@ -88,7 +87,6 @@ def test_deploy(slc_secrets: Secrets, itde):
         slc_secrets,
         name="SESSION_3",
         flavor="template-Exasol-all-python-3.10",
-        # language_alias="my_python",
     )
     slc.deploy()
     assert slc.activation_key == (
@@ -125,7 +123,6 @@ def test_deploy_slc_with_new_packages(
         slc_secrets,
         name="SESSION_2",
         flavor="template-Exasol-all-python-3.10",
-        # language_alias="my_new_python",
     )
     slc.deploy()
     assert slc.activation_key == (

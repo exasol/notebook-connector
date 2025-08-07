@@ -2,7 +2,7 @@ import contextlib
 import logging
 from pathlib import Path
 from test.unit.slc.util import (
-    SESSION_ARGS,
+    SESSION_OPTIONS,
     SecretsMock,
     not_raises,
     secrets_without,
@@ -73,14 +73,13 @@ def test_repo_missing(sample_session):
         ScriptLanguageContainer(secrets, sample_session)
 
 
-@pytest.mark.parametrize("arg, description", SESSION_ARGS.items())
-def test_missing_slc_option(sample_session, arg, description):
+@pytest.mark.parametrize("option, description", SESSION_OPTIONS.items())
+def test_missing_slc_option(sample_session, option, description):
     """
-    Secrets does not contain the specified property for the current SLC
-    session.  The test expects ScriptLanguageContainer to raise an
-    SlcError.
+    Secrets does not contain the specified option for the current SLC.
+    The test expects ScriptLanguageContainer to raise an SlcError.
     """
-    secrets = secrets_without(sample_session, arg)
+    secrets = secrets_without(sample_session, option)
     with pytest.raises(SlcError, match=f"does not contain a {description}"):
         ScriptLanguageContainer(secrets, sample_session)
 
@@ -115,12 +114,6 @@ def test_legal_names(sample_session, tmp_path, name):
         ScriptLanguageContainer(secrets, name=name)
 
 
-@pytest.fixture
-def slc_with_tmp_checkout_dir(sample_session, tmp_path) -> ScriptLanguageContainer:
-    secrets = SecretsMock.for_slc(sample_session, tmp_path).simulate_checkout()
-    return ScriptLanguageContainer(secrets, name=sample_session)
-
-
 def test_non_unique_name(slc_with_tmp_checkout_dir):
     secrets = slc_with_tmp_checkout_dir.session.secrets
     name = slc_with_tmp_checkout_dir.session.name
@@ -133,6 +126,12 @@ def test_non_unique_name(slc_with_tmp_checkout_dir):
             name,
             flavor="flavor",
         )
+
+
+@pytest.fixture
+def slc_with_tmp_checkout_dir(sample_session, tmp_path) -> ScriptLanguageContainer:
+    secrets = SecretsMock.for_slc(sample_session, tmp_path).simulate_checkout()
+    return ScriptLanguageContainer(secrets, name=sample_session)
 
 
 def mock_docker_client_context(image_tags: list[str]):

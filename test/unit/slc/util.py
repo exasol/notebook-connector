@@ -54,14 +54,14 @@ class SecretsMock(Secrets):
         return cls(session, dict(slc_options()))
 
 
-SESSION_ARGS = {
+SESSION_OPTIONS = {
     "checkout_dir": "checkout directory",
     "flavor": "flavor",
 }
 
 
 def secrets_without(session: str, argument: str):
-    args = dict(SESSION_ARGS)
+    args = dict(SESSION_OPTIONS)
     args[argument] = None
     return SecretsMock.for_slc(session, **args)
 

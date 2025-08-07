@@ -85,7 +85,7 @@ def clone_slc_repo(session: SlcSession):
     """
     dir = session.checkout_dir
     if dir.is_dir():
-        LOG.warning(f"Directory '{dir}' is not empty. Skipping cloning....")
+        LOG.warning(f"Directory '{dir}' is not empty. Skipping checkout....")
         return
 
     dir.mkdir(parents=True, exist_ok=True)
@@ -104,16 +104,15 @@ class ScriptLanguageContainer:
     Support building different flavors of Exasol Script Language
     Containers (SLCs) using the SLCT.
 
-    Parameter name serves as a key for different SLC sessions. Each session is
-    associated with SLC-related properties stored in the Secure Configuration
-    Storage (SCS / secrets / conf):
+    Parameter ``name`` serves as a key for additional SLC options stored in
+    the Secure Configuration Storage (SCS / secrets / conf):
 
     * flavor
-    * language_alias
     * checkout_dir
 
-    If parameter verify is True, and one of these properties is missing in the
-    SCS, then the constructor will raise an SlcError.
+    If one of these options is missing in the SCS or the SLC Git repository
+    has not been checked out (i.e. cloned) into the checkout_dir, then the
+    constructor will raise an SlcError.
 
     Additionally, the caller needs to ensure, that a flavor with this name is
     contained in the SLC release specified in variable
@@ -142,10 +141,7 @@ class ScriptLanguageContainer:
     ) -> ScriptLanguageContainer:
         session = SlcSession(secrets=secrets, name=name)
         checkout_dir = Path.cwd() / constants.SLC_CHECKOUT_DIR / name
-        session.save(
-            flavor=flavor,
-            checkout_dir=checkout_dir,
-        )
+        session.save(flavor=flavor, checkout_dir=checkout_dir)
         clone_slc_repo(session)
         return cls(secrets=secrets, name=name)
 
@@ -186,11 +182,11 @@ class ScriptLanguageContainer:
             k: self.session.secrets.get(v)
             for k, v in [
                 ("bucketfs_host", CKey.bfs_host_name),
-                ("bucketfs_name", CKey.bfs_service),
-                ("bucket_name", CKey.bfs_bucket),
                 ("bucketfs_port", CKey.bfs_port),
                 ("bucketfs_username", CKey.bfs_user),
                 ("bucketfs_password", CKey.bfs_password),
+                ("bucketfs_name", CKey.bfs_service),
+                ("bucket", CKey.bfs_bucket),
             ]
         }
 
