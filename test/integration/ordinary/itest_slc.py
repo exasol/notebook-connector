@@ -16,9 +16,9 @@ from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slc.constants import PipPackageDefinition
 from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
+    PipPackageDefinition,
 )
 
 
@@ -214,3 +214,4 @@ def test_clean_export(sample_slc: ScriptLanguageContainer):
     sample_slc.workspace.cleanup_export_path()
     p = Path(sample_slc.workspace.export_path)
     assert not p.is_dir()
+
