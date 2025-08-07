@@ -84,7 +84,14 @@ def test_slc_images(sample_slc: ScriptLanguageContainer):
 
 @pytest.mark.dependency(name="deploy_slc")
 def test_deploy(sample_slc: ScriptLanguageContainer, itde):
-    sample_slc.language_alias = "my_python"
+    slc = ScriptLanguageContainer.create(
+        slc_secrets,
+        name="session_3",
+        flavor="template-Exasol-all-python-3.10",
+        language_alias="my_python",
+    )
+    # Do we still need a save method for single attribute, e.g. save
+    # language_alias?
     sample_slc.deploy()
     assert sample_slc.activation_key == (
         "my_python=localzmq+protobuf:///bfsdefault/default/container/"
@@ -103,7 +110,6 @@ def test_append_custom_packages(
     sample_slc.append_custom_packages(
         [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
     )
-    # Would we like to move custom_pip_file from SlcSession to ScriptLanguageContainer?
     with open(sample_slc.session.custom_pip_file) as f:
         pip_content = f.read()
         for custom_package, version, _ in custom_packages:
@@ -115,7 +121,6 @@ def test_append_custom_packages(
 )
 def test_deploy_slc_with_new_packages(
     slc_secrets: Secrets,
-    # sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str, str]],
 ):
     slc = ScriptLanguageContainer.create(
@@ -196,7 +201,7 @@ def run(ctx):
     name="clean_up_images", depends=["deploy_slc_with_new_packages"]
 )
 def test_clean_up_images(sample_slc: ScriptLanguageContainer):
-    sample_slc.clean_all_images()
+    sample_slc.clean_docker_images()
     with ContextDockerClient() as docker_client:
         images = docker_client.images.list(name="exasol/script-language-container")
         assert len(images) == 0
