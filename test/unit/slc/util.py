@@ -1,5 +1,8 @@
+import contextlib
 from collections.abc import Iterator
 from pathlib import Path
+
+import pytest
 
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc.slc_session import SlcSession
@@ -62,3 +65,11 @@ def secrets_without(session: str, argument: str):
     args = dict(SESSION_ARGS)
     args[argument] = None
     return SecretsMock.for_slc(session, **args)
+
+
+@contextlib.contextmanager
+def not_raises(exception):
+    try:
+        yield
+    except exception:
+        raise pytest.fail(f"DID RAISE {exception}")

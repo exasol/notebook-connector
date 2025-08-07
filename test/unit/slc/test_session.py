@@ -8,8 +8,8 @@ import pytest
 
 from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.slc_session import (
-    SlcSession,
     SlcError,
+    SlcSession,
 )
 
 

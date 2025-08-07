@@ -4,6 +4,7 @@ from pathlib import Path
 from test.unit.slc.util import (
     SESSION_ARGS,
     SecretsMock,
+    not_raises,
     secrets_without,
 )
 from unittest.mock import (
@@ -23,8 +24,8 @@ from exasol.nb_connector.slc import (
 )
 from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
-    SlcSession,
     SlcError,
+    SlcSession,
 )
 
 
@@ -90,26 +91,33 @@ def test_missing_slc_option(sample_session, arg, description):
         ScriptLanguageContainer(secrets, sample_session)
 
 
-# @pytest.mark.parametrize("name", ["", None])
-# def test_empty_name(name):
-#     """
-#     Verify empty string or None are not accepted as name of a
-#     ScriptLanguageContainer.
-#     """
-#     secrets = Mock()
-#     with pytest.raises(SlcError):
-#         ScriptLanguageContainer(secrets, name=name)
-
-
-@pytest.mark.parametrize( "name", [
-    "", "LoWERCASE", "SPACE CHARACTER",
-    "SPECIAL-", "/", ":", "&",
-])
-def test_name(name):
+@pytest.mark.parametrize(
+    "name",
+    [
+        "",
+        "LoWERCASE",
+        "SPACE CHARACTER",
+        "SPECIAL-",
+        "/",
+        ":",
+        "&",
+        "1_NUMBER_PREFIX",
+        "_UNDERSCORE_PREFIX",
+    ],
+)
+def test_illegal_names(name):
     secrets = Mock()
     with pytest.raises(
-        SlcError, match='name ".*" doesn\'t match regular expression',
+        SlcError,
+        match='name ".*" doesn\'t match regular expression',
     ):
+        ScriptLanguageContainer(secrets, name=name)
+
+
+@pytest.mark.parametrize("name", ["ABC", "ABC_123"])
+def test_legal_names(sample_session, tmp_path, name):
+    secrets = SecretsMock.for_slc(name, tmp_path).simulate_checkout()
+    with not_raises(SlcError):
         ScriptLanguageContainer(secrets, name=name)
 
 

@@ -22,8 +22,8 @@ from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PRE
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.slc_session import (
-    SlcSession,
     SlcError,
+    SlcSession,
 )
 
 LOG = logging.getLogger(__name__)
