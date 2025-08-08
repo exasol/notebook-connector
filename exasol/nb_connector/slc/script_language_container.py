@@ -196,7 +196,7 @@ class ScriptLanguageContainer:
         """
         Exports the current SLC to the export directory.
         """
-        with current_directory(self.session.checkout_dir):
+        with current_directory(self.checkout_dir):
             exaslct_api.export(
                 flavor_path=(str(self.flavor_path),),
                 export_path=str(self.workspace.export_path),
@@ -210,7 +210,7 @@ class ScriptLanguageContainer:
         stores the activation string in the Secure Configuration Storage.
         """
         bfs_params = {
-            k: self.session.secrets.get(v)
+            k: self.secrets.get(v)
             for k, v in [
                 ("bucketfs_host", CKey.bfs_host_name),
                 ("bucketfs_port", CKey.bfs_port),
@@ -221,7 +221,7 @@ class ScriptLanguageContainer:
             ]
         }
 
-        with current_directory(self.session.checkout_dir):
+        with current_directory(self.checkout_dir):
             exaslct_api.deploy(
                 flavor_path=(str(self.flavor_path),),
                 **bfs_params,
@@ -243,7 +243,7 @@ class ScriptLanguageContainer:
             )
             activation_key = re_res.groups()[0]
             _, url = activation_key.split("=", maxsplit=1)
-            self.session.secrets.save(self._alias_key, f"{self.language_alias}={url}")
+            self.secrets.save(self._alias_key, f"{self.language_alias}={url}")
 
     @property
     def _alias_key(self):
@@ -257,7 +257,7 @@ class ScriptLanguageContainer:
         the language of the uploaded script-language-container.
         """
         try:
-            return self.session.secrets[self._alias_key]
+            return self.secrets[self._alias_key]
         except AttributeError as ex:
             raise SlcError(
                 "Secure Configuration Storage does not contains an activation key."
@@ -270,7 +270,7 @@ class ScriptLanguageContainer:
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
-        with open(self.session.custom_pip_file, "a") as f:
+        with open(self.custom_pip_file, "a") as f:
             for p in pip_packages:
                 print(f"{p.pkg}|{p.version}", file=f)
 

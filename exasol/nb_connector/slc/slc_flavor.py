@@ -41,7 +41,7 @@ class SlcFlavor:
         return secrets[self.key]
 
     def exists(self, secrets: Secrets) -> bool:
-        return secrets.get(self.key)
+        return True if secrets.get(self.key) else False
 
     def verify(self, secrets: Secrets) -> SlcFlavor:
         try:
