@@ -16,14 +16,13 @@ from exasol_integration_test_docker_environment.lib.docker import (
 )
 from git import Repo
 
-from exasol.nb_connector.ai_lab_config import AILabConfig
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
-from exasol.nb_connector.slc.slc_session import (
+from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
-    SlcSession,
+    SlcFlavor,
 )
 
 LOG = logging.getLogger(__name__)
@@ -78,12 +77,12 @@ class Workspace:
         shutil.rmtree(self.export_path)
 
 
-def clone_slc_repo(session: SlcSession):
+def clone_slc_repo(target_dir: Path):
     """
     Clones the script-languages-release repository from Github into
     the target dir configured in the Secure Configuration Storage.
     """
-    dir = session.checkout_dir
+    dir = target_dir # session.checkout_dir
     if dir.is_dir():
         LOG.warning(f"Directory '{dir}' is not empty. Skipping checkout....")
         return
@@ -97,6 +96,11 @@ def clone_slc_repo(session: SlcSession):
     )
     LOG.info("Fetching submodules...")
     repo.submodule_update(recursive=True)
+
+
+
+def checkout_dir(name: str) -> Path:
+    return Path.cwd() / constants.SLC_CHECKOUT_DIR / name
 
 
 class ScriptLanguageContainer:
@@ -124,12 +128,16 @@ class ScriptLanguageContainer:
         secrets: Secrets,
         name: str,
     ):
-        self.session = SlcSession(secrets, name)
-        self.workspace = Workspace(Path.cwd())
-        self.session.verify()
-        if not self.session.flavor_dir.is_dir():
+        self.secrets = secrets
+        self.name = name
+        self.slc_flavor = SlcFlavor(name).verify(secrets)
+        self.workspace = Workspace(Path.cwd() / name)
+        # self.session = SlcSession(secrets, name)
+        # self.session.verify()
+        if not self.flavor_dir.is_dir():
+            # if not self.session.flavor_dir.is_dir():
             raise SlcError(
-                f"SLC Git repository not checked out to {self.session.checkout_dir}."
+                f"SLC Git repository not checked out to {self.checkout_dir}."
             )
 
     @classmethod
@@ -139,27 +147,66 @@ class ScriptLanguageContainer:
         name: str,
         flavor: str,
     ) -> ScriptLanguageContainer:
-        session = SlcSession(secrets=secrets, name=name)
-        checkout_dir = Path.cwd() / constants.SLC_CHECKOUT_DIR / name
-        session.save(flavor=flavor, checkout_dir=checkout_dir)
-        clone_slc_repo(session)
+        slc_flavor = SlcFlavor(name)
+        if slc_flavor.exists(secrets):
+            raise SlcError(
+                "Secure Configuration Storage already contains a"
+                f" flavor for SLC name {name}."
+            )
+        slc_flavor.save(secrets, flavor)
+        clone_slc_repo(checkout_dir(name))
         return cls(secrets=secrets, name=name)
 
-    @property
-    def name(self) -> str:
-        return self.session.name
+    # @property
+    # def name(self) -> str:
+    #     return self.name
 
     @property
     def flavor(self) -> str:
-        return self.session.flavor
+        return self.slc_flavor.get(self.secrets)
 
     @property
     def language_alias(self) -> str:
-        return self.session.language_alias
+        """
+        Is case-insensitive.
+        """
+        return f"custom_slc_{self.name}"
+
+    # @property
+    # def language_alias(self) -> str:
+    #     return self.session.language_alias
 
     @property
-    def flavor_path(self) -> str:
-        return str(self.session.flavor_path_in_slc_repo)
+    def checkout_dir(self) -> Path:
+        return checkout_dir(self.name)
+
+    # @property
+    # def flavor_path(self) -> str:
+    #     return str(self.session.flavor_path_in_slc_repo)
+
+    @property
+    def flavor_path(self) -> Path:
+        """
+        Path to the used flavor within the script-languages-release
+        repository
+        """
+        return constants.FLAVORS_PATH_IN_SLC_REPO / self.flavor
+
+    @property
+    def flavor_dir(self) -> Path:
+        return self.checkout_dir / self.flavor_path
+
+    @property
+    def custom_pip_file(self) -> Path:
+        """
+        Returns the path to the custom pip file of the flavor
+        """
+        return (
+            self.flavor_dir
+            / "flavor_customization"
+            / "packages"
+            / "python3_pip_packages"
+        )
 
     def export(self):
         """
@@ -167,7 +214,7 @@ class ScriptLanguageContainer:
         """
         with current_directory(self.session.checkout_dir):
             exaslct_api.export(
-                flavor_path=(self.flavor_path,),
+                flavor_path=(str(self.flavor_path),),
                 export_path=str(self.workspace.export_path),
                 output_directory=str(self.workspace.output_path),
                 release_name=self.language_alias,
@@ -192,7 +239,7 @@ class ScriptLanguageContainer:
 
         with current_directory(self.session.checkout_dir):
             exaslct_api.deploy(
-                flavor_path=(self.flavor_path,),
+                flavor_path=(str(self.flavor_path),),
                 **bfs_params,
                 path_in_bucket=constants.PATH_IN_BUCKET,
                 release_name=self.language_alias,
@@ -200,7 +247,7 @@ class ScriptLanguageContainer:
             )
             container_name = f"{self.flavor}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(
-                flavor_path=self.flavor_path,
+                flavor_path=str(self.flavor_path),
                 bucketfs_name=bfs_params["bucketfs_name"],
                 bucket_name=bfs_params["bucket"],
                 container_name=container_name,
@@ -260,6 +307,6 @@ class ScriptLanguageContainer:
         Deletes local docker images related to the current flavor.
         """
         exaslct_api.clean_flavor_images(
-            flavor_path=(self.flavor_path,),
+            flavor_path=(str(self.flavor_path),),
             output_directory=str(self.workspace.output_path),
         )

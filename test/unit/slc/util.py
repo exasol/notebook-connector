@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 from collections.abc import Iterator
 from pathlib import Path
@@ -5,17 +7,17 @@ from pathlib import Path
 import pytest
 
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slc.slc_session import SlcSession
+from exasol.nb_connector.slc.slc_flavor import SlcFlavor
 
 
 class SecretsMock(Secrets):
     def __init__(
         self,
-        session: str,
-        initial: dict[str, str],
+        slc_name: str,
+        # initial: dict[str, str],
     ):
-        self.session = session
-        self._mock = initial
+        self.slc_name = slc_name
+        self._mock = {}
 
     def get(self, key: str) -> str:
         return self._mock.get(key)
@@ -30,12 +32,23 @@ class SecretsMock(Secrets):
         self._mock[key] = value
         return self
 
-    def simulate_checkout(self):
-        SlcSession(self, self.session).flavor_dir.mkdir(parents=True)
-        return self
+    # def simulate_checkout(self):
+    #     SlcSession(self, self.session).flavor_dir.mkdir(parents=True)
+    #     return self
 
     @classmethod
     def for_slc(
+        cls,
+        slc_name: str,
+        flavor: str | None = "Vanilla",
+    ) -> SecretsMock:
+        instance = cls(slc_name)
+        if flavor:
+            SlcFlavor(slc_name).save(instance, flavor)
+        return instance
+
+    @classmethod
+    def old_for_slc(
         cls,
         session: str,
         checkout_dir: Path | None,

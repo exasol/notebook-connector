@@ -1,15 +1,11 @@
 import contextlib
-import logging
 from pathlib import Path
 from test.unit.slc.util import (
-    SESSION_OPTIONS,
     SecretsMock,
     not_raises,
-    secrets_without,
 )
 from unittest.mock import (
     Mock,
-    call,
     create_autospec,
 )
 
@@ -23,10 +19,12 @@ from exasol.nb_connector.slc import (
     script_language_container,
 )
 from exasol.nb_connector.slc.script_language_container import (
-    current_directory,
     ScriptLanguageContainer,
+    current_directory,
+)
+from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
-    SlcSession,
+    SlcFlavor,
 )
 
 
@@ -50,48 +48,57 @@ def simulate_clone(flavor: str):
     return create_dir
 
 
+@pytest.fixture
+def slc_factory(tmp_path, git_repo_mock):
+    """
+    Provides a context to create an instance of ScriptLanguageContainer in
+    a temporary directory and simulating the SLC Git repo to be cloned inside.
+    """
+    @contextlib.contextmanager
+    def context(slc_name: str, flavor: str):
+       secrets = SecretsMock(slc_name)
+       git_repo_mock.clone_from.side_effect = simulate_clone(flavor)
+       with current_directory(tmp_path):
+           yield ScriptLanguageContainer.create(
+               secrets,
+               name=slc_name,
+               flavor=flavor,
+           )
+
+    return context
+
+
 def test_create(
-    sample_session,
+    sample_slc_name,
     git_repo_mock,
     monkeypatch: MonkeyPatch,
     tmp_path,
     caplog,
 ):
-    secrets = SecretsMock(sample_session, {})
     my_flavor = "Strawberry"
+    secrets = SecretsMock(sample_slc_name)
     git_repo_mock.clone_from.side_effect = simulate_clone(my_flavor)
 
     with current_directory(tmp_path):
         testee = ScriptLanguageContainer.create(
             secrets,
-            name=sample_session,
+            name=sample_slc_name,
             flavor=my_flavor,
         )
 
-    flavor_dir = Path(constants.SLC_CHECKOUT_DIR) / sample_session
+    flavor_dir = Path(constants.SLC_CHECKOUT_DIR) / sample_slc_name
     assert secrets.SLC_FLAVOR_CUDA == my_flavor
-    assert Path(secrets.SLC_DIR_CUDA).parts[-2:] == flavor_dir.parts
-    assert testee.flavor_path.endswith(my_flavor)
+    assert testee.checkout_dir.parts[-2:] == flavor_dir.parts
+    assert testee.flavor_path.name == my_flavor
     assert git_repo_mock.clone_from.called
     assert "Cloning into" in caplog.text
     assert "Fetching submodules" in caplog.text
 
 
-def test_repo_missing(sample_session):
-    secrets = SecretsMock.for_slc(sample_session, Path())
+def test_repo_missing(sample_slc_name):
+    secrets = SecretsMock.for_slc(sample_slc_name, Path())
     with pytest.raises(SlcError, match="SLC Git repository not checked out"):
-        ScriptLanguageContainer(secrets, sample_session)
-
-
-@pytest.mark.parametrize("option, description", SESSION_OPTIONS.items())
-def test_missing_slc_option(sample_session, option, description):
-    """
-    Secrets does not contain the specified option for the current SLC.
-    The test expects ScriptLanguageContainer to raise an SlcError.
-    """
-    secrets = secrets_without(sample_session, option)
-    with pytest.raises(SlcError, match=f"does not contain a {description}"):
-        ScriptLanguageContainer(secrets, sample_session)
+        ScriptLanguageContainer(secrets, sample_slc_name)
 
 
 @pytest.mark.parametrize(
@@ -117,31 +124,30 @@ def test_illegal_names(name):
 
 
 @pytest.mark.parametrize("name", ["ABC", "ABC_123", "abc", "abc_123"])
-def test_legal_names(sample_session, tmp_path, name):
-    secrets = SecretsMock.for_slc(name, tmp_path).simulate_checkout()
+def test_legal_names(name, slc_factory):
+    flavor="Strawberry"
     with not_raises(SlcError):
-        testee = ScriptLanguageContainer(secrets, name=name)
-    assert testee.name == name.upper()
+        with slc_factory(slc_name=name, flavor=flavor) as slc:
+            assert slc.flavor == flavor
+
+
+@pytest.fixture
+def slc_with_tmp_checkout_dir(sample_slc_name, slc_factory) -> ScriptLanguageContainer:
+    with slc_factory(slc_name=sample_slc_name, flavor="Vanilla") as slc:
+        yield slc
 
 
 def test_non_unique_name(slc_with_tmp_checkout_dir):
-    secrets = slc_with_tmp_checkout_dir.session.secrets
-    name = slc_with_tmp_checkout_dir.session.name
+    existing_slc = slc_with_tmp_checkout_dir
     with pytest.raises(
         SlcError,
         match="already contains a flavor for SLC name",
     ):
         ScriptLanguageContainer.create(
-            secrets,
-            name,
-            flavor="flavor",
+            existing_slc.secrets,
+            existing_slc.name,
+            flavor="Strawberry",
         )
-
-
-@pytest.fixture
-def slc_with_tmp_checkout_dir(sample_session, tmp_path) -> ScriptLanguageContainer:
-    secrets = SecretsMock.for_slc(sample_session, tmp_path).simulate_checkout()
-    return ScriptLanguageContainer(secrets, name=sample_session)
 
 
 def mock_docker_client_context(image_tags: list[str]):
@@ -167,7 +173,7 @@ def mock_docker_client_context(image_tags: list[str]):
     return context
 
 
-def test_docker_images(sample_session, monkeypatch, tmp_path):
+def test_docker_images(monkeypatch: MonkeyPatch, slc_factory):
     """
     This test mocks the Docker client simulating to return a list of
     Docker images to be available on the current system.
@@ -178,11 +184,6 @@ def test_docker_images(sample_session, monkeypatch, tmp_path):
     """
     image_name = "exasol/script-language-container"
     flavor = "template-Exasol-all-python-3.10-conda"
-    secrets = SecretsMock.for_slc(
-        sample_session,
-        tmp_path,
-        flavor=flavor,
-    ).simulate_checkout()
     prefix = f"{image_name}:{flavor}"
     expected = [
         f"{prefix}-build_run_123",
@@ -197,5 +198,5 @@ def test_docker_images(sample_session, monkeypatch, tmp_path):
         "ContextDockerClient",
         mock_docker_client_context(image_tags),
     )
-    testee = ScriptLanguageContainer(secrets, name=sample_session)
-    assert testee.docker_images == expected
+    with slc_factory("MY_SLC", flavor) as slc:
+        assert slc.docker_images == expected
