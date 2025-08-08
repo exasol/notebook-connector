@@ -43,6 +43,7 @@ def itde(slc_secrets: Secrets):
 
 DEFAULT_FLAVOR = "template-Exasol-all-python-3.10"
 
+
 def create_slc(
     secrets: Secrets,
     name: str,
