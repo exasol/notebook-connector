@@ -48,19 +48,23 @@ def create_slc(
 ) -> ScriptLanguageContainer:
     return ScriptLanguageContainer.create(
         secrets,
-        name="MY_SESSION",
+        name=name,
         flavor="template-Exasol-all-python-3.10",
     )
 
 
 @pytest.fixture(scope="module")
-def slc_1(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
-    return create_slc(slc_secrets, "SLC_1")
+def sample_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
+    return create_slc(slc_secrets, "sample")
 
 
 @pytest.fixture(scope="module")
-def slc_2(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
-    return create_slc(slc_secrets, "SLC_2")
+def other_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
+    """
+    Creates another SLC to verify operations to be limited to the current
+    SLC only, e.g. removing docker images or working directories.
+    """
+    return create_slc(slc_secrets, "other")
 
 
 @pytest.fixture
@@ -69,9 +73,9 @@ def custom_packages() -> list[tuple[str, str, str]]:
 
 
 @pytest.mark.dependency(name="export_slc")
-def test_export_slc(slc_1: ScriptLanguageContainer):
-    slc_1.export()
-    export_path = slc_1.workspace.export_path
+def test_export_slc(sample_slc: ScriptLanguageContainer):
+    sample_slc.export()
+    export_path = sample_slc.workspace.export_path
     assert export_path.exists()
     tgz = [f for f in export_path.glob("*.tar.gz")]
     assert len(tgz) == 1
@@ -81,110 +85,87 @@ def test_export_slc(slc_1: ScriptLanguageContainer):
     assert tgz_sum[0].is_file()
 
 
+def slc_img_name(slc: ScriptLanguageContainer) -> str:
+    prefix = "exasol/script-language-container"
+    return f"{prefix}:{slc.name}"
+
+
 @pytest.mark.dependency(name="slc_images", depends=["export_slc"])
-def test_slc_images(slc_1: ScriptLanguageContainer):
-    images = slc_1.docker_images
+def test_slc_images(sample_slc: ScriptLanguageContainer):
+    images = sample_slc.docker_images
     assert len(images) > 0
+    expected = slc_img_name(sample_slc)
     for img in images:
-        assert "exasol/script-language-container" in img
+        assert expected in img
 
 
 @pytest.mark.dependency(name="deploy_slc")
-def test_deploy(slc_secrets: Secrets, itde):
-    # If the intention of this test is to reuse the already created SLC then
-    # this test should use the same name "MY_SESSION" rather than creating a
-    # new SLC with a different name.
-    slc = ScriptLanguageContainer.create(
-        slc_secrets,
-        name="session_3",
-        flavor="template-Exasol-all-python-3.10",
-    )
-    slc.deploy()
+def test_deploy(sample_slc: ScriptLanguageContainer, itde):
+    sample_slc.deploy()
     assert slc.activation_key == (
-        "CUSTOM_SLC_SESSION_3=localzmq+protobuf:///bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-CUSTOM_SLC_SESSION_3"
+        "custom_slc_sample=localzmq+protobuf:///bfsdefault/default/container/"
+        "template-Exasol-all-python-3.10-release-custom_slc_sample"
         "?lang=python"
         "#buckets/bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-CUSTOM_SLC_SESSION_3/"
+        "template-Exasol-all-python-3.10-release-custom_slc_sample/"
         "exaudf/exaudfclient"
     )
 
 
 @pytest.mark.dependency(name="append_custom_packages", depends=["deploy_slc"])
 def test_append_custom_packages(
-    slc_1: ScriptLanguageContainer, custom_packages: list[tuple[str, str, str]]
+    sample_slc: ScriptLanguageContainer, custom_packages: list[tuple[str, str, str]]
 ):
-    # If the intention of this test is to reuse the already created SLC then
-    # this test should use the same name "MY_SESSION" rather than creating a
-    # new SLC with a different name.
-    #
-    # Otherwise this tests needs to create a new SLC with a different name And
-    # this new SLC needs to be used in dependent test cases such as
-    # deploy_slc_with_new_packages.
-    slc_1.append_custom_packages(
+    sample_slc.append_custom_packages(
         [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
     )
-    with open(slc_1.session.custom_pip_file) as f:
+    with open(sample_slc.session.custom_pip_file) as f:
         pip_content = f.read()
         for custom_package, version, _ in custom_packages:
             assert f"{custom_package}|{version}" in pip_content
 
 
 @pytest.mark.dependency(
-    name="deploy_slc_with_new_packages", depends=["append_custom_packages"]
+    name="deploy_slc_with_custom_packages", depends=["append_custom_packages"]
 )
-def test_deploy_slc_with_new_packages(
-    slc_secrets: Secrets,
-    custom_packages: list[tuple[str, str, str]],
-):
-    # If the intention of this test is to reuse the already created SLC then
-    # this test should use the same name "MY_SESSION" rather than creating a
-    # new SLC with a different name.
-    slc = ScriptLanguageContainer.create(
-        slc_secrets,
-        name="session_2",
-        flavor="template-Exasol-all-python-3.10",
-    )
-    slc.deploy()
-    assert slc.activation_key == (
-        "CUSTOM_SLC_SESSION_2=localzmq+protobuf:///bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-CUSTOM_SLC_SESSION_2"
+def test_deploy_slc_with_custom_packages(sample_slc: ScriptLanguageContainer):
+    sample_slc.deploy()
+    assert sample_slc.activation_key == (
+        "custom_slc_sample=localzmq+protobuf:///bfsdefault/default/container/"
+        "template-Exasol-all-python-3.10-release-custom_slc_sample"
         "?lang=python"
         "#buckets/bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-CUSTOM_SLC_SESSION_2/"
+        "template-Exasol-all-python-3.10-release-custom_slc_sample/"
         "exaudf/exaudfclient"
     )
 
 
 @pytest.mark.dependency(
-    name="udf_with_new_packages", depends=["deploy_slc_with_new_packages"]
+    name="udf_with_custom_packages",
+    depends=["deploy_slc_with_custom_packages"],
 )
-def test_udf_with_new_packages(
+def test_udf_with_custom_packages(
     slc_secrets: Secrets,
-    slc_1: ScriptLanguageContainer,
+    sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str, str]],
 ):
-    # If the intention of this test is to reuse the already created SLC then
-    # this test should use the same name "MY_SESSION" rather than creating a
-    # new SLC with a different name.
-    def import_statements(indent: int) -> str:
-        separator = "\n" + " " * indent
-        return separator.join(
-            f"import {module}" for pkg, version, module in custom_packages
-        )
-
-    # curently this test fails as the SLC deployed by the test case
-    # deploy_slc_with_new_packages above uses a different language alias.
+    import_statements = "\n    ".join(
+        f"import {module}" for pkg, version, module in custom_packages
+    )
     udf = textwrap.dedent(
-        f"""
-        CREATE OR REPLACE ALIAS SET SCRIPT test_custom_packages(i integer)
+        """
+        CREATE OR REPLACE {language_alias}
+        SET SCRIPT test_custom_packages(i integer)
         EMITS (o VARCHAR(2000000)) AS
         def run(ctx):
-            {import_statements(indent=12)}
+            {import_statements}
 
             ctx.emit("success")
         /
         """
+    ).format(
+        language_alias=sample_slc.language_alias,
+        import_statements=import_statements,
     )
     con = open_pyexasol_connection_with_lang_definitions(slc_secrets)
     try:
@@ -197,59 +178,41 @@ def test_udf_with_new_packages(
         con.close()
 
 
-@pytest.mark.dependency(name="test_old_alias", depends=["udf_with_new_packages"])
-def test_old_alias(slc_secrets: Secrets, slc_1: ScriptLanguageContainer):
-    # This use case is no longer possible as the alias is generated from the
-    # name of an SLC.  So an old alias cannot be reused. Only the complete SLC
-    # can be reused. Probably this is the intention of this test case.
-
-    udf = textwrap.dedent(
-        f"""
-CREATE OR REPLACE my_python SET SCRIPT test_old_slc(i integer)
-EMITS (o VARCHAR(2000000)) AS
-def run(ctx):
-    ctx.emit("success")
-/
-        """
-    )
-    con = open_pyexasol_connection_with_lang_definitions(slc_secrets, schema="TEST")
-    try:
-        con.execute(udf)
-        res = con.execute("select test_old_slc(1)")
-        rows = res.fetchall()
-        assert rows == [("success",)]
-    finally:
-        con.close()
-
-
 @pytest.mark.dependency(
-    name="clean_up_images", depends=["deploy_slc_with_new_packages"]
+    name="clean_docker_images", depends=["deploy_slc_with_custom_packages"]
 )
-def test_clean_up_images(slc_1: ScriptLanguageContainer):
-    # Cleaning up docker images is specific to each SLC.  Maybe it would make
-    # sense to verify that cleaning the docker images of SLC A does not remove
-    # the docker images of SLC B.
-    slc_1.clean_docker_images()
+def test_clean_docker_images(
+    sample_slc: ScriptLanguageContainer,
+    other_slc: ScriptLanguageContainer,
+):
+    sample_slc.clean_docker_images()
     with ContextDockerClient() as docker_client:
         images = docker_client.images.list(name="exasol/script-language-container")
-        assert len(images) == 0
+    assert slc_img_name(sample_slc) not in images
+    assert slc_img_name(other_slc) in images
 
 
-@pytest.mark.dependency(name="clean_up_output_path", depends=["clean_up_images"])
-def test_clean_output(slc_1: ScriptLanguageContainer):
-    # Cleaning up directories is specific to the particular SLC.  So the test
-    # is expected to remain successful.  Maybe the test could verify that the
-    # directories of another SLC remain to exist?
-    slc_1.workspace.cleanup_output_path()
-    p = Path(slc_1.workspace.output_path)
-    assert not p.is_dir()
+@pytest.mark.dependency(name="clean_up_output_path", depends=["clean_docker_images"])
+def test_clean_output(
+    sample_slc: ScriptLanguageContainer,
+    other_slc: ScriptLanguageContainer,
+):
+    def output_path_exists(slc: ScriptLanguageContainer) -> bool:
+        return slc.workspace.output_path.is_dir()
+
+    sample_slc.workspace.cleanup_output_path()
+    assert not output_path_exists(sample_slc)
+    assert output_path_exists(other_slc)
 
 
-@pytest.mark.dependency(name="clean_up_export_path", depends=["clean_up_images"])
-def test_clean_export(slc_1: ScriptLanguageContainer):
-    # Cleaning up directories is specific to the particular SLC.  So the test
-    # is expected to remain successful.  Maybe the test could verify that the
-    # directories of another SLC remain to exist?
-    slc_1.workspace.cleanup_export_path()
-    p = Path(slc_1.workspace.export_path)
-    assert not p.is_dir()
+@pytest.mark.dependency(name="clean_up_export_path", depends=["clean_docker_images"])
+def test_clean_export(
+    sample_slc: ScriptLanguageContainer,
+    other_slc: ScriptLanguageContainer,
+):
+    def export_path_exists(slc: ScriptLanguageContainer) -> bool:
+        return slc.workspace.export_path.is_dir()
+
+    sample_slc.workspace.cleanup_export_path()
+    assert not export_path_exists(sample_slc)
+    assert export_path_exists(other_slc)

@@ -99,7 +99,10 @@ def test_create(
         assert secrets.SLC_FLAVOR_CUDA == my_flavor
         checkout_dir = tmp_path / constants.SLC_CHECKOUT_DIR / sample_slc_name
         assert testee.checkout_dir == checkout_dir
-        assert testee.flavor_path == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / my_flavor
+        assert (
+            testee.flavor_path
+            == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / my_flavor
+        )
         assert testee.custom_pip_file.parts[-3:] == (
             "flavor_customization",
             "packages",

@@ -51,26 +51,26 @@ class Workspace:
         self.root_dir = root_dir
 
     @property
-    def export_path(self):
+    def export_path(self) -> Path:
         """
         Returns the export path for script-languages-container
         """
         return self.root_dir / "container"
 
     @property
-    def output_path(self):
+    def output_path(self) -> Path:
         """
         Returns the output path containing caches and logs.
         """
         return self.root_dir / "output"
 
-    def cleanup_output_path(self):
+    def cleanup_output_path(self) -> None:
         """
         Remove the output path recursively.
         """
         shutil.rmtree(self.output_path)
 
-    def cleanup_export_path(self):
+    def cleanup_export_path(self) -> None:
         """
         Remove the export path recursively
         """
