@@ -172,6 +172,7 @@ def test_udf_with_new_packages(
         return separator.join(
             f"import {module}" for pkg, version, module in custom_packages
         )
+
     # curently this test fails as the SLC deployed by the test case
     # deploy_slc_with_new_packages above uses a different language alias.
     udf = textwrap.dedent(

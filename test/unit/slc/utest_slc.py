@@ -29,6 +29,11 @@ from exasol.nb_connector.slc.slc_flavor import (
 
 
 @pytest.fixture
+def sample_slc_name() -> str:
+    return "CUDA"
+
+
+@pytest.fixture
 def git_repo_mock(monkeypatch: MonkeyPatch):
     mock = create_autospec(git.Repo)
     monkeypatch.setattr(script_language_container, "Repo", mock)
@@ -41,6 +46,7 @@ def simulate_clone(flavor: str):
     git_repo_mock for simulating a successful checkout to the
     ScriptLanguageContainer.
     """
+
     def create_dir(url: str, dir: Path, branch: str):
         (dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor).mkdir(parents=True)
         return Mock()
@@ -54,16 +60,17 @@ def slc_factory(tmp_path, git_repo_mock):
     Provides a context to create an instance of ScriptLanguageContainer in
     a temporary directory and simulating the SLC Git repo to be cloned inside.
     """
+
     @contextlib.contextmanager
     def context(slc_name: str, flavor: str):
-       secrets = SecretsMock(slc_name)
-       git_repo_mock.clone_from.side_effect = simulate_clone(flavor)
-       with current_directory(tmp_path):
-           yield ScriptLanguageContainer.create(
-               secrets,
-               name=slc_name,
-               flavor=flavor,
-           )
+        secrets = SecretsMock(slc_name)
+        git_repo_mock.clone_from.side_effect = simulate_clone(flavor)
+        with current_directory(tmp_path):
+            yield ScriptLanguageContainer.create(
+                secrets,
+                name=slc_name,
+                flavor=flavor,
+            )
 
     return context
 
@@ -85,14 +92,20 @@ def test_create(
             name=sample_slc_name,
             flavor=my_flavor,
         )
+        assert git_repo_mock.clone_from.called
+        assert "Cloning into" in caplog.text
+        assert "Fetching submodules" in caplog.text
 
-    flavor_dir = Path(constants.SLC_CHECKOUT_DIR) / sample_slc_name
-    assert secrets.SLC_FLAVOR_CUDA == my_flavor
-    assert testee.checkout_dir.parts[-2:] == flavor_dir.parts
-    assert testee.flavor_path.name == my_flavor
-    assert git_repo_mock.clone_from.called
-    assert "Cloning into" in caplog.text
-    assert "Fetching submodules" in caplog.text
+        assert secrets.SLC_FLAVOR_CUDA == my_flavor
+        checkout_dir = tmp_path / constants.SLC_CHECKOUT_DIR / sample_slc_name
+        assert testee.checkout_dir == checkout_dir
+        assert testee.flavor_path == constants.FLAVORS_PATH_IN_SLC_REPO / my_flavor
+        assert testee.flavor_dir == checkout_dir / testee.flavor_path
+        assert testee.custom_pip_file.parts[-3:] == (
+            "flavor_customization",
+            "packages",
+            "python3_pip_packages",
+        )
 
 
 def test_repo_missing(sample_slc_name):
@@ -125,7 +138,7 @@ def test_illegal_names(name):
 
 @pytest.mark.parametrize("name", ["ABC", "ABC_123", "abc", "abc_123"])
 def test_legal_names(name, slc_factory):
-    flavor="Strawberry"
+    flavor = "Strawberry"
     with not_raises(SlcError):
         with slc_factory(slc_name=name, flavor=flavor) as slc:
             assert slc.flavor == flavor

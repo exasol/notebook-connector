@@ -82,7 +82,7 @@ def clone_slc_repo(target_dir: Path):
     Clones the script-languages-release repository from Github into
     the target dir configured in the Secure Configuration Storage.
     """
-    dir = target_dir # session.checkout_dir
+    dir = target_dir
     if dir.is_dir():
         LOG.warning(f"Directory '{dir}' is not empty. Skipping checkout....")
         return
@@ -96,7 +96,6 @@ def clone_slc_repo(target_dir: Path):
     )
     LOG.info("Fetching submodules...")
     repo.submodule_update(recursive=True)
-
 
 
 def checkout_dir(name: str) -> Path:
@@ -132,10 +131,7 @@ class ScriptLanguageContainer:
         self.name = name
         self.slc_flavor = SlcFlavor(name).verify(secrets)
         self.workspace = Workspace(Path.cwd() / name)
-        # self.session = SlcSession(secrets, name)
-        # self.session.verify()
         if not self.flavor_dir.is_dir():
-            # if not self.session.flavor_dir.is_dir():
             raise SlcError(
                 f"SLC Git repository not checked out to {self.checkout_dir}."
             )
@@ -157,10 +153,6 @@ class ScriptLanguageContainer:
         clone_slc_repo(checkout_dir(name))
         return cls(secrets=secrets, name=name)
 
-    # @property
-    # def name(self) -> str:
-    #     return self.name
-
     @property
     def flavor(self) -> str:
         return self.slc_flavor.get(self.secrets)
@@ -172,17 +164,9 @@ class ScriptLanguageContainer:
         """
         return f"custom_slc_{self.name}"
 
-    # @property
-    # def language_alias(self) -> str:
-    #     return self.session.language_alias
-
     @property
     def checkout_dir(self) -> Path:
         return checkout_dir(self.name)
-
-    # @property
-    # def flavor_path(self) -> str:
-    #     return str(self.session.flavor_path_in_slc_repo)
 
     @property
     def flavor_path(self) -> Path:
