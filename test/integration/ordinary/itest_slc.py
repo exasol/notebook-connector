@@ -119,6 +119,16 @@ def test_deploy_slc_with_new_packages(
     slc_secrets: Secrets,
     custom_packages: list[tuple[str, str, str]],
 ):
+    # The former test implementation reused the same SLC with a different
+    # Language Alias. test_udf_with_new_packages() relied on the same name but
+    # different language alias.
+    #
+    # This is no longer possible.
+    #
+    # I also don't see any "new packages" added here, but only the unchanged
+    # packages, potentially deployed again.
+    #
+    # What was the intention of this test?
     slc = ScriptLanguageContainer.create(
         slc_secrets,
         name="session_2",
@@ -146,6 +156,8 @@ def test_udf_with_new_packages(
     import_statements = "\n".join(
         f"    import {module}" for pkg, version, module in custom_packages
     )
+    # curently this test fails as the SLC deployed by the test case
+    # deploy_slc_with_new_packages above uses a different language alias.
     udf = textwrap.dedent(
         f"""
 CREATE OR REPLACE {sample_slc.language_alias} SET SCRIPT test_custom_packages(i integer)
