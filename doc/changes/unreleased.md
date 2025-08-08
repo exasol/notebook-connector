@@ -7,6 +7,7 @@ This release of the Notebook Connector comes with breaking changes in the `SlctM
 * Some public methods or and attributes have been
   * renamed
     * `flavor_name` to `flavor`
+    * `flavor_dir` to `flavor_path`
     * `upload()` to `deploy()`
     * `slc_docker_images()` to `docker_images()`
     * `clean_all_images()` to `clean_docker_images()`
@@ -34,4 +35,3 @@ See the NC User Guide for details.
 * #208: Widened version constraints for:
    * exasol-saas-api from ">=0.9.0,<1.0.0" to ">=0.9.0,<3"
    * exasol-bucketfs from "^1.0.0" to ">=1,<3"
-

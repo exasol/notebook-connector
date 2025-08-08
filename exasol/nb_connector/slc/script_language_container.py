@@ -131,7 +131,7 @@ class ScriptLanguageContainer:
         self.name = name
         self.slc_flavor = SlcFlavor(name).verify(secrets)
         self.workspace = Workspace(Path.cwd() / name)
-        if not self.flavor_dir.is_dir():
+        if not self.flavor_path.is_dir():
             raise SlcError(
                 f"SLC Git repository not checked out to {self.checkout_dir}."
             )
@@ -169,16 +169,12 @@ class ScriptLanguageContainer:
         return checkout_dir(self.name)
 
     @property
-    def flavor_path(self) -> Path:
-        """
-        Path to the used flavor within the script-languages-release
-        repository
-        """
-        return constants.FLAVORS_PATH_IN_SLC_REPO / self.flavor
+    def _flavor_path_rel(self) -> str:
+        return str(self.flavor_path.relative_to(self.checkout_dir))
 
     @property
-    def flavor_dir(self) -> Path:
-        return self.checkout_dir / self.flavor_path
+    def flavor_path(self) -> Path:
+        return self.checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / self.flavor
 
     @property
     def custom_pip_file(self) -> Path:
@@ -186,7 +182,7 @@ class ScriptLanguageContainer:
         Returns the path to the custom pip file of the flavor
         """
         return (
-            self.flavor_dir
+            self.flavor_path
             / "flavor_customization"
             / "packages"
             / "python3_pip_packages"
@@ -198,7 +194,7 @@ class ScriptLanguageContainer:
         """
         with current_directory(self.checkout_dir):
             exaslct_api.export(
-                flavor_path=(str(self.flavor_path),),
+                flavor_path=(str(self._flavor_path_rel),),
                 export_path=str(self.workspace.export_path),
                 output_directory=str(self.workspace.output_path),
                 release_name=self.language_alias,
@@ -223,7 +219,7 @@ class ScriptLanguageContainer:
 
         with current_directory(self.checkout_dir):
             exaslct_api.deploy(
-                flavor_path=(str(self.flavor_path),),
+                flavor_path=(str(self._flavor_path_rel),),
                 **bfs_params,
                 path_in_bucket=constants.PATH_IN_BUCKET,
                 release_name=self.language_alias,
@@ -231,7 +227,7 @@ class ScriptLanguageContainer:
             )
             container_name = f"{self.flavor}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(
-                flavor_path=str(self.flavor_path),
+                flavor_path=str(self._flavor_path_rel),
                 bucketfs_name=bfs_params["bucketfs_name"],
                 bucket_name=bfs_params["bucket"],
                 container_name=container_name,
@@ -291,6 +287,6 @@ class ScriptLanguageContainer:
         Deletes local docker images related to the current flavor.
         """
         exaslct_api.clean_flavor_images(
-            flavor_path=(str(self.flavor_path),),
+            flavor_path=(str(self._flavor_path_rel),),
             output_directory=str(self.workspace.output_path),
         )
