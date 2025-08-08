@@ -22,7 +22,6 @@ class SlcError(Exception):
 
 
 class SlcFlavor:
-    # def __init__(self, slc_name: str, slc_dir: Path):
     def __init__(self, slc_name: str):
         if not NAME_PATTERN.match(slc_name):
             raise SlcError(
@@ -30,7 +29,6 @@ class SlcFlavor:
                 f' regular expression "{NAME_PATTERN}".'
             )
         self.slc_name = slc_name
-        # self.slc_dir = slc_dir
 
     @property
     def key(self):
