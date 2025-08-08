@@ -120,7 +120,7 @@ def test_append_custom_packages(
     sample_slc.append_custom_packages(
         [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
     )
-    with open(sample_slc.session.custom_pip_file) as f:
+    with open(sample_slc.custom_pip_file) as f:
         pip_content = f.read()
         for custom_package, version, _ in custom_packages:
             assert f"{custom_package}|{version}" in pip_content
