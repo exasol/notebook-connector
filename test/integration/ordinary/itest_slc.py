@@ -41,16 +41,14 @@ def itde(slc_secrets: Secrets):
     remove_itde()
 
 
+DEFAULT_FLAVOR = "template-Exasol-all-python-3.10"
+
 def create_slc(
     secrets: Secrets,
     name: str,
-    flavor: str = "template-Exasol-all-python-3.10",
+    flavor: str = DEFAULT_FLAVOR,
 ) -> ScriptLanguageContainer:
-    return ScriptLanguageContainer.create(
-        secrets,
-        name=name,
-        flavor="template-Exasol-all-python-3.10",
-    )
+    return ScriptLanguageContainer.create(secrets, name=name, flavor=flavor)
 
 
 @pytest.fixture(scope="module")
@@ -99,17 +97,19 @@ def test_slc_images(sample_slc: ScriptLanguageContainer):
         assert expected in img
 
 
+def expected_activation_key(slc: ScriptLanguageContainer) -> str:
+    alias = slc.language_alias
+    bfs_path = f"default/container/{slc.flavor}-release-{alias}"
+    return (
+        f"{alias}=localzmq+protobuf:///bfsdefault/{bfs_path}?lang=python"
+        f"#buckets/bfsdefault/{bfs_path}/exaudf/exaudfclient"
+    )
+
+
 @pytest.mark.dependency(name="deploy_slc")
 def test_deploy(sample_slc: ScriptLanguageContainer, itde):
     sample_slc.deploy()
-    assert slc.activation_key == (
-        "custom_slc_sample=localzmq+protobuf:///bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-custom_slc_sample"
-        "?lang=python"
-        "#buckets/bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-custom_slc_sample/"
-        "exaudf/exaudfclient"
-    )
+    assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
 
 @pytest.mark.dependency(name="append_custom_packages", depends=["deploy_slc"])
@@ -130,14 +130,7 @@ def test_append_custom_packages(
 )
 def test_deploy_slc_with_custom_packages(sample_slc: ScriptLanguageContainer):
     sample_slc.deploy()
-    assert sample_slc.activation_key == (
-        "custom_slc_sample=localzmq+protobuf:///bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-custom_slc_sample"
-        "?lang=python"
-        "#buckets/bfsdefault/default/container/"
-        "template-Exasol-all-python-3.10-release-custom_slc_sample/"
-        "exaudf/exaudfclient"
-    )
+    assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
 
 @pytest.mark.dependency(
