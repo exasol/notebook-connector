@@ -23,6 +23,7 @@ from exasol.nb_connector.slc import (
     script_language_container,
 )
 from exasol.nb_connector.slc.script_language_container import (
+    current_directory,
     ScriptLanguageContainer,
     SlcError,
     SlcSession,
@@ -36,6 +37,19 @@ def git_repo_mock(monkeypatch: MonkeyPatch):
     return mock
 
 
+def simulate_clone(flavor: str):
+    """
+    This function can be set as side effect to method clone_from of the
+    git_repo_mock for simulating a successful checkout to the
+    ScriptLanguageContainer.
+    """
+    def create_dir(url: str, dir: Path, branch: str):
+        (dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor).mkdir(parents=True)
+        return Mock()
+
+    return create_dir
+
+
 def test_create(
     sample_session,
     git_repo_mock,
@@ -45,22 +59,18 @@ def test_create(
 ):
     secrets = SecretsMock(sample_session, {})
     my_flavor = "Strawberry"
-    monkeypatch.setattr(Path, "cwd", Mock(return_value=tmp_path))
-    checkout_dir = tmp_path / constants.SLC_CHECKOUT_DIR / sample_session
-    flavor_dir = checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / my_flavor
+    git_repo_mock.clone_from.side_effect = simulate_clone(my_flavor)
 
-    def create_dir(url, dir, branch):
-        flavor_dir.mkdir(parents=True)
-        return Mock()
+    with current_directory(tmp_path):
+        testee = ScriptLanguageContainer.create(
+            secrets,
+            name=sample_session,
+            flavor=my_flavor,
+        )
 
-    git_repo_mock.clone_from.side_effect = create_dir
-    testee = ScriptLanguageContainer.create(
-        secrets,
-        name=sample_session,
-        flavor=my_flavor,
-    )
+    flavor_dir = Path(constants.SLC_CHECKOUT_DIR) / sample_session
     assert secrets.SLC_FLAVOR_CUDA == my_flavor
-    assert Path(secrets.SLC_DIR_CUDA).parts[-2:] == checkout_dir.parts[-2:]
+    assert Path(secrets.SLC_DIR_CUDA).parts[-2:] == flavor_dir.parts
     assert testee.flavor_path.endswith(my_flavor)
     assert git_repo_mock.clone_from.called
     assert "Cloning into" in caplog.text
