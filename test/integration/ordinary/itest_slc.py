@@ -185,7 +185,7 @@ def test_clean_docker_images(
     sample_slc.clean_docker_images()
     with ContextDockerClient() as docker_client:
         images = docker_client.images.list(name="exasol/script-language-container")
-    tags = [ img.tags[0] for img in images ]
+    tags = [img.tags[0] for img in images]
     assert slc_img_name(sample_slc) not in tags
     assert slc_img_name(other_slc) in tags
 
