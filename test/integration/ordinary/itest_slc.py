@@ -64,7 +64,7 @@ def other_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContain
     to be limited to the current SLC only, e.g. removing docker images or
     working directories.
     """
-    slc = create_slc(slc_secrets, "other", flavor="test-Exasol-8-cuda-ml-conda")
+    slc = create_slc(slc_secrets, "other", flavor="template-Exasol-all-r-4")
     slc.deploy()
     return slc
 
