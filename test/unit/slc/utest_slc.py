@@ -20,7 +20,6 @@ from exasol.nb_connector.slc import (
 )
 from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
-    Workspace,
     current_directory,
 )
 from exasol.nb_connector.slc.slc_flavor import (
@@ -74,15 +73,6 @@ def slc_factory(tmp_path, git_repo_mock):
             )
 
     return context
-
-
-def test_workspace(tmp_path: Path):
-    with current_directory(tmp_path):
-        slc_name = "something"
-        workspace = Workspace.for_slc(slc_name)
-        assert workspace.git_clone_path == (
-            tmp_path / constants.WORKSPACE_DIR / slc_name / "git-clone"
-        )
 
 
 def test_create(
