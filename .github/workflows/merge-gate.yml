@@ -28,14 +28,14 @@ jobs:
   ordinary-itests:
     name: Ordinary iTests
     # needs: [ slow-checks-approval ]
-    uses: ./.github/workflows/slow-tests/ordinary-integration.yml
+    uses: ./.github/workflows/tests-ordinary-integration.yml
     permissions:
       contents: read
 
 #   saas-tests:
 #     name: SaaS
 #     needs: [ slow-checks-approval ]
-#     uses: ./.github/workflows/slow-tests/saas.yml
+#     uses: ./.github/workflows/tests-saas.yml
 #     secrets: inherit
 #     permissions:
 #       contents: read
@@ -43,14 +43,14 @@ jobs:
 #   large-runner-tests:
 #     name: Large Runner
 #     needs: [ slow-checks-approval ]
-#     uses: ./.github/workflows/slow-tests/large-runner.yml
+#     uses: ./.github/workflows/tests-large-runner.yml
 #     permissions:
 #       contents: read
 #
 #   gpu-tests:
 #     name: GPU
 #     needs: [ slow-checks-approval ]
-#     uses: ./.github/workflows/slow-tests/gpu.yml
+#     uses: ./.github/workflows/tests-gpu.yml
 #     permissions:
 #       contents: read
 
