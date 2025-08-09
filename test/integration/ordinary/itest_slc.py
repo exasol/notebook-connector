@@ -63,7 +63,9 @@ def other_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContain
     Creates another SLC to verify operations to be limited to the current
     SLC only, e.g. removing docker images or working directories.
     """
-    slc = create_slc(slc_secrets, "other")
+    slc = create_slc(
+        slc_secrets, "other", flavor="template-Exasol-all-python-3.10-conda"
+    )
     slc.deploy()
     return slc
 
