@@ -67,6 +67,7 @@ def other_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContain
     working directories.
     """
     slc = create_slc(slc_secrets, "other", flavor="template-Exasol-all-r-4")
+    slc.export()
     slc.deploy()
     return slc
 
