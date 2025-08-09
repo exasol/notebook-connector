@@ -282,9 +282,7 @@ class ScriptLanguageContainer:
         prefix = f"{image_name}:{self.flavor}"
         with ContextDockerClient() as docker_client:
             images = docker_client.images.list(name=image_name)
-            return [
-                tag for img in images if (tag := img.tags[0]).startswith(prefix)
-            ]
+            return [tag for img in images if (tag := img.tags[0]).startswith(prefix)]
 
     def clean_docker_images(self):
         """
