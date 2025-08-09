@@ -60,12 +60,11 @@ def sample_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContai
 @pytest.fixture(scope="module")
 def other_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
     """
-    Creates another SLC to verify operations to be limited to the current
-    SLC only, e.g. removing docker images or working directories.
+    Creates another SLC with a different flavor for verifying operations
+    to be limited to the current SLC only, e.g. removing docker images or
+    working directories.
     """
-    slc = create_slc(
-        slc_secrets, "other", flavor="template-Exasol-all-python-3.10-conda"
-    )
+    slc = create_slc(slc_secrets, "other", flavor="template-Exasol-all-r-4")
     slc.deploy()
     return slc
 
@@ -186,8 +185,9 @@ def test_clean_docker_images(
     sample_slc.clean_docker_images()
     with ContextDockerClient() as docker_client:
         images = docker_client.images.list(name="exasol/script-language-container")
-    assert slc_img_name(sample_slc) not in images
-    # assert slc_img_name(other_slc) in images
+    tags = [ img.tags[0] for img in images ]
+    assert slc_img_name(sample_slc) not in tags
+    assert slc_img_name(other_slc) in tags
 
 
 @pytest.mark.dependency(name="clean_up_output_path", depends=["clean_docker_images"])
