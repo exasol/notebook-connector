@@ -82,26 +82,29 @@ def test_create(
     tmp_path,
     caplog,
 ):
-    my_flavor = "Strawberry"
+    flavor = "Strawberry"
     secrets = SecretsMock(sample_slc_name)
-    git_repo_mock.clone_from.side_effect = simulate_clone(my_flavor)
+    git_repo_mock.clone_from.side_effect = simulate_clone(flavor)
 
     with current_directory(tmp_path):
         testee = ScriptLanguageContainer.create(
             secrets,
             name=sample_slc_name,
-            flavor=my_flavor,
+            flavor=flavor,
         )
         assert git_repo_mock.clone_from.called
         assert "Cloning into" in caplog.text
         assert "Fetching submodules" in caplog.text
 
-        assert secrets.SLC_FLAVOR_CUDA == my_flavor
-        checkout_dir = tmp_path / constants.SLC_CHECKOUT_DIR / sample_slc_name
+        assert secrets.SLC_FLAVOR_CUDA == flavor
+        checkout_dir = (
+            tmp_path / constants.WORKSPACE_DIR / sample_slc_name / "git-clone"
+        )
         assert testee.checkout_dir == checkout_dir
+        assert testee.flavor_path.is_dir()
         assert (
             testee.flavor_path
-            == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / my_flavor
+            == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor
         )
         assert testee.custom_pip_file.parts[-3:] == (
             "flavor_customization",

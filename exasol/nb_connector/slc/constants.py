@@ -20,4 +20,4 @@ Using the SLC_RELEASE 9.6.0 because we are limited to slc-tool 3.*. (see pyproje
 Check the developer guide (./doc/developer-guide.md) for more information.
 """
 
-SLC_CHECKOUT_DIR = ".slc_checkout"
+WORKSPACE_DIR = ".workspace"

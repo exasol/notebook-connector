@@ -63,7 +63,9 @@ def other_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContain
     Creates another SLC to verify operations to be limited to the current
     SLC only, e.g. removing docker images or working directories.
     """
-    return create_slc(slc_secrets, "other")
+    slc = create_slc(slc_secrets, "other")
+    slc.deploy()
+    return slc
 
 
 @pytest.fixture
@@ -86,7 +88,7 @@ def test_export_slc(sample_slc: ScriptLanguageContainer):
 
 def slc_img_name(slc: ScriptLanguageContainer) -> str:
     prefix = "exasol/script-language-container"
-    return f"{prefix}:{slc.name}"
+    return f"{prefix}:{slc.flavor}"
 
 
 @pytest.mark.dependency(name="slc_images", depends=["export_slc"])

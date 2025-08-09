@@ -50,6 +50,18 @@ class Workspace:
     def __init__(self, root_dir: Path):
         self.root_dir = root_dir
 
+    @classmethod
+    def for_slc(cls, name: str) -> Workspace:
+        return cls(Path.cwd() / constants.WORKSPACE_DIR / name)
+
+    @property
+    def git_clone_path(self) -> Path:
+        """
+        Returns the path for cloning Git repository
+        script-languages-container-release.
+        """
+        return self.root_dir / "git-clone"
+
     @property
     def export_path(self) -> Path:
         """
@@ -98,24 +110,18 @@ def clone_slc_repo(target_dir: Path):
     repo.submodule_update(recursive=True)
 
 
-def checkout_dir(name: str) -> Path:
-    return Path.cwd() / constants.SLC_CHECKOUT_DIR / name
-
-
 class ScriptLanguageContainer:
     """
     Support building different flavors of Exasol Script Language
     Containers (SLCs) using the SLCT.
 
-    Parameter ``name`` serves as a key for additional SLC options stored in
-    the Secure Configuration Storage (SCS / secrets / conf):
+    Parameter ``name`` serves as a key for the related flavor stored in the
+    Secure Configuration Storage (SCS / secrets / conf).  The flavor is used
+    as a template for building the SLC.
 
-    * flavor
-    * checkout_dir
-
-    If one of these options is missing in the SCS or the SLC Git repository
-    has not been checked out (i.e. cloned) into the checkout_dir, then the
-    constructor will raise an SlcError.
+    If the flavor is missing in the SCS or the SLC Git repository has not been
+    checked out (i.e. cloned) into the checkout_dir, then the constructor will
+    raise an SlcError.
 
     Additionally, the caller needs to ensure, that a flavor with this name is
     contained in the SLC release specified in variable
@@ -129,8 +135,8 @@ class ScriptLanguageContainer:
     ):
         self.secrets = secrets
         self.name = name
-        self.slc_flavor = SlcFlavor(name).verify(secrets)
-        self.workspace = Workspace(Path.cwd() / name)
+        self.flavor = SlcFlavor(name).verify(secrets)
+        self.workspace = Workspace.for_slc(name)
         if not self.flavor_path.is_dir():
             raise SlcError(
                 f"SLC Git repository not checked out to {self.checkout_dir}."
@@ -150,12 +156,9 @@ class ScriptLanguageContainer:
                 f" flavor for SLC name {name}."
             )
         slc_flavor.save(secrets, flavor)
-        clone_slc_repo(checkout_dir(name))
+        workspace = Workspace.for_slc(name)
+        clone_slc_repo(workspace.git_clone_path)
         return cls(secrets=secrets, name=name)
-
-    @property
-    def flavor(self) -> str:
-        return self.slc_flavor.get(self.secrets)
 
     @property
     def language_alias(self) -> str:
@@ -166,7 +169,7 @@ class ScriptLanguageContainer:
 
     @property
     def checkout_dir(self) -> Path:
-        return checkout_dir(self.name)
+        return self.workspace.git_clone_path
 
     @property
     def _flavor_path_rel(self) -> str:
@@ -264,7 +267,7 @@ class ScriptLanguageContainer:
         Appends packages to the custom pip file.
 
         Note: This method is not idempotent: Multiple calls with the same
-        package definitions will result in duplicated entries.
+        package definitions will result in duplicate entries.
         """
         with open(self.custom_pip_file, "a") as f:
             for p in pip_packages:
@@ -272,21 +275,23 @@ class ScriptLanguageContainer:
 
     @property
     def docker_images(self) -> list[str]:
+        """
+        Return list of Docker image tags related to the current SLC.
+        """
         image_name = "exasol/script-language-container"
+        prefix = f"{image_name}:{self.flavor}"
         with ContextDockerClient() as docker_client:
             images = docker_client.images.list(name=image_name)
-            image_tags = [img.tags[0] for img in images]
             return [
-                tag
-                for tag in image_tags
-                if tag.startswith(f"{image_name}:{self.flavor}")
+                tag for img in images if (tag := img.tags[0]).startswith(prefix)
             ]
 
     def clean_docker_images(self):
         """
-        Deletes local docker images related to the current flavor.
+        Deletes local docker images related to the current SLC.
         """
-        exaslct_api.clean_flavor_images(
-            flavor_path=(str(self._flavor_path_rel),),
-            output_directory=str(self.workspace.output_path),
-        )
+        with current_directory(self.checkout_dir):
+            exaslct_api.clean_flavor_images(
+                flavor_path=(str(self._flavor_path_rel),),
+                output_directory=str(self.workspace.output_path),
+            )

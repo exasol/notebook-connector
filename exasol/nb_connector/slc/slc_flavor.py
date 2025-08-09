@@ -37,18 +37,14 @@ class SlcFlavor:
     def save(self, secrets: Secrets, flavor: str) -> None:
         secrets.save(self.key, flavor)
 
-    def get(self, secrets: Secrets) -> str:
-        return secrets[self.key]
-
     def exists(self, secrets: Secrets) -> bool:
         return True if secrets.get(self.key) else False
 
-    def verify(self, secrets: Secrets) -> SlcFlavor:
+    def verify(self, secrets: Secrets) -> str:
         try:
-            secrets[self.key]
+            return secrets[self.key]
         except AttributeError as ex:
             raise SlcError(
                 "Secure Configuration Storage does not contain a"
                 f" flavor for SLC {self.slc_name}."
             ) from ex
-        return self
