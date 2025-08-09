@@ -1409,14 +1409,14 @@ transformers = ">=4.48.0"
 
 [[package]]
 name = "exasol-toolbox"
-version = "1.7.2"
+version = "1.7.4"
 description = "Your one-stop solution for managing all standard tasks and core workflows of your Python project."
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["dev"]
 files = [
-    {file = "exasol_toolbox-1.7.2-py3-none-any.whl", hash = "sha256:2f60106b753daa6374ae527da324e3bf344f63e9092600edbdf1509b2a8751ce"},
-    {file = "exasol_toolbox-1.7.2.tar.gz", hash = "sha256:1c1e299de0bf0278a1ae72293082ad4c3ef990318829b7dbf54e881e0347aa28"},
+    {file = "exasol_toolbox-1.7.4-py3-none-any.whl", hash = "sha256:1eac5f8ce53c79b251cfd234a911c2354b23483939a3dc05f32673c3c8e7033d"},
+    {file = "exasol_toolbox-1.7.4.tar.gz", hash = "sha256:e2f485728d61104291a84f470092a63a6f0f5771a4b61c2722385e1879c25264"},
 ]
 
 [package.dependencies]

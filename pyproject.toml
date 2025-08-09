@@ -76,6 +76,11 @@ minversion = "6.0"
 testpaths = [
     "test"
 ]
+python_files = [
+    "utest_*.py",
+    "itest_*.py",
+    "test_*.py",
+]
 
 [tool.coverage.run]
 relative_files = true
