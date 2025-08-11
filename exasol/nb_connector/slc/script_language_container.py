@@ -138,28 +138,19 @@ class ScriptLanguageContainer:
         }
 
         with current_directory(self.checkout_dir):
-            exaslct_api.deploy(
+            result = exaslct_api.deploy(
                 flavor_path=(str(self._flavor_path_rel),),
                 **bfs_params,
                 path_in_bucket=constants.PATH_IN_BUCKET,
                 release_name=self.language_alias,
                 output_directory=str(self.workspace.output_path),
             )
-            container_name = f"{self.flavor}-release-{self.language_alias}"
-            result = exaslct_api.generate_language_activation(
-                flavor_path=str(self._flavor_path_rel),
-                bucketfs_name=bfs_params["bucketfs_name"],
-                bucket_name=bfs_params["bucket"],
-                container_name=container_name,
-                path_in_bucket=constants.PATH_IN_BUCKET,
-            )
-            alter_session_cmd = result[0]
-            re_res = re.search(
-                r"ALTER SESSION SET SCRIPT_LANGUAGES='(.*)'", alter_session_cmd
-            )
-            activation_key = re_res.groups()[0]
-            _, url = activation_key.split("=", maxsplit=1)
-            self.secrets.save(self._alias_key, f"{self.language_alias}={url}")
+            deploy_result = result[self._flavor_path_rel]["release"]
+            builder = deploy_result.language_definition_builder
+            components = builder.generate_definition_components()
+            builder.add_custom_alias(components[0].alias, self.language_alias)
+            lang_def = builder.generate_definition()
+            self.secrets.save(self._alias_key, lang_def)
 
     @property
     def _alias_key(self):
