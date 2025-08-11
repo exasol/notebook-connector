@@ -53,63 +53,61 @@ def simulate_clone(flavor: str):
     return create_dir
 
 
-@pytest.fixture
-def slc_factory(tmp_path, git_repo_mock):
+class SlcFactory:
     """
     Provides a context to create an instance of ScriptLanguageContainer in
     a temporary directory and simulating the SLC Git repo to be cloned inside.
     """
+    def __init__(self, path: Path, git_repo_mock: Mock):
+        self.path = path
+        self.git_repo_mock = git_repo_mock
 
     @contextlib.contextmanager
-    def context(slc_name: str, flavor: str):
+    def context(self, slc_name: str, flavor: str):
         secrets = SecretsMock(slc_name)
-        git_repo_mock.clone_from.side_effect = simulate_clone(flavor)
-        with current_directory(tmp_path):
+        self.git_repo_mock.clone_from.side_effect = simulate_clone(flavor)
+        with current_directory(self.path):
             yield ScriptLanguageContainer.create(
                 secrets,
                 name=slc_name,
                 flavor=flavor,
             )
 
-    return context
+
+@pytest.fixture
+def slc_factory(tmp_path, git_repo_mock):
+    return SlcFactory(tmp_path, git_repo_mock)
 
 
 def test_create(
     sample_slc_name,
-    git_repo_mock,
     monkeypatch: MonkeyPatch,
-    tmp_path,
     caplog,
+    slc_factory,
 ):
     flavor = "Strawberry"
-    secrets = SecretsMock(sample_slc_name)
-    git_repo_mock.clone_from.side_effect = simulate_clone(flavor)
+    with slc_factory.context(sample_slc_name, flavor) as slc:
+        testee = slc
 
-    with current_directory(tmp_path):
-        testee = ScriptLanguageContainer.create(
-            secrets,
-            name=sample_slc_name,
-            flavor=flavor,
-        )
-        assert git_repo_mock.clone_from.called
-        assert "Cloning into" in caplog.text
-        assert "Fetching submodules" in caplog.text
+    assert slc_factory.git_repo_mock.clone_from.called
+    assert "Cloning into" in caplog.text
+    assert "Fetching submodules" in caplog.text
 
-        assert secrets.SLC_FLAVOR_CUDA == flavor
-        checkout_dir = (
-            tmp_path / constants.WORKSPACE_DIR / sample_slc_name / "git-clone"
-        )
-        assert testee.checkout_dir == checkout_dir
-        assert testee.flavor_path.is_dir()
-        assert (
-            testee.flavor_path
-            == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor
-        )
-        assert testee.custom_pip_file.parts[-3:] == (
-            "flavor_customization",
-            "packages",
-            "python3_pip_packages",
-        )
+    assert testee.secrets.SLC_FLAVOR_CUDA == flavor
+    checkout_dir = (
+        slc_factory.path / constants.WORKSPACE_DIR / sample_slc_name / "git-clone"
+    )
+    assert testee.checkout_dir == checkout_dir
+    assert testee.flavor_path.is_dir()
+    assert (
+        testee.flavor_path
+        == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor
+    )
+    assert testee.custom_pip_file.parts[-3:] == (
+        "flavor_customization",
+        "packages",
+        "python3_pip_packages",
+    )
 
 
 def test_repo_missing(sample_slc_name):
@@ -144,13 +142,13 @@ def test_illegal_names(name):
 def test_legal_names(name, slc_factory):
     flavor = "Strawberry"
     with not_raises(SlcError):
-        with slc_factory(slc_name=name, flavor=flavor) as slc:
+        with slc_factory.context(slc_name=name, flavor=flavor) as slc:
             assert slc.flavor == flavor
 
 
 @pytest.fixture
 def slc_with_tmp_checkout_dir(sample_slc_name, slc_factory) -> ScriptLanguageContainer:
-    with slc_factory(slc_name=sample_slc_name, flavor="Vanilla") as slc:
+    with slc_factory.context(slc_name=sample_slc_name, flavor="Vanilla") as slc:
         yield slc
 
 
@@ -215,5 +213,5 @@ def test_docker_image_tags(monkeypatch: MonkeyPatch, slc_factory):
         "ContextDockerClient",
         mock_docker_client_context(image_tags),
     )
-    with slc_factory("MY_SLC", flavor) as slc:
+    with slc_factory.context("MY_SLC", flavor) as slc:
         assert slc.docker_image_tags == expected
