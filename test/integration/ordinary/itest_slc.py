@@ -1,6 +1,8 @@
 import textwrap
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Iterator
+
 from test.integration.ordinary.test_itde_manager import remove_itde
 
 import pytest
@@ -15,12 +17,12 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc.script_language_container import (
     PipPackageDefinition,
     ScriptLanguageContainer,
-    constants,
+    constants, CondaPackageDefinition,
 )
-
+from test.package_manager import PackageManager
 
 @pytest.fixture(scope="module")
-def working_path() -> Path:
+def working_path() -> Iterator[Path]:
     with TemporaryDirectory() as d:
         yield Path(d)
 
@@ -43,25 +45,32 @@ def itde(slc_secrets: Secrets):
     remove_itde()
 
 
-DEFAULT_FLAVOR = "template-Exasol-all-python-3.10"
+DEFAULT_FLAVORS = {
+    PackageManager.PIP : "template-Exasol-all-python-3.10",
+    PackageManager.CONDA: "template-Exasol-all-python-3.10-conda"
+}
+
 OTHER_FLAVOR = "template-Exasol-all-r-4"
 """
 The flavors may depend on the release of the SLCR used via SLC_RELEASE_TAG in constants.py.
 See the developer guide (./doc/developer-guide.md) for more details.
 """
 
+@pytest.fixture(scope="module")
+def default_flavor(package_manager: PackageManager) -> str:
+    return DEFAULT_FLAVORS[package_manager]
 
 def create_slc(
     secrets: Secrets,
     name: str,
-    flavor: str = DEFAULT_FLAVOR,
+    flavor: str,
 ) -> ScriptLanguageContainer:
     return ScriptLanguageContainer.create(secrets, name=name, flavor=flavor)
 
 
 @pytest.fixture(scope="module")
-def sample_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
-    return create_slc(slc_secrets, "sample")
+def sample_slc(slc_secrets: Secrets, working_path: Path, default_flavor: str) -> ScriptLanguageContainer:
+    return create_slc(slc_secrets, "sample", default_flavor)
 
 
 @pytest.fixture(scope="module")
@@ -87,12 +96,12 @@ def test_export_slc(sample_slc: ScriptLanguageContainer):
     sample_slc.export()
     export_path = sample_slc.workspace.export_path
     assert export_path.exists()
-    tgz = [f for f in export_path.glob("*.tar.gz")]
-    assert len(tgz) == 1
-    assert tgz[0].is_file()
-    tgz_sum = [f for f in export_path.glob("*.tar.gz.sha512sum")]
-    assert len(tgz_sum) == 1
-    assert tgz_sum[0].is_file()
+    tar = [f for f in export_path.glob("*.tar")]
+    assert len(tar) == 1
+    assert tar[0].is_file()
+    tar_sum = [f for f in export_path.glob("*.tar.sha512sum")]
+    assert len(tar_sum) == 1
+    assert tar_sum[0].is_file()
 
 
 def slc_docker_tag_prefix(slc: ScriptLanguageContainer) -> str:
@@ -125,15 +134,26 @@ def test_deploy(sample_slc: ScriptLanguageContainer, itde):
 
 @pytest.mark.dependency(name="append_custom_packages", depends=["deploy_slc"])
 def test_append_custom_packages(
-    sample_slc: ScriptLanguageContainer, custom_packages: list[tuple[str, str, str]]
-):
-    sample_slc.append_custom_packages(
-        [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
-    )
-    with open(sample_slc.custom_pip_file) as f:
-        pip_content = f.read()
-        for custom_package, version, _ in custom_packages:
-            assert f"{custom_package}|{version}" in pip_content
+    sample_slc: ScriptLanguageContainer, custom_packages: list[tuple[str, str, str]], package_manager: PackageManager):
+    if package_manager == PackageManager.PIP:
+        sample_slc.append_custom_pip_packages(
+            [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
+        )
+        with open(sample_slc.custom_pip_file) as f:
+            pip_content = f.read()
+            for custom_package, version, _ in custom_packages:
+                assert f"{custom_package}|{version}" in pip_content
+    elif package_manager == PackageManager.CONDA:
+        sample_slc.append_custom_conda_packages(
+            [
+                CondaPackageDefinition(pkg, version)
+                for pkg, version, _ in custom_packages
+            ]
+        )
+        with open(sample_slc.custom_conda_file) as f:
+            conda_content = f.read()
+            for custom_package, version, _ in custom_packages:
+                assert f"{custom_package}|{version}" in conda_content
 
 
 @pytest.mark.dependency(

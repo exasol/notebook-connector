@@ -7,6 +7,7 @@ from pathlib import (
 )
 
 from exasol.slc import api as exaslct_api
+from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import (
     ContextDockerClient,
 )
@@ -25,6 +26,16 @@ from exasol.nb_connector.slc.workspace import (
 )
 
 PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
+CondaPackageDefinition = namedtuple("CondaPackageDefinition", ["pkg", "version"])
+
+
+def _append_packages(file_path: Path, packages: list[PipPackageDefinition] | list[CondaPackageDefinition]):
+    """
+    Appends packages to the custom packages file.
+    """
+    with open(file_path, "a") as f:
+        for p in packages:
+            print(f"{p.pkg}|{p.version}", file=f)
 
 
 class ScriptLanguageContainer:
@@ -97,16 +108,26 @@ class ScriptLanguageContainer:
         return self.checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / self.flavor
 
     @property
+    def custom_packages_dir(self):
+        """
+        Returns the path to the custom packages directory of the flavor
+        """
+        return self.flavor_dir / "flavor_customization" / "packages"
+
+
+    @property
     def custom_pip_file(self) -> Path:
         """
-        Returns the path to the custom pip file of the flavor
+        Returns the path to the custom pip packages file of the flavor
         """
-        return (
-            self.flavor_path
-            / "flavor_customization"
-            / "packages"
-            / "python3_pip_packages"
-        )
+        return self.custom_packages_dir / "python3_pip_packages"
+
+    @property
+    def custom_conda_file(self) -> Path:
+        """
+        Returns the path to the custom conda packages file of the flavor
+        """
+        return self.custom_packages_dir / "conda_packages"
 
     def export(self):
         """
@@ -144,6 +165,7 @@ class ScriptLanguageContainer:
                 path_in_bucket=constants.PATH_IN_BUCKET,
                 release_name=self.language_alias,
                 output_directory=str(self.workspace.output_path),
+                compression_strategy=CompressionStrategy.NONE,
             )
             container_name = f"{self.flavor}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(
@@ -179,16 +201,23 @@ class ScriptLanguageContainer:
                 "Secure Configuration Storage does not contains an activation key."
             ) from ex
 
-    def append_custom_packages(self, pip_packages: list[PipPackageDefinition]):
+    def append_custom_pip_packages(self, pip_packages: list[PipPackageDefinition]):
         """
-        Appends packages to the custom pip file.
-
+        Appends packages to the custom pip packages file.
         Note: This method is not idempotent: Multiple calls with the same
-        package definitions will result in duplicate entries.
+        package definitions will result in duplicated entries.
         """
-        with open(self.custom_pip_file, "a") as f:
-            for p in pip_packages:
-                print(f"{p.pkg}|{p.version}", file=f)
+        _append_packages(self.custom_pip_file, pip_packages)
+
+    def append_custom_conda_packages(
+        self, conda_packages: list[CondaPackageDefinition]
+    ):
+        """
+        Appends packages to the custom conda packages file.
+        Note: This method is not idempotent: Multiple calls with the same
+        package definitions will result in duplicated entries.
+        """
+        _append_packages(self.custom_conda_file, conda_packages)
 
     @property
     def docker_image_tags(self) -> list[str]:
