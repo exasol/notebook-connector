@@ -2,7 +2,7 @@ from pathlib import Path
 
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 
-DEFAULT_ALIAS = "ai_lab_default"  # unused
+DEFAULT_ALIAS = "ai_lab_default"  # To be used in the Jupyter notebooks of the AI Lab
 PATH_IN_BUCKET = "container"
 
 SLC_DOCKER_IMG_NAME = "exasol/script-language-container"

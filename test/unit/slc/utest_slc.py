@@ -17,15 +17,14 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import (
     constants,
     script_language_container,
+    workspace,
 )
-from exasol.nb_connector.slc.script_language_container import (
-    ScriptLanguageContainer,
-    current_directory,
-)
+from exasol.nb_connector.slc.script_language_container import ScriptLanguageContainer
 from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
     SlcFlavor,
 )
+from exasol.nb_connector.slc.workspace import current_directory
 
 
 @pytest.fixture
@@ -36,7 +35,7 @@ def sample_slc_name() -> str:
 @pytest.fixture
 def git_repo_mock(monkeypatch: MonkeyPatch):
     mock = create_autospec(git.Repo)
-    monkeypatch.setattr(script_language_container, "Repo", mock)
+    monkeypatch.setattr(workspace, "Repo", mock)
     return mock
 
 
