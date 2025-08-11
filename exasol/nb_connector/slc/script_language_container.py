@@ -29,7 +29,9 @@ PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
 CondaPackageDefinition = namedtuple("CondaPackageDefinition", ["pkg", "version"])
 
 
-def _append_packages(file_path: Path, packages: list[PipPackageDefinition] | list[CondaPackageDefinition]):
+def _append_packages(
+    file_path: Path, packages: list[PipPackageDefinition] | list[CondaPackageDefinition]
+):
     """
     Appends packages to the custom packages file.
     """
@@ -113,7 +115,6 @@ class ScriptLanguageContainer:
         Returns the path to the custom packages directory of the flavor
         """
         return self.flavor_dir / "flavor_customization" / "packages"
-
 
     @property
     def custom_pip_file(self) -> Path:

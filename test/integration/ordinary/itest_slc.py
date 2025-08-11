@@ -1,9 +1,9 @@
 import textwrap
+from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Iterator
-
 from test.integration.ordinary.test_itde_manager import remove_itde
+from test.package_manager import PackageManager
 
 import pytest
 from docker.models.images import Image as DockerImage
@@ -15,11 +15,12 @@ from exasol.nb_connector.language_container_activation import (
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc.script_language_container import (
+    CondaPackageDefinition,
     PipPackageDefinition,
     ScriptLanguageContainer,
-    constants, CondaPackageDefinition,
+    constants,
 )
-from test.package_manager import PackageManager
+
 
 @pytest.fixture(scope="module")
 def working_path() -> Iterator[Path]:
@@ -46,8 +47,8 @@ def itde(slc_secrets: Secrets):
 
 
 DEFAULT_FLAVORS = {
-    PackageManager.PIP : "template-Exasol-all-python-3.10",
-    PackageManager.CONDA: "template-Exasol-all-python-3.10-conda"
+    PackageManager.PIP: "template-Exasol-all-python-3.10",
+    PackageManager.CONDA: "template-Exasol-all-python-3.10-conda",
 }
 
 OTHER_FLAVOR = "template-Exasol-all-r-4"
@@ -56,9 +57,11 @@ The flavors may depend on the release of the SLCR used via SLC_RELEASE_TAG in co
 See the developer guide (./doc/developer-guide.md) for more details.
 """
 
+
 @pytest.fixture(scope="module")
 def default_flavor(package_manager: PackageManager) -> str:
     return DEFAULT_FLAVORS[package_manager]
+
 
 def create_slc(
     secrets: Secrets,
@@ -69,7 +72,9 @@ def create_slc(
 
 
 @pytest.fixture(scope="module")
-def sample_slc(slc_secrets: Secrets, working_path: Path, default_flavor: str) -> ScriptLanguageContainer:
+def sample_slc(
+    slc_secrets: Secrets, working_path: Path, default_flavor: str
+) -> ScriptLanguageContainer:
     return create_slc(slc_secrets, "sample", default_flavor)
 
 
@@ -134,7 +139,10 @@ def test_deploy(sample_slc: ScriptLanguageContainer, itde):
 
 @pytest.mark.dependency(name="append_custom_packages", depends=["deploy_slc"])
 def test_append_custom_packages(
-    sample_slc: ScriptLanguageContainer, custom_packages: list[tuple[str, str, str]], package_manager: PackageManager):
+    sample_slc: ScriptLanguageContainer,
+    custom_packages: list[tuple[str, str, str]],
+    package_manager: PackageManager,
+):
     if package_manager == PackageManager.PIP:
         sample_slc.append_custom_pip_packages(
             [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]

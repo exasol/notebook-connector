@@ -1,9 +1,9 @@
 from pathlib import Path
+from test.package_manager import PackageManager
 
 import pytest
 
 from exasol.nb_connector.secret_store import Secrets
-from test.package_manager import PackageManager
 
 
 @pytest.fixture

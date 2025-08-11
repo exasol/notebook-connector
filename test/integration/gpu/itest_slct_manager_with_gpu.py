@@ -4,9 +4,6 @@ from collections.abc import (
 )
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
-from exasol.nb_connector.slc import ScriptLanguageContainer
-from exasol.nb_connector.slc.script_language_container import CondaPackageDefinition
 from test.integration.ordinary.test_itde_manager import remove_itde
 
 import pytest
@@ -20,7 +17,8 @@ from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
 from exasol.nb_connector.secret_store import Secrets
-
+from exasol.nb_connector.slc import ScriptLanguageContainer
+from exasol.nb_connector.slc.script_language_container import CondaPackageDefinition
 
 
 @pytest.fixture(scope="session")
@@ -40,9 +38,10 @@ def secrets_file(working_path: Path) -> Path:
     return working_path / "sample_database.db"
 
 
-
 @pytest.fixture(scope="module")
-def sample_slc(slc_secrets: Secrets, working_path: Path, flavor: str) -> ScriptLanguageContainer:
+def sample_slc(
+    slc_secrets: Secrets, working_path: Path, flavor: str
+) -> ScriptLanguageContainer:
     return ScriptLanguageContainer.create(slc_secrets, name=name, flavor=flavor)
 
 
@@ -52,10 +51,12 @@ def slc_secrets(secrets_file, working_path, flavor) -> Secrets:
     secrets.save(AILabConfig.accelerator, Accelerator.nvidia.value)
     return secrets
 
-@pytest.fixture(scope="module")
-def sample_slc(slc_secrets: Secrets, working_path: Path, flavor: str) -> ScriptLanguageContainer:
-    return ScriptLanguageContainer.create(slc_secrets, name="sample_gpu", flavor=flavor)
 
+@pytest.fixture(scope="module")
+def sample_slc(
+    slc_secrets: Secrets, working_path: Path, flavor: str
+) -> ScriptLanguageContainer:
+    return ScriptLanguageContainer.create(slc_secrets, name="sample_gpu", flavor=flavor)
 
 
 @pytest.fixture(scope="module")
