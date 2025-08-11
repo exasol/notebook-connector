@@ -44,3 +44,9 @@ Check if the referred version of SLCR is also compatible with the version of SLC
 1. Go to [SLCR releases](https://github.com/exasol/script-languages-release/releases)
 2. Search for the SLCR version referenced in NC's file `exasol/nb_connector/slct_manager.py`
 3. Check if in the SLCR release, file  `pyproject.toml`, dependency `script-languages-container-tools` has the same major version
+
+### Impact on NC Tests
+
+Some of the tests of the Notebook Connector, especially the integration tests, may depend on particular properties of a particular SLCR release, e.g. a particular flavor to be present.
+
+In consequence updating the SLCR version potentially may require to update the NC tests, e.g. the name of the flavor used in the tests.

@@ -1,13 +1,25 @@
 # Notebook Connector User Guide
 
-## SlctManager
+## Managing Script Language Containers (SLCs)
 
-Class `SlctManager` in the Notebook Connector (NC) supports building different flavors of [Exasol Script Language Containers](https://github.com/exasol/script-languages-release) (SLCs). SlctManager uses [script-languages-container-tool](https://github.com/exasol/script-languages-container-tool) internally.
+The Notebook Connector (NC) supports building different flavors of [Exasol Script Language Containers](https://github.com/exasol/script-languages-release) (SLCs) using the [script-languages-container-tool](https://github.com/exasol/script-languages-container-tool).
 
-* The name of the SLC flavor must be provided in the Secure Configuration Storage (SCS) passed as parameter `secrets` to the constructor of SlctManager.
-* Additionally the caller must specify the *key* in the SCS for finding the flavor name.
+The specific options for building an SLC are stored in the Secure Configuration Storage (SCS).  Each SLC is identified by an arbitrary unique name used as index into the SCS for finding the related options.
 
-The constructor therefore supports the additional optional parameter `session`:
+You can set the SLC options using the class method `ScriptLanguageContainer.create()`, with parameters
+* `secrets`: The SCS
+* `name`: The name of the SLC instance
+  * will be converted to upper-case and must be unique
+* `flavor`: The name of a template as provided by the [Exasol Script Language Containers](https://github.com/exasol/script-languages-release).
 
-![](slct-manager-parameters.drawio.png)
+Method `create()` will then
+* Select a Language Alias for executing UDF scripts inside the SLC
+  * See section _Define your own script aliases_ on [docs.exasol.com](https://docs.exasol.com/db/latest/database_concepts/udf_scripts/adding_new_packages_script_languages.htm).
+  * The Language Alias will use prefix `custom_slc_` followed by the specified name
+  * Consecutive call to method `deploy()` will overwrite the SLC using the same Language Alias.
+* Save the `flavor` to the SCS indexed by the SLC's name.
+* Raise an error if the name has already been used.
+* Clone the SLC Git repository to the local file system.
+
+The constructor of class `ScriptLanguageContainer` verifies the SCS to contain the flavor and the SLC repository to be cloned to the local file system.
 

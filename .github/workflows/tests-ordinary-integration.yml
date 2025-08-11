@@ -16,7 +16,7 @@ jobs:
         file:
           - test_itde_manager.py
           - test_sagemaker_extension_wrapper.py
-          - test_slct_manager.py
+          - itest_slc.py
           - test_transformers_extension_wrapper.py
           - itde_mgr_in_container/test_itde_connect.py
           - itde_mgr_in_container/test_itde_external.py
@@ -36,15 +36,14 @@ jobs:
         with:
           tool-cache: true
           large-packages: false
+          haskell: true
 
       - name: Free disk space by removing large directories
         run: |
           sudo rm -rf /usr/local/graalvm/
-          sudo rm -rf /usr/local/.ghcup/
           sudo rm -rf /usr/local/share/powershell
           sudo rm -rf /usr/local/share/chromium
           sudo rm -rf /usr/local/lib/node_modules
-          sudo rm -rf /opt/ghc
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@1.7.4
