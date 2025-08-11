@@ -2,8 +2,12 @@
 
 ## Summary
 
-This release of the Notebook Connector comes with breaking changes in the `SlctManager`:
-* The class has been renamed to `ScriptLanguageContainer`.
+This release of the Notebook Connector evolves the prior `SlctManager` interface to
+* Support building SLCs with GPU support, requiring a special flavor, e.g. [template-Exasol-8-python-3.10-cuda-conda](https://github.com/exasol/script-languages/tree/master/flavors/template-Exasol-8-python-3.10-cuda-conda)
+* Incl. isolating various SLC sessions regarding flavors, Git clones and working directories.
+
+The release comes with breaking changes:
+* Class `SlctManager` has been renamed to `ScriptLanguageContainer`.
 * Some public methods or and attributes have been
   * renamed
     * `flavor_name` to `flavor`
@@ -16,7 +20,7 @@ This release of the Notebook Connector comes with breaking changes in the `SlctM
     * `clone_slc_repo()`
 * The handling of Secure Configuration Storage and the SlcSession have been changed.
 
-See the NC User Guide for details.
+See the NC [User Guide](../user_guide/user-guide.md) for details.
 
 ## Features
 
