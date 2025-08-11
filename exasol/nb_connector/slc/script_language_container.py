@@ -191,7 +191,7 @@ class ScriptLanguageContainer:
                 print(f"{p.pkg}|{p.version}", file=f)
 
     @property
-    def docker_images(self) -> list[str]:
+    def docker_image_tags(self) -> list[str]:
         """
         Return list of Docker image tags related to the current SLC.
         """
