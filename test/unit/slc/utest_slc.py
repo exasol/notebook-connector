@@ -87,8 +87,8 @@ def test_create(
     slc_factory,
 ):
     flavor = "Strawberry"
-    with slc_factory.context(sample_slc_name, flavor) as slc:
-        testee = slc
+    with slc_factory.context(sample_slc_name, flavor) as testee:
+        pass
 
     assert slc_factory.git_repo_mock.clone_from.called
     assert "Cloning into" in caplog.text
