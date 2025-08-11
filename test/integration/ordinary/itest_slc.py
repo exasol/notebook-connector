@@ -44,6 +44,11 @@ def itde(slc_secrets: Secrets):
 
 
 DEFAULT_FLAVOR = "template-Exasol-all-python-3.10"
+OTHER_FLAVOR = "template-Exasol-all-r-4"
+"""
+The flavors may depend on the release of the SLCR used via SLC_RELEASE_TAG in constants.py.
+See the developer guide (./doc/developer-guide.md) for more details.
+"""
 
 
 def create_slc(
@@ -66,7 +71,7 @@ def other_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContain
     to be limited to the current SLC only, e.g. removing docker images or
     working directories.
     """
-    slc = create_slc(slc_secrets, "other", flavor="template-Exasol-all-r-4")
+    slc = create_slc(slc_secrets, "other", flavor=OTHER_FLAVOR)
     slc.export()
     slc.deploy()
     return slc
