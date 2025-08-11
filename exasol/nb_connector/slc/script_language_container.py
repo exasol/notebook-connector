@@ -15,13 +15,13 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
-from exasol.nb_connector.slc.workspace import (
-    Workspace,
-    current_directory,
-)
 from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
     SlcFlavor,
+)
+from exasol.nb_connector.slc.workspace import (
+    Workspace,
+    current_directory,
 )
 
 PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
