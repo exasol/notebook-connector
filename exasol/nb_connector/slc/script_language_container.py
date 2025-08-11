@@ -140,6 +140,7 @@ class ScriptLanguageContainer:
                 export_path=str(self.workspace.export_path),
                 output_directory=str(self.workspace.output_path),
                 release_name=self.language_alias,
+                compression_strategy=CompressionStrategy.NONE,
             )
 
     def deploy(self):

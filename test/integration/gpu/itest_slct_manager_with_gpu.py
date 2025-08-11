@@ -70,13 +70,7 @@ def itde(slc_secrets: Secrets):
 def custom_packages() -> list[tuple[str, str]]:
     return [("numba[cuda]", "0.61.2")]
 
-
-@pytest.mark.dependency(name="clone")
-def test_clone_slc(slct_manager):
-    slct_manager.clone_slc_repo()
-
-
-@pytest.mark.dependency(name="test_append_custom_packages", depends=["clone"])
+@pytest.mark.dependency(name="append_custom_packages")
 def test_append_custom_packages(
     sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str]],
@@ -87,7 +81,7 @@ def test_append_custom_packages(
 
 
 @pytest.mark.dependency(
-    name="upload_slc_with_new_packages", depends=["test_append_custom_packages"]
+    name="upload_slc_with_new_packages", depends=["append_custom_packages"]
 )
 def test_upload_slc_with_new_packages(
     slc_secrets: Secrets,
