@@ -114,7 +114,7 @@ class ScriptLanguageContainer:
         """
         Returns the path to the custom packages directory of the flavor
         """
-        return self.flavor_dir / "flavor_customization" / "packages"
+        return self.flavor_path / "flavor_customization" / "packages"
 
     @property
     def custom_pip_file(self) -> Path:

@@ -30,9 +30,9 @@ jobs:
             extra_param: ""
           - file: itde_mgr_in_container/test_itde_stop_and_restart.py
             extra_param: ""
-          - file: test_slct_manager.py
+          - file: itest_slc.py
             extra_param: "--package-manager pip"
-          - file: test_slct_manager.py
+          - file: itest_slc.py
             extra_param: "--package-manager conda"
 
     steps:
