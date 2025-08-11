@@ -114,7 +114,7 @@ class ScriptLanguageContainer:
     Support building different flavors of Exasol Script Language
     Containers (SLCs) using the SLCT.
 
-    Parameter ``name`` serves as a key for the related flavor stored in the
+    Parameter ``name`` serves as base of the language alias and a key for the related flavor stored in the
     Secure Configuration Storage (SCS / secrets / conf).  The flavor is used
     as a template for building the SLC.
 
