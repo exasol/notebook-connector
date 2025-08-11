@@ -146,7 +146,7 @@ class ScriptLanguageContainer:
                 output_directory=str(self.workspace.output_path),
             )
             print(f"exaslct_api.deploy() returned {result}")
-            deploy_result = result[self.flavor]["release"]
+            deploy_result = result[self._flavor_path_rel]["release"]
             builder = deploy_result.language_definition_builder
             builder.add_custom_alias(self.language_alias)
             lang_def = builder.generate_definition()
