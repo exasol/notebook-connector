@@ -94,16 +94,15 @@ def clone_slc_repo(target_dir: Path):
     Clones the script-languages-release repository from Github into
     the target dir configured in the Secure Configuration Storage.
     """
-    dir = target_dir
-    if dir.is_dir():
-        LOG.warning(f"Directory '{dir}' is not empty. Skipping checkout....")
+    if target_dir.is_dir():
+        LOG.warning(f"Directory '{target_dir}' is not empty. Skipping checkout....")
         return
 
-    dir.mkdir(parents=True, exist_ok=True)
-    LOG.info(f"Cloning into {dir}...")
+    target_dir.mkdir(parents=True, exist_ok=True)
+    LOG.info(f"Cloning into {target_dir}...")
     repo = Repo.clone_from(
         "https://github.com/exasol/script-languages-release",
-        dir,
+        target_dir,
         branch=constants.SLC_RELEASE_TAG,
     )
     LOG.info("Fetching submodules...")
