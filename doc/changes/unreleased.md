@@ -18,7 +18,7 @@ The release comes with breaking changes:
   * removed
     * `check_slc_repo_complete()`
     * `clone_slc_repo()`
-* The handling of Secure Configuration Storage and the SlcSession have been changed.
+* The handling of Secure Configuration Storage has been changed to support using multiple SLC flavors.
 
 See the NC [User Guide](../user_guide/user-guide.md) for details.
 

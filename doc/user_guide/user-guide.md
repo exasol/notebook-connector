@@ -12,17 +12,14 @@ You can set the SLC options using the class method `ScriptLanguageContainer.crea
   * will be converted to upper-case and must be unique
 * `flavor`: The name of a template as provided by the [Exasol Script Language Containers](https://github.com/exasol/script-languages-release).
 
-Method `create()` additionally will select
-* a Language Alias for executing UDF scripts inside the SLC, see section _Define your own script aliases_ on [docs.exasol.com](https://docs.exasol.com/db/latest/database_concepts/udf_scripts/adding_new_packages_script_languages.htm).
-  * The Language Alias will use prefix `CUSTOM_SLC_` followed by the specified name
-* a `checkout_dir`&mdash;a unique path in the local file system for cloning the SLC Git repository.
+Method `create()` will then
+* Select a Language Alias for executing UDF scripts inside the SLC
+  * See section _Define your own script aliases_ on [docs.exasol.com](https://docs.exasol.com/db/latest/database_concepts/udf_scripts/adding_new_packages_script_languages.htm).
+  * The Language Alias will use prefix `custom_slc_` followed by the specified name
+  * Consecutive call to method `deploy()` will overwrite the SLC using the same Language Alias.
+* Save the `flavor` to the SCS indexed by the SLC's name.
+* Raise an error if the name has already been used.
+* Clone the SLC Git repository to the local file system.
 
-Before returning an instance of class `ScriptLanguageContainer` method `create()` will
-* Save the SLC options `flavor` and `checkout_dir` in the SCS&mdash;all indexed by the SLC's name.
-* Checkout (i.e. `git clone`) the SLC Git repository to the `checkout_dir` in the local file system.
+The constructor of class `ScriptLanguageContainer` verifies the SCS to contain the flavor and the SLC repository to be cloned to the local file system.
 
-Method `create()` raises an error if the SCS already contains one of the SLC options as this indicates the SLC's name to be non-unique.
-
-The constructor of class `ScriptLanguageContainer` verifies the SCS to contain the required SLC options and the SLC repository to be checked out (cloned) in the local file system.
-
-Consecutive call to method `deploy()` will overwrite the SLC using the identical Language Alias.
