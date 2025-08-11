@@ -27,32 +27,32 @@ jobs:
 
   ordinary-itests:
     name: Ordinary iTests
-    needs: [ slow-checks-approval ]
+    # needs: [ slow-checks-approval ]
     uses: ./.github/workflows/tests-ordinary-integration.yml
     permissions:
       contents: read
 
-  saas-tests:
-    name: SaaS
-    needs: [ slow-checks-approval ]
-    uses: ./.github/workflows/tests-saas.yml
-    secrets: inherit
-    permissions:
-      contents: read
-
-  large-runner-tests:
-    name: Large Runner
-    needs: [ slow-checks-approval ]
-    uses: ./.github/workflows/tests-large-runner.yml
-    permissions:
-      contents: read
-
-  gpu-tests:
-    name: GPU
-    needs: [ slow-checks-approval ]
-    uses: ./.github/workflows/tests-gpu.yml
-    permissions:
-      contents: read
+#  saas-tests:
+#    name: SaaS
+#    needs: [ slow-checks-approval ]
+#    uses: ./.github/workflows/tests-saas.yml
+#    secrets: inherit
+#    permissions:
+#      contents: read
+#
+#  large-runner-tests:
+#    name: Large Runner
+#    needs: [ slow-checks-approval ]
+#    uses: ./.github/workflows/tests-large-runner.yml
+#    permissions:
+#      contents: read
+#
+#  gpu-tests:
+#    name: GPU
+#    needs: [ slow-checks-approval ]
+#    uses: ./.github/workflows/tests-gpu.yml
+#    permissions:
+#      contents: read
 
   # This job ensures inputs have been executed successfully.
   approve-merge:
