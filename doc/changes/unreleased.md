@@ -13,7 +13,7 @@ The release comes with breaking changes:
     * `flavor_name` to `flavor`
     * `flavor_dir` to `flavor_path`
     * `upload()` to `deploy()`
-    * `slc_docker_images()` to `docker_images()`
+    * `slc_docker_images()` to `docker_image_tags()`
     * `clean_all_images()` to `clean_docker_images()`
   * removed
     * `check_slc_repo_complete()`

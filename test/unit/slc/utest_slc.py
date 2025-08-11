@@ -190,7 +190,7 @@ def mock_docker_client_context(image_tags: list[str]):
     return context
 
 
-def test_docker_images(monkeypatch: MonkeyPatch, slc_factory):
+def test_docker_image_tags(monkeypatch: MonkeyPatch, slc_factory):
     """
     This test mocks the Docker client simulating to return a list of
     Docker images to be available on the current system.
@@ -216,4 +216,4 @@ def test_docker_images(monkeypatch: MonkeyPatch, slc_factory):
         mock_docker_client_context(image_tags),
     )
     with slc_factory("MY_SLC", flavor) as slc:
-        assert slc.docker_images == expected
+        assert slc.docker_image_tags == expected

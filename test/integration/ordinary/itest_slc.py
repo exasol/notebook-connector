@@ -90,15 +90,15 @@ def test_export_slc(sample_slc: ScriptLanguageContainer):
     assert tgz_sum[0].is_file()
 
 
-def slc_docker_tag(slc: ScriptLanguageContainer) -> str:
+def slc_docker_tag_prefix(slc: ScriptLanguageContainer) -> str:
     return f"{constants.SLC_DOCKER_IMG_NAME}:{slc.flavor}"
 
 
 @pytest.mark.dependency(name="slc_images", depends=["export_slc"])
 def test_slc_images(sample_slc: ScriptLanguageContainer):
-    images = sample_slc.docker_images
+    images = sample_slc.docker_image_tags
     assert len(images) > 0
-    expected = slc_docker_tag(sample_slc)
+    expected = slc_docker_tag_prefix(sample_slc)
     for img in images:
         assert expected in img
 
@@ -188,7 +188,7 @@ def test_clean_docker_images(
         images: list[DockerImage],
         slc: ScriptLanguageContainer,
     ) -> list[str]:
-        prefix = slc_docker_tag(slc)
+        prefix = slc_docker_tag_prefix(slc)
         return [tag for img in images if (tag := img.tags[0]).startswith(prefix)]
 
     sample_slc.clean_docker_images()
