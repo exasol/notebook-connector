@@ -148,7 +148,8 @@ class ScriptLanguageContainer:
             print(f"exaslct_api.deploy() returned {result}")
             deploy_result = result[self._flavor_path_rel]["release"]
             builder = deploy_result.language_definition_builder
-            builder.lang_def_components[0].alias = self.language_alias
+            components = builder.generate_definition_components()
+            builder.add_custom_alias(components[0].alias, self.language_alias)
             lang_def = builder.generate_definition()
             self.secrets.save(self._alias_key, lang_def)
 
