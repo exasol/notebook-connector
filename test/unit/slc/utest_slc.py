@@ -58,6 +58,7 @@ class SlcFactory:
     Provides a context to create an instance of ScriptLanguageContainer in
     a temporary directory and simulating the SLC Git repo to be cloned inside.
     """
+
     def __init__(self, path: Path, git_repo_mock: Mock):
         self.path = path
         self.git_repo_mock = git_repo_mock
@@ -101,8 +102,7 @@ def test_create(
     assert testee.checkout_dir == checkout_dir
     assert testee.flavor_path.is_dir()
     assert (
-        testee.flavor_path
-        == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor
+        testee.flavor_path == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor
     )
     assert testee.custom_pip_file.parts[-3:] == (
         "flavor_customization",
