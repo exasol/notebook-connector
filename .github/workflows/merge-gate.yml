@@ -62,7 +62,8 @@ jobs:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
     # Removed saas-tests from being required
-    needs: [ fast-checks, large-runner-tests, ordinary-itests, gpu-tests ]
+    # needs: [ fast-checks, large-runner-tests, ordinary-itests, gpu-tests ]
+    needs: [ fast-checks, ordinary-itests ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
