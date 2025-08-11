@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 from test.integration.ordinary.test_itde_manager import remove_itde
 
 import pytest
+from docker.models.images import Image as DockerImage
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 from exasol.nb_connector.itde_manager import bring_itde_up
@@ -14,6 +15,7 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc.script_language_container import (
     PipPackageDefinition,
     ScriptLanguageContainer,
+    constants,
 )
 
 
@@ -65,6 +67,7 @@ def other_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContain
     working directories.
     """
     slc = create_slc(slc_secrets, "other", flavor="template-Exasol-all-r-4")
+    slc.export()
     slc.deploy()
     return slc
 
@@ -87,16 +90,15 @@ def test_export_slc(sample_slc: ScriptLanguageContainer):
     assert tgz_sum[0].is_file()
 
 
-def slc_img_name(slc: ScriptLanguageContainer) -> str:
-    prefix = "exasol/script-language-container"
-    return f"{prefix}:{slc.flavor}"
+def slc_docker_tag(slc: ScriptLanguageContainer) -> str:
+    return f"{constants.SLC_DOCKER_IMG_NAME}:{slc.flavor}"
 
 
 @pytest.mark.dependency(name="slc_images", depends=["export_slc"])
 def test_slc_images(sample_slc: ScriptLanguageContainer):
     images = sample_slc.docker_images
     assert len(images) > 0
-    expected = slc_img_name(sample_slc)
+    expected = slc_docker_tag(sample_slc)
     for img in images:
         assert expected in img
 
@@ -182,12 +184,19 @@ def test_clean_docker_images(
     sample_slc: ScriptLanguageContainer,
     other_slc: ScriptLanguageContainer,
 ):
+    def contains(
+        images: list[DockerImage],
+        slc: ScriptLanguageContainer,
+    ) -> list[str]:
+        prefix = slc_docker_tag(slc)
+        return [tag for img in images if (tag := img.tags[0]).startswith(prefix)]
+
     sample_slc.clean_docker_images()
     with ContextDockerClient() as docker_client:
-        images = docker_client.images.list(name="exasol/script-language-container")
-    tags = [ img.tags[0] for img in images ]
-    assert slc_img_name(sample_slc) not in tags
-    assert slc_img_name(other_slc) in tags
+        images = docker_client.images.list(name=constants.SLC_DOCKER_IMG_NAME)
+
+    assert not contains(images, sample_slc)
+    assert contains(images, other_slc)
 
 
 @pytest.mark.dependency(name="clean_up_output_path", depends=["clean_docker_images"])

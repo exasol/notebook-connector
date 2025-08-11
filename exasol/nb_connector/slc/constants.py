@@ -5,6 +5,8 @@ from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PRE
 DEFAULT_ALIAS = "ai_lab_default"  # unused
 PATH_IN_BUCKET = "container"
 
+SLC_DOCKER_IMG_NAME = "exasol/script-language-container"
+
 SLC_ACTIVATION_KEY_PREFIX = ACTIVATION_KEY_PREFIX + "slc_"
 """
 Activation SQL for the Custom SLC will be saved in the Secure

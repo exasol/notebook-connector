@@ -278,7 +278,7 @@ class ScriptLanguageContainer:
         """
         Return list of Docker image tags related to the current SLC.
         """
-        image_name = "exasol/script-language-container"
+        image_name = constants.SLC_DOCKER_IMG_NAME
         prefix = f"{image_name}:{self.flavor}"
         with ContextDockerClient() as docker_client:
             images = docker_client.images.list(name=image_name)
