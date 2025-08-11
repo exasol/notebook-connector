@@ -93,6 +93,7 @@ def test_create(
     assert "Cloning into" in caplog.text
     assert "Fetching submodules" in caplog.text
 
+    assert testee.language_alias == f"custom_slc_{sample_slc_name}"
     assert testee.secrets.SLC_FLAVOR_CUDA == flavor
     checkout_dir = (
         slc_factory.path / constants.WORKSPACE_DIR / sample_slc_name / "git-clone"
