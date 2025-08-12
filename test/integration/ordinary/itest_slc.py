@@ -2,6 +2,9 @@ import textwrap
 from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+from exasol.slc.models.compression_strategy import CompressionStrategy
+
 from test.integration.ordinary.test_itde_manager import remove_itde
 from test.package_manager import PackageManager
 
@@ -67,25 +70,26 @@ def create_slc(
     secrets: Secrets,
     name: str,
     flavor: str,
+    compression_strategy: CompressionStrategy,
 ) -> ScriptLanguageContainer:
-    return ScriptLanguageContainer.create(secrets, name=name, flavor=flavor)
+    return ScriptLanguageContainer.create(secrets, name=name, flavor=flavor, compression_strategy=compression_strategy)
 
 
 @pytest.fixture(scope="module")
 def sample_slc(
-    slc_secrets: Secrets, working_path: Path, default_flavor: str
+    slc_secrets: Secrets, working_path: Path, default_flavor: str, compression_strategy: CompressionStrategy
 ) -> ScriptLanguageContainer:
-    return create_slc(slc_secrets, "sample", default_flavor)
+    return create_slc(slc_secrets, "sample", default_flavor, compression_strategy)
 
 
 @pytest.fixture(scope="module")
-def other_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
+def other_slc(slc_secrets: Secrets, working_path: Path, compression_strategy: CompressionStrategy) -> ScriptLanguageContainer:
     """
     Creates another SLC with a different flavor for verifying operations
     to be limited to the current SLC only, e.g. removing docker images or
     working directories.
     """
-    slc = create_slc(slc_secrets, "other", flavor=OTHER_FLAVOR)
+    slc = create_slc(slc_secrets, "other", flavor=OTHER_FLAVOR, compression_strategy=compression_strategy)
     slc.export()
     slc.deploy()
     return slc
@@ -97,14 +101,15 @@ def custom_packages() -> list[tuple[str, str, str]]:
 
 
 @pytest.mark.dependency(name="export_slc")
-def test_export_slc(sample_slc: ScriptLanguageContainer):
+def test_export_slc(sample_slc: ScriptLanguageContainer, compression_strategy: CompressionStrategy):
     sample_slc.export()
     export_path = sample_slc.workspace.export_path
+    expected_suffix = "tar" if compression_strategy == CompressionStrategy.NONE else "tar.gz"
     assert export_path.exists()
-    tar = [f for f in export_path.glob("*.tar")]
+    tar = [f for f in export_path.glob(f"*.{expected_suffix}")]
     assert len(tar) == 1
     assert tar[0].is_file()
-    tar_sum = [f for f in export_path.glob("*.tar.sha512sum")]
+    tar_sum = [f for f in export_path.glob(f"*.{expected_suffix}.sha512sum")]
     assert len(tar_sum) == 1
     assert tar_sum[0].is_file()
 
@@ -137,12 +142,13 @@ def test_deploy(sample_slc: ScriptLanguageContainer, itde):
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
 
-@pytest.mark.dependency(name="append_custom_packages", depends=["deploy_slc"])
-def test_append_custom_packages(
+@pytest.mark.dependency(name="append_custom_pip_packages", depends=["deploy_slc"])
+def test_append_custom_pip_packages(
     sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str, str]],
     package_manager: PackageManager,
 ):
+    # Cannot skip the test if it's not a Pip package manager, otherwise dependent tests below won't run
     if package_manager == PackageManager.PIP:
         sample_slc.append_custom_pip_packages(
             [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
@@ -151,7 +157,16 @@ def test_append_custom_packages(
             pip_content = f.read()
             for custom_package, version, _ in custom_packages:
                 assert f"{custom_package}|{version}" in pip_content
-    elif package_manager == PackageManager.CONDA:
+
+
+@pytest.mark.dependency(name="append_custom_conda_packages", depends=["deploy_slc"])
+def test_append_custom_conda_packages(
+    sample_slc: ScriptLanguageContainer,
+    custom_packages: list[tuple[str, str, str]],
+    package_manager: PackageManager,
+):
+    #Cannot skip the test if it's not a Conda package manager, otherwise dependent tests below won't run
+    if package_manager == PackageManager.CONDA:
         sample_slc.append_custom_conda_packages(
             [
                 CondaPackageDefinition(pkg, version)
@@ -163,9 +178,8 @@ def test_append_custom_packages(
             for custom_package, version, _ in custom_packages:
                 assert f"{custom_package}|{version}" in conda_content
 
-
 @pytest.mark.dependency(
-    name="deploy_slc_with_custom_packages", depends=["append_custom_packages"]
+    name="deploy_slc_with_custom_packages", depends=["append_custom_pip_packages", "append_custom_conda_packages"]
 )
 def test_deploy_slc_with_custom_packages(sample_slc: ScriptLanguageContainer):
     sample_slc.deploy()

@@ -31,9 +31,11 @@ jobs:
           - file: itde_mgr_in_container/test_itde_stop_and_restart.py
             extra_param: ""
           - file: itest_slc.py
-            extra_param: "--package-manager pip"
+            extra_param: "--package-manager pip --compression-strategy gzip"
           - file: itest_slc.py
-            extra_param: "--package-manager conda"
+            extra_param: "--package-manager conda --compression-strategy gzip"
+          - file: itest_slc.py
+            extra_param: "--package-manager pip --compression-strategy none"
 
     steps:
 

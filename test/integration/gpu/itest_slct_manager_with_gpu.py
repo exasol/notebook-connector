@@ -4,6 +4,9 @@ from collections.abc import (
 )
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+from exasol.slc.models.compression_strategy import CompressionStrategy
+
 from test.integration.ordinary.test_itde_manager import remove_itde
 
 import pytest
@@ -20,12 +23,11 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import ScriptLanguageContainer
 from exasol.nb_connector.slc.script_language_container import CondaPackageDefinition
 
-
-@pytest.fixture(scope="session")
-def flavor(request) -> str:
-    val = "template-Exasol-8-python-3.10-cuda-conda"
-    return val
-
+DEFAULT_GPU_FLAVOR = "template-Exasol-8-python-3.10-cuda-conda"
+"""
+The flavor may depend on the release of the SLCR used via SLC_RELEASE_TAG in constants.py.
+See the developer guide (./doc/developer-guide.md) for more details.
+"""
 
 @pytest.fixture(scope="module")
 def working_path() -> Iterator[Path]:
@@ -37,16 +39,8 @@ def working_path() -> Iterator[Path]:
 def secrets_file(working_path: Path) -> Path:
     return working_path / "sample_database.db"
 
-
 @pytest.fixture(scope="module")
-def sample_slc(
-    slc_secrets: Secrets, working_path: Path, flavor: str
-) -> ScriptLanguageContainer:
-    return ScriptLanguageContainer.create(slc_secrets, name=name, flavor=flavor)
-
-
-@pytest.fixture(scope="module")
-def slc_secrets(secrets_file, working_path, flavor) -> Secrets:
+def slc_secrets(secrets_file) -> Secrets:
     secrets = Secrets(secrets_file, master_password="abc")
     secrets.save(AILabConfig.accelerator, Accelerator.nvidia.value)
     return secrets
@@ -54,9 +48,9 @@ def slc_secrets(secrets_file, working_path, flavor) -> Secrets:
 
 @pytest.fixture(scope="module")
 def sample_slc(
-    slc_secrets: Secrets, working_path: Path, flavor: str
+    slc_secrets: Secrets
 ) -> ScriptLanguageContainer:
-    return ScriptLanguageContainer.create(slc_secrets, name="sample_gpu", flavor=flavor)
+    return ScriptLanguageContainer.create(slc_secrets, name="sample_gpu", flavor=DEFAULT_GPU_FLAVOR, compression_strategy=CompressionStrategy.NONE)
 
 
 @pytest.fixture(scope="module")
@@ -88,12 +82,11 @@ def test_upload_slc_with_new_packages(
     slc_secrets: Secrets,
     itde,
     sample_slc: ScriptLanguageContainer,
-    flavor,
 ):
     sample_slc.deploy()
     assert (
         sample_slc.activation_key
-        == f"{sample_slc.language_alias}=localzmq+protobuf:///bfsdefault/default/container/{flavor}-release-{sample_slc.language_alias}?lang=python#buckets/bfsdefault/default/container/{flavor}-release-{sample_slc.language_alias}/exaudf/exaudfclient"
+        == f"{sample_slc.language_alias}=localzmq+protobuf:///bfsdefault/default/container/{DEFAULT_GPU_FLAVOR}-release-{sample_slc.language_alias}?lang=python#buckets/bfsdefault/default/container/{DEFAULT_GPU_FLAVOR}-release-{sample_slc.language_alias}/exaudf/exaudfclient"
     )
 
 
