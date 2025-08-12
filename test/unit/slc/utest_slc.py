@@ -1,5 +1,8 @@
 import contextlib
 from pathlib import Path
+
+from exasol.slc.models.compression_strategy import CompressionStrategy
+
 from test.unit.slc.util import (
     SecretsMock,
     not_raises,
@@ -109,6 +112,7 @@ def test_create(
         "packages",
         "python3_pip_packages",
     )
+    assert testee.compression_strategy == CompressionStrategy.GZIP
 
 
 def test_repo_missing(sample_slc_name):

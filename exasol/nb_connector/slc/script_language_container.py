@@ -75,6 +75,7 @@ class ScriptLanguageContainer:
     ):
         self.secrets = secrets
         self.name = name
+        _verify_name(name)
         self.flavor = SlcFlavor(name).verify(secrets)
         self.compression_strategy = SlcCompressionStrategy(name).verify(secrets)
         self.workspace = Workspace.for_slc(name)
