@@ -23,7 +23,7 @@ def secrets() -> Iterator[Secrets]:
 
 
 @pytest.fixture(scope="module")
-def secrets_module(sample_file_module) -> Iterator[Secrets]:
+def secrets_module() -> Iterator[Secrets]:
     with _sample_file() as secret_db:
         yield Secrets(sample_file_module, master_password="abc")
 
