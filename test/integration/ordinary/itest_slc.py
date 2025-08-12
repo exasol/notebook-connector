@@ -2,14 +2,12 @@ import textwrap
 from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
-from exasol.slc.models.compression_strategy import CompressionStrategy
-
 from test.integration.ordinary.test_itde_manager import remove_itde
 from test.package_manager import PackageManager
 
 import pytest
 from docker.models.images import Image as DockerImage
+from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
 from exasol.nb_connector.itde_manager import bring_itde_up
@@ -72,24 +70,36 @@ def create_slc(
     flavor: str,
     compression_strategy: CompressionStrategy,
 ) -> ScriptLanguageContainer:
-    return ScriptLanguageContainer.create(secrets, name=name, flavor=flavor, compression_strategy=compression_strategy)
+    return ScriptLanguageContainer.create(
+        secrets, name=name, flavor=flavor, compression_strategy=compression_strategy
+    )
 
 
 @pytest.fixture(scope="module")
 def sample_slc(
-    slc_secrets: Secrets, working_path: Path, default_flavor: str, compression_strategy: CompressionStrategy
+    slc_secrets: Secrets,
+    working_path: Path,
+    default_flavor: str,
+    compression_strategy: CompressionStrategy,
 ) -> ScriptLanguageContainer:
     return create_slc(slc_secrets, "sample", default_flavor, compression_strategy)
 
 
 @pytest.fixture(scope="module")
-def other_slc(slc_secrets: Secrets, working_path: Path, compression_strategy: CompressionStrategy) -> ScriptLanguageContainer:
+def other_slc(
+    slc_secrets: Secrets, working_path: Path, compression_strategy: CompressionStrategy
+) -> ScriptLanguageContainer:
     """
     Creates another SLC with a different flavor for verifying operations
     to be limited to the current SLC only, e.g. removing docker images or
     working directories.
     """
-    slc = create_slc(slc_secrets, "other", flavor=OTHER_FLAVOR, compression_strategy=compression_strategy)
+    slc = create_slc(
+        slc_secrets,
+        "other",
+        flavor=OTHER_FLAVOR,
+        compression_strategy=compression_strategy,
+    )
     slc.export()
     slc.deploy()
     return slc
@@ -101,10 +111,14 @@ def custom_packages() -> list[tuple[str, str, str]]:
 
 
 @pytest.mark.dependency(name="export_slc")
-def test_export_slc(sample_slc: ScriptLanguageContainer, compression_strategy: CompressionStrategy):
+def test_export_slc(
+    sample_slc: ScriptLanguageContainer, compression_strategy: CompressionStrategy
+):
     sample_slc.export()
     export_path = sample_slc.workspace.export_path
-    expected_suffix = "tar" if compression_strategy == CompressionStrategy.NONE else "tar.gz"
+    expected_suffix = (
+        "tar" if compression_strategy == CompressionStrategy.NONE else "tar.gz"
+    )
     assert export_path.exists()
     tar = [f for f in export_path.glob(f"*.{expected_suffix}")]
     assert len(tar) == 1
@@ -165,7 +179,7 @@ def test_append_custom_conda_packages(
     custom_packages: list[tuple[str, str, str]],
     package_manager: PackageManager,
 ):
-    #Cannot skip the test if it's not a Conda package manager, otherwise dependent tests below won't run
+    # Cannot skip the test if it's not a Conda package manager, otherwise dependent tests below won't run
     if package_manager == PackageManager.CONDA:
         sample_slc.append_custom_conda_packages(
             [
@@ -178,8 +192,10 @@ def test_append_custom_conda_packages(
             for custom_package, version, _ in custom_packages:
                 assert f"{custom_package}|{version}" in conda_content
 
+
 @pytest.mark.dependency(
-    name="deploy_slc_with_custom_packages", depends=["append_custom_pip_packages", "append_custom_conda_packages"]
+    name="deploy_slc_with_custom_packages",
+    depends=["append_custom_pip_packages", "append_custom_conda_packages"],
 )
 def test_deploy_slc_with_custom_packages(sample_slc: ScriptLanguageContainer):
     sample_slc.deploy()

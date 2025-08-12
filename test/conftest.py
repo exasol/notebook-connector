@@ -1,10 +1,8 @@
 from pathlib import Path
-
-from exasol.slc.models.compression_strategy import CompressionStrategy
-
 from test.package_manager import PackageManager
 
 import pytest
+from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.secret_store import Secrets
 
@@ -29,7 +27,6 @@ def pytest_addoption(parser):
         help="Package Manager to use",
     )
 
-
     parser.addoption(
         "--compression-strategy",
         action="store",
@@ -38,6 +35,7 @@ def pytest_addoption(parser):
         default="gzip",
         help="Compression Strategy to use",
     )
+
 
 @pytest.fixture(scope="session")
 def package_manager(request) -> PackageManager:

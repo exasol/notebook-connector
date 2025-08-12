@@ -13,7 +13,6 @@ from exasol_integration_test_docker_environment.lib.docker import (
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.slc_compression_strategy import SlcCompressionStrategy
@@ -31,12 +30,14 @@ CondaPackageDefinition = namedtuple("CondaPackageDefinition", ["pkg", "version"]
 
 NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$", flags=re.IGNORECASE)
 
+
 def _verify_name(slc_name: str) -> None:
     if not NAME_PATTERN.match(slc_name):
         raise SlcError(
             f'SLC name "{slc_name}" doesn\'t match'
             f' regular expression "{NAME_PATTERN}".'
         )
+
 
 def _append_packages(
     file_path: Path, packages: list[PipPackageDefinition] | list[CondaPackageDefinition]
@@ -102,7 +103,7 @@ class ScriptLanguageContainer:
             raise SlcError(
                 "Secure Configuration Storage already contains a"
                 f" compression strategy for SLC name {name}."
-)
+            )
         slc_flavor.save(secrets, flavor)
         slc_compression_strategy.save(secrets, compression_strategy)
         workspace = Workspace.for_slc(name)
@@ -159,7 +160,7 @@ class ScriptLanguageContainer:
                 export_path=str(self.workspace.export_path),
                 output_directory=str(self.workspace.output_path),
                 release_name=self.language_alias,
-                compression_strategy=self.compression_strategy
+                compression_strategy=self.compression_strategy,
             )
 
     def deploy(self):
@@ -186,7 +187,7 @@ class ScriptLanguageContainer:
                 path_in_bucket=constants.PATH_IN_BUCKET,
                 release_name=self.language_alias,
                 output_directory=str(self.workspace.output_path),
-                compression_strategy=self.compression_strategy
+                compression_strategy=self.compression_strategy,
             )
             deploy_result = result[self._flavor_path_rel]["release"]
             builder = deploy_result.language_definition_builder

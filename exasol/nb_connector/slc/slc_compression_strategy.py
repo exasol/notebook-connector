@@ -3,11 +3,11 @@ from __future__ import annotations
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slc import SlcError
+from exasol.nb_connector.slc.slc_error import SlcError
 
 
 class SlcCompressionStrategy:
-    def __init__(self, slc_name ):
+    def __init__(self, slc_name):
         self.slc_name = slc_name
 
     @property

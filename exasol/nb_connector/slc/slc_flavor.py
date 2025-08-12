@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import re
-from pathlib import Path
-
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slc import SlcError
+from exasol.nb_connector.slc.slc_error import SlcError
 
 
 class SlcFlavor:

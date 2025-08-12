@@ -4,12 +4,10 @@ from collections.abc import (
 )
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
-from exasol.slc.models.compression_strategy import CompressionStrategy
-
 from test.integration.ordinary.test_itde_manager import remove_itde
 
 import pytest
+from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.ai_lab_config import (
     Accelerator,
@@ -29,6 +27,7 @@ The flavor may depend on the release of the SLCR used via SLC_RELEASE_TAG in con
 See the developer guide (./doc/developer-guide.md) for more details.
 """
 
+
 @pytest.fixture(scope="module")
 def working_path() -> Iterator[Path]:
     with TemporaryDirectory() as d:
@@ -39,6 +38,7 @@ def working_path() -> Iterator[Path]:
 def secrets_file(working_path: Path) -> Path:
     return working_path / "sample_database.db"
 
+
 @pytest.fixture(scope="module")
 def slc_secrets(secrets_file) -> Secrets:
     secrets = Secrets(secrets_file, master_password="abc")
@@ -47,10 +47,13 @@ def slc_secrets(secrets_file) -> Secrets:
 
 
 @pytest.fixture(scope="module")
-def sample_slc(
-    slc_secrets: Secrets
-) -> ScriptLanguageContainer:
-    return ScriptLanguageContainer.create(slc_secrets, name="sample_gpu", flavor=DEFAULT_GPU_FLAVOR, compression_strategy=CompressionStrategy.NONE)
+def sample_slc(slc_secrets: Secrets) -> ScriptLanguageContainer:
+    return ScriptLanguageContainer.create(
+        slc_secrets,
+        name="sample_gpu",
+        flavor=DEFAULT_GPU_FLAVOR,
+        compression_strategy=CompressionStrategy.NONE,
+    )
 
 
 @pytest.fixture(scope="module")
