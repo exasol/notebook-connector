@@ -8,3 +8,7 @@ class PackageManager(enum.Enum):
 
     PIP = "pip"
     CONDA = "conda"
+    
+    def __str__(self):
+        # this allows using `choices` in argparse 
+        return self.value    
