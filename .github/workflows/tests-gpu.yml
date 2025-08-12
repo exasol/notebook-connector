@@ -9,12 +9,6 @@ jobs:
     name: GPU Tests
     runs-on:
       labels: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - file: itest_slct_manager_with_gpu.py
-          - file: test_itde_manager_with_gpu.py
 
     permissions:
       contents: read
@@ -50,4 +44,4 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Tests
-        run: poetry run -- pytest -rA --setup-show test/integration/gpu/${{matrix.file}}
+        run: poetry run -- pytest -rA --setup-show test/integration/gpu/
