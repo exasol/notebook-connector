@@ -140,7 +140,6 @@ class ScriptLanguageContainer:
                 export_path=str(self.workspace.export_path),
                 output_directory=str(self.workspace.output_path),
                 release_name=self.language_alias,
-                compression_strategy=CompressionStrategy.NONE,
             )
 
     def deploy(self):
@@ -167,7 +166,6 @@ class ScriptLanguageContainer:
                 path_in_bucket=constants.PATH_IN_BUCKET,
                 release_name=self.language_alias,
                 output_directory=str(self.workspace.output_path),
-                compression_strategy=CompressionStrategy.NONE,
             )
             container_name = f"{self.flavor}-release-{self.language_alias}"
             result = exaslct_api.generate_language_activation(

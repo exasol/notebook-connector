@@ -64,4 +64,4 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Pytest
-        run: poetry run -- pytest -rA --setup-show test/integration/ordinary/${{ matrix.file }}
+        run: poetry run -- pytest -rA --setup-show test/integration/ordinary/${{ matrix.file }} ${{matrix.extra_param}}
