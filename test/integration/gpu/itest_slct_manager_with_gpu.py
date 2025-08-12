@@ -1,4 +1,5 @@
 import textwrap
+from test.utils.integration_test_utils import setup_itde_module
 
 import pytest
 from exasol.slc.models.compression_strategy import CompressionStrategy
@@ -13,13 +14,13 @@ from exasol.nb_connector.language_container_activation import (
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import ScriptLanguageContainer
 from exasol.nb_connector.slc.script_language_container import CondaPackageDefinition
-from test.utils.integration_test_utils import setup_itde_module
 
 DEFAULT_GPU_FLAVOR = "template-Exasol-8-python-3.10-cuda-conda"
 """
 The flavor may depend on the release of the SLCR used via SLC_RELEASE_TAG in constants.py.
 See the developer guide (./doc/developer-guide.md) for more details.
 """
+
 
 @pytest.fixture(scope="module")
 def secrets_module(sample_file_module) -> Secrets:

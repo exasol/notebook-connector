@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import textwrap
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Iterator
 
 import pytest
 from pyexasol import ExaConnection
@@ -16,6 +16,7 @@ from exasol.nb_connector.itde_manager import (
 from exasol.nb_connector.language_container_activation import get_activation_sql
 from exasol.nb_connector.secret_store import Secrets
 
+
 def _setup_itde_impl(secrets: Secrets) -> Iterator[None]:
     bring_itde_up(secrets)
 
@@ -28,6 +29,7 @@ def _setup_itde_impl(secrets: Secrets) -> Iterator[None]:
         yield
     finally:
         take_itde_down(secrets)
+
 
 @pytest.fixture
 def setup_itde(secrets) -> Iterator[None]:
@@ -47,6 +49,7 @@ def setup_itde_module(secrets_module) -> Iterator[None]:
     The scope is per test module.
     """
     yield from _setup_itde_impl(secrets_module)
+
 
 def activate_languages(pyexasol_connection: ExaConnection, secrets: Secrets) -> None:
     """

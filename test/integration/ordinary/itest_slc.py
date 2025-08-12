@@ -1,6 +1,6 @@
 import textwrap
-
 from test.package_manager import PackageManager
+from test.utils.integration_test_utils import setup_itde_module
 
 import pytest
 from docker.models.images import Image as DockerImage
@@ -17,8 +17,6 @@ from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
     constants,
 )
-from test.utils.integration_test_utils import setup_itde_module
-
 
 DEFAULT_FLAVORS = {
     PackageManager.PIP: "template-Exasol-all-python-3.10",
@@ -169,7 +167,9 @@ def test_append_custom_conda_packages(
     name="deploy_slc_with_custom_packages",
     depends=["append_custom_pip_packages", "append_custom_conda_packages"],
 )
-def test_deploy_slc_with_custom_packages(sample_slc: ScriptLanguageContainer, setup_itde_module):
+def test_deploy_slc_with_custom_packages(
+    sample_slc: ScriptLanguageContainer, setup_itde_module
+):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
