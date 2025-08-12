@@ -11,9 +11,9 @@ from exasol.nb_connector.secret_store import Secrets
 
 
 @contextlib.contextmanager
-def _sample_file() -> Path:
+def _sample_file() -> Iterator[Path]:
     with TemporaryDirectory() as d:
-        return Path(d) / "sample_database.db"
+        yield Path(d) / "sample_database.db"
 
 
 @pytest.fixture
@@ -25,7 +25,7 @@ def secrets() -> Iterator[Secrets]:
 @pytest.fixture(scope="module")
 def secrets_module() -> Iterator[Secrets]:
     with _sample_file() as secret_db:
-        yield Secrets(sample_file_module, master_password="abc")
+        yield Secrets(secret_db, master_password="abc")
 
 
 def pytest_addoption(parser):
