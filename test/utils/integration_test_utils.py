@@ -25,6 +25,7 @@ def sample_db_file() -> Iterator[Path]:
     with TemporaryDirectory() as d:
         yield Path(d) / "sample_database.db"
 
+
 def _setup_itde_impl(secrets: Secrets) -> Iterator[None]:
     bring_itde_up(secrets)
 

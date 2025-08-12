@@ -1,12 +1,11 @@
 from collections.abc import Iterator
 from test.package_manager import PackageManager
+from test.utils.integration_test_utils import sample_db_file
 
 import pytest
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.secret_store import Secrets
-
-from test.utils.integration_test_utils import sample_db_file
 
 
 @pytest.fixture
