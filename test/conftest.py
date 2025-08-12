@@ -1,7 +1,4 @@
-import contextlib
 from collections.abc import Iterator
-from pathlib import Path
-from tempfile import TemporaryDirectory
 from test.package_manager import PackageManager
 
 import pytest
@@ -9,22 +6,18 @@ from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.secret_store import Secrets
 
-
-@contextlib.contextmanager
-def _sample_file() -> Iterator[Path]:
-    with TemporaryDirectory() as d:
-        yield Path(d) / "sample_database.db"
+from test.utils.integration_test_utils import sample_db_file
 
 
 @pytest.fixture
 def secrets() -> Iterator[Secrets]:
-    with _sample_file() as secret_db:
+    with sample_db_file() as secret_db:
         yield Secrets(secret_db, master_password="abc")
 
 
 @pytest.fixture(scope="module")
 def secrets_module() -> Iterator[Secrets]:
-    with _sample_file() as secret_db:
+    with sample_db_file() as secret_db:
         yield Secrets(secret_db, master_password="abc")
 
 

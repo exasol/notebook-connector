@@ -1,5 +1,7 @@
 import textwrap
-from test.utils.integration_test_utils import setup_itde_module
+from collections.abc import Iterator
+
+from test.utils.integration_test_utils import setup_itde_module, sample_db_file
 
 import pytest
 from exasol.slc.models.compression_strategy import CompressionStrategy
@@ -23,10 +25,11 @@ See the developer guide (./doc/developer-guide.md) for more details.
 
 
 @pytest.fixture(scope="module")
-def secrets_module(sample_file_module) -> Secrets:
-    secrets = Secrets(sample_file_module, master_password="abc")
-    secrets.save(AILabConfig.accelerator, Accelerator.nvidia.value)
-    return secrets
+def secrets_module() -> Iterator[Secrets]:
+    with sample_db_file() as secret_db:
+        secrets = Secrets(secret_db, master_password="abc")
+        secrets.save(AILabConfig.accelerator, Accelerator.nvidia.value)
+        yield secrets
 
 
 @pytest.fixture(scope="module")
