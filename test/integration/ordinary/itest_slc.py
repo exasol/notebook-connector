@@ -1,8 +1,5 @@
 import textwrap
-from collections.abc import Iterator
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from test.integration.ordinary.test_itde_manager import remove_itde
+
 from test.package_manager import PackageManager
 
 import pytest
@@ -10,7 +7,6 @@ from docker.models.images import Image as DockerImage
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
-from exasol.nb_connector.itde_manager import bring_itde_up
 from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
@@ -21,30 +17,7 @@ from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
     constants,
 )
-
-
-@pytest.fixture(scope="module")
-def working_path() -> Iterator[Path]:
-    with TemporaryDirectory() as d:
-        yield Path(d)
-
-
-@pytest.fixture(scope="module")
-def secrets_file(working_path: Path) -> Path:
-    return working_path / "sample_database.db"
-
-
-@pytest.fixture(scope="module")
-def slc_secrets(secrets_file, working_path) -> Secrets:
-    secrets = Secrets(secrets_file, master_password="abc")
-    return secrets
-
-
-@pytest.fixture(scope="module")
-def itde(slc_secrets: Secrets):
-    bring_itde_up(slc_secrets)
-    yield
-    remove_itde()
+from test.utils.integration_test_utils import setup_itde_module
 
 
 DEFAULT_FLAVORS = {
@@ -77,17 +50,16 @@ def create_slc(
 
 @pytest.fixture(scope="module")
 def sample_slc(
-    slc_secrets: Secrets,
-    working_path: Path,
+    secrets_module: Secrets,
     default_flavor: str,
     compression_strategy: CompressionStrategy,
 ) -> ScriptLanguageContainer:
-    return create_slc(slc_secrets, "sample", default_flavor, compression_strategy)
+    return create_slc(secrets_module, "sample", default_flavor, compression_strategy)
 
 
 @pytest.fixture(scope="module")
 def other_slc(
-    slc_secrets: Secrets, working_path: Path, compression_strategy: CompressionStrategy
+    secrets_module: Secrets, compression_strategy: CompressionStrategy
 ) -> ScriptLanguageContainer:
     """
     Creates another SLC with a different flavor for verifying operations
@@ -95,7 +67,7 @@ def other_slc(
     working directories.
     """
     slc = create_slc(
-        slc_secrets,
+        secrets_module,
         "other",
         flavor=OTHER_FLAVOR,
         compression_strategy=compression_strategy,
@@ -151,7 +123,7 @@ def expected_activation_key(slc: ScriptLanguageContainer) -> str:
 
 
 @pytest.mark.dependency(name="deploy_slc")
-def test_deploy(sample_slc: ScriptLanguageContainer, itde):
+def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
@@ -197,7 +169,7 @@ def test_append_custom_conda_packages(
     name="deploy_slc_with_custom_packages",
     depends=["append_custom_pip_packages", "append_custom_conda_packages"],
 )
-def test_deploy_slc_with_custom_packages(sample_slc: ScriptLanguageContainer):
+def test_deploy_slc_with_custom_packages(sample_slc: ScriptLanguageContainer, setup_itde_module):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
@@ -207,7 +179,7 @@ def test_deploy_slc_with_custom_packages(sample_slc: ScriptLanguageContainer):
     depends=["deploy_slc_with_custom_packages"],
 )
 def test_udf_with_custom_packages(
-    slc_secrets: Secrets,
+    secrets_module: Secrets,
     sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str, str]],
 ):
@@ -229,7 +201,7 @@ def test_udf_with_custom_packages(
         language_alias=sample_slc.language_alias,
         import_statements=import_statements,
     )
-    con = open_pyexasol_connection_with_lang_definitions(slc_secrets)
+    con = open_pyexasol_connection_with_lang_definitions(secrets_module)
     try:
         con.execute("CREATE SCHEMA TEST")
         con.execute(udf)

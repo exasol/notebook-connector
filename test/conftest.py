@@ -1,4 +1,7 @@
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Iterator
+
 from test.package_manager import PackageManager
 
 import pytest
@@ -15,6 +18,15 @@ def sample_file(tmp_path: Path) -> Path:
 @pytest.fixture
 def secrets(sample_file) -> Secrets:  # pylint: disable=W0621
     return Secrets(sample_file, master_password="abc")
+
+@pytest.fixture(scope="module")
+def sample_file_module() -> Iterator[Path]:
+    with TemporaryDirectory() as d:
+        yield Path(d) / "sample_database.db"
+
+@pytest.fixture(scope="module")
+def secrets_module(sample_file_module) -> Secrets:  # pylint: disable=W0621
+    return Secrets(sample_file_module, master_password="abc")
 
 
 def pytest_addoption(parser):

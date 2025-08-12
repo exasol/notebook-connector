@@ -1,10 +1,4 @@
 import textwrap
-from collections.abc import (
-    Iterator,
-)
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from test.integration.ordinary.test_itde_manager import remove_itde
 
 import pytest
 from exasol.slc.models.compression_strategy import CompressionStrategy
@@ -13,13 +7,13 @@ from exasol.nb_connector.ai_lab_config import (
     Accelerator,
     AILabConfig,
 )
-from exasol.nb_connector.itde_manager import bring_itde_up
 from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import ScriptLanguageContainer
 from exasol.nb_connector.slc.script_language_container import CondaPackageDefinition
+from test.utils.integration_test_utils import setup_itde_module
 
 DEFAULT_GPU_FLAVOR = "template-Exasol-8-python-3.10-cuda-conda"
 """
@@ -27,40 +21,21 @@ The flavor may depend on the release of the SLCR used via SLC_RELEASE_TAG in con
 See the developer guide (./doc/developer-guide.md) for more details.
 """
 
-
 @pytest.fixture(scope="module")
-def working_path() -> Iterator[Path]:
-    with TemporaryDirectory() as d:
-        yield Path(d)
-
-
-@pytest.fixture(scope="module")
-def secrets_file(working_path: Path) -> Path:
-    return working_path / "sample_database.db"
-
-
-@pytest.fixture(scope="module")
-def slc_secrets(secrets_file) -> Secrets:
-    secrets = Secrets(secrets_file, master_password="abc")
+def secrets_module(sample_file_module) -> Secrets:
+    secrets = Secrets(sample_file_module, master_password="abc")
     secrets.save(AILabConfig.accelerator, Accelerator.nvidia.value)
     return secrets
 
 
 @pytest.fixture(scope="module")
-def sample_slc(slc_secrets: Secrets) -> ScriptLanguageContainer:
+def sample_slc(secrets_module: Secrets) -> ScriptLanguageContainer:
     return ScriptLanguageContainer.create(
-        slc_secrets,
+        secrets_module,
         name="sample_gpu",
         flavor=DEFAULT_GPU_FLAVOR,
         compression_strategy=CompressionStrategy.NONE,
     )
-
-
-@pytest.fixture(scope="module")
-def itde(slc_secrets: Secrets):
-    bring_itde_up(slc_secrets)
-    yield
-    remove_itde()
 
 
 @pytest.fixture
@@ -82,8 +57,8 @@ def test_append_custom_packages(
     name="upload_slc_with_new_packages", depends=["append_custom_packages"]
 )
 def test_upload_slc_with_new_packages(
-    slc_secrets: Secrets,
-    itde,
+    secrets_module: Secrets,
+    setup_itde_module,
     sample_slc: ScriptLanguageContainer,
 ):
     sample_slc.deploy()
@@ -97,7 +72,7 @@ def test_upload_slc_with_new_packages(
     name="udf_with_new_packages", depends=["upload_slc_with_new_packages"]
 )
 def test_numba(
-    slc_secrets: Secrets,
+    secrets_module: Secrets,
     sample_slc: ScriptLanguageContainer,
 ):
     udf = textwrap.dedent(
@@ -115,7 +90,7 @@ def run(ctx):
 /
         """
     )
-    con = open_pyexasol_connection_with_lang_definitions(slc_secrets)
+    con = open_pyexasol_connection_with_lang_definitions(secrets_module)
     try:
         con.execute("CREATE SCHEMA TEST")
         con.execute(udf)
