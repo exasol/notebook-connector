@@ -3,8 +3,10 @@ from __future__ import annotations
 import contextlib
 
 import pytest
+from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.slc.slc_compression_strategy import SlcCompressionStrategy
 from exasol.nb_connector.slc.slc_flavor import SlcFlavor
 
 
@@ -34,10 +36,12 @@ class SecretsMock(Secrets):
         cls,
         slc_name: str,
         flavor: str | None = "Vanilla",
+        compression_strategy: CompressionStrategy = CompressionStrategy.NONE,
     ) -> SecretsMock:
         instance = cls(slc_name)
         if flavor:
             SlcFlavor(slc_name).save(instance, flavor)
+            SlcCompressionStrategy(slc_name).save(instance, compression_strategy)
         return instance
 
 

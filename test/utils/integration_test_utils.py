@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import contextlib
 import textwrap
+from collections.abc import Iterator
 from contextlib import contextmanager
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 from pyexasol import ExaConnection
@@ -16,13 +20,13 @@ from exasol.nb_connector.language_container_activation import get_activation_sql
 from exasol.nb_connector.secret_store import Secrets
 
 
-@pytest.fixture
-def setup_itde(secrets) -> None:
-    """
-    Brings up the ITDE and takes it down when the tests are completed or failed.
-    Creates a schema and saves its name in the secret store.
-    """
+@contextlib.contextmanager
+def sample_db_file() -> Iterator[Path]:
+    with TemporaryDirectory() as d:
+        yield Path(d) / "sample_database.db"
 
+
+def _setup_itde_impl(secrets: Secrets) -> Iterator[None]:
     bring_itde_up(secrets)
 
     schema = "INTEGRATION_TEST"
@@ -34,6 +38,26 @@ def setup_itde(secrets) -> None:
         yield
     finally:
         take_itde_down(secrets)
+
+
+@pytest.fixture
+def setup_itde(secrets) -> Iterator[None]:
+    """
+    Brings up the ITDE and takes it down when the tests are completed or failed.
+    Creates a schema and saves its name in the secret store.
+    The scope is per test function.
+    """
+    yield from _setup_itde_impl(secrets)
+
+
+@pytest.fixture(scope="module")
+def setup_itde_module(secrets_module) -> Iterator[None]:
+    """
+    Brings up the ITDE and takes it down when the tests are completed or failed.
+    Creates a schema and saves its name in the secret store.
+    The scope is per test module.
+    """
+    yield from _setup_itde_impl(secrets_module)
 
 
 def activate_languages(pyexasol_connection: ExaConnection, secrets: Secrets) -> None:

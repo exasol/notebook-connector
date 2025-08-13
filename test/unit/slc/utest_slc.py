@@ -12,6 +12,7 @@ from unittest.mock import (
 import git
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
+from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import (
@@ -109,6 +110,7 @@ def test_create(
         "packages",
         "python3_pip_packages",
     )
+    assert testee.compression_strategy == CompressionStrategy.GZIP
 
 
 def test_repo_missing(sample_slc_name):

@@ -1,33 +1,11 @@
 from __future__ import annotations
 
-import re
-from pathlib import Path
-
 from exasol.nb_connector.secret_store import Secrets
-
-NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$", flags=re.IGNORECASE)
-
-
-class SlcError(Exception):
-    """
-    Signals errors related to ScriptLanguageContainer:
-
-    * The name of the SLC is not unique
-
-    * the Secure Configuration Storage (SCS / secrets / conf) does not contain
-      a required option
-
-    * The SLC Git repository has not been checked out (cloned)
-    """
+from exasol.nb_connector.slc.slc_error import SlcError
 
 
 class SlcFlavor:
     def __init__(self, slc_name: str):
-        if not NAME_PATTERN.match(slc_name):
-            raise SlcError(
-                f'SLC name "{slc_name}" doesn\'t match'
-                f' regular expression "{NAME_PATTERN}".'
-            )
         self.slc_name = slc_name
 
     @property

@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 
 import pytest
 
@@ -7,6 +8,11 @@ from exasol.nb_connector.secret_store import (
     InvalidPassword,
     Secrets,
 )
+
+
+@pytest.fixture
+def sample_file(tmp_path: Path) -> Path:
+    return tmp_path / "sample_database.db"
 
 
 def test_no_database_file(secrets):

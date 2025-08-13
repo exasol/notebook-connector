@@ -24,7 +24,7 @@ def test_itde_with_gpu(secrets):
         query_accelerator_parameters = cleandoc(
             f"""
                 SELECT PARAM_VALUE, PARAM_NAME FROM EXA_METADATA 
-                WHERE PARAM_NAME LIKE '%accelerator%' 
+                WHERE PARAM_NAME IN ('acceleratorDeviceDetected', 'acceleratorDeviceGpuNvidiaDetected')
                 ORDER BY PARAM_NAME;
                 """
         )
