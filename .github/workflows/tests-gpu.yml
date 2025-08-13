@@ -9,6 +9,7 @@ jobs:
     name: GPU Tests
     runs-on:
       labels: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
+
     permissions:
       contents: read
 
@@ -43,4 +44,4 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Tests
-        run: poetry run -- pytest -rA --setup-show test/integration/gpu
+        run: poetry run -- pytest -rA --setup-show test/integration/gpu/

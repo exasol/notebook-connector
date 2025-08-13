@@ -7,14 +7,15 @@ from pathlib import (
 )
 
 from exasol.slc import api as exaslct_api
+from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import (
     ContextDockerClient,
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.language_container_activation import ACTIVATION_KEY_PREFIX
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
+from exasol.nb_connector.slc.slc_compression_strategy import SlcCompressionStrategy
 from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
     SlcFlavor,
@@ -25,6 +26,28 @@ from exasol.nb_connector.slc.workspace import (
 )
 
 PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
+CondaPackageDefinition = namedtuple("CondaPackageDefinition", ["pkg", "version"])
+
+NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$", flags=re.IGNORECASE)
+
+
+def _verify_name(slc_name: str) -> None:
+    if not NAME_PATTERN.match(slc_name):
+        raise SlcError(
+            f'SLC name "{slc_name}" doesn\'t match'
+            f' regular expression "{NAME_PATTERN}".'
+        )
+
+
+def _append_packages(
+    file_path: Path, packages: list[PipPackageDefinition] | list[CondaPackageDefinition]
+):
+    """
+    Appends packages to the custom packages file.
+    """
+    with open(file_path, "a") as f:
+        for p in packages:
+            print(f"{p.pkg}|{p.version}", file=f)
 
 
 class ScriptLanguageContainer:
@@ -52,7 +75,9 @@ class ScriptLanguageContainer:
     ):
         self.secrets = secrets
         self.name = name
+        _verify_name(name)
         self.flavor = SlcFlavor(name).verify(secrets)
+        self.compression_strategy = SlcCompressionStrategy(name).verify(secrets)
         self.workspace = Workspace.for_slc(name)
         if not self.flavor_path.is_dir():
             raise SlcError(
@@ -65,14 +90,23 @@ class ScriptLanguageContainer:
         secrets: Secrets,
         name: str,
         flavor: str,
+        compression_strategy: CompressionStrategy = CompressionStrategy.GZIP,
     ) -> ScriptLanguageContainer:
+        _verify_name(name)
         slc_flavor = SlcFlavor(name)
         if slc_flavor.exists(secrets):
             raise SlcError(
                 "Secure Configuration Storage already contains a"
                 f" flavor for SLC name {name}."
             )
+        slc_compression_strategy = SlcCompressionStrategy(slc_name=name)
+        if slc_compression_strategy.exists(secrets):
+            raise SlcError(
+                "Secure Configuration Storage already contains a"
+                f" compression strategy for SLC name {name}."
+            )
         slc_flavor.save(secrets, flavor)
+        slc_compression_strategy.save(secrets, compression_strategy)
         workspace = Workspace.for_slc(name)
         workspace.clone_slc_repo()
         return cls(secrets=secrets, name=name)
@@ -97,16 +131,25 @@ class ScriptLanguageContainer:
         return self.checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / self.flavor
 
     @property
+    def custom_packages_dir(self):
+        """
+        Returns the path to the custom packages directory of the flavor
+        """
+        return self.flavor_path / "flavor_customization" / "packages"
+
+    @property
     def custom_pip_file(self) -> Path:
         """
-        Returns the path to the custom pip file of the flavor
+        Returns the path to the custom pip packages file of the flavor
         """
-        return (
-            self.flavor_path
-            / "flavor_customization"
-            / "packages"
-            / "python3_pip_packages"
-        )
+        return self.custom_packages_dir / "python3_pip_packages"
+
+    @property
+    def custom_conda_file(self) -> Path:
+        """
+        Returns the path to the custom conda packages file of the flavor
+        """
+        return self.custom_packages_dir / "conda_packages"
 
     def export(self):
         """
@@ -118,6 +161,7 @@ class ScriptLanguageContainer:
                 export_path=str(self.workspace.export_path),
                 output_directory=str(self.workspace.output_path),
                 release_name=self.language_alias,
+                compression_strategy=self.compression_strategy,
             )
 
     def deploy(self):
@@ -144,6 +188,7 @@ class ScriptLanguageContainer:
                 path_in_bucket=constants.PATH_IN_BUCKET,
                 release_name=self.language_alias,
                 output_directory=str(self.workspace.output_path),
+                compression_strategy=self.compression_strategy,
             )
             deploy_result = result[self._flavor_path_rel]["release"]
             builder = deploy_result.language_definition_builder
@@ -170,16 +215,23 @@ class ScriptLanguageContainer:
                 "Secure Configuration Storage does not contains an activation key."
             ) from ex
 
-    def append_custom_packages(self, pip_packages: list[PipPackageDefinition]):
+    def append_custom_pip_packages(self, pip_packages: list[PipPackageDefinition]):
         """
-        Appends packages to the custom pip file.
-
+        Appends packages to the custom pip packages file.
         Note: This method is not idempotent: Multiple calls with the same
-        package definitions will result in duplicate entries.
+        package definitions will result in duplicated entries.
         """
-        with open(self.custom_pip_file, "a") as f:
-            for p in pip_packages:
-                print(f"{p.pkg}|{p.version}", file=f)
+        _append_packages(self.custom_pip_file, pip_packages)
+
+    def append_custom_conda_packages(
+        self, conda_packages: list[CondaPackageDefinition]
+    ):
+        """
+        Appends packages to the custom conda packages file.
+        Note: This method is not idempotent: Multiple calls with the same
+        package definitions will result in duplicated entries.
+        """
+        _append_packages(self.custom_conda_file, conda_packages)
 
     @property
     def docker_image_tags(self) -> list[str]:

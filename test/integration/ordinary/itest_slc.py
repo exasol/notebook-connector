@@ -1,49 +1,28 @@
 import textwrap
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from test.integration.ordinary.test_itde_manager import remove_itde
+from test.package_manager import PackageManager
+from test.utils.integration_test_utils import setup_itde_module
 
 import pytest
 from docker.models.images import Image as DockerImage
+from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 
-from exasol.nb_connector.itde_manager import bring_itde_up
 from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc.script_language_container import (
+    CondaPackageDefinition,
     PipPackageDefinition,
     ScriptLanguageContainer,
     constants,
 )
 
+DEFAULT_FLAVORS = {
+    PackageManager.PIP: "template-Exasol-all-python-3.10",
+    PackageManager.CONDA: "template-Exasol-all-python-3.10-conda",
+}
 
-@pytest.fixture(scope="module")
-def working_path() -> Path:
-    with TemporaryDirectory() as d:
-        yield Path(d)
-
-
-@pytest.fixture(scope="module")
-def secrets_file(working_path: Path) -> Path:
-    return working_path / "sample_database.db"
-
-
-@pytest.fixture(scope="module")
-def slc_secrets(secrets_file, working_path) -> Secrets:
-    secrets = Secrets(secrets_file, master_password="abc")
-    return secrets
-
-
-@pytest.fixture(scope="module")
-def itde(slc_secrets: Secrets):
-    bring_itde_up(slc_secrets)
-    yield
-    remove_itde()
-
-
-DEFAULT_FLAVOR = "template-Exasol-all-python-3.10"
 OTHER_FLAVOR = "template-Exasol-all-r-4"
 """
 The flavors may depend on the release of the SLCR used via SLC_RELEASE_TAG in constants.py.
@@ -51,27 +30,46 @@ See the developer guide (./doc/developer-guide.md) for more details.
 """
 
 
+@pytest.fixture(scope="module")
+def default_flavor(package_manager: PackageManager) -> str:
+    return DEFAULT_FLAVORS[package_manager]
+
+
 def create_slc(
     secrets: Secrets,
     name: str,
-    flavor: str = DEFAULT_FLAVOR,
+    flavor: str,
+    compression_strategy: CompressionStrategy,
 ) -> ScriptLanguageContainer:
-    return ScriptLanguageContainer.create(secrets, name=name, flavor=flavor)
+    return ScriptLanguageContainer.create(
+        secrets, name=name, flavor=flavor, compression_strategy=compression_strategy
+    )
 
 
 @pytest.fixture(scope="module")
-def sample_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
-    return create_slc(slc_secrets, "sample")
+def sample_slc(
+    secrets_module: Secrets,
+    default_flavor: str,
+    compression_strategy: CompressionStrategy,
+) -> ScriptLanguageContainer:
+    return create_slc(secrets_module, "sample", default_flavor, compression_strategy)
 
 
 @pytest.fixture(scope="module")
-def other_slc(slc_secrets: Secrets, working_path: Path) -> ScriptLanguageContainer:
+def other_slc(
+    secrets_module: Secrets, compression_strategy: CompressionStrategy
+) -> ScriptLanguageContainer:
     """
     Creates another SLC with a different flavor for verifying operations
     to be limited to the current SLC only, e.g. removing docker images or
     working directories.
     """
-    slc = create_slc(slc_secrets, "other", flavor=OTHER_FLAVOR)
+    slc = create_slc(
+        secrets_module,
+        "other",
+        flavor=OTHER_FLAVOR,
+        compression_strategy=compression_strategy,
+    )
     slc.export()
     slc.deploy()
     return slc
@@ -83,16 +81,21 @@ def custom_packages() -> list[tuple[str, str, str]]:
 
 
 @pytest.mark.dependency(name="export_slc")
-def test_export_slc(sample_slc: ScriptLanguageContainer):
+def test_export_slc(
+    sample_slc: ScriptLanguageContainer, compression_strategy: CompressionStrategy
+):
     sample_slc.export()
     export_path = sample_slc.workspace.export_path
+    expected_suffix = (
+        "tar" if compression_strategy == CompressionStrategy.NONE else "tar.gz"
+    )
     assert export_path.exists()
-    tgz = [f for f in export_path.glob("*.tar.gz")]
-    assert len(tgz) == 1
-    assert tgz[0].is_file()
-    tgz_sum = [f for f in export_path.glob("*.tar.gz.sha512sum")]
-    assert len(tgz_sum) == 1
-    assert tgz_sum[0].is_file()
+    tar = [f for f in export_path.glob(f"*.{expected_suffix}")]
+    assert len(tar) == 1
+    assert tar[0].is_file()
+    tar_sum = [f for f in export_path.glob(f"*.{expected_suffix}.sha512sum")]
+    assert len(tar_sum) == 1
+    assert tar_sum[0].is_file()
 
 
 def slc_docker_tag_prefix(slc: ScriptLanguageContainer) -> str:
@@ -118,28 +121,55 @@ def expected_activation_key(slc: ScriptLanguageContainer) -> str:
 
 
 @pytest.mark.dependency(name="deploy_slc")
-def test_deploy(sample_slc: ScriptLanguageContainer, itde):
+def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
 
-@pytest.mark.dependency(name="append_custom_packages", depends=["deploy_slc"])
-def test_append_custom_packages(
-    sample_slc: ScriptLanguageContainer, custom_packages: list[tuple[str, str, str]]
+@pytest.mark.dependency(name="append_custom_pip_packages", depends=["deploy_slc"])
+def test_append_custom_pip_packages(
+    sample_slc: ScriptLanguageContainer,
+    custom_packages: list[tuple[str, str, str]],
+    package_manager: PackageManager,
 ):
-    sample_slc.append_custom_packages(
-        [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
-    )
-    with open(sample_slc.custom_pip_file) as f:
-        pip_content = f.read()
-        for custom_package, version, _ in custom_packages:
-            assert f"{custom_package}|{version}" in pip_content
+    # Cannot skip the test if it's not a Pip package manager, otherwise dependent tests below won't run
+    if package_manager == PackageManager.PIP:
+        sample_slc.append_custom_pip_packages(
+            [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
+        )
+        with open(sample_slc.custom_pip_file) as f:
+            pip_content = f.read()
+            for custom_package, version, _ in custom_packages:
+                assert f"{custom_package}|{version}" in pip_content
+
+
+@pytest.mark.dependency(name="append_custom_conda_packages", depends=["deploy_slc"])
+def test_append_custom_conda_packages(
+    sample_slc: ScriptLanguageContainer,
+    custom_packages: list[tuple[str, str, str]],
+    package_manager: PackageManager,
+):
+    # Cannot skip the test if it's not a Conda package manager, otherwise dependent tests below won't run
+    if package_manager == PackageManager.CONDA:
+        sample_slc.append_custom_conda_packages(
+            [
+                CondaPackageDefinition(pkg, version)
+                for pkg, version, _ in custom_packages
+            ]
+        )
+        with open(sample_slc.custom_conda_file) as f:
+            conda_content = f.read()
+            for custom_package, version, _ in custom_packages:
+                assert f"{custom_package}|{version}" in conda_content
 
 
 @pytest.mark.dependency(
-    name="deploy_slc_with_custom_packages", depends=["append_custom_packages"]
+    name="deploy_slc_with_custom_packages",
+    depends=["append_custom_pip_packages", "append_custom_conda_packages"],
 )
-def test_deploy_slc_with_custom_packages(sample_slc: ScriptLanguageContainer):
+def test_deploy_slc_with_custom_packages(
+    sample_slc: ScriptLanguageContainer, setup_itde_module
+):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
@@ -149,7 +179,7 @@ def test_deploy_slc_with_custom_packages(sample_slc: ScriptLanguageContainer):
     depends=["deploy_slc_with_custom_packages"],
 )
 def test_udf_with_custom_packages(
-    slc_secrets: Secrets,
+    secrets_module: Secrets,
     sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str, str]],
 ):
@@ -171,7 +201,7 @@ def test_udf_with_custom_packages(
         language_alias=sample_slc.language_alias,
         import_statements=import_statements,
     )
-    con = open_pyexasol_connection_with_lang_definitions(slc_secrets)
+    con = open_pyexasol_connection_with_lang_definitions(secrets_module)
     try:
         con.execute("CREATE SCHEMA TEST")
         con.execute(udf)
