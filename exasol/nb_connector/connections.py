@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ssl
+import warnings
 from pathlib import Path
 from typing import (
     Any,
@@ -85,7 +86,7 @@ def get_udf_bucket_path(conf: Secrets) -> str:
     Builds the path of the BucketFS bucket specified in the configuration,
     as it's seen in the udf's file system.
     """
-    bucket = open_bucketfs_connection(conf)
+    bucket = open_bucketfs_bucket(conf)
     return bucket.udf_path
 
 
@@ -244,6 +245,35 @@ def _get_ca_cert_verification(conf: Secrets) -> Any:
 
 
 def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
+    """
+    Just calls open_bucketfs_bucket(conf) which does following
+    Connects to a BucketFS service using provided configuration parameters.
+    Returns the BucketLike object for the bucket selected in the configuration.
+    Supports both On-Prem and Saas backends.
+
+    The configuration should provide the following parameters;
+    On-Prem:
+        - Host name and port of the BucketFS service (bfs_host_name or db_host_name, bfs_port),
+        - Client security credentials (bfs_user, bfs_password).
+        - Bucket name (bfs_bucket)
+        Optional parameters include:
+        - Secured comm flag (bfs_encryption), defaults to False.
+        - Some of the SSL options (cert_vld, trusted_ca).
+    Saas:
+        - SaaS service url (saas_url),
+        - SaaS account id (saas_account_id),
+        - Database id or name (saas_database_id or saas_database_name),
+        - Client security credentials (saas_token).
+    """
+
+    warnings.warn(
+        "open_bucketfs_connection is deprecated. Use open_bucketfs_bucket instead.",
+        DeprecationWarning,
+    )
+    return open_bucketfs_bucket(conf)
+
+
+def open_bucketfs_bucket(conf: Secrets) -> bfs.BucketLike:
     """
     Connects to a BucketFS service using provided configuration parameters.
     Returns the BucketLike object for the bucket selected in the configuration.

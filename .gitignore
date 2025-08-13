@@ -11,3 +11,4 @@ __pycache__/
 .build_output
 # drawio backup files
 /doc/user_guide/*.bkp
+.workspace/

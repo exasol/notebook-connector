@@ -4,6 +4,7 @@ import ssl
 import tempfile
 import types
 import unittest.mock
+import warnings
 from contextlib import ExitStack
 from typing import (
     Any,
@@ -19,6 +20,7 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.connections import (
     get_external_host,
+    open_bucketfs_bucket,
     open_bucketfs_connection,
     open_bucketfs_location,
     open_ibis_connection,
@@ -210,8 +212,8 @@ def test_open_sqlalchemy_connection_saas(
 
 
 @unittest.mock.patch("exasol.bucketfs.Service")
-def test_open_bucketfs_connection(mock_bfs_service, conf):
-    open_bucketfs_connection(conf)
+def test_open_bucketfs_bucket(mock_bfs_service, conf):
+    open_bucketfs_bucket(conf)
     mock_bfs_service.assert_called_once_with(
         f"http://{conf.get(CKey.db_host_name)}:{conf.get(CKey.bfs_port)}",
         {
@@ -226,9 +228,9 @@ def test_open_bucketfs_connection(mock_bfs_service, conf):
 
 
 @unittest.mock.patch("exasol.bucketfs.Service")
-def test_open_bucketfs_connection_https_no_verify(mock_bfs_service, conf):
+def test_open_bucketfs_bucket_https_no_verify(mock_bfs_service, conf):
     conf.save(CKey.bfs_encryption, "True")
-    open_bucketfs_connection(conf)
+    open_bucketfs_bucket(conf)
     mock_bfs_service.assert_called_once_with(
         f"https://{conf.get(CKey.db_host_name)}:{conf.get(CKey.bfs_port)}",
         {
@@ -243,10 +245,10 @@ def test_open_bucketfs_connection_https_no_verify(mock_bfs_service, conf):
 
 
 @unittest.mock.patch("exasol.bucketfs.Service")
-def test_open_bucketfs_connection_https_verify(mock_bfs_service, conf):
+def test_open_bucketfs_bucket_https_verify(mock_bfs_service, conf):
     conf.save(CKey.bfs_encryption, "True")
     conf.save(CKey.cert_vld, "True")
-    open_bucketfs_connection(conf)
+    open_bucketfs_bucket(conf)
     mock_bfs_service.assert_called_once_with(
         f"https://{conf.get(CKey.db_host_name)}:{conf.get(CKey.bfs_port)}",
         {
@@ -261,12 +263,12 @@ def test_open_bucketfs_connection_https_verify(mock_bfs_service, conf):
 
 
 @unittest.mock.patch("exasol.bucketfs.Service")
-def test_open_bucketfs_connection_trust_ca_file(mock_bfs_service, conf):
+def test_open_bucketfs_bucket_trust_ca_file(mock_bfs_service, conf):
     conf.save(CKey.bfs_encryption, "True")
     conf.save(CKey.cert_vld, "True")
     with tempfile.NamedTemporaryFile() as tmp_file:
         conf.save(CKey.trusted_ca, tmp_file.name)
-        open_bucketfs_connection(conf)
+        open_bucketfs_bucket(conf)
         mock_bfs_service.assert_called_once_with(
             f"https://{conf.get(CKey.db_host_name)}:{conf.get(CKey.bfs_port)}",
             {
@@ -282,10 +284,10 @@ def test_open_bucketfs_connection_trust_ca_file(mock_bfs_service, conf):
 
 @unittest.mock.patch("exasol.bucketfs.SaaSBucket")
 @unittest.mock.patch("exasol.saas.client.api_access.get_database_id")
-def test_open_bucketfs_connection_saas(mock_database_id, mock_saas_bucket, conf_saas):
+def test_open_bucketfs_bucket_saas(mock_database_id, mock_saas_bucket, conf_saas):
     database_id = "dfdopt568se"
     mock_database_id.return_value = database_id
-    open_bucketfs_connection(conf_saas)
+    open_bucketfs_bucket(conf_saas)
     mock_saas_bucket.assert_called_once_with(
         url=conf_saas.get(CKey.saas_url),
         account_id=conf_saas.get(CKey.saas_account_id),
@@ -324,3 +326,12 @@ def test_open_ibis_connection(mock_connect, conf):
         password=conf.get(CKey.db_password),
         schema=schema,
     )
+
+
+@unittest.mock.patch("exasol.bucketfs.Service")
+def test_open_bucketfs_connection_deprecated(mock_bfs_service, conf):
+    with pytest.warns(
+        DeprecationWarning, match="open_bucketfs_connection is deprecated"
+    ):
+        result = open_bucketfs_connection(conf)
+        assert result
