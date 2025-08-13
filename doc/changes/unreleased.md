@@ -40,3 +40,4 @@ See the NC [User Guide](../user_guide/user-guide.md) for details.
    * exasol-saas-api from ">=0.9.0,<1.0.0" to ">=0.9.0,<3"
    * exasol-bucketfs from "^1.0.0" to ">=1,<3"
 * #226: Used `LanguageDefinitionsBuilder` to create the SLC activation statement
+* #231: Implemented clean up all Script-Languages-Container related docker images 

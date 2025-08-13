@@ -246,10 +246,9 @@ class ScriptLanguageContainer:
 
     def clean_docker_images(self):
         """
-        Deletes local docker images related to the current SLC.
+        Deletes all SLC related local docker images.
         """
         with current_directory(self.checkout_dir):
-            exaslct_api.clean_flavor_images(
-                flavor_path=(str(self._flavor_path_rel),),
+            exaslct_api.clean_all_images(
                 output_directory=str(self.workspace.output_path),
             )
