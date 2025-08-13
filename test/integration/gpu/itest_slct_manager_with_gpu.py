@@ -83,17 +83,17 @@ def test_numba(
 ):
     udf = textwrap.dedent(
         f"""
-CREATE OR REPLACE {sample_slc.language_alias} SCALAR SCRIPT
-test_gpu_available()
-RETURNS VARCHAR(1000) AS
- %perInstanceRequiredAcceleratorDevices GpuNvidia;
-from numba import cuda
-def run(ctx):
-    if cuda.is_available():
-        return "GPU Found"
-    else:
-        return "GPU Not Found"
-/
+        CREATE OR REPLACE {sample_slc.language_alias} SCALAR SCRIPT
+        test_gpu_available()
+        RETURNS VARCHAR(1000) AS
+         %perInstanceRequiredAcceleratorDevices GpuNvidia;
+        from numba import cuda
+        def run(ctx):
+            if cuda.is_available():
+                return "GPU Found"
+            else:
+                return "GPU Not Found"
+        /
         """
     )
     con = open_pyexasol_connection_with_lang_definitions(secrets_module)
