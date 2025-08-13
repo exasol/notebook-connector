@@ -231,7 +231,7 @@ def test_clean_docker_images(
         images = docker_client.images.list(name=constants.SLC_DOCKER_IMG_NAME)
 
     assert not contains(images, sample_slc)
-    assert contains(images, other_slc)
+    assert not contains(images, other_slc)
 
 
 @pytest.mark.dependency(name="clean_up_output_path", depends=["clean_docker_images"])
