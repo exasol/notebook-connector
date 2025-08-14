@@ -1,9 +1,8 @@
 import os
 import textwrap
+from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Iterator
-
 from test.package_manager import PackageManager
 from test.utils.integration_test_utils import setup_itde_module
 
@@ -34,6 +33,7 @@ The flavors may depend on the release of the SLCR used via SLC_RELEASE_TAG in co
 See the developer guide (./doc/developer-guide.md) for more details.
 """
 
+
 @pytest.fixture(scope="module")
 def temp_cwd() -> Iterator[Path]:
     old_cwd = Path.cwd()
@@ -42,8 +42,6 @@ def temp_cwd() -> Iterator[Path]:
         os.chdir(new_cwd)
         yield new_cwd
     os.chdir(old_cwd)
-
-
 
 
 @pytest.fixture(scope="module")
@@ -74,8 +72,7 @@ def sample_slc(
 
 @pytest.fixture(scope="module")
 def other_slc(
-    temp_cwd: Path,
-    secrets_module: Secrets, compression_strategy: CompressionStrategy
+    temp_cwd: Path, secrets_module: Secrets, compression_strategy: CompressionStrategy
 ) -> ScriptLanguageContainer:
     """
     Creates another SLC with a different flavor for verifying operations
@@ -245,7 +242,6 @@ def test_clean_docker_images(
         return [tag for img in images if (tag := img.tags[0]).startswith(prefix)]
 
     output_path = Path.cwd() / "clean_docker_images_output"
-
 
     ScriptLanguageContainer.clean_docker_images(output_path=output_path)
     with ContextDockerClient() as docker_client:

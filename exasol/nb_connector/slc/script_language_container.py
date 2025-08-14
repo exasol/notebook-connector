@@ -248,7 +248,7 @@ class ScriptLanguageContainer:
     def clean_docker_images(cls, output_path: Path = Path.cwd()) -> None:
         """
         Deletes all SLC related local docker images.
-        Parameter `output_path` defines the path where the log files are stored.
+        :param output_path: Defines the path where the log files are stored.
         """
         exaslct_api.clean_all_images(
             output_directory=str(output_path),
