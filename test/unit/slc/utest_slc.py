@@ -212,7 +212,7 @@ def test_docker_image_tags(monkeypatch: MonkeyPatch, slc_factory):
         f"exasol/other-image:{flavor}-suffix-1",
     ]
     monkeypatch.setattr(
-        script_language_container,
+        script_languages_container,
         "ContextDockerClient",
         mock_docker_client_context(image_tags),
     )
