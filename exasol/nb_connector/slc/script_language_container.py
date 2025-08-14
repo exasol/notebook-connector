@@ -79,10 +79,16 @@ class ScriptLanguageContainer:
         self.flavor = SlcFlavor(name).verify(secrets)
         self.compression_strategy = SlcCompressionStrategy(name).verify(secrets)
         self.workspace = Workspace.for_slc(name)
-        if not self.flavor_path.is_dir():
+        if not self.checkout_dir.is_dir():
             raise SlcError(
                 f"SLC Git repository not checked out to {self.checkout_dir}."
             )
+        if not self.flavor_path.is_dir():
+            raise SlcError(
+                f"Given flavor {self.flavor} not found in version {constants.SLC_RELEASE_TAG} of "
+                "Script-Languages-Release. "
+                "Check out available flavors at https://github.com/exasol/script-languages-release/releases/tag/{constants.SLC_RELEASE_TAG}.")
+
 
     @classmethod
     def create(
