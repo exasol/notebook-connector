@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ssl
+import warnings
 from pathlib import Path
 from typing import (
     Any,
@@ -85,7 +86,7 @@ def get_udf_bucket_path(conf: Secrets) -> str:
     Builds the path of the BucketFS bucket specified in the configuration,
     as it's seen in the udf's file system.
     """
-    bucket = open_bucketfs_connection(conf)
+    bucket = open_bucketfs_bucket(conf)
     return bucket.udf_path
 
 
@@ -244,6 +245,18 @@ def _get_ca_cert_verification(conf: Secrets) -> Any:
 
 
 def open_bucketfs_connection(conf: Secrets) -> bfs.BucketLike:
+    """
+    This function is deprecated, please use open_bucketfs_bucket(conf) instead.
+    """
+
+    warnings.warn(
+        "open_bucketfs_connection is deprecated. Use open_bucketfs_bucket instead.",
+        DeprecationWarning,
+    )
+    return open_bucketfs_bucket(conf)
+
+
+def open_bucketfs_bucket(conf: Secrets) -> bfs.BucketLike:
     """
     Connects to a BucketFS service using provided configuration parameters.
     Returns the BucketLike object for the bucket selected in the configuration.
