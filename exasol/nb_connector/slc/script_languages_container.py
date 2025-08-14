@@ -6,6 +6,7 @@ from pathlib import (
     Path,
 )
 
+import requests
 from exasol.slc import api as exaslct_api
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import (
@@ -264,3 +265,21 @@ class ScriptLanguagesContainer:
         exaslct_api.clean_all_images(
             output_directory=str(output_path),
         )
+
+    @classmethod
+    def list_available_flavors(cls) -> list[str]:
+        owner = "exasol"
+        repo = "script-languages-release"
+        path = "flavors"
+
+        url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
+        params = {"ref": constants.SLC_RELEASE_TAG}
+
+        response = requests.get(url, params=params)
+        data = response.json()
+        return [
+            (item["name"])
+            for item in data
+            if item["type"] in ("dir", "symlink")
+            and item["name"].startswith("template")
+        ]

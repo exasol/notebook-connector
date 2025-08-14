@@ -1,4 +1,5 @@
 import contextlib
+import json
 from pathlib import Path
 from test.unit.slc.util import (
     SecretsMock,
@@ -11,6 +12,7 @@ from unittest.mock import (
 
 import git
 import pytest
+import requests
 from _pytest.monkeypatch import MonkeyPatch
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
@@ -218,3 +220,215 @@ def test_docker_image_tags(monkeypatch: MonkeyPatch, slc_factory):
     )
     with slc_factory.context("MY_SLC", flavor) as slc:
         assert slc.docker_image_tags == expected
+
+
+@pytest.fixture
+def requests_get_mock(monkeypatch: MonkeyPatch):
+    mock_response = Mock()
+    mock_response.json.return_value = [
+        {
+            "name": "README.md",
+            "path": "flavors/README.md",
+            "sha": "c31e9f0e08f389210b6fc12920f26b535c570575",
+            "size": 4944,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/README.md?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/README.md",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/c31e9f0e08f389210b6fc12920f26b535c570575",
+            "download_url": "https://raw.githubusercontent.com/exasol/script-languages-release/9.7.0/flavors/README.md",
+            "type": "file",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/README.md?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/c31e9f0e08f389210b6fc12920f26b535c570575",
+                "html": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/README.md",
+            },
+        },
+        {
+            "name": "standard-EXASOL-all-java-11",
+            "path": "flavors/standard-EXASOL-all-java-11",
+            "sha": "1d2bce195d16a83d65f45c1dd5a9f9e34b16fd28",
+            "size": 0,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/standard-EXASOL-all-java-11?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/standard-EXASOL-all-java-11",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/trees/1d2bce195d16a83d65f45c1dd5a9f9e34b16fd28",
+            "download_url": None,
+            "type": "dir",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/standard-EXASOL-all-java-11?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/trees/1d2bce195d16a83d65f45c1dd5a9f9e34b16fd28",
+                "html": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/standard-EXASOL-all-java-11",
+            },
+        },
+        {
+            "name": "standard-EXASOL-all-java-17",
+            "path": "flavors/standard-EXASOL-all-java-17",
+            "sha": "e521b9bfdd414c62056e4cb8edbc8112d8807ff6",
+            "size": 0,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/standard-EXASOL-all-java-17?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/standard-EXASOL-all-java-17",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/trees/e521b9bfdd414c62056e4cb8edbc8112d8807ff6",
+            "download_url": None,
+            "type": "dir",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/standard-EXASOL-all-java-17?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/trees/e521b9bfdd414c62056e4cb8edbc8112d8807ff6",
+                "html": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/standard-EXASOL-all-java-17",
+            },
+        },
+        {
+            "name": "standard-EXASOL-all-python-3.10",
+            "path": "flavors/standard-EXASOL-all-python-3.10",
+            "sha": "458b5f2b8d97c23f978304675d983f82a8e08323",
+            "size": 0,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/standard-EXASOL-all-python-3.10?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/standard-EXASOL-all-python-3.10",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/trees/458b5f2b8d97c23f978304675d983f82a8e08323",
+            "download_url": None,
+            "type": "dir",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/standard-EXASOL-all-python-3.10?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/trees/458b5f2b8d97c23f978304675d983f82a8e08323",
+                "html": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/standard-EXASOL-all-python-3.10",
+            },
+        },
+        {
+            "name": "standard-EXASOL-all-r-4.4",
+            "path": "flavors/standard-EXASOL-all-r-4.4",
+            "sha": "af73bc131e05265b5d8caffd9ba260d71de8dfc1",
+            "size": 0,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/standard-EXASOL-all-r-4.4?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/standard-EXASOL-all-r-4.4",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/trees/af73bc131e05265b5d8caffd9ba260d71de8dfc1",
+            "download_url": None,
+            "type": "dir",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/standard-EXASOL-all-r-4.4?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/trees/af73bc131e05265b5d8caffd9ba260d71de8dfc1",
+                "html": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/standard-EXASOL-all-r-4.4",
+            },
+        },
+        {
+            "name": "standard-EXASOL-all",
+            "path": "flavors/standard-EXASOL-all",
+            "sha": "245830f932f73cdaf6c7fd2498a2475f6424e6ac",
+            "size": 0,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/standard-EXASOL-all?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/standard-EXASOL-all",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/trees/245830f932f73cdaf6c7fd2498a2475f6424e6ac",
+            "download_url": None,
+            "type": "dir",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/standard-EXASOL-all?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/trees/245830f932f73cdaf6c7fd2498a2475f6424e6ac",
+                "html": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/standard-EXASOL-all",
+            },
+        },
+        {
+            "name": "template-Exasol-8-python-3.10-cuda-conda",
+            "path": "flavors/template-Exasol-8-python-3.10-cuda-conda",
+            "sha": "0dfb2ccd82936f0dcb1edca352ae0a05adfa2af8",
+            "size": 68,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/template-Exasol-8-python-3.10-cuda-conda?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/template-Exasol-8-python-3.10-cuda-conda",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/0dfb2ccd82936f0dcb1edca352ae0a05adfa2af8",
+            "download_url": "https://raw.githubusercontent.com/exasol/script-languages-release/9.7.0/flavors/template-Exasol-8-python-3.10-cuda-conda",
+            "type": "symlink",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/template-Exasol-8-python-3.10-cuda-conda?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/0dfb2ccd82936f0dcb1edca352ae0a05adfa2af8",
+                "html": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/template-Exasol-8-python-3.10-cuda-conda",
+            },
+        },
+        {
+            "name": "template-Exasol-all-python-3.10",
+            "path": "flavors/template-Exasol-all-python-3.10",
+            "sha": "35cf44356fa359c420aeaab680861a38fd9f574a",
+            "size": 60,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/template-Exasol-all-python-3.10?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/template-Exasol-all-python-3.10",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/35cf44356fa359c420aeaab680861a38fd9f574a",
+            "download_url": "https://raw.githubusercontent.com/exasol/script-languages-release/9.7.0/flavors/template-Exasol-all-python-3.10",
+            "type": "symlink",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/template-Exasol-all-python-3.10?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/35cf44356fa359c420aeaab680861a38fd9f574a",
+                "html": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/template-Exasol-all-python-3.10",
+            },
+        },
+        {
+            "name": "template-Exasol-all-python-3.10-conda",
+            "path": "flavors/template-Exasol-all-python-3.10-conda",
+            "sha": "d43273557b778fb95dde456f70acbd187defcc11",
+            "size": 66,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/template-Exasol-all-python-3.10-conda?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/template-Exasol-all-python-3.10-conda",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/d43273557b778fb95dde456f70acbd187defcc11",
+            "download_url": "https://raw.githubusercontent.com/exasol/script-languages-release/9.7.0/flavors/template-Exasol-all-python-3.10-conda",
+            "type": "symlink",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/template-Exasol-all-python-3.10-conda?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/d43273557b778fb95dde456f70acbd187defcc11",
+                "html": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/template-Exasol-all-python-3.10-conda",
+            },
+        },
+        {
+            "name": "template-Exasol-all-python-3.12",
+            "path": "flavors/template-Exasol-all-python-3.12",
+            "sha": "53ce9768bed6879e2cb7184b97e8cb3db44760c5",
+            "size": 60,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/template-Exasol-all-python-3.12?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/template-Exasol-all-python-3.12",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/53ce9768bed6879e2cb7184b97e8cb3db44760c5",
+            "download_url": "https://raw.githubusercontent.com/exasol/script-languages-release/9.7.0/flavors/template-Exasol-all-python-3.12",
+            "type": "symlink",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/template-Exasol-all-python-3.12?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/53ce9768bed6879e2cb7184b97e8cb3db44760c5",
+                "html": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/template-Exasol-all-python-3.12",
+            },
+        },
+        {
+            "name": "template-Exasol-all-r-4",
+            "path": "flavors/template-Exasol-all-r-4",
+            "sha": "8e44732984669e2828801918562442f4b1335229",
+            "size": 0,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/template-Exasol-all-r-4?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/template-Exasol-all-r-4",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/trees/8e44732984669e2828801918562442f4b1335229",
+            "download_url": None,
+            "type": "dir",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/template-Exasol-all-r-4?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/trees/8e44732984669e2828801918562442f4b1335229",
+                "html": "https://github.com/exasol/script-languages-release/tree/9.7.0/flavors/template-Exasol-all-r-4",
+            },
+        },
+        {
+            "name": "test-Exasol-8-cuda-ml",
+            "path": "flavors/test-Exasol-8-cuda-ml",
+            "sha": "3f25325a7564abedcc5d59d585087c7a48ab1d9e",
+            "size": 50,
+            "url": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/test-Exasol-8-cuda-ml?ref=9.7.0",
+            "html_url": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/test-Exasol-8-cuda-ml",
+            "git_url": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/3f25325a7564abedcc5d59d585087c7a48ab1d9e",
+            "download_url": "https://raw.githubusercontent.com/exasol/script-languages-release/9.7.0/flavors/test-Exasol-8-cuda-ml",
+            "type": "symlink",
+            "_links": {
+                "self": "https://api.github.com/repos/exasol/script-languages-release/contents/flavors/test-Exasol-8-cuda-ml?ref=9.7.0",
+                "git": "https://api.github.com/repos/exasol/script-languages-release/git/blobs/3f25325a7564abedcc5d59d585087c7a48ab1d9e",
+                "html": "https://github.com/exasol/script-languages-release/blob/9.7.0/flavors/test-Exasol-8-cuda-ml",
+            },
+        },
+    ]
+    monkeypatch.setattr(requests, "get", Mock(return_value=mock_response))
+
+
+def test_list_available_flavors(requests_get_mock):
+    available_flavors = ScriptLanguagesContainer.list_available_flavors()
+    expected_flavors = [
+        "template-Exasol-8-python-3.10-cuda-conda",
+        "template-Exasol-all-python-3.10",
+        "template-Exasol-all-python-3.10-conda",
+        "template-Exasol-all-python-3.12",
+        "template-Exasol-all-r-4",
+    ]
+    assert available_flavors == expected_flavors
