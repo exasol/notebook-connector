@@ -87,8 +87,8 @@ class ScriptLanguageContainer:
             raise SlcError(
                 f"Given flavor {self.flavor} not found in version {constants.SLC_RELEASE_TAG} of "
                 "Script-Languages-Release. "
-                "Check out available flavors at https://github.com/exasol/script-languages-release/releases/tag/{constants.SLC_RELEASE_TAG}.")
-
+                "Check out available flavors at https://github.com/exasol/script-languages-release/releases/tag/{constants.SLC_RELEASE_TAG}."
+            )
 
     @classmethod
     def create(
