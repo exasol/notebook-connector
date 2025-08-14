@@ -68,6 +68,11 @@ class ScriptLanguagesContainer:
     constants.SLC_RELEASE_TAG.
     """
 
+    GITHUB_URL = f"https://github.com/exasol/script-languages-release/releases/tag/{constants.SLC_RELEASE_TAG}"
+    """
+    Hyperlink to the GitHub tag which is being used.
+    """
+
     def __init__(
         self,
         secrets: Secrets,
