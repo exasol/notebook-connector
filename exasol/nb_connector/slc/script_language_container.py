@@ -244,11 +244,12 @@ class ScriptLanguageContainer:
             images = docker_client.images.list(name=image_name)
             return [tag for img in images if (tag := img.tags[0]).startswith(prefix)]
 
-    def clean_docker_images(self):
+    @classmethod
+    def clean_docker_images(cls, output_path: Path = Path.cwd()) -> None:
         """
         Deletes all SLC related local docker images.
+        Parameter `output_path` defines the path where the log files are stored.
         """
-        with current_directory(self.checkout_dir):
-            exaslct_api.clean_all_images(
-                output_directory=str(self.workspace.output_path),
-            )
+        exaslct_api.clean_all_images(
+            output_directory=str(output_path),
+        )
