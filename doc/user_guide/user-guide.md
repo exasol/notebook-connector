@@ -6,7 +6,7 @@ The Notebook Connector (NC) supports building different flavors of [Exasol Scrip
 
 The specific options for building an SLC are stored in the Secure Configuration Storage (SCS).  Each SLC is identified by an arbitrary unique name used as index into the SCS for finding the related options.
 
-You can set the SLC options using the class method `ScriptLanguageContainer.create()`, with parameters
+You can set the SLC options using the class method `ScriptLanguagesContainer.create()`, with parameters
 * `secrets`: The SCS
 * `name`: The name of the SLC instance
   * will be converted to upper-case and must be unique
@@ -21,5 +21,5 @@ Method `create()` will then
 * Raise an error if the name has already been used.
 * Clone the SLC Git repository to the local file system.
 
-The constructor of class `ScriptLanguageContainer` verifies the SCS to contain the flavor and the SLC repository to be cloned to the local file system.
+The constructor of class `ScriptLanguagesContainer` verifies the SCS to contain the flavor and the SLC repository to be cloned to the local file system.
 

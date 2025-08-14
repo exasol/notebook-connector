@@ -15,10 +15,10 @@ from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slc.script_language_container import (
+from exasol.nb_connector.slc.script_languages_container import (
     CondaPackageDefinition,
     PipPackageDefinition,
-    ScriptLanguageContainer,
+    ScriptLanguagesContainer,
     constants,
 )
 
@@ -54,8 +54,8 @@ def create_slc(
     name: str,
     flavor: str,
     compression_strategy: CompressionStrategy,
-) -> ScriptLanguageContainer:
-    return ScriptLanguageContainer.create(
+) -> ScriptLanguagesContainer:
+    return ScriptLanguagesContainer.create(
         secrets, name=name, flavor=flavor, compression_strategy=compression_strategy
     )
 
@@ -66,14 +66,14 @@ def sample_slc(
     secrets_module: Secrets,
     default_flavor: str,
     compression_strategy: CompressionStrategy,
-) -> ScriptLanguageContainer:
+) -> ScriptLanguagesContainer:
     return create_slc(secrets_module, "sample", default_flavor, compression_strategy)
 
 
 @pytest.fixture(scope="module")
 def other_slc(
     temp_cwd: Path, secrets_module: Secrets, compression_strategy: CompressionStrategy
-) -> ScriptLanguageContainer:
+) -> ScriptLanguagesContainer:
     """
     Creates another SLC with a different flavor for verifying operations
     to be limited to the current SLC only, e.g. removing docker images or
@@ -97,7 +97,7 @@ def custom_packages() -> list[tuple[str, str, str]]:
 
 @pytest.mark.dependency(name="export_slc")
 def test_export_slc(
-    sample_slc: ScriptLanguageContainer, compression_strategy: CompressionStrategy
+    sample_slc: ScriptLanguagesContainer, compression_strategy: CompressionStrategy
 ):
     sample_slc.export()
     export_path = sample_slc.workspace.export_path
@@ -113,12 +113,12 @@ def test_export_slc(
     assert tar_sum[0].is_file()
 
 
-def slc_docker_tag_prefix(slc: ScriptLanguageContainer) -> str:
+def slc_docker_tag_prefix(slc: ScriptLanguagesContainer) -> str:
     return f"{constants.SLC_DOCKER_IMG_NAME}:{slc.flavor}"
 
 
 @pytest.mark.dependency(name="slc_images", depends=["export_slc"])
-def test_slc_images(sample_slc: ScriptLanguageContainer):
+def test_slc_images(sample_slc: ScriptLanguagesContainer):
     images = sample_slc.docker_image_tags
     assert len(images) > 0
     expected = slc_docker_tag_prefix(sample_slc)
@@ -126,7 +126,7 @@ def test_slc_images(sample_slc: ScriptLanguageContainer):
         assert expected in img
 
 
-def expected_activation_key(slc: ScriptLanguageContainer) -> str:
+def expected_activation_key(slc: ScriptLanguagesContainer) -> str:
     alias = slc.language_alias
     bfs_path = f"default/container/{slc.flavor}-release-{alias}"
     return (
@@ -136,14 +136,14 @@ def expected_activation_key(slc: ScriptLanguageContainer) -> str:
 
 
 @pytest.mark.dependency(name="deploy_slc")
-def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
+def test_deploy(sample_slc: ScriptLanguagesContainer, setup_itde_module):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
 
 @pytest.mark.dependency(name="append_custom_pip_packages", depends=["deploy_slc"])
 def test_append_custom_pip_packages(
-    sample_slc: ScriptLanguageContainer,
+    sample_slc: ScriptLanguagesContainer,
     custom_packages: list[tuple[str, str, str]],
     package_manager: PackageManager,
 ):
@@ -160,7 +160,7 @@ def test_append_custom_pip_packages(
 
 @pytest.mark.dependency(name="append_custom_conda_packages", depends=["deploy_slc"])
 def test_append_custom_conda_packages(
-    sample_slc: ScriptLanguageContainer,
+    sample_slc: ScriptLanguagesContainer,
     custom_packages: list[tuple[str, str, str]],
     package_manager: PackageManager,
 ):
@@ -183,7 +183,7 @@ def test_append_custom_conda_packages(
     depends=["append_custom_pip_packages", "append_custom_conda_packages"],
 )
 def test_deploy_slc_with_custom_packages(
-    sample_slc: ScriptLanguageContainer, setup_itde_module
+    sample_slc: ScriptLanguagesContainer, setup_itde_module
 ):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
@@ -195,7 +195,7 @@ def test_deploy_slc_with_custom_packages(
 )
 def test_udf_with_custom_packages(
     secrets_module: Secrets,
-    sample_slc: ScriptLanguageContainer,
+    sample_slc: ScriptLanguagesContainer,
     custom_packages: list[tuple[str, str, str]],
 ):
     import_statements = "\n    ".join(
@@ -231,19 +231,19 @@ def test_udf_with_custom_packages(
     name="clean_docker_images", depends=["deploy_slc_with_custom_packages"]
 )
 def test_clean_docker_images(
-    sample_slc: ScriptLanguageContainer,
-    other_slc: ScriptLanguageContainer,
+    sample_slc: ScriptLanguagesContainer,
+    other_slc: ScriptLanguagesContainer,
 ):
     def contains(
         images: list[DockerImage],
-        slc: ScriptLanguageContainer,
+        slc: ScriptLanguagesContainer,
     ) -> list[str]:
         prefix = slc_docker_tag_prefix(slc)
         return [tag for img in images if (tag := img.tags[0]).startswith(prefix)]
 
     output_path = Path.cwd() / "clean_docker_images_output"
 
-    ScriptLanguageContainer.clean_docker_images(output_path=output_path)
+    ScriptLanguagesContainer.clean_docker_images(output_path=output_path)
     with ContextDockerClient() as docker_client:
         images = docker_client.images.list(name=constants.SLC_DOCKER_IMG_NAME)
 
@@ -254,10 +254,10 @@ def test_clean_docker_images(
 
 @pytest.mark.dependency(name="clean_up_output_path", depends=["clean_docker_images"])
 def test_clean_output(
-    sample_slc: ScriptLanguageContainer,
-    other_slc: ScriptLanguageContainer,
+    sample_slc: ScriptLanguagesContainer,
+    other_slc: ScriptLanguagesContainer,
 ):
-    def output_path_exists(slc: ScriptLanguageContainer) -> bool:
+    def output_path_exists(slc: ScriptLanguagesContainer) -> bool:
         return slc.workspace.output_path.is_dir()
 
     sample_slc.workspace.cleanup_output_path()
@@ -267,10 +267,10 @@ def test_clean_output(
 
 @pytest.mark.dependency(name="clean_up_export_path", depends=["clean_docker_images"])
 def test_clean_export(
-    sample_slc: ScriptLanguageContainer,
-    other_slc: ScriptLanguageContainer,
+    sample_slc: ScriptLanguagesContainer,
+    other_slc: ScriptLanguagesContainer,
 ):
-    def export_path_exists(slc: ScriptLanguageContainer) -> bool:
+    def export_path_exists(slc: ScriptLanguagesContainer) -> bool:
         return slc.workspace.export_path.is_dir()
 
     sample_slc.workspace.cleanup_export_path()

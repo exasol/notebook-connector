@@ -1,6 +1,6 @@
 class SlcError(Exception):
     """
-    Signals errors related to ScriptLanguageContainer:
+    Signals errors related to ScriptLanguagesContainer:
 
     * The name of the SLC is not unique
 
