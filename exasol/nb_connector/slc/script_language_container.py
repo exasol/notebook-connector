@@ -6,6 +6,7 @@ from pathlib import (
     Path,
 )
 
+import requests
 from exasol.slc import api as exaslct_api
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import (
@@ -68,6 +69,11 @@ class ScriptLanguageContainer:
     constants.SLC_RELEASE_TAG.
     """
 
+    GITHUB_URL = f"https://github.com/exasol/script-languages-release/releases/tag/{constants.SLC_RELEASE_TAG}"
+    """
+    Hyperlink to the GitHub tag which is being used.
+    """
+
     def __init__(
         self,
         secrets: Secrets,
@@ -79,9 +85,15 @@ class ScriptLanguageContainer:
         self.flavor = SlcFlavor(name).verify(secrets)
         self.compression_strategy = SlcCompressionStrategy(name).verify(secrets)
         self.workspace = Workspace.for_slc(name)
-        if not self.flavor_path.is_dir():
+        if not self.checkout_dir.is_dir():
             raise SlcError(
                 f"SLC Git repository not checked out to {self.checkout_dir}."
+            )
+        if not self.flavor_path.is_dir():
+            raise SlcError(
+                f"Given flavor {self.flavor} not found in version {constants.SLC_RELEASE_TAG} of "
+                "Script-Languages-Release. "
+                "Check out available flavors at https://github.com/exasol/script-languages-release/releases/tag/{constants.SLC_RELEASE_TAG}."
             )
 
     @classmethod
@@ -253,3 +265,24 @@ class ScriptLanguageContainer:
         exaslct_api.clean_all_images(
             output_directory=str(output_path),
         )
+
+    @classmethod
+    def list_available_flavors(cls) -> list[str]:
+        owner = "exasol"
+        repo = "script-languages-release"
+        path = "flavors"
+
+        url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
+        params = {"ref": constants.SLC_RELEASE_TAG}
+
+        try:
+            response = requests.get(url, params=params, timeout=30)
+            data = response.json()
+            return [
+                (item["name"])
+                for item in data
+                if item["type"] in ("dir", "symlink")
+                and item["name"].startswith("template")
+            ]
+        except requests.exceptions.RequestException as ex:
+            raise SlcError("Unable to fetch flavor definitions.") from ex
