@@ -51,7 +51,7 @@ def _append_packages(
             print(f"{p.pkg}|{p.version}", file=f)
 
 
-class ScriptLanguagesContainer:
+class ScriptLanguageContainer:
     """
     Support building different flavors of Exasol Script Language
     Containers (SLCs) using the SLCT.
@@ -103,7 +103,7 @@ class ScriptLanguagesContainer:
         name: str,
         flavor: str,
         compression_strategy: CompressionStrategy = CompressionStrategy.GZIP,
-    ) -> ScriptLanguagesContainer:
+    ) -> ScriptLanguageContainer:
         _verify_name(name)
         slc_flavor = SlcFlavor(name)
         if slc_flavor.exists(secrets):

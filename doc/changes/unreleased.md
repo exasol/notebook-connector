@@ -7,7 +7,7 @@ This release of the Notebook Connector evolves the prior `SlctManager` interface
 * Incl. isolating various SLC sessions regarding flavors, Git clones and working directories.
 
 The release comes with breaking changes:
-* Class `SlctManager` has been renamed to `ScriptLanguagesContainer`.
+* Class `SlctManager` has been renamed to `ScriptLanguageContainer`.
 * Some public methods or and attributes have been
   * renamed
     * `flavor_name` to `flavor`
@@ -43,4 +43,4 @@ See the NC [User Guide](../user_guide/user-guide.md) for details.
 * #38: Renamed `connections.open_bucketfs_connection` to `connections.open_bucketfs_bucket`
 * #231: Implemented clean up all Script-Languages-Container related docker images 
 
-* #236: Improved flavor check and renamed class ScriptLanguageContainer 
+* #236: Added check to validate if flavor exists in cloned slc-rel repository 

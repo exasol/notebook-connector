@@ -1,6 +1,6 @@
-from exasol.nb_connector.slc.script_languages_container import (
+from exasol.nb_connector.slc.script_language_container import (
     CondaPackageDefinition,
     PipPackageDefinition,
-    ScriptLanguagesContainer,
+    ScriptLanguageContainer,
 )
 from exasol.nb_connector.slc.slc_error import SlcError

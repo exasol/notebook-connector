@@ -19,10 +19,10 @@ from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import (
     constants,
-    script_languages_container,
+    script_language_container,
     workspace,
 )
-from exasol.nb_connector.slc.script_languages_container import ScriptLanguagesContainer
+from exasol.nb_connector.slc.script_language_container import ScriptLanguageContainer
 from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
     SlcFlavor,
@@ -46,7 +46,7 @@ def simulate_clone(flavor: str):
     """
     This function can be set as side effect to method clone_from of the
     git_repo_mock for simulating a successful checkout to the
-    ScriptLanguagesContainer.
+    ScriptLanguageContainer.
     """
 
     def create_dir(url: str, dir: Path, branch: str):
@@ -58,7 +58,7 @@ def simulate_clone(flavor: str):
 
 class SlcFactory:
     """
-    Provides a context to create an instance of ScriptLanguagesContainer in
+    Provides a context to create an instance of ScriptLanguageContainer in
     a temporary directory and simulating the SLC Git repo to be cloned inside.
     """
 
@@ -71,7 +71,7 @@ class SlcFactory:
         secrets = SecretsMock(slc_name)
         self.git_repo_mock.clone_from.side_effect = simulate_clone(flavor)
         with current_directory(self.path):
-            yield ScriptLanguagesContainer.create(
+            yield ScriptLanguageContainer.create(
                 secrets,
                 name=slc_name,
                 flavor=flavor,
@@ -118,7 +118,7 @@ def test_create(
 def test_repo_missing(sample_slc_name):
     secrets = SecretsMock.for_slc(sample_slc_name, Path())
     with pytest.raises(SlcError, match="SLC Git repository not checked out"):
-        ScriptLanguagesContainer(secrets, sample_slc_name)
+        ScriptLanguageContainer(secrets, sample_slc_name)
 
 
 @pytest.mark.parametrize(
@@ -140,7 +140,7 @@ def test_illegal_names(name):
         SlcError,
         match='name ".*" doesn\'t match regular expression',
     ):
-        ScriptLanguagesContainer(secrets, name=name)
+        ScriptLanguageContainer(secrets, name=name)
 
 
 @pytest.mark.parametrize("name", ["ABC", "ABC_123", "abc", "abc_123"])
@@ -152,7 +152,7 @@ def test_legal_names(name, slc_factory):
 
 
 @pytest.fixture
-def slc_with_tmp_checkout_dir(sample_slc_name, slc_factory) -> ScriptLanguagesContainer:
+def slc_with_tmp_checkout_dir(sample_slc_name, slc_factory) -> ScriptLanguageContainer:
     with slc_factory.context(slc_name=sample_slc_name, flavor="Vanilla") as slc:
         yield slc
 
@@ -163,7 +163,7 @@ def test_non_unique_name(slc_with_tmp_checkout_dir):
         SlcError,
         match="already contains a flavor for SLC name",
     ):
-        ScriptLanguagesContainer.create(
+        ScriptLanguageContainer.create(
             existing_slc.secrets,
             existing_slc.name,
             flavor="Strawberry",
@@ -198,7 +198,7 @@ def test_docker_image_tags(monkeypatch: MonkeyPatch, slc_factory):
     This test mocks the Docker client simulating to return a list of
     Docker images to be available on the current system.
 
-    The test then verifies the ScriptLanguagesContainer under test to return
+    The test then verifies the ScriptLanguageContainer under test to return
     only the Docker images with each image's first tag starting with the
     expected image name and the flavor.
     """

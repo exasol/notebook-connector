@@ -16,8 +16,8 @@ from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slc import ScriptLanguagesContainer
-from exasol.nb_connector.slc.script_languages_container import CondaPackageDefinition
+from exasol.nb_connector.slc import ScriptLanguageContainer
+from exasol.nb_connector.slc.script_language_container import CondaPackageDefinition
 
 DEFAULT_GPU_FLAVOR = "template-Exasol-8-python-3.10-cuda-conda"
 """
@@ -35,8 +35,8 @@ def secrets_module() -> Iterator[Secrets]:
 
 
 @pytest.fixture(scope="module")
-def sample_slc(secrets_module: Secrets) -> ScriptLanguagesContainer:
-    return ScriptLanguagesContainer.create(
+def sample_slc(secrets_module: Secrets) -> ScriptLanguageContainer:
+    return ScriptLanguageContainer.create(
         secrets_module,
         name="sample_gpu",
         flavor=DEFAULT_GPU_FLAVOR,
@@ -51,7 +51,7 @@ def custom_packages() -> list[tuple[str, str]]:
 
 @pytest.mark.dependency(name="append_custom_packages")
 def test_append_custom_packages(
-    sample_slc: ScriptLanguagesContainer,
+    sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str]],
 ):
     sample_slc.append_custom_conda_packages(
@@ -65,7 +65,7 @@ def test_append_custom_packages(
 def test_upload_slc_with_new_packages(
     secrets_module: Secrets,
     setup_itde_module,
-    sample_slc: ScriptLanguagesContainer,
+    sample_slc: ScriptLanguageContainer,
 ):
     sample_slc.deploy()
     assert (
@@ -79,7 +79,7 @@ def test_upload_slc_with_new_packages(
 )
 def test_numba(
     secrets_module: Secrets,
-    sample_slc: ScriptLanguagesContainer,
+    sample_slc: ScriptLanguageContainer,
 ):
     udf = textwrap.dedent(
         f"""
