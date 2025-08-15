@@ -423,7 +423,7 @@ def requests_get_mock(monkeypatch: MonkeyPatch):
 
 
 def test_list_available_flavors(requests_get_mock):
-    available_flavors = ScriptLanguagesContainer.list_available_flavors()
+    available_flavors = ScriptLanguageContainer.list_available_flavors()
     expected_flavors = [
         "template-Exasol-8-python-3.10-cuda-conda",
         "template-Exasol-all-python-3.10",
