@@ -275,11 +275,14 @@ class ScriptLanguageContainer:
         url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
         params = {"ref": constants.SLC_RELEASE_TAG}
 
-        response = requests.get(url, params=params)
-        data = response.json()
-        return [
-            (item["name"])
-            for item in data
-            if item["type"] in ("dir", "symlink")
-            and item["name"].startswith("template")
-        ]
+        try:
+            response = requests.get(url, params=params, timeout=30)
+            data = response.json()
+            return [
+                (item["name"])
+                for item in data
+                if item["type"] in ("dir", "symlink")
+                and item["name"].startswith("template")
+            ]
+        except requests.exceptions.RequestException as ex:
+            raise SlcError("Unable to fetch flavor definitions.") from ex
