@@ -19,6 +19,10 @@ The release comes with breaking changes:
     * `clone_slc_repo()`
 * The handling of Secure Configuration Storage has been changed to support using multiple SLC flavors.
 
+Additionally, the new `ScriptLanguageContainer` class supports adding conda packages to conda based flavors.
+
+Also, the release contains several internal improvements.
+
 See the NC [User Guide](../user_guide/user-guide.md) for details.
 
 ## Features
