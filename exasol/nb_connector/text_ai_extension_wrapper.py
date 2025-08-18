@@ -173,6 +173,8 @@ def initialize_text_ai_extension(
 
     If given a container_file path instead, installs the given container in the Bucketfs.
 
+    If neither is given, attempts to install the latest version.
+
     This function doesn't activate the language container. Instead, it gets the
     activation SQL using the same API and writes it to the secret store. The name
     of the key is defined in the ACTIVATION_KEY constant.
