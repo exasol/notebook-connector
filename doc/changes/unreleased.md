@@ -43,6 +43,6 @@ See the NC [User Guide](../user_guide/user-guide.md) for details.
 * #38: Renamed `connections.open_bucketfs_connection` to `connections.open_bucketfs_bucket`
 * #231: Implemented clean up all Script-Languages-Container related docker images 
 * #236: Added check to validate if flavor exists in cloned slc-rel repository
-* #238: Changed path pf SLC workspace directory
+* #238: Changed path of SLC workspace directory
 * #234: Reduced ITDE log level in NC
 * #235: Cleaned up ai lab config
