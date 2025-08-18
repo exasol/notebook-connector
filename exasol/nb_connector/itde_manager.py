@@ -1,3 +1,4 @@
+import logging
 import os
 from enum import IntFlag
 from typing import (
@@ -98,6 +99,7 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
             docker_runtime=docker_runtime,
             docker_environment_variable=docker_environment_variable,
             additional_db_parameter=additional_db_parameter,
+            log_level=logging.getLevelName(logging.INFO),
         )
 
     db_info = env_info.database_info

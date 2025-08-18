@@ -173,9 +173,6 @@ def initialize_text_ai_extension(
 
     If given a container_file path instead, installs the given container in the Bucketfs.
 
-    If neither is given, checks if txaie_slc_file_local_path is set and installs this SLC if found,
-    otherwise attempts to install the latest version from t.b.d.
-
     This function doesn't activate the language container. Instead, it gets the
     activation SQL using the same API and writes it to the secret store. The name
     of the key is defined in the ACTIVATION_KEY constant.
