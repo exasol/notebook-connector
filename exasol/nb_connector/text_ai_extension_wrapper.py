@@ -168,13 +168,12 @@ def initialize_text_ai_extension(
     Possible steps:
 
     * Call the Text-AI Extension's language container deployment API.
-    If given a version, downloads the specified released version of the extension from ???
+    If given a version, downloads the specified released version of the extension
     and uploads it to the BucketFS.
 
     If given a container_file path instead, installs the given container in the Bucketfs.
 
-    If neither is given, checks if txaie_slc_file_local_path is set and installs this SLC if found,
-    otherwise attempts to install the latest version from t.b.d.
+    If neither is given, attempts to install the latest version.
 
     This function doesn't activate the language container. Instead, it gets the
     activation SQL using the same API and writes it to the secret store. The name

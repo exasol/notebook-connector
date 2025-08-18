@@ -22,4 +22,4 @@ Using the SLC_RELEASE 9.7.0 because we are limited to slc-tool 3.*. (see pyproje
 Check the developer guide (./doc/developer-guide.md) for more information.
 """
 
-WORKSPACE_DIR = ".workspace"
+WORKSPACE_DIR = "slc_workspace"

@@ -42,5 +42,7 @@ See the NC [User Guide](../user_guide/user-guide.md) for details.
 * #226: Used `LanguageDefinitionsBuilder` to create the SLC activation statement
 * #38: Renamed `connections.open_bucketfs_connection` to `connections.open_bucketfs_bucket`
 * #231: Implemented clean up all Script-Languages-Container related docker images 
-
-* #236: Added check to validate if flavor exists in cloned slc-rel repository 
+* #236: Added check to validate if flavor exists in cloned slc-rel repository
+* #238: Changed path of SLC workspace directory
+* #234: Reduced ITDE log level in NC
+* #235: Cleaned up ai lab config

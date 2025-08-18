@@ -1,3 +1,4 @@
+import logging
 from unittest import mock
 
 import pytest
@@ -72,6 +73,7 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
             docker_runtime=None,
             docker_environment_variable=(),
             additional_db_parameter=(),
+            log_level=logging.getLevelName(logging.INFO),
         )
     ]
 
@@ -131,6 +133,7 @@ def test_bring_itde_up_with_accelerator(
             docker_runtime=expected_docker_runtime,
             docker_environment_variable=expected_docker_environment_variable,
             additional_db_parameter=expected_additional_db_parameter,
+            log_level=logging.getLevelName(logging.INFO),
         )
     ]
 
