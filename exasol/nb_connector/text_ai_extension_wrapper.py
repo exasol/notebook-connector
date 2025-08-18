@@ -168,7 +168,7 @@ def initialize_text_ai_extension(
     Possible steps:
 
     * Call the Text-AI Extension's language container deployment API.
-    If given a version, downloads the specified released version of the extension from ???
+    If given a version, downloads the specified released version of the extension
     and uploads it to the BucketFS.
 
     If given a container_file path instead, installs the given container in the Bucketfs.
