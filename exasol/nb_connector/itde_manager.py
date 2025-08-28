@@ -84,11 +84,11 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
 
         docker_runtime = None
         docker_environment_variable: tuple[str, ...] = ()
-        additional_db_parameter: tuple[str, ...] = ()
+        additional_db_parameter: tuple[str, ...] = ('-etlCheckCertsDefault=1',)
         if accelerator == Accelerator.nvidia.value:
             docker_runtime = "nvidia"
             docker_environment_variable = ("NVIDIA_VISIBLE_DEVICES=all",)
-            additional_db_parameter = ("-enableAcceleratorDeviceDetection=1",)
+            additional_db_parameter = additional_db_parameter + ("-enableAcceleratorDeviceDetection=1",)
 
         env_info, _ = api.spawn_test_environment(
             environment_name=ENVIRONMENT_NAME,
