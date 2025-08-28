@@ -26,13 +26,11 @@ animated spinner from https://github.com/pavdmyt/yaspin.
 DEF_BFS_MODELS_DIR = "models"
 
 
-
 @dataclass
 class TransformerModel:
     name: str
     task_type: str
     factory: Any
-
 
 
 def _interactive_usage() -> bool:
