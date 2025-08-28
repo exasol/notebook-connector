@@ -46,7 +46,7 @@ from exasol.nb_connector.language_container_activation import (
 from exasol.nb_connector.model_installation import (
     create_bfs_connection,
     create_model_repository,
-    install_model,
+    install_model, TransformerModel,
 )
 from exasol.nb_connector.secret_store import Secrets
 
@@ -81,13 +81,6 @@ BFS_CONNECTION_PREFIX = "TXAIE_BFS"
 Prefix for Exasol CONNECTION objects containing a BucketFS location and
 credentials.
 """
-
-
-@dataclass
-class TransformerModel:
-    name: str
-    task_type: str
-    factory: Any
 
 
 def deploy_license(

@@ -1,4 +1,6 @@
 import os
+from dataclasses import dataclass
+from typing import Any
 
 from exasol.ai.text.extractors.bucketfs_model_repository import BucketFSRepository
 from exasol.ai.text.impl.utils.transformers_utils import download_transformers_model
@@ -10,7 +12,6 @@ from exasol.nb_connector.extension_wrapper_common import (
     encapsulate_bucketfs_credentials,
 )
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.text_ai_extension_wrapper import TransformerModel
 
 PATH_IN_BUCKET = "ai-lab"
 """ Location in BucketFS bucket to upload data for Extensions, e.g. its language container. """
@@ -23,6 +24,15 @@ animated spinner from https://github.com/pavdmyt/yaspin.
 
 # Models will be uploaded into this directory in BucketFS.
 DEF_BFS_MODELS_DIR = "models"
+
+
+
+@dataclass
+class TransformerModel:
+    name: str
+    task_type: str
+    factory: Any
+
 
 
 def _interactive_usage() -> bool:
