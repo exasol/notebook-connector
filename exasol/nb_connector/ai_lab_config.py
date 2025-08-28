@@ -35,11 +35,9 @@ class AILabConfig(Enum):
     itde_volume = auto()
     itde_network = auto()
     te_bfs_connection = auto()
-    te_models_bfs_dir = auto()
     te_hf_connection = auto()
     te_models_cache_dir = auto()
     txaie_bfs_connection = auto()
-    txaie_models_bfs_dir = auto()
     txaie_models_cache_dir = auto()
     sme_aws_bucket = auto()
     sme_aws_role = auto()
@@ -51,6 +49,7 @@ class AILabConfig(Enum):
     saas_database_name = auto()
     storage_backend = auto()
     accelerator = auto()
+    bfs_model_subdir = auto()
 
 
 class StorageBackend(Enum):
