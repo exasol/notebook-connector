@@ -6,21 +6,19 @@ from exasol_transformers_extension.deployment.te_language_container_deployer imp
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.bfs_connection import ensure_bfs_connection
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.extension_wrapper_common import (
+    PATH_IN_BUCKET_FOR_SLC,
     deploy_language_container,
-    encapsulate_bucketfs_credentials,
     encapsulate_huggingface_token,
 )
 from exasol.nb_connector.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
     get_activation_sql,
 )
+from exasol.nb_connector.model_installation import ensure_model_subdir_config_value
 from exasol.nb_connector.secret_store import Secrets
-
-# Root directory in a BucketFS bucket where all stuff of the Transformers
-# Extension, including its language container, will be uploaded.
-PATH_IN_BUCKET = "TE"
 
 LANGUAGE_ALIAS = "PYTHON3_TE"
 
@@ -33,9 +31,6 @@ ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "te"
 # The name of the connection object with BucketFS location and credentials
 # will be prefixed with this string.
 BFS_CONNECTION_PREFIX = "TE_BFS"
-
-# Models will be uploaded into this directory in BucketFS.
-BFS_MODELS_DIR = "te_models"
 
 # The name of the connection object with a Huggingface token will be prefixed
 # with this string.
@@ -114,7 +109,6 @@ def initialize_te_extension(
 
     # Make the connection object names
     db_user = str(conf.get(CKey.db_user))
-    bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, db_user])
     token = conf.get(CKey.huggingface_token)
     hf_conn_name = "_".join([HF_CONNECTION_PREFIX, db_user]) if token else ""
 
@@ -128,25 +122,22 @@ def initialize_te_extension(
             container_name=TeLanguageContainerDeployer.SLC_NAME,
             language_alias=language_alias,
             activation_key=ACTIVATION_KEY,
-            path_in_bucket=PATH_IN_BUCKET,
+            path_in_bucket=PATH_IN_BUCKET_FOR_SLC,
             allow_override=allow_override,
         )
+
+    ensure_bfs_connection(conf)
+    ensure_model_subdir_config_value(conf)
 
     # Create the required objects in the database
     if run_deploy_scripts:
         deploy_scripts(conf, language_alias)
-    if run_encapsulate_bfs_credentials:
-        encapsulate_bucketfs_credentials(
-            conf, path_in_bucket=PATH_IN_BUCKET, connection_name=bfs_conn_name
-        )
     if token and run_encapsulate_hf_token:
         encapsulate_huggingface_token(conf, hf_conn_name)
 
-    # Save the connection object names in the secret store.
-    conf.save(CKey.te_bfs_connection, bfs_conn_name)
+    # Save the connection object name in the secret store.
     conf.save(CKey.te_hf_connection, hf_conn_name)
     # Save the directory names in the secret store
-    conf.save(CKey.te_models_bfs_dir, BFS_MODELS_DIR)
     conf.save(CKey.te_models_cache_dir, MODELS_CACHE_DIR)
 
 

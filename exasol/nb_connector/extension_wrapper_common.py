@@ -22,6 +22,11 @@ from exasol.nb_connector.connections import (
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.utils import optional_str_to_bool
 
+PATH_IN_BUCKET_FOR_SLC = "ai-lab/slc"
+"""
+Location to deploy Script-Language-Contains relatively to bucket in BucketFS.
+"""
+
 
 def str_to_bool(conf: Secrets, key: CKey, default_value: bool) -> bool:
     """
