@@ -7,7 +7,11 @@ from exasol.ai.text.impl.utils.transformers_utils import download_transformers_m
 from yaspin import yaspin
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.bfs_connection import ensure_bfs_connection_name, ensure_bfs_connection, PATH_IN_BUCKET
+from exasol.nb_connector.bfs_connection import (
+    PATH_IN_BUCKET,
+    ensure_bfs_connection,
+    ensure_bfs_connection_name,
+)
 from exasol.nb_connector.connections import open_bucketfs_location
 from exasol.nb_connector.secret_store import Secrets
 
@@ -57,6 +61,7 @@ def install_model(conf: Secrets, model: TransformerModel) -> None:
         )
     spinner.ok(CHECKMARK)
 
+
 def create_model_repository(conf: Secrets) -> BucketFSRepository:
     """
     Creates a BucketFSRepository encapsulating using the sub-directory from the secret store.
@@ -68,4 +73,3 @@ def create_model_repository(conf: Secrets) -> BucketFSRepository:
         connection_name=ensure_bfs_connection_name(conf),
         sub_dir=ensure_model_subdir_config_value(conf),
     )
-

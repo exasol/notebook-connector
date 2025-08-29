@@ -1,11 +1,14 @@
-from exasol.nb_connector.extension_wrapper_common import encapsulate_bucketfs_credentials
-from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.extension_wrapper_common import (
+    encapsulate_bucketfs_credentials,
+)
+from exasol.nb_connector.secret_store import Secrets
 
 DEF_BFS_CONNECTION_NAME = "bfs_ai_lab_connection"
 
 PATH_IN_BUCKET = "ai-lab"
 """ Location in BucketFS bucket to upload data for Extensions, e.g. its language container. """
+
 
 def ensure_bfs_connection_name(conf: Secrets) -> str:
     connection_name = conf.get(CKey.bfs_connection_name)
@@ -13,6 +16,7 @@ def ensure_bfs_connection_name(conf: Secrets) -> str:
         conf.save(CKey.bfs_connection_name, DEF_BFS_CONNECTION_NAME)
         connection_name = DEF_BFS_CONNECTION_NAME
     return connection_name
+
 
 def ensure_bfs_connection(conf: Secrets) -> None:
     """

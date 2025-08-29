@@ -129,7 +129,6 @@ def initialize_te_extension(
     ensure_bfs_connection(conf)
     ensure_subdir_config_value(conf)
 
-
     # Create the required objects in the database
     if run_deploy_scripts:
         deploy_scripts(conf, language_alias)

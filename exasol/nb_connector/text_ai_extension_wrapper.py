@@ -45,7 +45,8 @@ from exasol.nb_connector.language_container_activation import (
 from exasol.nb_connector.model_installation import (
     TransformerModel,
     create_model_repository,
-    install_model, ensure_model_subdir_config_value,
+    ensure_model_subdir_config_value,
+    install_model,
 )
 from exasol.nb_connector.secret_store import Secrets
 
