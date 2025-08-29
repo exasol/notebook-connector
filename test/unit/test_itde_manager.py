@@ -103,7 +103,10 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
             Accelerator.nvidia.value,
             "nvidia",
             ("NVIDIA_VISIBLE_DEVICES=all",),
-            ("-etlCheckCertsDefault=1", "-enableAcceleratorDeviceDetection=1",),
+            (
+                "-etlCheckCertsDefault=1",
+                "-enableAcceleratorDeviceDetection=1",
+            ),
         ),
     ],
 )
