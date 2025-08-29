@@ -16,7 +16,7 @@ from exasol.nb_connector.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
     get_activation_sql,
 )
-from exasol.nb_connector.model_installation import create_bfs_connection
+from exasol.nb_connector.model_installation import ensure_bfs_model_connection
 from exasol.nb_connector.secret_store import Secrets
 
 LANGUAGE_ALIAS = "PYTHON3_TE"
@@ -108,7 +108,6 @@ def initialize_te_extension(
 
     # Make the connection object names
     db_user = str(conf.get(CKey.db_user))
-    bfs_conn_name = "_".join([BFS_CONNECTION_PREFIX, db_user])
     token = conf.get(CKey.huggingface_token)
     hf_conn_name = "_".join([HF_CONNECTION_PREFIX, db_user]) if token else ""
 
@@ -126,16 +125,15 @@ def initialize_te_extension(
             allow_override=allow_override,
         )
 
+    ensure_bfs_model_connection(conf)
+
     # Create the required objects in the database
     if run_deploy_scripts:
         deploy_scripts(conf, language_alias)
-    if run_encapsulate_bfs_credentials:
-        create_bfs_connection(conf, bfs_conn_name)
     if token and run_encapsulate_hf_token:
         encapsulate_huggingface_token(conf, hf_conn_name)
 
-    # Save the connection object names in the secret store.
-    conf.save(CKey.te_bfs_connection, bfs_conn_name)
+    # Save the connection object name in the secret store.
     conf.save(CKey.te_hf_connection, hf_conn_name)
     # Save the directory names in the secret store
     conf.save(CKey.te_models_cache_dir, MODELS_CACHE_DIR)

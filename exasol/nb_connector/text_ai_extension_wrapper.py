@@ -45,7 +45,7 @@ from exasol.nb_connector.language_container_activation import (
 )
 from exasol.nb_connector.model_installation import (
     TransformerModel,
-    create_bfs_connection,
+    ensure_bfs_model_connection,
     create_model_repository,
     install_model,
 )
@@ -117,7 +117,6 @@ def initialize_text_ai_extension(
     install_slc: bool = True,
     install_scripts: bool = True,
     install_models: bool = True,
-    install_bfs_credentials: bool = True,
     allow_override_language_alias: bool = True,
 ) -> None:
     """
@@ -177,12 +176,11 @@ def initialize_text_ai_extension(
             allow_override=allow_override_language_alias,
         )
 
-    db_user = conf.get(CKey.db_user)
-    bfs_conn_name = f"{BFS_CONNECTION_PREFIX}_{db_user}"
-
     print(f"Text AI: Updating Secure Configuration Storage")
-    conf.save(CKey.txaie_bfs_connection, bfs_conn_name)
     conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
+
+    print(f"Text AI: Ensuring BFS model connection")
+    ensure_bfs_model_connection(conf)
 
     if install_slc:
         print("Text AI: Downloading and installing Script Language Container (SLC)")
@@ -226,9 +224,6 @@ def initialize_text_ai_extension(
         )
         create_scripts(pyexasol_connection)
 
-    if install_bfs_credentials:
-        print(f"Text AI: Creating BFS connection {bfs_conn_name}")
-        create_bfs_connection(conf, bfs_conn_name)
     print(f"Text AI: Installation finished.")
 
 
