@@ -6,6 +6,7 @@ from exasol_transformers_extension.deployment.te_language_container_deployer imp
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.bfs_connection import ensure_bfs_connection
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.extension_wrapper_common import (
     PATH_IN_BUCKET_FOR_SLC,
@@ -16,7 +17,7 @@ from exasol.nb_connector.language_container_activation import (
     ACTIVATION_KEY_PREFIX,
     get_activation_sql,
 )
-from exasol.nb_connector.model_installation import ensure_bfs_model_connection
+from exasol.nb_connector.model_installation import ensure_subdir_config_value
 from exasol.nb_connector.secret_store import Secrets
 
 LANGUAGE_ALIAS = "PYTHON3_TE"
@@ -125,7 +126,9 @@ def initialize_te_extension(
             allow_override=allow_override,
         )
 
-    ensure_bfs_model_connection(conf)
+    ensure_bfs_connection(conf)
+    ensure_subdir_config_value(conf)
+
 
     # Create the required objects in the database
     if run_deploy_scripts:

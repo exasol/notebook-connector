@@ -3,10 +3,8 @@
 # see https://github.com/exasol/notebook-connector/issues/206
 
 import importlib.metadata
-from dataclasses import dataclass
 from pathlib import Path
 from typing import (
-    Any,
     Optional,
 )
 
@@ -32,6 +30,7 @@ from transformers import (
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.bfs_connection import ensure_bfs_connection
 from exasol.nb_connector.connections import (
     open_pyexasol_connection,
 )
@@ -46,8 +45,7 @@ from exasol.nb_connector.language_container_activation import (
 from exasol.nb_connector.model_installation import (
     TransformerModel,
     create_model_repository,
-    ensure_bfs_model_connection,
-    install_model,
+    install_model, ensure_model_subdir_config_value,
 )
 from exasol.nb_connector.secret_store import Secrets
 
@@ -180,7 +178,8 @@ def initialize_text_ai_extension(
     conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
 
     print(f"Text AI: Ensuring BFS model connection")
-    ensure_bfs_model_connection(conf)
+    ensure_bfs_connection(conf)
+    ensure_model_subdir_config_value(conf)
 
     if install_slc:
         print("Text AI: Downloading and installing Script Language Container (SLC)")
