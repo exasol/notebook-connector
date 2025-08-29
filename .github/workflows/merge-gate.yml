@@ -11,30 +11,31 @@ jobs:
     permissions:
       contents: read
 
-  slow-checks-approval:
-    name: Slow Check Approval
+  run-slow-tests:
+    name: Run Slow Tests
     runs-on: ubuntu-24.04
-    environment: manual-approval
     permissions:
       contents: read
-    # Replace the steps below with the required actions
-    # and/or add additional jobs if required
-    # Note:
-    #   If you add additional jobs, make sure they are added as a requirement
-    #   to the approve-merge job's input requirements (needs).
+
+    # Even though the environment "manual-approval" will be created automatically,
+    # it still needs to be configured to require interactive review.
+    # See project settings on GitHub (Settings / Environments / manual-approval).
+    environment: manual-approval
     steps:
-      - run: echo "Manual Approval"
+      - name: Tests
+        run: echo "Slow tests approved"
+
 
   ordinary-itests:
     name: Ordinary iTests
-    needs: [ slow-checks-approval ]
+    needs: [ run-slow-tests ]
     uses: ./.github/workflows/tests-ordinary-integration.yml
     permissions:
       contents: read
 
   saas-tests:
     name: SaaS
-    needs: [ slow-checks-approval ]
+    needs: [ run-slow-tests ]
     uses: ./.github/workflows/tests-saas.yml
     secrets: inherit
     permissions:
@@ -42,14 +43,14 @@ jobs:
 
   large-runner-tests:
     name: Large Runner
-    needs: [ slow-checks-approval ]
+    needs: [ run-slow-tests ]
     uses: ./.github/workflows/tests-large-runner.yml
     permissions:
       contents: read
 
   gpu-tests:
     name: GPU
-    needs: [ slow-checks-approval ]
+    needs: [ run-slow-tests ]
     uses: ./.github/workflows/tests-gpu.yml
     permissions:
       contents: read
