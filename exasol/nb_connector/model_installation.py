@@ -84,13 +84,11 @@ def ensure_bfs_model_connection(conf: Secrets) -> None:
          conf:
             The secret store.
     """
-    if conf.get(CKey.bfs_model_connection_created) is None:
-        encapsulate_bucketfs_credentials(
-            conf,
-            path_in_bucket=PATH_IN_BUCKET,
-            connection_name=_ensure_bfs_model_connection_name(conf),
-        )
-        conf.save(CKey.bfs_model_connection_created, "true")
+    encapsulate_bucketfs_credentials(
+        conf,
+        path_in_bucket=PATH_IN_BUCKET,
+        connection_name=_ensure_bfs_model_connection_name(conf),
+    )
     _ensure_subdir_config_value(conf)
 
 

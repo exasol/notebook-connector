@@ -49,7 +49,6 @@ class AILabConfig(Enum):
     accelerator = auto()
     bfs_model_subdir = auto()
     bfs_model_connection_name = auto()
-    bfs_model_connection_created = auto()
 
 
 class StorageBackend(Enum):
