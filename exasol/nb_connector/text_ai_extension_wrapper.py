@@ -231,9 +231,7 @@ class Extraction(AbstractExtraction):
     def defaults_with_model_repository(self, conf: Secrets) -> Defaults:
         if self.defaults.model_repository:
             return self.defaults
-        model_repository = create_model_repository(
-            conf=conf, bfs_conn_name=conf.txaie_bfs_connection
-        )
+        model_repository = create_model_repository(conf=conf)
         return Defaults(
             parallelism_per_node=self.defaults.parallelism_per_node,
             batch_size=self.defaults.batch_size,

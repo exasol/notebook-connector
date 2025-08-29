@@ -65,6 +65,14 @@ def install_model(conf: Secrets, model: TransformerModel) -> None:
     spinner.ok(CHECKMARK)
 
 
+def _ensure_bfs_model_connection_name(conf: Secrets) -> str:
+    connection_name = conf.get(CKey.bfs_model_connection_name)
+    if connection_name is None:
+        conf.save(CKey.bfs_model_connection_name, DEF_BFS_CONNECTION_NAME)
+        connection_name = DEF_BFS_CONNECTION_NAME
+    return connection_name
+
+
 def ensure_bfs_model_connection(conf: Secrets) -> None:
     """
     Creates a connection object specifically for models in the database encapsulating
@@ -77,28 +85,23 @@ def ensure_bfs_model_connection(conf: Secrets) -> None:
             The secret store.
     """
     if conf.get(CKey.bfs_model_connection_created) is None:
-        connection_name = conf.get(CKey.bfs_model_connection_name)
-        if connection_name is None:
-            conf.save(CKey.bfs_model_connection_name, DEF_BFS_CONNECTION_NAME)
-            connection_name = DEF_BFS_CONNECTION_NAME
-
         encapsulate_bucketfs_credentials(
-            conf, path_in_bucket=PATH_IN_BUCKET, connection_name=connection_name
+            conf,
+            path_in_bucket=PATH_IN_BUCKET,
+            connection_name=_ensure_bfs_model_connection_name(conf),
         )
         conf.save(CKey.bfs_model_connection_created, "true")
     _ensure_subdir_config_value(conf)
 
 
-def create_model_repository(conf: Secrets, bfs_conn_name: str) -> BucketFSRepository:
+def create_model_repository(conf: Secrets) -> BucketFSRepository:
     """
     Creates a BucketFSRepository encapsulating using the sub-directory from the secret store.
     Parameters:
          conf:
             The secret store.
-        bfs_conn_name:
-            The name of the new bucketfs connection.
     """
     return BucketFSRepository(
-        connection_name=bfs_conn_name,
+        connection_name=_ensure_bfs_model_connection_name(conf),
         sub_dir=_ensure_subdir_config_value(conf),
     )
