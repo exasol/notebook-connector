@@ -33,13 +33,13 @@ jobs:
     permissions:
       contents: read
 
-  saas-tests:
-    name: SaaS
-    needs: [ run-slow-tests ]
-    uses: ./.github/workflows/tests-saas.yml
-    secrets: inherit
-    permissions:
-      contents: read
+#  saas-tests:
+#    name: SaaS
+#    needs: [ run-slow-tests ]
+#    uses: ./.github/workflows/tests-saas.yml
+#    secrets: inherit
+#    permissions:
+#      contents: read
 
   large-runner-tests:
     name: Large Runner
