@@ -1,4 +1,4 @@
-# 2.0.0 - 2025-09-01
+# 2.0.0 - 2025-09-02
 
 This release disables the certificate check for the importer when starting a docker db using the ITDE (this is a temporary fix until the notebook connector updated to pyexasol >=1.0.0). Also, the installation of AI models has been refactored which resulted in breaking API changes. The used Script-Language-Container version was updated to 10.0.0. Besides, there were internal improvements.
 
