@@ -163,7 +163,7 @@ class ScriptLanguageContainer:
         """
         return self.custom_packages_dir / "conda_packages"
 
-    def export(self):
+    def export(self) -> None:
         """
         Exports the current SLC to the export directory.
         """
@@ -171,6 +171,18 @@ class ScriptLanguageContainer:
             exaslct_api.export(
                 flavor_path=(str(self._flavor_path_rel),),
                 export_path=str(self.workspace.export_path),
+                output_directory=str(self.workspace.output_path),
+                release_name=self.language_alias,
+                compression_strategy=self.compression_strategy,
+            )
+
+    def export_no_copy(self) -> None:
+        """
+        Exports the current SLC to the internal output directory only, without copying to the export directory.
+        """
+        with current_directory(self.checkout_dir):
+            exaslct_api.export(
+                flavor_path=(str(self._flavor_path_rel),),
                 output_directory=str(self.workspace.output_path),
                 release_name=self.language_alias,
                 compression_strategy=self.compression_strategy,
