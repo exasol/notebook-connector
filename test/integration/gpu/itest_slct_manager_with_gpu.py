@@ -46,7 +46,7 @@ def sample_slc(secrets_module: Secrets) -> ScriptLanguageContainer:
 
 @pytest.fixture
 def custom_packages() -> list[tuple[str, str]]:
-    return [("numba[cuda]", "0.61.2")]
+    return [("numba", "0.61.2")]
 
 
 @pytest.mark.dependency(name="append_custom_packages")
