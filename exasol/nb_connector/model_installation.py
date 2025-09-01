@@ -69,6 +69,7 @@ def create_model_repository(conf: Secrets) -> BucketFSRepository:
          conf:
             The secret store.
     """
+    ensure_bfs_connection(conf)
     return BucketFSRepository(
         connection_name=ensure_bfs_connection_name(conf),
         sub_dir=ensure_model_subdir_config_value(conf),
