@@ -94,6 +94,7 @@ def other_slc(
 def custom_packages() -> list[tuple[str, str, str]]:
     return [("xgboost", "2.0.3", "xgboost"), ("scikit-learn", "1.5.0", "sklearn")]
 
+
 def _check_exported_slc_exists(expected_suffix: str, expected_path: Path) -> None:
     tar = [f for f in expected_path.glob(f"*.{expected_suffix}")]
     assert len(tar) == 1
@@ -116,6 +117,7 @@ def test_export_slc_no_copy(
 
     internal_export_path = sample_slc.workspace.output_path / "cache" / "exports"
     _check_exported_slc_exists(expected_suffix, internal_export_path)
+
 
 @pytest.mark.dependency(name="export_slc", depends=["export_slc_no_copy"])
 def test_export_slc(
