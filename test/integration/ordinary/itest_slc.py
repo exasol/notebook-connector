@@ -94,8 +94,30 @@ def other_slc(
 def custom_packages() -> list[tuple[str, str, str]]:
     return [("xgboost", "2.0.3", "xgboost"), ("scikit-learn", "1.5.0", "sklearn")]
 
+def _check_exported_slc_exists(expected_suffix: str, expected_path: Path) -> None:
+    tar = [f for f in expected_path.glob(f"*.{expected_suffix}")]
+    assert len(tar) == 1
+    assert tar[0].is_file()
+    tar_sum = [f for f in expected_path.glob(f"*.{expected_suffix}.sha512sum")]
+    assert len(tar_sum) == 1
+    assert tar_sum[0].is_file()
 
-@pytest.mark.dependency(name="export_slc")
+
+@pytest.mark.dependency(name="export_slc_no_copy")
+def test_export_slc_no_copy(
+    sample_slc: ScriptLanguageContainer, compression_strategy: CompressionStrategy
+):
+    sample_slc.export_no_copy()
+    export_path = sample_slc.workspace.export_path
+    expected_suffix = (
+        "tar" if compression_strategy == CompressionStrategy.NONE else "tar.gz"
+    )
+    assert not export_path.exists()
+
+    internal_export_path = sample_slc.workspace.output_path / "cache" / "exports"
+    _check_exported_slc_exists(expected_suffix, internal_export_path)
+
+@pytest.mark.dependency(name="export_slc", depends=["export_slc_no_copy"])
 def test_export_slc(
     sample_slc: ScriptLanguageContainer, compression_strategy: CompressionStrategy
 ):
@@ -105,12 +127,7 @@ def test_export_slc(
         "tar" if compression_strategy == CompressionStrategy.NONE else "tar.gz"
     )
     assert export_path.exists()
-    tar = [f for f in export_path.glob(f"*.{expected_suffix}")]
-    assert len(tar) == 1
-    assert tar[0].is_file()
-    tar_sum = [f for f in export_path.glob(f"*.{expected_suffix}.sha512sum")]
-    assert len(tar_sum) == 1
-    assert tar_sum[0].is_file()
+    _check_exported_slc_exists(expected_suffix, export_path)
 
 
 def slc_docker_tag_prefix(slc: ScriptLanguageContainer) -> str:
