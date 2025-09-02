@@ -14,6 +14,10 @@ This release disables the certificate check for the importer when starting a doc
 
  - #250: Added export function which does not copy container file to export directory
 
+## Bugs
+
+ - #252: Fixed db parameter etlCheckCertsDefault
+
 ## Dependency Updates
 
 ### `dev`
