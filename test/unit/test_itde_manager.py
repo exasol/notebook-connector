@@ -72,7 +72,7 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
             docker_db_image_version=db_image_version,
             docker_runtime=None,
             docker_environment_variable=(),
-            additional_db_parameter=("-etlCheckCertsDefault=1",),
+            additional_db_parameter=("-etlCheckCertsDefault=0",),
             log_level=logging.getLevelName(logging.INFO),
         )
     ]
@@ -98,13 +98,13 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
 @pytest.mark.parametrize(
     "accelerator, expected_docker_runtime, expected_docker_environment_variable, expected_additional_db_parameter",
     [
-        (Accelerator.none.value, None, (), ("-etlCheckCertsDefault=1",)),
+        (Accelerator.none.value, None, (), ("-etlCheckCertsDefault=0",)),
         (
             Accelerator.nvidia.value,
             "nvidia",
             ("NVIDIA_VISIBLE_DEVICES=all",),
             (
-                "-etlCheckCertsDefault=1",
+                "-etlCheckCertsDefault=0",
                 "-enableAcceleratorDeviceDetection=1",
             ),
         ),
