@@ -17,8 +17,6 @@ jobs:
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v1
-        # with:
-        #   extras: tool.poetry.extras.sqlcipher3-binary
 
       - name: Check Version(s)
         run: poetry run -- nox -s version:check

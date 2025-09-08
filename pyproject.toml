@@ -33,8 +33,6 @@ classifiers = [
     "Topic :: Security :: Cryptography",
 ]
 
-# [tool.poetry.dependencies]
-
 [project.optional-dependencies]
 sqlcipher3-binary = [ 'sqlcipher3-binary >= 0.5.0; sys_platform=="linux"' ]
 sqlcipher3 = [ 'sqlcipher3-binary >= 0.5.0; sys_platform=="darwin"' ]
