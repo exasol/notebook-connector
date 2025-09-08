@@ -17,6 +17,8 @@ jobs:
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v1
+        # with:
+        #   extras: tool.poetry.extras.sqlcipher3-binary
 
       - name: Check Version(s)
         run: poetry run -- nox -s version:check
@@ -81,6 +83,9 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@v1
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install All Optional Dependencies (aka. "extras")
+        run: poetry install --all-extras
 
       - name: Run lint
         run: poetry run -- nox -s lint:code
