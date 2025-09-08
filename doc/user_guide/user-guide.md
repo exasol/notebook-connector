@@ -1,5 +1,19 @@
 # Notebook Connector User Guide
 
+## Installing the Notebook Connector (NC)
+
+Most of NC's dependencies are declared as "optional" in file `pyproject.toml`.
+
+You can install selected dependencies using poetry's CLI option `-E`, e.g.
+```shell
+poetry install -E torch
+```
+
+You can also install all optional dependencies using poetry's CLI option `--all-extras`:
+```shell
+poetry install --all-extras
+```
+
 ## Managing Script Language Containers (SLCs)
 
 The Notebook Connector (NC) supports building different flavors of [Exasol Script Language Containers](https://github.com/exasol/script-languages-release) (SLCs) using the [script-languages-container-tool](https://github.com/exasol/script-languages-container-tool).
