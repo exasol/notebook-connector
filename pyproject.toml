@@ -33,7 +33,7 @@ classifiers = [
     "Topic :: Security :: Cryptography",
 ]
 
-[tool.poetry.dependencies]
+# [tool.poetry.dependencies]
 
 [tool.poetry.extras]
 sqlcipher3-binary = { version = ">=0.5.0", platform = "linux" }
