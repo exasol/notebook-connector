@@ -7,7 +7,7 @@ description = "Accelerate"
 optional = true
 python-versions = ">=3.9.0"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "accelerate-1.10.1-py3-none-any.whl", hash = "sha256:3621cff60b9a27ce798857ece05e2b9f56fcc71631cfb31ccf71f0359c311f11"},
     {file = "accelerate-1.10.1.tar.gz", hash = "sha256:3dea89e433420e4bfac0369cae7e36dcd6a56adfcfd38cdda145c6225eab5df8"},
@@ -76,7 +76,7 @@ files = [
     {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
 ]
-markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "antlr4-python3-runtime"
@@ -124,7 +124,7 @@ files = [
     {file = "argcomplete-3.6.2-py3-none-any.whl", hash = "sha256:65b3133a29ad53fb42c48cf5114752c7ab66c1c38544fdf6460f450c09b42591"},
     {file = "argcomplete-3.6.2.tar.gz", hash = "sha256:d0519b1bc867f5f4f4713c41ad0aba73a4a5f007449716b16f385f2166dc6adf"},
 ]
-markers = {main = "extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"text-ai\""}
 
 [package.extras]
 test = ["coverage", "mypy", "pexpect", "ruff", "wheel"]
@@ -136,7 +136,7 @@ description = "Fast ASN.1 parser and serializer with definitions for private key
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "asn1crypto-1.5.1-py2.py3-none-any.whl", hash = "sha256:db4e40728b728508912cbb3d44f19ce188f218e9eba635821bb4b68564f8fd67"},
     {file = "asn1crypto-1.5.1.tar.gz", hash = "sha256:13ae38502be632115abf8a24cbe5f4da52e3b5231990aff31123c805306ccb9c"},
@@ -164,7 +164,7 @@ description = "Keep all y'all's __all__'s in sync"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"ibis-framework\""
+markers = "extra == \"ibis\""
 files = [
     {file = "atpublic-5.1-py3-none-any.whl", hash = "sha256:135783dbd887fbddb6ef032d104da70c124f2b44b9e2d79df07b9da5334825e3"},
     {file = "atpublic-5.1.tar.gz", hash = "sha256:abc1f4b3dbdd841cc3539e4b5e4f3ad41d658359de704e30cb36da4d4e9d3022"},
@@ -291,7 +291,7 @@ files = [
     {file = "bcrypt-4.3.0-pp311-pypy311_pp73-manylinux_2_34_x86_64.whl", hash = "sha256:57967b7a28d855313a963aaea51bf6df89f833db4320da458e5b3c5ab6d4c938"},
     {file = "bcrypt-4.3.0.tar.gz", hash = "sha256:3a3fd2204178b6d2adcf09cb4f6426ffef54762577a7c9b54c159008cb288c18"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 tests = ["pytest (>=3.2.1,!=3.3.0)"]
@@ -374,7 +374,7 @@ description = "The Blis BLAS-like linear algebra library, as a self-contained C-
 optional = true
 python-versions = "<3.13,>=3.6"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "blis-1.2.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:112443b90698158ada38f71e74c079c3561e802554a51e9850d487c39db25de0"},
     {file = "blis-1.2.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:b9f8c4fbc303f47778d1fd47916cae785b6f3beaa2031502112a8c0aa5eb29f6"},
@@ -498,7 +498,7 @@ description = "Super lightweight function registries for your library"
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "catalogue-2.0.10-py3-none-any.whl", hash = "sha256:58c2de0020aa90f4a2da7dfad161bf7b3b054c86a5f09fcedc0b2b740c109a9f"},
     {file = "catalogue-2.0.10.tar.gz", hash = "sha256:4f56daa940913d3f09d589c191c74e5a6d51762b3a9e37dd53b7437afd6cda15"},
@@ -592,7 +592,7 @@ files = [
     {file = "cffi-1.17.1-cp39-cp39-win_amd64.whl", hash = "sha256:d016c76bdd850f3c626af19b0542c9677ba156e4ee4fccfdd7848803533ef662"},
     {file = "cffi-1.17.1.tar.gz", hash = "sha256:1c39c6016c32bc48dd54561950ebd6836e1670f2ae46128f67cf49e789c52824"},
 ]
-markers = {main = "(extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\" or extra == \"itde\" or extra == \"slc\") and (platform_python_implementation != \"PyPy\" or extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\")"}
+markers = {main = "(extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"itde\" or extra == \"slc\") and (platform_python_implementation != \"PyPy\" or extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")"}
 
 [package.dependencies]
 pycparser = "*"
@@ -722,7 +722,7 @@ files = [
     {file = "click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b"},
     {file = "click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
@@ -734,7 +734,7 @@ description = "pathlib-style classes for cloud storage services."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "cloudpathlib-0.22.0-py3-none-any.whl", hash = "sha256:2fdfaf5c4f85810ae8374d336d04dee371914d0e41a984695ae67308d7a5a009"},
     {file = "cloudpathlib-0.22.0.tar.gz", hash = "sha256:6c0cb0ceab4f66a3a05a84055f9318fb8316cae5e096819f3f8e4be64feab6e9"},
@@ -773,7 +773,7 @@ files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
-markers = {main = "(platform_system == \"Windows\" or extra == \"exasol-text-ai-extension\") and (platform_system == \"Windows\" or sys_platform == \"win32\") and (extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\")", dev = "platform_system == \"Windows\" or sys_platform == \"win32\""}
+markers = {main = "(platform_system == \"Windows\" or extra == \"text-ai\") and (platform_system == \"Windows\" or sys_platform == \"win32\") and (extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "platform_system == \"Windows\" or sys_platform == \"win32\""}
 
 [[package]]
 name = "colorlog"
@@ -786,7 +786,7 @@ files = [
     {file = "colorlog-6.9.0-py3-none-any.whl", hash = "sha256:5906e71acd67cb07a71e779c47c4bcb45fb8c2993eebe9e5adcd6a6f1b283eff"},
     {file = "colorlog-6.9.0.tar.gz", hash = "sha256:bfba54a1b93b94f54e1f4fe48395725a3d92fd2a4af702f6bd70946bdc0c6ac2"},
 ]
-markers = {main = "extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"text-ai\""}
 
 [package.dependencies]
 colorama = {version = "*", markers = "sys_platform == \"win32\""}
@@ -801,7 +801,7 @@ description = "The sweetest config system for Python"
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "confection-0.1.5-py3-none-any.whl", hash = "sha256:e29d3c3f8eac06b3f77eb9dfb4bf2fc6bcc9622a98ca00a698e3d019c6430b14"},
     {file = "confection-0.1.5.tar.gz", hash = "sha256:8e72dd3ca6bd4f48913cd220f10b8275978e740411654b6e8ca6d7008c590f0e"},
@@ -937,7 +937,7 @@ files = [
     {file = "cryptography-45.0.5-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:e357286c1b76403dd384d938f93c46b2b058ed4dfcdce64a770f0537ed3feb6f"},
     {file = "cryptography-45.0.5.tar.gz", hash = "sha256:72e76caa004ab63accdf26023fccd1d087f6d90ec6048ff33ad0445abf7f605a"},
 ]
-markers = {main = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\" or extra == \"itde\" or extra == \"slc\""}
+markers = {main = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"itde\" or extra == \"slc\""}
 
 [package.dependencies]
 cffi = {version = ">=1.14", markers = "platform_python_implementation != \"PyPy\""}
@@ -959,7 +959,7 @@ description = "Lightweight piece tokenization library"
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "curated-tokenizers-0.0.9.tar.gz", hash = "sha256:c93d47e54ab3528a6db2796eeb4bdce5d44e8226c671e42c2f23522ab1d0ce25"},
     {file = "curated_tokenizers-0.0.9-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:19d3a2570dbbd08bbdae4c79d187fb150ea3b663c2f060bd1e4a050a1358cfd1"},
@@ -1007,7 +1007,7 @@ description = "Curated transformer models"
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "curated-transformers-0.1.1.tar.gz", hash = "sha256:4671f03314df30efda2ec2b59bc7692ea34fcea44cb65382342c16684e8a2119"},
     {file = "curated_transformers-0.1.1-py2.py3-none-any.whl", hash = "sha256:d716063d73d803c6925d2dab56fde9b9ab8e89e663c2c0587804944ba488ff01"},
@@ -1046,7 +1046,7 @@ description = "Manage calls to calloc/free through Cython"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "cymem-2.0.11-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:1b4dd8f8c2475c7c9948eefa89c790d83134600858d8d43b90276efd8df3882e"},
     {file = "cymem-2.0.11-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:d46ba0d2e0f749195297d16f2286b55af7d7c084db2b853fdfccece2c000c5dc"},
@@ -1097,7 +1097,7 @@ files = [
     {file = "decorator-5.2.1-py3-none-any.whl", hash = "sha256:d316bb415a2d9e2d2b3abcc4084c6502fc09240e292cd76a76afc106a1c8e04a"},
     {file = "decorator-5.2.1.tar.gz", hash = "sha256:65f266143752f734b0a7cc83c46f4618af75b8c5911b00ccb61d0ac9b6da0360"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "defusedxml"
@@ -1122,7 +1122,7 @@ files = [
     {file = "dependency_groups-1.3.1-py3-none-any.whl", hash = "sha256:51aeaa0dfad72430fcfb7bcdbefbd75f3792e5919563077f30bc0d73f4493030"},
     {file = "dependency_groups-1.3.1.tar.gz", hash = "sha256:78078301090517fd938c19f64a53ce98c32834dfe0dee6b88004a569a6adfefd"},
 ]
-markers = {main = "extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"text-ai\""}
 
 [package.dependencies]
 packaging = "*"
@@ -1142,7 +1142,7 @@ files = [
     {file = "Deprecated-1.2.18-py2.py3-none-any.whl", hash = "sha256:bd5011788200372a32418f888e326a09ff80d0214bd961147cfed01b5c018eec"},
     {file = "deprecated-1.2.18.tar.gz", hash = "sha256:422b6f6d859da6f2ef57857761bfb392480502a64c3028ca9bbe86085d72115d"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 wrapt = ">=1.10,<2"
@@ -1178,7 +1178,7 @@ files = [
     {file = "distlib-0.4.0-py2.py3-none-any.whl", hash = "sha256:9659f7d87e46584a30b5780e43ac7a2143098441670ff0a49d5f9034c54a6c16"},
     {file = "distlib-0.4.0.tar.gz", hash = "sha256:feec40075be03a04501a973d81f633735b4b69f98b05450592310c0f401a4e0d"},
 ]
-markers = {main = "extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"text-ai\""}
 
 [[package]]
 name = "docker"
@@ -1191,7 +1191,7 @@ files = [
     {file = "docker-7.1.0-py3-none-any.whl", hash = "sha256:c96b93b7f0a746f9e77d325bcfb87422a3d8bd4f03136ae8a85b37f1898d5fc0"},
     {file = "docker-7.1.0.tar.gz", hash = "sha256:ad8c70e6e3f8926cb8a92619b832b4ea5299e2831c14284663184e200546fa6c"},
 ]
-markers = {main = "(extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\") and (sys_platform != \"win32\" or extra == \"sagemaker\")", dev = "sys_platform != \"win32\""}
+markers = {main = "(extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\") and (sys_platform != \"win32\" or extra == \"sagemaker\")", dev = "sys_platform != \"win32\""}
 
 [package.dependencies]
 pywin32 = {version = ">=304", markers = "sys_platform == \"win32\""}
@@ -1215,7 +1215,7 @@ files = [
     {file = "docutils-0.21.2-py3-none-any.whl", hash = "sha256:dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2"},
     {file = "docutils-0.21.2.tar.gz", hash = "sha256:3a6b18732edf182daa3cd12775bbb338cf5691468f91eeeb109deff6ebfa986f"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "exasol-advanced-analytics-framework"
@@ -1224,7 +1224,7 @@ description = "Framework for building complex data analysis algorithms with Exas
 optional = true
 python-versions = "<4,>=3.10"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "exasol_advanced_analytics_framework-0.6.1-py3-none-any.whl", hash = "sha256:54ade9879963128e71c60d363f67f5da8b804d3a1662c328ba48a447b578dd7e"},
     {file = "exasol_advanced_analytics_framework-0.6.1.tar.gz", hash = "sha256:af2a68b6768160c16577c2dc59ca4d75b814a6843eddfd3d92bd4dfd5bae6cf5"},
@@ -1252,7 +1252,7 @@ description = "BucketFS utilities for the Python programming language"
 optional = true
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
-markers = "extra == \"bucketfs\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"bucketfs\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "exasol_bucketfs-2.0.0-py3-none-any.whl", hash = "sha256:36281e41085163b23bfad39924a2044637c1f0733ee4dca5b18427d4379a14ac"},
     {file = "exasol_bucketfs-2.0.0.tar.gz", hash = "sha256:7fe53a54a9188b0156f0aee9135fe18078dcaa34e7f22e657e576df3472f2f6a"},
@@ -1275,7 +1275,7 @@ files = [
     {file = "exasol_error_reporting-1.0.0-py3-none-any.whl", hash = "sha256:62370f0925bbcbc847a6ee7d6bff8c82f76bdd1fe833de670af310b6b04ee5d5"},
     {file = "exasol_error_reporting-1.0.0.tar.gz", hash = "sha256:0b81cbb208cd74ca47643532568e467053a29905808e9f29b7b0e4ec5e4e0302"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "exasol-extension-license-protocol"
@@ -1284,7 +1284,7 @@ description = "Software License Generator and Validator for closed-source Extens
 optional = true
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "exasol_extension_license_protocol-0.1.1-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:d88d787d99a84082f8b9aa015c919e00ac5a01d688175d439bc85bb25ce4d4f4"},
 ]
@@ -1306,7 +1306,7 @@ files = [
     {file = "exasol_integration_test_docker_environment-4.2.0-py3-none-any.whl", hash = "sha256:142d03b73412e9c8f196120a4539d8380ca8cec61926c4f1bd1444ac441c1acc"},
     {file = "exasol_integration_test_docker_environment-4.2.0.tar.gz", hash = "sha256:e3820a586b72433802fc31a1db3903ff2c42d53b310cd342fb72cf23a2dd5b2f"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 click = ">=7.0"
@@ -1335,7 +1335,7 @@ description = "A collection of common utilities for Exasol extensions."
 optional = true
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "exasol_python_extension_common-0.11.0-py3-none-any.whl", hash = "sha256:b8655b699d45aa052597836516b2de187d8d3e8dd3bdff43d280e3b9455f28d5"},
     {file = "exasol_python_extension_common-0.11.0.tar.gz", hash = "sha256:f75cfc80aec522b4f0bff49d346e104f88b66af7b78afee88eb43203d60431d0"},
@@ -1402,7 +1402,7 @@ description = "Script Languages Container Tool"
 optional = true
 python-versions = "<4,>=3.10"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "exasol_script_languages_container_tool-3.4.1-py3-none-any.whl", hash = "sha256:d0fabc5a8bfab38c2ad6e13309ebce813051f5e4a13ecfd6e50775bffb733af4"},
     {file = "exasol_script_languages_container_tool-3.4.1.tar.gz", hash = "sha256:43264a85f2dbc6455993923583a0b73a58c5fb7e987852779fd83d89e3c63e2b"},
@@ -1424,7 +1424,7 @@ description = "Software components for text-based AI applications, such as infor
 optional = true
 python-versions = "<3.13,>=3.10"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "exasol_text_ai_extension-0.1.1-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:d652347fcb40a3483f1e269c50a58e097abeddd0f7212f1a36c8cbe412de1804"},
 ]
@@ -1490,7 +1490,7 @@ description = "An Exasol extension for using state-of-the-art pretrained machine
 optional = true
 python-versions = "<4.0.0,>=3.10.0"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "exasol_transformers_extension-2.2.1-py3-none-any.whl", hash = "sha256:a4d8947b4c9962ec4e38ef5ca69d4b755b20752a47e016ebb3f19e7af2e6d485"},
     {file = "exasol_transformers_extension-2.2.1.tar.gz", hash = "sha256:7e5ded1380a7d4ac9cf00ba9feb79e72d0930006ed8fc4262a5989dd56db642d"},
@@ -1539,7 +1539,7 @@ files = [
     {file = "fabric-3.2.2-py3-none-any.whl", hash = "sha256:91c47c0be68b14936c88b34da8a1f55e5710fd28397dac5d4ff2e21558113a6f"},
     {file = "fabric-3.2.2.tar.gz", hash = "sha256:8783ca42e3b0076f08b26901aac6b9d9b1f19c410074e7accfab902c184ff4a3"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 decorator = ">=5"
@@ -1584,7 +1584,7 @@ files = [
     {file = "filelock-3.18.0-py3-none-any.whl", hash = "sha256:c401f4f8377c4464e6db25fff06205fd89bdd83b65eb0488ed1b160f780e21de"},
     {file = "filelock-3.18.0.tar.gz", hash = "sha256:adbc88eabb99d2fec8c9c1b229b171f18afa655400173ddc653d5d01501fb9f2"},
 ]
-markers = {main = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"transformers\" or extra == \"text-ai\""}
 
 [package.extras]
 docs = ["furo (>=2024.8.6)", "sphinx (>=8.1.3)", "sphinx-autodoc-typehints (>=3)"]
@@ -1598,7 +1598,7 @@ description = "File-system specification"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "fsspec-2025.9.0-py3-none-any.whl", hash = "sha256:530dc2a2af60a414a832059574df4a6e10cce927f6f4a78209390fe38955cfb7"},
     {file = "fsspec-2025.9.0.tar.gz", hash = "sha256:19fd429483d25d28b65ec68f9f4adc16c17ea2c7c7bf54ec61360d478fb19c19"},
@@ -1662,7 +1662,7 @@ files = [
     {file = "gitdb-4.0.12-py3-none-any.whl", hash = "sha256:67073e15955400952c6565cc3e707c554a4eea2e428946f7a4c162fab9bd9bcf"},
     {file = "gitdb-4.0.12.tar.gz", hash = "sha256:5ef71f855d191a3326fcfbc0d5da835f26b13fbcba60c32c21091c349ffdb571"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 smmap = ">=3.0.1,<6"
@@ -1678,7 +1678,7 @@ files = [
     {file = "gitpython-3.1.45-py3-none-any.whl", hash = "sha256:8908cb2e02fb3b93b7eb0f2827125cb699869470432cc885f019b8fd0fccff77"},
     {file = "gitpython-3.1.45.tar.gz", hash = "sha256:85b0ee964ceddf211c41b9f27a49086010a190fd8132a24e21f362a4b36a791c"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 gitdb = ">=4.0.1,<5"
@@ -1965,7 +1965,7 @@ description = "Fast transfer of large files with the Hugging Face Hub."
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "(extra == \"transformers\" or extra == \"exasol-text-ai-extension\") and (platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\")"
+markers = "(extra == \"transformers\" or extra == \"text-ai\") and (platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\")"
 files = [
     {file = "hf_xet-1.1.9-cp37-abi3-macosx_10_12_x86_64.whl", hash = "sha256:a3b6215f88638dd7a6ff82cb4e738dcbf3d863bf667997c093a3c990337d1160"},
     {file = "hf_xet-1.1.9-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:9b486de7a64a66f9a172f4b3e0dfe79c9f0a93257c501296a2521a13495a698a"},
@@ -2034,7 +2034,7 @@ description = "Client library to download and publish models, datasets and other
 optional = true
 python-versions = ">=3.8.0"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "huggingface_hub-0.34.4-py3-none-any.whl", hash = "sha256:9b365d781739c93ff90c359844221beef048403f1bc1f1c123c191257c3c890a"},
     {file = "huggingface_hub-0.34.4.tar.gz", hash = "sha256:a4228daa6fb001be3f4f4bdaf9a0db00e1739235702848df00885c9b5742c85c"},
@@ -2078,7 +2078,7 @@ files = [
     {file = "humanfriendly-10.0-py2.py3-none-any.whl", hash = "sha256:1697e1a8a8f550fd43c2865cd84542fc175a61dcb779b6fee18cf6b6ccba1477"},
     {file = "humanfriendly-10.0.tar.gz", hash = "sha256:6b0b831ce8f15f7300721aa49829fc4e83921a9a301cc7f606be6686a2288ddc"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 pyreadline3 = {version = "*", markers = "sys_platform == \"win32\" and python_version >= \"3.8\""}
@@ -2090,7 +2090,7 @@ description = "The portable Python dataframe library"
 optional = true
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
-markers = "extra == \"ibis-framework\""
+markers = "extra == \"ibis\""
 files = [
     {file = "ibis_framework-9.5.0-py3-none-any.whl", hash = "sha256:145fe30d94f111cff332580c275ce77725c5ff7086eede93af0b371649d009c0"},
     {file = "ibis_framework-9.5.0.tar.gz", hash = "sha256:1c8a29277e63ee0dfc289bc8f550164b5e3bdaec1b76b62436c37d331bb4ef84"},
@@ -2217,7 +2217,7 @@ description = "Read metadata from Python packages"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "importlib_metadata-6.11.0-py3-none-any.whl", hash = "sha256:f0afba6205ad8f8947c7d338b5342d5db2afbfd82f9cbef7879a9539cc12eb9b"},
     {file = "importlib_metadata-6.11.0.tar.gz", hash = "sha256:1231cf92d825c9e03cfc4da076a16de6422c863558229ea0b22b675657463443"},
@@ -2242,7 +2242,7 @@ files = [
     {file = "importlib_resources-6.5.2-py3-none-any.whl", hash = "sha256:789cfdc3ed28c78b67a06acb8126751ced69a3d5f79c095a98298cd8a760ccec"},
     {file = "importlib_resources-6.5.2.tar.gz", hash = "sha256:185f87adef5bcc288449d98fb4fba07cea78bc036455dd44c5fc4a2fe78fed2c"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\""]
@@ -2275,7 +2275,7 @@ files = [
     {file = "invoke-2.2.0-py3-none-any.whl", hash = "sha256:6ea924cc53d4f78e3d98bc436b08069a03077e6f85ad1ddaa8a116d7dad15820"},
     {file = "invoke-2.2.0.tar.gz", hash = "sha256:ee6cbb101af1a859c7fe84f2a264c059020b0cb7fe3535f9424300ab568f6bd5"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "isort"
@@ -2304,7 +2304,7 @@ files = [
     {file = "jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67"},
     {file = "jinja2-3.1.6.tar.gz", hash = "sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 MarkupSafe = ">=2.0"
@@ -2336,7 +2336,7 @@ files = [
     {file = "joblib-1.5.1-py3-none-any.whl", hash = "sha256:4719a31f054c7d766948dcd83e9613686b27114f190f717cec7eaa2084f8a74a"},
     {file = "joblib-1.5.1.tar.gz", hash = "sha256:f4f86e351f39fe3d0d32a9f2c3d8af1ee4cec285aafcb27003dda5205576b444"},
 ]
-markers = {main = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"transformers\" or extra == \"text-ai\""}
 
 [[package]]
 name = "jproperties"
@@ -2364,7 +2364,7 @@ files = [
     {file = "jsonpickle-4.1.1-py3-none-any.whl", hash = "sha256:bb141da6057898aa2438ff268362b126826c812a1721e31cf08a6e142910dc91"},
     {file = "jsonpickle-4.1.1.tar.gz", hash = "sha256:f86e18f13e2b96c1c1eede0b7b90095bbb61d99fedc14813c44dc2f361dbbae1"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 cov = ["pytest-cov"]
@@ -2380,7 +2380,7 @@ description = "An implementation of JSON Schema validation for Python"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "jsonschema-4.25.1-py3-none-any.whl", hash = "sha256:3fba0169e345c7175110351d456342c364814cfcf3b964ba4587f22915230a63"},
     {file = "jsonschema-4.25.1.tar.gz", hash = "sha256:e4a9655ce0da0c0b67a085847e00a3a51449e1157f4f75e9fb5aa545e122eb85"},
@@ -2403,7 +2403,7 @@ description = "The JSON Schema meta-schemas and vocabularies, exposed as a Regis
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "jsonschema_specifications-2025.9.1-py3-none-any.whl", hash = "sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe"},
     {file = "jsonschema_specifications-2025.9.1.tar.gz", hash = "sha256:b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d"},
@@ -2419,7 +2419,7 @@ description = "KeyBERT performs keyword extraction with state-of-the-art transfo
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "keybert-0.8.5-py3-none-any.whl", hash = "sha256:005e0eab30c8e85c249ccc6eaad7741357e692591b3eaebe64c40f12614c2ca9"},
     {file = "keybert-0.8.5.tar.gz", hash = "sha256:4b8e4b4d129b319b6266c77b9c8ed34e94e5db42a977c977c8ae58f57343995f"},
@@ -2447,7 +2447,7 @@ description = "Set of vectorizers that extract keyphrases with part-of-speech pa
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "keyphrase_vectorizers-0.0.13-py3-none-any.whl", hash = "sha256:c520c361221e977ab59e5cb5457698b32de0930c640a7d0e7dbba8e6e03a7766"},
     {file = "keyphrase_vectorizers-0.0.13.tar.gz", hash = "sha256:4d984034627065db2f0880d0c96c3ae62717c15c29f358d4a7a28bc79e417ca3"},
@@ -2470,7 +2470,7 @@ description = "Tools for labeling human languages with IETF language tags"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "langcodes-3.5.0-py3-none-any.whl", hash = "sha256:853c69d1a35e0e13da2f427bb68fb2fa4a8f4fb899e0c62ad8df8d073dcfed33"},
     {file = "langcodes-3.5.0.tar.gz", hash = "sha256:1eef8168d07e51e131a2497ffecad4b663f6208e7c3ae3b8dc15c51734a6f801"},
@@ -2490,7 +2490,7 @@ description = "Supplementary data about languages used by the langcodes module"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "language_data-1.3.0-py3-none-any.whl", hash = "sha256:e2ee943551b5ae5f89cd0e801d1fc3835bb0ef5b7e9c3a4e8e17b2b214548fbf"},
     {file = "language_data-1.3.0.tar.gz", hash = "sha256:7600ef8aa39555145d06c89f0c324bf7dab834ea0b0a439d8243762e3ebad7ec"},
@@ -2532,7 +2532,7 @@ files = [
     {file = "lockfile-0.12.2-py2.py3-none-any.whl", hash = "sha256:6c3cb24f344923d30b2785d5ad75182c8ea7ac1b6171b08657258ec7429d50fa"},
     {file = "lockfile-0.12.2.tar.gz", hash = "sha256:6aed02de03cba24efabcd600b30540140634fc06cfa603822d508d5361e9f799"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "luigi"
@@ -2544,7 +2544,7 @@ groups = ["main", "dev"]
 files = [
     {file = "luigi-3.6.0.tar.gz", hash = "sha256:41b14850223c619d9006b30acda733e756b883fc7e60814205576647190c96e3"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 python-daemon = "*"
@@ -2564,7 +2564,7 @@ description = "Static memory-efficient and fast Trie-like structures for Python.
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "marisa_trie-1.3.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:7e957aa4251a8e70b9fe02a16b2d190f18787902da563cb7ba865508b8e8fb04"},
     {file = "marisa_trie-1.3.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:e5888b269e790356ce4525f3e8df1fe866d1497b7d7fb7548cfec883cb985288"},
@@ -2647,7 +2647,7 @@ files = [
     {file = "markdown-it-py-3.0.0.tar.gz", hash = "sha256:e3f60a94fa066dc52ec76661e37c851cb232d92f9886b15cb560aaada2df8feb"},
     {file = "markdown_it_py-3.0.0-py3-none-any.whl", hash = "sha256:355216845c60bd96232cd8d8c40e8f9765cc86f46880e43a8fd22dc1a1a8cab1"},
 ]
-markers = {main = "extra == \"ibis-framework\" or extra == \"sagemaker\" or extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"ibis\" or extra == \"sagemaker\" or extra == \"text-ai\""}
 
 [package.dependencies]
 mdurl = ">=0.1,<1.0"
@@ -2732,7 +2732,7 @@ files = [
     {file = "MarkupSafe-3.0.2-cp39-cp39-win_amd64.whl", hash = "sha256:6e296a513ca3d94054c2c881cc913116e90fd030ad1c656b3869762b754f5f8a"},
     {file = "markupsafe-3.0.2.tar.gz", hash = "sha256:ee55d3edf80167e48ea11a923c7386f4669df67d7994554387f84e7d8b0a2bf0"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "mccabe"
@@ -2777,7 +2777,7 @@ files = [
     {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
     {file = "mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba"},
 ]
-markers = {main = "extra == \"ibis-framework\" or extra == \"sagemaker\" or extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"ibis\" or extra == \"sagemaker\" or extra == \"text-ai\""}
 
 [[package]]
 name = "mock"
@@ -2804,7 +2804,7 @@ description = "Python library for arbitrary-precision floating-point arithmetic"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "mpmath-1.3.0-py3-none-any.whl", hash = "sha256:a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c"},
     {file = "mpmath-1.3.0.tar.gz", hash = "sha256:7a28eb2a9774d00c7bc92411c19a89209d5da7c4c9a9e227be8330a23a25b91f"},
@@ -2925,7 +2925,7 @@ description = "Cython bindings for MurmurHash"
 optional = true
 python-versions = "<3.14,>=3.6"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "murmurhash-1.0.13-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:136c7017e7d59ef16f065c2285bf5d30557ad8260adf47714c3c2802725e3e07"},
     {file = "murmurhash-1.0.13-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:d0292f6fcd99361157fafad5c86d508f367931b7699cce1e14747364596950cb"},
@@ -3070,7 +3070,7 @@ files = [
     {file = "netaddr-1.3.0-py3-none-any.whl", hash = "sha256:c2c6a8ebe5554ce33b7d5b3a306b71bbb373e000bbbf2350dd5213cc56e3dbbe"},
     {file = "netaddr-1.3.0.tar.gz", hash = "sha256:5c3c3d9895b551b763779ba7db7a03487dc1f8e3b385af819af341ae9ef6e48a"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 nicer-shell = ["ipython"]
@@ -3086,7 +3086,7 @@ files = [
     {file = "networkx-3.4.2-py3-none-any.whl", hash = "sha256:df5d4365b724cf81b8c6a7312509d0c22386097011ad1abe274afd5e9d3bbc5f"},
     {file = "networkx-3.4.2.tar.gz", hash = "sha256:307c3669428c5362aab27c8a1260aa8f47c4e91d3891f48be0141738d8d053e1"},
 ]
-markers = {main = "python_version == \"3.10\" and (extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\")", dev = "python_version == \"3.10\""}
+markers = {main = "python_version == \"3.10\" and (extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "python_version == \"3.10\""}
 
 [package.extras]
 default = ["matplotlib (>=3.7)", "numpy (>=1.24)", "pandas (>=2.0)", "scipy (>=1.10,!=1.11.0,!=1.11.1)"]
@@ -3107,7 +3107,7 @@ files = [
     {file = "networkx-3.5-py3-none-any.whl", hash = "sha256:0030d386a9a06dee3565298b4a734b68589749a544acbb6c412dc9e2489ec6ec"},
     {file = "networkx-3.5.tar.gz", hash = "sha256:d4c6f9cf81f52d69230866796b82afbccdec3db7ae4fbd1b65ea750feed50037"},
 ]
-markers = {main = "python_version >= \"3.11\" and (extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\")", dev = "python_version >= \"3.11\""}
+markers = {main = "python_version >= \"3.11\" and (extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "python_version >= \"3.11\""}
 
 [package.extras]
 default = ["matplotlib (>=3.8)", "numpy (>=1.25)", "pandas (>=2.0)", "scipy (>=1.11.2)"]
@@ -3125,7 +3125,7 @@ description = "Natural Language Toolkit"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "nltk-3.9.1-py3-none-any.whl", hash = "sha256:4fa26829c5b00715afe3061398a8989dc643b92ce7dd93fb4585a70930d168a1"},
     {file = "nltk-3.9.1.tar.gz", hash = "sha256:87d127bd3de4bd89a4f81265e5fa59cb1b199b27440175370f7417d2bc7ae868"},
@@ -3168,7 +3168,7 @@ files = [
     {file = "nox-2025.5.1-py3-none-any.whl", hash = "sha256:56abd55cf37ff523c254fcec4d152ed51e5fe80e2ab8317221d8b828ac970a31"},
     {file = "nox-2025.5.1.tar.gz", hash = "sha256:2a571dfa7a58acc726521ac3cd8184455ebcdcbf26401c7b737b5bc6701427b2"},
 ]
-markers = {main = "extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"text-ai\""}
 
 [package.dependencies]
 argcomplete = ">=1.9.4,<4"
@@ -3190,7 +3190,7 @@ description = "Fundamental package for array computing in Python"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\" or extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"sagemaker\""
+markers = "extra == \"text-ai\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"sagemaker\""
 files = [
     {file = "numpy-1.26.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:9ff0f4f29c51e2803569d7a51c2304de5554655a60c5d776e35b4a41413830d0"},
     {file = "numpy-1.26.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:2e4ee3380d6de9c9ec04745830fd9e2eccb3e6cf790d39d7b98ffd19b0dd754a"},
@@ -3237,7 +3237,7 @@ description = "CUBLAS native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_cublas_cu12-12.8.4.1-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:b86f6dd8935884615a0683b663891d43781b819ac4f2ba2b0c9604676af346d0"},
     {file = "nvidia_cublas_cu12-12.8.4.1-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:8ac4e771d5a348c551b2a426eda6193c19aa630236b418086020df5ba9667142"},
@@ -3251,7 +3251,7 @@ description = "CUDA profiling tools runtime libs."
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_cuda_cupti_cu12-12.8.90-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:4412396548808ddfed3f17a467b104ba7751e6b58678a4b840675c56d21cf7ed"},
     {file = "nvidia_cuda_cupti_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:ea0cb07ebda26bb9b29ba82cda34849e73c166c18162d3913575b0c9db9a6182"},
@@ -3265,7 +3265,7 @@ description = "NVRTC native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_cuda_nvrtc_cu12-12.8.93-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl", hash = "sha256:a7756528852ef889772a84c6cd89d41dfa74667e24cca16bb31f8f061e3e9994"},
     {file = "nvidia_cuda_nvrtc_cu12-12.8.93-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:fc1fec1e1637854b4c0a65fb9a8346b51dd9ee69e61ebaccc82058441f15bce8"},
@@ -3279,7 +3279,7 @@ description = "CUDA Runtime native Libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_cuda_runtime_cu12-12.8.90-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:52bf7bbee900262ffefe5e9d5a2a69a30d97e2bc5bb6cc866688caa976966e3d"},
     {file = "nvidia_cuda_runtime_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:adade8dcbd0edf427b7204d480d6066d33902cab2a4707dcfc48a2d0fd44ab90"},
@@ -3293,7 +3293,7 @@ description = "cuDNN runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_cudnn_cu12-9.10.2.21-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:c9132cc3f8958447b4910a1720036d9eff5928cc3179b0a51fb6d167c6cc87d8"},
     {file = "nvidia_cudnn_cu12-9.10.2.21-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:949452be657fa16687d0930933f032835951ef0892b37d2d53824d1a84dc97a8"},
@@ -3310,7 +3310,7 @@ description = "CUFFT native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_cufft_cu12-11.3.3.83-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:848ef7224d6305cdb2a4df928759dca7b1201874787083b6e7550dd6765ce69a"},
     {file = "nvidia_cufft_cu12-11.3.3.83-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:4d2dd21ec0b88cf61b62e6b43564355e5222e4a3fb394cac0db101f2dd0d4f74"},
@@ -3327,7 +3327,7 @@ description = "cuFile GPUDirect libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_cufile_cu12-1.13.1.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:1d069003be650e131b21c932ec3d8969c1715379251f8d23a1860554b1cb24fc"},
     {file = "nvidia_cufile_cu12-1.13.1.3-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:4beb6d4cce47c1a0f1013d72e02b0994730359e17801d395bdcbf20cfb3bb00a"},
@@ -3340,7 +3340,7 @@ description = "CURAND native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_curand_cu12-10.3.9.90-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:dfab99248034673b779bc6decafdc3404a8a6f502462201f2f31f11354204acd"},
     {file = "nvidia_curand_cu12-10.3.9.90-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:b32331d4f4df5d6eefa0554c565b626c7216f87a06a4f56fab27c3b68a830ec9"},
@@ -3354,7 +3354,7 @@ description = "CUDA solver native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_cusolver_cu12-11.7.3.90-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:db9ed69dbef9715071232caa9b69c52ac7de3a95773c2db65bdba85916e4e5c0"},
     {file = "nvidia_cusolver_cu12-11.7.3.90-py3-none-manylinux_2_27_x86_64.whl", hash = "sha256:4376c11ad263152bd50ea295c05370360776f8c3427b30991df774f9fb26c450"},
@@ -3373,7 +3373,7 @@ description = "CUSPARSE native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_cusparse_cu12-12.5.8.93-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:9b6c161cb130be1a07a27ea6923df8141f3c295852f4b260c65f18f3e0a091dc"},
     {file = "nvidia_cusparse_cu12-12.5.8.93-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:1ec05d76bbbd8b61b06a80e1eaf8cf4959c3d4ce8e711b65ebd0443bb0ebb13b"},
@@ -3390,7 +3390,7 @@ description = "NVIDIA cuSPARSELt"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_cusparselt_cu12-0.7.1-py3-none-manylinux2014_aarch64.whl", hash = "sha256:8878dce784d0fac90131b6817b607e803c36e629ba34dc5b433471382196b6a5"},
     {file = "nvidia_cusparselt_cu12-0.7.1-py3-none-manylinux2014_x86_64.whl", hash = "sha256:f1bb701d6b930d5a7cea44c19ceb973311500847f81b634d802b7b539dc55623"},
@@ -3404,7 +3404,7 @@ description = "NVIDIA Collective Communication Library (NCCL) Runtime"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_nccl_cu12-2.27.3-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:9ddf1a245abc36c550870f26d537a9b6087fb2e2e3d6e0ef03374c6fd19d984f"},
     {file = "nvidia_nccl_cu12-2.27.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:adf27ccf4238253e0b826bce3ff5fa532d65fc42322c8bfdfaf28024c0fbe039"},
@@ -3417,7 +3417,7 @@ description = "Nvidia JIT LTO Library"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_nvjitlink_cu12-12.8.93-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl", hash = "sha256:81ff63371a7ebd6e6451970684f916be2eab07321b73c9d244dc2b4da7f73b88"},
     {file = "nvidia_nvjitlink_cu12-12.8.93-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:adccd7161ace7261e01bb91e44e88da350895c270d23f744f0820c818b7229e7"},
@@ -3431,7 +3431,7 @@ description = "NVIDIA Tools Extension"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "nvidia_nvtx_cu12-12.8.90-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:d7ad891da111ebafbf7e015d34879f7112832fc239ff0d7d776b6cb685274615"},
     {file = "nvidia_nvtx_cu12-12.8.90-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:5b17e2001cc0d751a5bc2c6ec6d26ad95913324a4adb86788c944f8ce9ba441f"},
@@ -3462,7 +3462,7 @@ description = "TLS (SSL) sockets, key generation, encryption, decryption, signin
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "oscrypto-1.3.0-py2.py3-none-any.whl", hash = "sha256:2b2f1d2d42ec152ca90ccb5682f3e051fb55986e1b170ebde472b133713e7085"},
     {file = "oscrypto-1.3.0.tar.gz", hash = "sha256:6f5fef59cb5b3708321db7cca56aed8ad7e662853351e7991fcf60ec606d47a4"},
@@ -3500,7 +3500,7 @@ files = [
     {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
     {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
 ]
-markers = {main = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "pandas"
@@ -3509,7 +3509,7 @@ description = "Powerful data structures for data analysis, time series, and stat
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "pandas-2.3.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:52bc29a946304c360561974c6542d1dd628ddafa69134a7131fdfd6a5d7a1a35"},
     {file = "pandas-2.3.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:220cc5c35ffaa764dd5bb17cf42df283b5cb7fdf49e10a7b053a06c9cb48ee2b"},
@@ -3601,7 +3601,7 @@ files = [
     {file = "paramiko-3.5.1-py3-none-any.whl", hash = "sha256:43b9a0501fc2b5e70680388d9346cf252cfb7d00b0667c39e80eb43a408b8f61"},
     {file = "paramiko-3.5.1.tar.gz", hash = "sha256:b2c665bc45b2b215bd7d7f039901b14b067da00f3a11e6640995fd58f2664822"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 bcrypt = ">=3.2"
@@ -3620,7 +3620,7 @@ description = "Easy-to-use parser combinators, for parsing in pure Python"
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "extra == \"ibis-framework\""
+markers = "extra == \"ibis\""
 files = [
     {file = "parsy-2.1-py3-none-any.whl", hash = "sha256:8f18e7b11985e7802e7e3ecbd8291c6ca243d29820b1186e4c84605db4efffa0"},
     {file = "parsy-2.1.tar.gz", hash = "sha256:fd5dd18d7b0b61f8275ee88665f430a20c02cf5a82d88557f35330530186d7ac"},
@@ -3679,7 +3679,7 @@ description = "Python Imaging Library (Fork)"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "pillow-11.3.0-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:1b9c17fd4ace828b3003dfd1e30bff24863e0eb59b535e8f80194d9cc7ecf860"},
     {file = "pillow-11.3.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:65dc69160114cdd0ca0f35cb434633c75e8e7fad4cf855177a05bf38678f73ad"},
@@ -3884,7 +3884,7 @@ files = [
     {file = "platformdirs-4.3.8-py3-none-any.whl", hash = "sha256:ff7059bb7eb1179e2685604f4aaf157cfd9535242bd23742eadc3c13542139b4"},
     {file = "platformdirs-4.3.8.tar.gz", hash = "sha256:3d512d96e16bcb959a814c9f348431070822a6496326a4be0911c40b5a74c2bc"},
 ]
-markers = {main = "extra == \"sagemaker\" or extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"sagemaker\" or extra == \"text-ai\""}
 
 [package.extras]
 docs = ["furo (>=2024.8.6)", "proselint (>=0.14)", "sphinx (>=8.1.3)", "sphinx-autodoc-typehints (>=3)"]
@@ -3918,7 +3918,7 @@ files = [
     {file = "portalocker-2.10.1-py3-none-any.whl", hash = "sha256:53a5984ebc86a025552264b459b46a2086e269b21823cb572f8f28ee759e45bf"},
     {file = "portalocker-2.10.1.tar.gz", hash = "sha256:ef1bf844e878ab08aee7e40184156e1151f228f103aa5c6bd0724cc330960f8f"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 pywin32 = {version = ">=226", markers = "platform_system == \"Windows\""}
@@ -3983,7 +3983,7 @@ description = "Cython hash table that trusts the keys are pre-hashed"
 optional = true
 python-versions = "<3.14,>=3.6"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "preshed-3.0.10-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:14593c32e6705fda0fd54684293ca079530418bb1fb036dcbaa6c0ef0f144b7d"},
     {file = "preshed-3.0.10-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:ba1960a3996678aded882260133853e19e3a251d9f35a19c9d7d830c4238c4eb"},
@@ -4085,7 +4085,7 @@ description = "Cross-platform lib for process and system monitoring in Python.  
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "psutil-7.0.0-cp36-abi3-macosx_10_9_x86_64.whl", hash = "sha256:101d71dc322e3cffd7cea0650b09b3d08b8e7c4109dd6809fe452dfd00e58b25"},
     {file = "psutil-7.0.0-cp36-abi3-macosx_11_0_arm64.whl", hash = "sha256:39db632f6bb862eeccf56660871433e111b6ea58f2caea825571951d4b6aa3da"},
@@ -4125,7 +4125,7 @@ description = "Python library for Apache Arrow"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"ibis-framework\""
+markers = "extra == \"ibis\""
 files = [
     {file = "pyarrow-17.0.0-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:a5c8b238d47e48812ee577ee20c9a2779e6a5904f1708ae240f53ecbee7c9f07"},
     {file = "pyarrow-17.0.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:db023dc4c6cae1015de9e198d41250688383c3f9af8f565370ab2b4cb5f62655"},
@@ -4178,7 +4178,7 @@ description = ""
 optional = true
 python-versions = ">=3.5"
 groups = ["main"]
-markers = "extra == \"ibis-framework\""
+markers = "extra == \"ibis\""
 files = [
     {file = "pyarrow_hotfix-0.7-py3-none-any.whl", hash = "sha256:3236f3b5f1260f0e2ac070a55c1a7b339c4bb7267839bd2015e283234e758100"},
     {file = "pyarrow_hotfix-0.7.tar.gz", hash = "sha256:59399cd58bdd978b2e42816a4183a55c6472d4e33d183351b6069f11ed42661d"},
@@ -4191,7 +4191,7 @@ description = "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs 
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "pyasn1-0.6.1-py3-none-any.whl", hash = "sha256:0d632f46f2ba09143da3a8afe9e33fb6f92fa2320ab7e886e2d0f7672af84629"},
     {file = "pyasn1-0.6.1.tar.gz", hash = "sha256:6f580d2bdd84365380830acf45550f2511469f673cb4a5ae3857a3170128b034"},
@@ -4208,7 +4208,7 @@ files = [
     {file = "pycparser-2.22-py3-none-any.whl", hash = "sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"},
     {file = "pycparser-2.22.tar.gz", hash = "sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6"},
 ]
-markers = {main = "(extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\" or extra == \"itde\" or extra == \"slc\") and (platform_python_implementation != \"PyPy\" or extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\")"}
+markers = {main = "(extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"itde\" or extra == \"slc\") and (platform_python_implementation != \"PyPy\" or extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")"}
 
 [[package]]
 name = "pydantic"
@@ -4221,7 +4221,7 @@ files = [
     {file = "pydantic-2.11.7-py3-none-any.whl", hash = "sha256:dde5df002701f6de26248661f6835bbe296a47bf73990135c7d07ce741b9623b"},
     {file = "pydantic-2.11.7.tar.gz", hash = "sha256:d989c3c6cb79469287b1569f7447a17848c998458d49ebe294e975b9baf0f0db"},
 ]
-markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 annotated-types = ">=0.6.0"
@@ -4341,7 +4341,7 @@ files = [
     {file = "pydantic_core-2.33.2-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:2807668ba86cb38c6817ad9bc66215ab8584d1d304030ce4f0887336f28a5e27"},
     {file = "pydantic_core-2.33.2.tar.gz", hash = "sha256:7cb8bc3605c29176e1b105350d2e6474142d7c1bd1d9327c4a9bdb46bf827acc"},
 ]
-markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
@@ -4357,7 +4357,7 @@ files = [
     {file = "pydot-4.0.1-py3-none-any.whl", hash = "sha256:869c0efadd2708c0be1f916eb669f3d664ca684bc57ffb7ecc08e70d5e93fee6"},
     {file = "pydot-4.0.1.tar.gz", hash = "sha256:c2148f681c4a33e08bf0e26a9e5f8e4099a82e0e2a068098f32ce86577364ad5"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 pyparsing = ">=3.1.0"
@@ -4376,7 +4376,7 @@ description = "Exasol python driver with extra features"
 optional = true
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
-markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "pyexasol-0.27.0-py3-none-any.whl", hash = "sha256:041e1db1ae8f26fa24876056ce8da5830e346fc47734847a95cc960ac056d0c6"},
     {file = "pyexasol-0.27.0.tar.gz", hash = "sha256:795490cd810617bf927e0e90b88347facb5e66f58e0e16378fef5d22fadacd60"},
@@ -4420,7 +4420,7 @@ files = [
     {file = "pygments-2.19.2-py3-none-any.whl", hash = "sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b"},
     {file = "pygments-2.19.2.tar.gz", hash = "sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887"},
 ]
-markers = {main = "extra == \"ibis-framework\" or extra == \"sagemaker\" or extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"ibis\" or extra == \"sagemaker\" or extra == \"text-ai\""}
 
 [package.extras]
 windows-terminal = ["colorama (>=0.4.6)"]
@@ -4432,7 +4432,7 @@ description = "Validates X.509 certificates and paths; forked from wbond/certval
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "pyhanko_certvalidator-0.28.0-py3-none-any.whl", hash = "sha256:37d02f61974175843ce36b467c0d9d7eae78caa6e356beeb753360c351494dc2"},
     {file = "pyhanko_certvalidator-0.28.0.tar.gz", hash = "sha256:6b2911520a3e9cf24a640f67488fadac82ad3818f4256ddfb7e8fa1fada80f2d"},
@@ -4497,7 +4497,7 @@ files = [
     {file = "PyNaCl-1.5.0-cp36-abi3-win_amd64.whl", hash = "sha256:20f42270d27e1b6a29f54032090b972d97f0a1b0948cc52392041ef7831fee93"},
     {file = "PyNaCl-1.5.0.tar.gz", hash = "sha256:8ac7448f09ab85811607bdd21ec2464495ac8b7c66d146bf545b0f08fb9220ba"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 cffi = ">=1.4.1"
@@ -4513,7 +4513,7 @@ description = "Python wrapper module around the OpenSSL library"
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "pyopenssl-25.1.0-py3-none-any.whl", hash = "sha256:2b11f239acc47ac2e5aca04fd7fa829800aeee22a2eb30d744572a157bd8a1ab"},
     {file = "pyopenssl-25.1.0.tar.gz", hash = "sha256:8d031884482e0c67ee92bf9a4d8cceb08d92aba7136432ffb0703c5280fc205b"},
@@ -4538,7 +4538,7 @@ files = [
     {file = "pyparsing-3.2.3-py3-none-any.whl", hash = "sha256:a749938e02d6fd0b59b356ca504a24982314bb090c383e3cf201c95ef7e2bfcf"},
     {file = "pyparsing-3.2.3.tar.gz", hash = "sha256:b9c13f1ab8b3b542f72e28f634bad4de758ab3ce4546e4301970ad6fa77c38be"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 diagrams = ["jinja2", "railroad-diagrams"]
@@ -4554,7 +4554,7 @@ files = [
     {file = "pyreadline3-3.5.4-py3-none-any.whl", hash = "sha256:eaf8e6cc3c49bcccf145fc6067ba8643d1df34d604a1ec0eccbf7a18e6d3fae6"},
     {file = "pyreadline3-3.5.4.tar.gz", hash = "sha256:8d57d53039a1c75adba8e50dd3d992b28143480816187ea5efbd5c78e6c885b7"},
 ]
-markers = {main = "sys_platform == \"win32\" and (extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\")", dev = "sys_platform == \"win32\""}
+markers = {main = "sys_platform == \"win32\" and (extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "sys_platform == \"win32\""}
 
 [package.extras]
 dev = ["build", "flake8", "mypy", "pytest", "twine"]
@@ -4662,7 +4662,7 @@ files = [
     {file = "python_daemon-3.1.2-py3-none-any.whl", hash = "sha256:b906833cef63502994ad48e2eab213259ed9bb18d54fa8774dcba2ff7864cec6"},
     {file = "python_daemon-3.1.2.tar.gz", hash = "sha256:f7b04335adc473de877f5117e26d5f1142f4c9f7cd765408f0877757be5afbf4"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 lockfile = ">=0.10"
@@ -4696,7 +4696,7 @@ description = "World timezone definitions, modern and historical"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00"},
     {file = "pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3"},
@@ -4746,7 +4746,7 @@ files = [
     {file = "pywin32-311-cp39-cp39-win_amd64.whl", hash = "sha256:e0c4cfb0621281fe40387df582097fd796e80430597cb9944f0ae70447bacd91"},
     {file = "pywin32-311-cp39-cp39-win_arm64.whl", hash = "sha256:62ea666235135fee79bb154e695f3ff67370afefd71bd7fea7512fc70ef31e3d"},
 ]
-markers = {main = "(extra == \"sagemaker\" or platform_system == \"Windows\") and (extra == \"sagemaker\" or extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\") and (sys_platform == \"win32\" or platform_system == \"Windows\")", dev = "platform_system == \"Windows\""}
+markers = {main = "(extra == \"sagemaker\" or platform_system == \"Windows\") and (extra == \"sagemaker\" or extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\") and (sys_platform == \"win32\" or platform_system == \"Windows\")", dev = "platform_system == \"Windows\""}
 
 [[package]]
 name = "pyyaml"
@@ -4810,7 +4810,7 @@ files = [
     {file = "PyYAML-6.0.2-cp39-cp39-win_amd64.whl", hash = "sha256:39693e1f8320ae4f43943590b49779ffb98acb81f788220ea932a6b6c51004d8"},
     {file = "pyyaml-6.0.2.tar.gz", hash = "sha256:d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"},
 ]
-markers = {main = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "pyzmq"
@@ -4819,7 +4819,7 @@ description = "Python bindings for 0MQ"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "pyzmq-26.4.0-cp310-cp310-macosx_10_15_universal2.whl", hash = "sha256:0329bdf83e170ac133f44a233fc651f6ed66ef8e66693b5af7d54f45d1ef5918"},
     {file = "pyzmq-26.4.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:398a825d2dea96227cf6460ce0a174cf7657d6f6827807d4d1ae9d0f9ae64315"},
@@ -4926,7 +4926,7 @@ description = "JSON Referencing + Python"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "referencing-0.36.2-py3-none-any.whl", hash = "sha256:e8699adbbf8b5c7de96d8ffa0eb5c158b3beafce084968e2ea8bb08c6794dcd0"},
     {file = "referencing-0.36.2.tar.gz", hash = "sha256:df2e89862cd09deabbdba16944cc3f10feb6b3e6f18e902f7cc25609a34775aa"},
@@ -4944,7 +4944,7 @@ description = "Alternative regular expression module, to replace re."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "regex-2025.9.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:c5aa2a6a73bf218515484b36a0d20c6ad9dc63f6339ff6224147b0e2c095ee55"},
     {file = "regex-2025.9.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:8c2ff5c01d5e47ad5fc9d31bcd61e78c2fa0068ed00cab86b7320214446da766"},
@@ -5088,7 +5088,7 @@ files = [
     {file = "rich-13.9.4-py3-none-any.whl", hash = "sha256:6049d5e6ec054bf2779ab3358186963bac2ea89175919d699e378b99738c2a90"},
     {file = "rich-13.9.4.tar.gz", hash = "sha256:439594978a49a09530cff7ebc4b5c7103ef57baf48d5ea3184f21d9a2befa098"},
 ]
-markers = {main = "extra == \"ibis-framework\" or extra == \"sagemaker\" or extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"ibis\" or extra == \"sagemaker\" or extra == \"text-ai\""}
 
 [package.dependencies]
 markdown-it-py = ">=2.2.0"
@@ -5105,7 +5105,7 @@ description = "Python bindings to Rust's persistent data structures (rpds)"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "rpds_py-0.27.1-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:68afeec26d42ab3b47e541b272166a0b4400313946871cba3ed3a4fc0cab1cef"},
     {file = "rpds_py-0.27.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:74e5b2f7bb6fa38b1b10546d27acbacf2a022a8b5543efb06cfebc72a59c85be"},
@@ -5271,7 +5271,7 @@ description = "Pure-Python RSA implementation"
 optional = true
 python-versions = "<4,>=3.6"
 groups = ["main"]
-markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "rsa-4.9.1-py3-none-any.whl", hash = "sha256:68635866661c6836b8d39430f97a996acbd61bfa49406748ea243539fe239762"},
     {file = "rsa-4.9.1.tar.gz", hash = "sha256:e7bdbfdb5497da4c07dfd35530e1a902659db6ff241e39d9953cad06ebd0ae75"},
@@ -5306,7 +5306,7 @@ description = "SacreMoses"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "sacremoses-0.1.1-py3-none-any.whl", hash = "sha256:31e04c98b169bfd902144824d191825cd69220cdb4ae4bcf1ec58a7db5587b1a"},
     {file = "sacremoses-0.1.1.tar.gz", hash = "sha256:b6fd5d3a766b02154ed80b962ddca91e1fd25629c0978c7efba21ebccf663934"},
@@ -5325,7 +5325,7 @@ description = ""
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "safetensors-0.6.2-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:9c85ede8ec58f120bad982ec47746981e210492a6db876882aa021446af8ffba"},
     {file = "safetensors-0.6.2-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:d6675cf4b39c98dbd7d940598028f3742e0375a6b4d4277e76beb0c35f4b843b"},
@@ -5454,7 +5454,7 @@ description = "A set of python modules for machine learning and data mining"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "scikit_learn-1.7.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:406204dd4004f0517f0b23cf4b28c6245cbd51ab1b6b78153bc784def214946d"},
     {file = "scikit_learn-1.7.1-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:16af2e44164f05d04337fd1fc3ae7c4ea61fd9b0d527e22665346336920fe0e1"},
@@ -5506,7 +5506,7 @@ description = "Fundamental algorithms for scientific computing in Python"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"exasol-text-ai-extension\""
+markers = "python_version == \"3.10\" and extra == \"text-ai\""
 files = [
     {file = "scipy-1.15.3-cp310-cp310-macosx_10_13_x86_64.whl", hash = "sha256:a345928c86d535060c9c2b25e71e87c39ab2f22fc96e9636bd74d1dbf9de448c"},
     {file = "scipy-1.15.3-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:ad3432cb0f9ed87477a8d97f03b763fd1d57709f1bbde3c9369b1dff5503b253"},
@@ -5571,7 +5571,7 @@ description = "Fundamental algorithms for scientific computing in Python"
 optional = true
 python-versions = ">=3.11"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"exasol-text-ai-extension\""
+markers = "python_version >= \"3.11\" and extra == \"text-ai\""
 files = [
     {file = "scipy-1.16.1-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:c033fa32bab91dc98ca59d0cf23bb876454e2bb02cbe592d5023138778f70030"},
     {file = "scipy-1.16.1-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:6e5c2f74e5df33479b5cd4e97a9104c511518fbd979aa9b8f6aec18b2e9ecae7"},
@@ -5645,7 +5645,7 @@ description = "Embeddings, Retrieval, and Reranking"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "sentence_transformers-5.1.0-py3-none-any.whl", hash = "sha256:fc803929f6a3ce82e2b2c06e0efed7a36de535c633d5ce55efac0b710ea5643e"},
     {file = "sentence_transformers-5.1.0.tar.gz", hash = "sha256:70c7630697cc1c64ffca328d6e8688430ebd134b3c2df03dc07cb3a016b04739"},
@@ -5679,7 +5679,7 @@ files = [
     {file = "setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922"},
     {file = "setuptools-80.9.0.tar.gz", hash = "sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c"},
 ]
-markers = {main = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\") or extra == \"exasol-text-ai-extension\" or python_version == \"3.12\" and (extra == \"exasol-text-ai-extension\" or extra == \"transformers\")"}
+markers = {main = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\") or extra == \"text-ai\" or python_version == \"3.12\" and (extra == \"text-ai\" or extra == \"transformers\")"}
 
 [package.extras]
 check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\"", "ruff (>=0.8.0) ; sys_platform != \"cygwin\""]
@@ -5701,7 +5701,7 @@ files = [
     {file = "shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"},
     {file = "shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de"},
 ]
-markers = {main = "extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"text-ai\""}
 
 [[package]]
 name = "shibuya"
@@ -5837,7 +5837,7 @@ files = [
     {file = "simplejson-3.20.1-py3-none-any.whl", hash = "sha256:8a6c1bbac39fa4a79f83cbf1df6ccd8ff7069582a9fd8db1e52cea073bc2c697"},
     {file = "simplejson-3.20.1.tar.gz", hash = "sha256:e64139b4ec4f1f24c142ff7dcafe55a22b811a74d86d66560c8815687143037d"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "six"
@@ -5858,7 +5858,7 @@ description = "Utils for streaming large files (S3, HDFS, GCS, SFTP, Azure Blob 
 optional = true
 python-versions = "<4.0,>=3.8"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "smart_open-7.3.1-py3-none-any.whl", hash = "sha256:e243b2e7f69d6c0c96dd763d6fbbedbb4e0e4fc6d74aa007acc5b018d523858c"},
     {file = "smart_open-7.3.1.tar.gz", hash = "sha256:b33fee8dffd206f189d5e704106a8723afb4210d2ff47e0e1f7fbe436187a990"},
@@ -5902,7 +5902,7 @@ files = [
     {file = "smmap-5.0.2-py3-none-any.whl", hash = "sha256:b30115f0def7d7531d22a0fb6502488d879e75b260a9db4d0819cfb25403af5e"},
     {file = "smmap-5.0.2.tar.gz", hash = "sha256:26ea65a03958fa0c8a1c7e8c7a58fdc77221b8910f6be2131affade476898ad5"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "sniffio"
@@ -5939,7 +5939,7 @@ files = [
     {file = "sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"},
     {file = "sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88"},
 ]
-markers = {main = "extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"text-ai\""}
 
 [[package]]
 name = "sortedcontainers-pydantic"
@@ -5948,7 +5948,7 @@ description = "Pydantic support for the sortedcontainers package."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "sortedcontainers_pydantic-2.0.0-py3-none-any.whl", hash = "sha256:1c38a05f1a8618189bdd8b87f0c3bc8cc1196e6c39f0e30f694b709ba3e2a508"},
     {file = "sortedcontainers_pydantic-2.0.0.tar.gz", hash = "sha256:0cb3abfbda64dc1fa2365b578ddc3a259c7d75daeae76d2f9087f5ebc1f8f1fe"},
@@ -5981,7 +5981,7 @@ description = "Industrial-strength Natural Language Processing (NLP) in Python"
 optional = true
 python-versions = "<3.13,>=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "spacy-3.8.6-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:4ef75f98747c0673c9035156f0ed85ae076da240de72ed31e0ecce13080f7bbe"},
     {file = "spacy-3.8.6-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:852ae5e19f0c14daa07699216cc35be8991b303aa55ad485fd7531ca0ab626b8"},
@@ -6069,7 +6069,7 @@ description = "A spaCy package for the Rust tokenizations library"
 optional = true
 python-versions = "<3.14,>=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "spacy_alignments-0.9.2-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:2ace14b2d0d7028460d03d7440990e17b2ad65cd8009350ae375eddf1aea676f"},
     {file = "spacy_alignments-0.9.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:646096245fee96a582c4bf72bf868ef518af85fdab5ca5dd5e055a85114aa42e"},
@@ -6116,7 +6116,7 @@ description = "Curated transformer models for spaCy pipelines"
 optional = true
 python-versions = "<3.14,>=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "spacy_curated_transformers-0.3.1-py2.py3-none-any.whl", hash = "sha256:503559b6a1d6e44ec2c978e18ed871ce5c3d56871dc9216c0e1523428204e610"},
     {file = "spacy_curated_transformers-0.3.1.tar.gz", hash = "sha256:7e53fccf64260e641b0a3f2b65b6d98381b86cef6eeb21ce279e8db849e8525d"},
@@ -6134,7 +6134,7 @@ description = "Legacy registered functions for spaCy backwards compatibility"
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "spacy-legacy-3.0.12.tar.gz", hash = "sha256:b37d6e0c9b6e1d7ca1cf5bc7152ab64a4c4671f59c85adaf7a3fcb870357a774"},
     {file = "spacy_legacy-3.0.12-py2.py3-none-any.whl", hash = "sha256:476e3bd0d05f8c339ed60f40986c07387c0a71479245d6d0f4298dbd52cda55f"},
@@ -6147,7 +6147,7 @@ description = "Logging utilities for SpaCy"
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "spacy-loggers-1.0.5.tar.gz", hash = "sha256:d60b0bdbf915a60e516cc2e653baeff946f0cfc461b452d11a4d5458c6fe5f24"},
     {file = "spacy_loggers-1.0.5-py3-none-any.whl", hash = "sha256:196284c9c446cc0cdb944005384270d775fdeaf4f494d8e269466cfa497ef645"},
@@ -6160,7 +6160,7 @@ description = "spaCy pipelines for pre-trained BERT and other transformers"
 optional = true
 python-versions = "<3.14,>=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "spacy_transformers-1.3.9-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:6ca8ff36226b86dc58fa512e85047c6a749b3ac4a6ac2e7d71aa440414b8791b"},
     {file = "spacy_transformers-1.3.9-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:fe2b1b294bf63d89dd529ec5143aa7d434ee394d5d51f82c8267cf1d54fd8c92"},
@@ -6578,7 +6578,7 @@ description = "An easily customizable SQL parser and transpiler"
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "extra == \"ibis-framework\""
+markers = "extra == \"ibis\""
 files = [
     {file = "sqlglot-25.20.2-py3-none-any.whl", hash = "sha256:cdbfd7ce3f2f39f32bd7b4c23fd9e0fd261636a6b14285b914e8def25fd0a567"},
     {file = "sqlglot-25.20.2.tar.gz", hash = "sha256:169fe8308dd70d7bd40117b2221b62bdc7c4e2ea8eb07394b2a6146cdedf05ab"},
@@ -6595,7 +6595,7 @@ description = "Modern high-performance serialization utilities for Python"
 optional = true
 python-versions = "<3.14,>=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "srsly-2.5.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d0cda6f65cc0dd1daf47e856b0d6c5d51db8a9343c5007723ca06903dcfe367d"},
     {file = "srsly-2.5.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:cf643e6f45c266cfacea54997a1f9cfe0113fadac1ac21a1ec5b200cfe477ba0"},
@@ -6684,7 +6684,7 @@ files = [
     {file = "stopwatch.py-2.0.1-py3-none-any.whl", hash = "sha256:5802a0178d766120c11dd5df8ae838e9beccb8c88329dbd5f0f7ac4b7fed9107"},
     {file = "stopwatch.py-2.0.1.tar.gz", hash = "sha256:8cc94ba0f6469d434eabd8b227166e595fd42350e7f66dbf1a1a80697f60cc79"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "structlog"
@@ -6693,7 +6693,7 @@ description = "Structured Logging for Python"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "structlog-25.4.0-py3-none-any.whl", hash = "sha256:fe809ff5c27e557d14e613f45ca441aabda051d119ee5a0102aaba6ce40eed2c"},
     {file = "structlog-25.4.0.tar.gz", hash = "sha256:186cd1b0a8ae762e29417095664adf1d6a31702160a46dacb7796ea82f7409e4"},
@@ -6709,7 +6709,7 @@ description = "Computer algebra system (CAS) in Python"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "sympy-1.14.0-py3-none-any.whl", hash = "sha256:e091cc3e99d2141a0ba2847328f5479b05d94a6635cb96148ccb3f34671bd8f5"},
     {file = "sympy-1.14.0.tar.gz", hash = "sha256:d3d3fe8df1e5a0b42f0e7bdf50541697dbe7d23746e894990c030e2b05e72517"},
@@ -6773,7 +6773,7 @@ description = "A refreshing functional take on deep learning, compatible with yo
 optional = true
 python-versions = "<3.13,>=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "thinc-8.3.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:916ea79a7c7462664be9435679b7769b4fc1ecea3886db6da6118e4eb5cc8c8b"},
     {file = "thinc-8.3.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:6c985ce9cf82a611f4f348c721372d073537ca0e8b7bbb8bd865c1598ddd79d1"},
@@ -6845,7 +6845,7 @@ description = "threadpoolctl"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "threadpoolctl-3.6.0-py3-none-any.whl", hash = "sha256:43a0b8fd5a2928500110039e43a5eed8480b918967083ea48dc3ab9f13c4a7fb"},
     {file = "threadpoolctl-3.6.0.tar.gz", hash = "sha256:8ab8b4aa3491d812b623328249fab5302a68d2d71745c8a4c719a2fcaba9f44e"},
@@ -6870,7 +6870,7 @@ description = ""
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "tokenizers-0.21.4-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:2ccc10a7c3bcefe0f242867dc914fc1226ee44321eb618cfe3019b5df3400133"},
     {file = "tokenizers-0.21.4-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:5e2f601a8e0cd5be5cc7506b20a79112370b9b3e9cb5f13f68ab11acd6ca7d60"},
@@ -6950,7 +6950,7 @@ files = [
     {file = "tomli-2.2.1-py3-none-any.whl", hash = "sha256:cb55c73c5f4408779d0cf3eef9f762b9c9f147a77de7b258bef0a5628adc85cc"},
     {file = "tomli-2.2.1.tar.gz", hash = "sha256:cd45e1dc79c835ce60f7404ec8119f2eb06d38b1deba146f07ced3bbc44505ff"},
 ]
-markers = {main = "extra == \"exasol-text-ai-extension\" and python_version == \"3.10\""}
+markers = {main = "extra == \"text-ai\" and python_version == \"3.10\""}
 
 [[package]]
 name = "tomlkit"
@@ -6971,7 +6971,7 @@ description = "List processing tools and functional utilities"
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "extra == \"ibis-framework\""
+markers = "extra == \"ibis\""
 files = [
     {file = "toolz-0.12.1-py3-none-any.whl", hash = "sha256:d22731364c07d72eea0a0ad45bafb2c2937ab6fd38a3507bf55eae8744aa7d85"},
     {file = "toolz-0.12.1.tar.gz", hash = "sha256:ecca342664893f177a13dac0e6b41cbd8ac25a358e5f215316d43e2100224f4d"},
@@ -6984,7 +6984,7 @@ description = "Tensors and Dynamic neural networks in Python with strong GPU acc
 optional = true
 python-versions = ">=3.9.0"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "torch-2.8.0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:0be92c08b44009d4131d1ff7a8060d10bafdb7ddcb7359ef8d8c5169007ea905"},
     {file = "torch-2.8.0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:89aa9ee820bb39d4d72b794345cccef106b574508dd17dbec457949678c76011"},
@@ -7062,7 +7062,7 @@ files = [
     {file = "tornado-6.5.1-cp39-abi3-win_arm64.whl", hash = "sha256:02420a0eb7bf617257b9935e2b754d1b63897525d8a289c9d65690d580b4dcf7"},
     {file = "tornado-6.5.1.tar.gz", hash = "sha256:84ceece391e8eb9b2b95578db65e920d2a61070260594819589609ba9bc6308c"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "tqdm"
@@ -7071,7 +7071,7 @@ description = "Fast, Extensible Progress Meter"
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2"},
     {file = "tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2"},
@@ -7094,7 +7094,7 @@ description = "State-of-the-art Machine Learning for JAX, PyTorch and TensorFlow
 optional = true
 python-versions = ">=3.9.0"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"exasol-text-ai-extension\""
+markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
     {file = "transformers-4.49.0-py3-none-any.whl", hash = "sha256:6b4fded1c5fee04d384b1014495b4235a2b53c87503d7d592423c06128cbbe03"},
     {file = "transformers-4.49.0.tar.gz", hash = "sha256:7e40e640b5b8dc3f48743f5f5adbdce3660c82baafbd3afdfc04143cdbd2089e"},
@@ -7167,7 +7167,7 @@ description = "A language and compiler for custom Deep Learning operations"
 optional = true
 python-versions = "<3.14,>=3.9"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"exasol-text-ai-extension\")"
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
     {file = "triton-3.4.0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:7ff2785de9bc02f500e085420273bb5cc9c9bb767584a4aa28d6e360cec70128"},
     {file = "triton-3.4.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:7b70f5e6a41e52e48cfc087436c8a28c17ff98db369447bcaff3b887a3ab4467"},
@@ -7192,7 +7192,7 @@ description = "Run-time type checker for Python"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "typeguard-4.4.4-py3-none-any.whl", hash = "sha256:b5f562281b6bfa1f5492470464730ef001646128b180769880468bd84b68b09e"},
     {file = "typeguard-4.4.4.tar.gz", hash = "sha256:3a7fd2dffb705d4d0efaed4306a704c89b9dee850b688f060a8b1615a79e5f74"},
@@ -7212,7 +7212,7 @@ files = [
     {file = "typer-0.16.0-py3-none-any.whl", hash = "sha256:1f79bed11d4d02d4310e3c1b7ba594183bcedb0ac73b27a9e5f28f6fb5b98855"},
     {file = "typer-0.16.0.tar.gz", hash = "sha256:af377ffaee1dbe37ae9440cb4e8f11686ea5ce4e9bae01b84ae7c63b87f1dd3b"},
 ]
-markers = {main = "extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"text-ai\""}
 
 [package.dependencies]
 click = ">=8.0.0"
@@ -7258,7 +7258,7 @@ files = [
     {file = "typing_inspection-0.4.1-py3-none-any.whl", hash = "sha256:389055682238f53b04f7badcb49b989835495a96700ced5dab2d8feae4b26f51"},
     {file = "typing_inspection-0.4.1.tar.gz", hash = "sha256:6ae134cc0203c33377d43188d4064e9b357dba58cff3185f22924610e70a9d28"},
 ]
-markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 typing-extensions = ">=4.12.0"
@@ -7270,7 +7270,7 @@ description = "Provider of IANA time zone data"
 optional = true
 python-versions = ">=2"
 groups = ["main"]
-markers = "extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "tzdata-2025.2-py2.py3-none-any.whl", hash = "sha256:1a403fada01ff9221ca8044d701868fa132215d84beb92242d9acd2147f667a8"},
     {file = "tzdata-2025.2.tar.gz", hash = "sha256:b60a638fcc0daffadf82fe0f57e53d06bdec2f36c4df66280ae79bce6bd6f2b9"},
@@ -7283,7 +7283,7 @@ description = "URI parsing, classification and composition"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "uritools-5.0.0-py3-none-any.whl", hash = "sha256:cead3a49ba8fbca3f91857343849d506d8639718f4a2e51b62e87393b493bd6f"},
     {file = "uritools-5.0.0.tar.gz", hash = "sha256:68180cad154062bd5b5d9ffcdd464f8de6934414b25462ae807b00b8df9345de"},
@@ -7339,7 +7339,7 @@ files = [
     {file = "virtualenv-20.32.0-py3-none-any.whl", hash = "sha256:2c310aecb62e5aa1b06103ed7c2977b81e042695de2697d01017ff0f1034af56"},
     {file = "virtualenv-20.32.0.tar.gz", hash = "sha256:886bf75cadfdc964674e6e33eb74d787dff31ca314ceace03ca5810620f4ecf0"},
 ]
-markers = {main = "extra == \"exasol-text-ai-extension\""}
+markers = {main = "extra == \"text-ai\""}
 
 [package.dependencies]
 distlib = ">=0.3.7,<1"
@@ -7357,7 +7357,7 @@ description = "A lightweight console printing and formatting toolkit"
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "wasabi-1.1.3-py3-none-any.whl", hash = "sha256:f76e16e8f7e79f8c4c8be49b4024ac725713ab10cd7f19350ad18a8e3f71728c"},
     {file = "wasabi-1.1.3.tar.gz", hash = "sha256:4bb3008f003809db0c3e28b4daf20906ea871a2bb43f9914197d540f4f2e0878"},
@@ -7385,7 +7385,7 @@ description = "Weasel: A small and easy workflow system"
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "extra == \"exasol-text-ai-extension\""
+markers = "extra == \"text-ai\""
 files = [
     {file = "weasel-0.4.1-py3-none-any.whl", hash = "sha256:24140a090ea1ac512a2b2f479cc64192fd1d527a7f3627671268d08ed5ac418c"},
     {file = "weasel-0.4.1.tar.gz", hash = "sha256:aabc210f072e13f6744e5c3a28037f93702433405cd35673f7c6279147085aa9"},
@@ -7409,7 +7409,7 @@ description = "WebSocket client for Python with low level API options"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis-framework\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "websocket_client-1.8.0-py3-none-any.whl", hash = "sha256:17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526"},
     {file = "websocket_client-1.8.0.tar.gz", hash = "sha256:3239df9f44da632f96012472805d40a23281a991027ce11d2f45a6f24ac4c3da"},
@@ -7508,7 +7508,7 @@ files = [
     {file = "wrapt-1.17.2-py3-none-any.whl", hash = "sha256:b18f2d1533a71f069c7f82d524a52599053d4c7166e9dd374ae2136b7f40f7c8"},
     {file = "wrapt-1.17.2.tar.gz", hash = "sha256:41388e9d4d1522446fe79d3213196bd9e3b301a336965b9e27ca2788ebd122f3"},
 ]
-markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"itde\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "yaspin"
@@ -7533,7 +7533,7 @@ description = "Backport of pathlib-compatible object wrapper for zip files"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"exasol-text-ai-extension\" or extra == \"sagemaker\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "zipp-3.23.0-py3-none-any.whl", hash = "sha256:071652d6115ed432f5ce1d34c336c0adfd6a884660d1e9712a256d3d3bd4b14e"},
     {file = "zipp-3.23.0.tar.gz", hash = "sha256:a07157588a12518c9d4034df3fbbee09c814741a33ff63c05fa29d26a2404166"},
@@ -7549,16 +7549,16 @@ type = ["pytest-mypy"]
 
 [extras]
 bucketfs = ["exasol-bucketfs"]
-exasol-text-ai-extension = ["exasol-text-ai-extension"]
-ibis-framework = ["ibis-framework"]
+ibis = ["ibis-framework"]
 itde = ["exasol-integration-test-docker-environment", "ifaddr"]
 pyexasol = ["pyexasol"]
 sagemaker = ["exasol-sagemaker-extension"]
 slc = ["GitPython", "exasol-script-languages-container-tool"]
 sqlalchemy = ["sqlalchemy-exasol"]
+text-ai = ["exasol-text-ai-extension"]
 transformers = ["exasol-transformers-extension", "yaspin"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "97dff1d0696aaf59b6a9e5972b4bf4e20d3184fe5ec9f66a7e0ae80667d9496e"
+content-hash = "e955985f638d4b4286f2ca7fdc576c31e990e3e8609a631487dab4b9fbf17d81"
