@@ -18,7 +18,7 @@ dynamic = ["classifiers"]
 dependencies = [
   "sqlcipher3-binary (>= 0.5.0); sys_platform==\"linux\"",
   "sqlcipher3 (>= 0.5.0); sys_platform==\"darwin\" or sys_platform==\"win32\"",
-  "exasol-saas-api (>=0.9.0, <3)",
+  "exasol-saas-api (>=0.9.0, <3)", # needed to get database id for database name
 ]
 
 [project.optional-dependencies]
@@ -41,9 +41,12 @@ ibis = [ "ibis-framework [exasol] (>=9.1.0, <10)" ]
 transformers = [
   "exasol-transformers-extension (>=2.2.1, <3)",
   "yaspin (>=3.1.0, <4)",
+  # Use individual category as soon as the following issues are fixed:
+  # https://github.com/exasol/transformers-extension/issues/317
+  # https://github.com/exasol/notebook-connector/issues/255
+  "exasol-text-ai-extension (>=0.1.0, <2.0.0)",
 ]
 sagemaker = [ "exasol-sagemaker-extension (>=0.11.5)" ]
-text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
 
 
 [project.urls]

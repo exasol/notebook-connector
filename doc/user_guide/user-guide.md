@@ -4,14 +4,9 @@
 
 Most of NC's dependencies are declared as "optional" in file `pyproject.toml`.
 
-You can install selected dependencies using poetry's CLI option `-E`, e.g.
+You can install selected dependencies using the following syntax
 ```shell
-poetry install -E torch
-```
-
-You can also install all optional dependencies using poetry's CLI option `--all-extras`:
-```shell
-poetry install --all-extras
+pip install "notebook-connector [slc itde]"
 ```
 
 ## Managing Script Language Containers (SLCs)
