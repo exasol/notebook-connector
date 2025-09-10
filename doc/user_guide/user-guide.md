@@ -4,20 +4,22 @@
 
 Most of NC's dependencies are declared as "optional" in file `pyproject.toml`.
 
+Here is a comprehensive list of all NC's optional dependency categories (aka. "extras"):
+| Package | pypi | Description |
+|---------|------|-------------|
+| `sqlalchemy`   | [sqlalchemy_exasol](https://pypi.org/project/sqlalchemy_exasol/) | SQLAlchemy dialect for Exasol databases |
+| `pyexasol`     | [pyexasol](https://pypi.org/project/pyexasol/) | Python driver for connecting to Exasol databases |
+| `bucketfs`     | [exasol-bucketfs](https://pypi.org/project/exasol-bucketfs/) | Python API to interact with Exasol [Bucketfs-Service(s)](https://docs.exasol.com/db/latest/database_concepts/bucketfs/bucketfs.htm)
+| `itde`         | [exasol-integration-test-docker-environment](https://pypi.org/project/exasol-integration-test-docker-environment/) | A docker-based environment for integration tests with EXASOL databases |
+| `slc`          | [exasol-script-languages-container-tool](https://pypi.org/project/exasol-script-languages-container-tool/) | Support for building Script Language Containers for [Exasol UDFs](https://docs.exasol.com/db/7.1/database_concepts/udf_scripts.htm) |
+| `ibis`         | [ibis-framework](https://pypi.org/project/ibis-framework/) | Portable Python dataframe library |
+| `transformers` | [exasol-transformers-extension](https://pypi.org/project/exasol-transformers-extension/) | An Exasol extension for using state-of-the-art pretrained machine learning models via the Hugging Face Transformers API |
+| `sagemaker`| [exasol-sagemaker-extension](https://pypi.org/project/exasol-sagemaker-extension/) | An Exasol extension to interact with AWS SageMaker from inside the database |
+
 You can install selected dependencies using the following syntax
 ```shell
 pip install "notebook-connector [slc, itde]"
 ```
-
-Here is a comprehensive list of all NC's optional dependency categories (aka. "extras"):
-* `sqlalchemy`
-* `pyexasol`
-* `bucketfs`
-* `itde`
-* `slc`
-* `ibis`
-* `transformers`
-* `sagemaker`
 
 You can also retrieve a list of all NC's dependency categories with the following command line, see [stackoverflow/64685527](https://stackoverflow.com/questions/64685527/pip-install-with-all-extras):
 
