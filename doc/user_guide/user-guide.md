@@ -9,6 +9,24 @@ You can install selected dependencies using the following syntax
 pip install "notebook-connector [slc, itde]"
 ```
 
+Here is a comprehensive list of all NC's optional dependency categories (aka. "extras"):
+* `sqlalchemy`
+* `pyexasol`
+* `bucketfs`
+* `itde`
+* `slc`
+* `ibis`
+* `transformers`
+* `sagemaker`
+
+You can also retrieve a list of all NC's dependency categories with the following command line, see [stackoverflow/64685527](https://stackoverflow.com/questions/64685527/pip-install-with-all-extras):
+
+```shell
+pip install --dry-run --ignore-installed --quiet --report=- \
+  exasol-notebook-connector \
+  | jq --raw-output '.install[0].metadata.provides_extra|join(",")'
+```
+
 ## Managing Script Language Containers (SLCs)
 
 The Notebook Connector (NC) supports building different flavors of [Exasol Script Language Containers](https://github.com/exasol/script-languages-release) (SLCs) using the [script-languages-container-tool](https://github.com/exasol/script-languages-container-tool).
