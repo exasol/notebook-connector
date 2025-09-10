@@ -19,7 +19,7 @@ Here is a comprehensive list of all NC's optional dependency categories (aka. "e
 
 You can install selected dependencies using the following syntax
 ```shell
-pip install "notebook-connector [slc, itde]"
+pip install "notebook-connector [slc, docker-db]"
 ```
 
 You can also retrieve a list of all NC's dependency categories with the following command line, see [stackoverflow/64685527](https://stackoverflow.com/questions/64685527/pip-install-with-all-extras):
