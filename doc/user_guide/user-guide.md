@@ -6,7 +6,7 @@ Most of NC's dependencies are declared as "optional" in file `pyproject.toml`.
 
 You can install selected dependencies using the following syntax
 ```shell
-pip install "notebook-connector [slc itde]"
+pip install "notebook-connector [slc, itde]"
 ```
 
 ## Managing Script Language Containers (SLCs)
