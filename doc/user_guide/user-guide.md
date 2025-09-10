@@ -11,7 +11,7 @@ Here is a comprehensive list of all NC's optional dependency categories (aka. "e
 | `pyexasol`     | [pyexasol](https://pypi.org/project/pyexasol/) | Python driver for connecting to Exasol databases |
 | `bucketfs`     | [exasol-bucketfs](https://pypi.org/project/exasol-bucketfs/) | Python API to interact with Exasol [Bucketfs-Service(s)](https://docs.exasol.com/db/latest/database_concepts/bucketfs/bucketfs.htm)
 | `itde`         | [exasol-integration-test-docker-environment](https://pypi.org/project/exasol-integration-test-docker-environment/) | A docker-based environment for integration tests with EXASOL databases |
-| `slc`          | [exasol-script-languages-container-tool](https://pypi.org/project/exasol-script-languages-container-tool/) | Support for building Script Language Containers for [Exasol UDFs](https://docs.exasol.com/db/7.1/database_concepts/udf_scripts.htm) |
+| `slc`          | [exasol-script-languages-container-tool](https://pypi.org/project/exasol-script-languages-container-tool/) | Support for building [Script Language Containers](https://github.com/exasol/script-languages-release) for [Exasol UDFs](https://docs.exasol.com/db/7.1/database_concepts/udf_scripts.htm) |
 | `ibis`         | [ibis-framework](https://pypi.org/project/ibis-framework/) | Portable Python dataframe library |
 | `transformers` | [exasol-transformers-extension](https://pypi.org/project/exasol-transformers-extension/) | An Exasol extension for using state-of-the-art pretrained machine learning models via the Hugging Face Transformers API |
 | `sagemaker`| [exasol-sagemaker-extension](https://pypi.org/project/exasol-sagemaker-extension/) | An Exasol extension to interact with AWS SageMaker from inside the database |
