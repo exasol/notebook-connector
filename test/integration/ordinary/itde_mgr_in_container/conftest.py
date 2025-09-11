@@ -344,7 +344,7 @@ def docker_container(
             copy.add_string_to_file("itde_external_test.py", itde_external_test)
             copy.copy("/tmp")
             exit_code, output = container.exec_run(
-                f"python3 -m pip install /tmp/{wheel_path.name} "
+                f"python3 -m pip install /tmp/{wheel_path.name} [docker-db]"
                 f"--extra-index-url https://download.pytorch.org/whl/cpu"
             )
             assert exit_code == 0, output
