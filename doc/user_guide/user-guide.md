@@ -1,5 +1,35 @@
 # Notebook Connector User Guide
 
+## Installing the Notebook Connector (NC)
+
+Most of NC's dependencies are declared as "optional" in file `pyproject.toml`.
+
+Here is a comprehensive list of all NC's optional dependency categories (aka. "extras"):
+
+| Package        | Description                                                                                                                                                                                                                                                   |
+|----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `sqlalchemy`   | [SQLAlchemy dialect](https://pypi.org/project/sqlalchemy_exasol/) for Exasol databases                                                                                                                                                                        |
+| `pyexasol`     | Python driver for [connecting to Exasol databases](https://pypi.org/project/pyexasol/)                                                                                                                                                                        |
+| `bucketfs`     | [Python API](https://pypi.org/project/exasol-bucketfs/) to interact with Exasol [Bucketfs-Service(s)](https://docs.exasol.com/db/latest/database_concepts/bucketfs/bucketfs.htm)                                                                              |
+| `docker-db`    | For starting a [Docker instance of the Exasol database](https://pypi.org/project/exasol-integration-test-docker-environment/)                                                                                                                                 |
+| `slc`          | For [building](https://pypi.org/project/exasol-script-languages-container-tool/) custom [Script Language Containers](https://github.com/exasol/script-languages-release) for [Exasol UDFs](https://docs.exasol.com/db/7.1/database_concepts/udf_scripts.htm)  |
+| `ibis`         | Portable Python dataframe library [ibis-framework](https://pypi.org/project/ibis-framework/)                                                                                                                                                                  |
+| `transformers` | An [Exasol extension](https://pypi.org/project/exasol-transformers-extension/) for using state-of-the-art pretrained machine learning models via the [Hugging Face Transformers API](https://github.com/huggingface/transformers)                                                                            |
+| `sagemaker`    | An [Exasol extension](https://pypi.org/project/exasol-sagemaker-extension/) to interact with [AWS SageMaker](https://pypi.org/project/sagemaker/) from inside the database                                                                                                                           |
+
+You can install selected dependencies using the following syntax
+```shell
+pip install "notebook-connector [slc, docker-db]"
+```
+
+You can also retrieve a list of all NC's dependency categories with the following command line, see [stackoverflow/64685527](https://stackoverflow.com/questions/64685527/pip-install-with-all-extras):
+
+```shell
+pip install --dry-run --ignore-installed --quiet --report=- \
+  exasol-notebook-connector \
+  | jq --raw-output '.install[0].metadata.provides_extra|join(",")'
+```
+
 ## Managing Script Language Containers (SLCs)
 
 The Notebook Connector (NC) supports building different flavors of [Exasol Script Language Containers](https://github.com/exasol/script-languages-release) (SLCs) using the [script-languages-container-tool](https://github.com/exasol/script-languages-container-tool).

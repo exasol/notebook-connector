@@ -39,6 +39,9 @@ jobs:
         with:
           poetry-version: 2.1.2
 
+      - name: Install All Optional Dependencies (aka. "extras")
+        run: poetry install --all-extras
+
       - name: Allow unprivileged user namespaces
         run: |
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
