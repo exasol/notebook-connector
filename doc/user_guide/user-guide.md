@@ -6,19 +6,6 @@ Most of NC's dependencies are declared as "optional" in file `pyproject.toml`.
 
 Here is a comprehensive list of all NC's optional dependency categories (aka. "extras"):
 
-| Package | pypi | Description |
-|---------|------|-------------|
-| `sqlalchemy`   | [sqlalchemy_exasol](https://pypi.org/project/sqlalchemy_exasol/) | SQLAlchemy dialect for Exasol databases |
-| `pyexasol`     | [pyexasol](https://pypi.org/project/pyexasol/) | Python driver for connecting to Exasol databases |
-| `bucketfs`     | [exasol-bucketfs](https://pypi.org/project/exasol-bucketfs/) | Python API to interact with Exasol [Bucketfs-Service(s)](https://docs.exasol.com/db/latest/database_concepts/bucketfs/bucketfs.htm) |
-| `docker-db`    | [exasol-integration-test-docker-environment](https://pypi.org/project/exasol-integration-test-docker-environment/) | Dependencies needed to start a Docker instance of the Exasol database |
-| `slc`          | [exasol-script-languages-container-tool](https://pypi.org/project/exasol-script-languages-container-tool/) | Support for building [Script Language Containers](https://github.com/exasol/script-languages-release) for [Exasol UDFs](https://docs.exasol.com/db/7.1/database_concepts/udf_scripts.htm) |
-| `ibis`         | [ibis-framework](https://pypi.org/project/ibis-framework/) | Portable Python dataframe library |
-| `transformers` | [exasol-transformers-extension](https://pypi.org/project/exasol-transformers-extension/) | An Exasol extension for using state-of-the-art pretrained machine learning models via the Hugging Face Transformers API |
-| `sagemaker`    | [exasol-sagemaker-extension](https://pypi.org/project/exasol-sagemaker-extension/) | An Exasol extension to interact with AWS SageMaker from inside the database |
-
-<!-- Alternative variant inlining column "pypi" -->
-
 | Package        | Description                                                                                                                                                                                                                                                   |
 |----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `sqlalchemy`   | [SQLAlchemy dialect](https://pypi.org/project/sqlalchemy_exasol/) for Exasol databases                                                                                                                                                                        |
