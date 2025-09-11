@@ -343,7 +343,7 @@ def docker_container(
             copy.add_string_to_file("itde_stop_and_restart.py", itde_stop_and_restart)
             copy.add_string_to_file("itde_external_test.py", itde_external_test)
             copy.copy("/tmp")
-            extras = "docker-db,bucketfs"
+            extras = "docker-db,bucketfs,ibis"
             exit_code, output = container.exec_run(
                 f'python3 -m pip install "/tmp/{wheel_path.name}[{extras}]"'
                 f" --extra-index-url https://download.pytorch.org/whl/cpu"
