@@ -345,7 +345,7 @@ def docker_container(
             copy.copy("/tmp")
             exit_code, output = container.exec_run(
                 f"python3 -m pip install /tmp/{wheel_path.name} [docker-db]"
-                f"--extra-index-url https://download.pytorch.org/whl/cpu"
+                f" --extra-index-url https://download.pytorch.org/whl/cpu"
             )
             assert exit_code == 0, output
             yield container

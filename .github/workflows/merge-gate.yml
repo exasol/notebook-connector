@@ -28,6 +28,7 @@ jobs:
 
   ordinary-itests:
     name: Ordinary iTests
+    # TODO: uncomment before merge!
     # needs: [ run-slow-tests ]
     uses: ./.github/workflows/tests-ordinary-integration.yml
     permissions:
