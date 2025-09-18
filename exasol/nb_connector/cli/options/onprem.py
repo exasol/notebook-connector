@@ -30,8 +30,9 @@ ONPREM_OPTIONS = [
         type=str,
         prompt=True,
         prompt_required=False,
-        # show_envvar=True,
         hide_input=True,
+        envvar="EXASOL_DB_PASSWORD",
+        show_envvar=True,
         help="Database password",
     ),
     click.option(

@@ -1,4 +1,5 @@
-from exasol.nb_connector.cli.options.all import COMMON_OPTIONS
+from exasol.nb_connector.cli.options.all import SCS_OPTIONS
+from exasol.nb_connector.cli.options.all import COMMON_CONFIGURE_OPTIONS
 from exasol.nb_connector.cli.options.bucketfs import BUCKETFS_OPTIONS
 from exasol.nb_connector.cli.options.docker_db import DOCKER_DB_OPTIONS
 from exasol.nb_connector.cli.options.onprem import ONPREM_OPTIONS

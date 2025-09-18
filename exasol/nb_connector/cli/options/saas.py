@@ -33,6 +33,8 @@ SAAS_OPTIONS = [
         type=str,
         prompt=True,
         hide_input=True,
+        envvar="EXASOL_SAAS_TOKEN",
+        show_envvar=True,
         help="SaaS personal access token",
     ),
 ]

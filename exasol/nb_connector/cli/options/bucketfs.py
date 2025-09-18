@@ -46,6 +46,8 @@ BUCKETFS_OPTIONS = [
         prompt=True,
         prompt_required=False,
         hide_input=True,
+        envvar="EXASOL_BUCKETFS_PASSWORD",
+        show_envvar=True,
         help="BucketFS password",
     ),
     click.option(
