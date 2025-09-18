@@ -146,3 +146,6 @@ max-module-lines = 800
 projectKey = "com.exasol:notebook-connector"
 hostUrl = "https://sonarcloud.io"
 organization = "exasol"
+
+[tool.poetry.plugins."console_scripts"]
+scs = 'exasol.nb_connector.cli.main:main'

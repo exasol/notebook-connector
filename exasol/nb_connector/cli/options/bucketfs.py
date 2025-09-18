@@ -1,0 +1,74 @@
+import click
+
+
+BUCKETFS_OPTIONS = [
+    click.option(
+        "--bucketfs-host",
+        metavar="HOST",
+        type=str,
+        default="localhost",
+        show_default=True,
+        help="BucketFS host name",
+    ),
+    click.option(
+        "--bucketfs-host-internal",
+        metavar="HOST",
+        type=str,
+        default="localhost",
+        show_default=True,
+        help="BucketFS Internal Host Name"),
+    click.option(
+        "--bucketfs-port",
+        metavar="PORT",
+        type=int,
+        default=2580,
+        show_default=True,
+        help="BucketFS port",
+    ),
+    click.option(
+        "--bucketfs-port-internal",
+        metavar="PORT",
+        type=int,
+        default=2580,
+        show_default=True,
+        help="BucketFS internal port",
+    ),
+    click.option(
+        "--bucketfs-username",
+        metavar="USERNAME",
+        type=str,
+        help="BucketFS user name",
+    ),
+    click.option(
+        "--bucketfs-password",
+        metavar="PASSWORD",
+        type=str,
+        prompt=True,
+        prompt_required=False,
+        hide_input=True,
+        help="BucketFS password",
+    ),
+    click.option(
+        "--bucketfs-name",
+        metavar="BFS_SERVICE",
+        type=str,
+        default="bfsdefault",
+        show_default=True,
+        help="BucketFS service name",
+    ),
+    click.option(
+        "--bucket",
+        metavar="BUCKET",
+        type=str,
+        default="default",
+        show_default=True,
+        help="BucketFS bucket name",
+    ),
+    click.option(
+        "--bucketfs-use-encryption/--no-bucketfs-use-encryption",
+        type=bool,
+        default=True,
+        show_default=True,
+        help="Whether to encrypt communication with the BucketFS or not",
+    ),
+]
