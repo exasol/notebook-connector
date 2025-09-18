@@ -49,7 +49,7 @@ def configure_onprem(
     bucket: str,
     bucketfs_use_encryption: bool,
     ssl_use_cert_validation: bool,
-    ssl_cert_path: str,
+    ssl_cert_path: Path,
     db_schema: str,
 ):
     backend = StorageBackend.onprem
@@ -74,7 +74,7 @@ def configure_saas(
     saas_database_name: str,
     saas_token: str,
     ssl_use_cert_validation: bool,
-    ssl_cert_path: str,
+    ssl_cert_path: Path,
     db_schema: str,
 ):
     backend = StorageBackend.saas

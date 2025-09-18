@@ -34,7 +34,7 @@ BUCKETFS_OPTIONS = [
         help="BucketFS internal port",
     ),
     click.option(
-        "--bucketfs-username",
+        "--bucketfs-user",
         metavar="USERNAME",
         type=str,
         help="BucketFS user name",

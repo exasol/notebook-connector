@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import click
 
 SSL_OPTIONS = [
@@ -11,7 +13,7 @@ SSL_OPTIONS = [
     click.option(
         "--ssl-cert-path",
         metavar="FILE/DIR",
-        type=str,
+        type=Path,
         help="SSL trusted CA file/dir",
     ),
  ]

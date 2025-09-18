@@ -5,7 +5,7 @@ from pathlib import Path
 SCS_OPTIONS = [
     click.option(
         "--scs-file",
-        metavar="PATH",
+        metavar="FILE",
         type=Path,
         help="File containing the Secure Configuration Storage (SCS)",
     ),
