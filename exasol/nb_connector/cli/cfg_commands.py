@@ -1,9 +1,9 @@
 import click
 from exasol.nb_connector.ai_lab_config import Accelerator
 
-from exasol.ai.mcp.server.cli._decorators import add_options
-from exasol.ai.mcp.server.cli.groups import cli
-from exasol.ai.mcp.server.cli.options import (
+from exasol.nb_connector.cli._decorators import add_options
+from exasol.nb_connector.cli.groups import cli
+from exasol.nb_connector.cli.options import (
     BUCKETFS_OPTIONS,
     COMMON_OPTIONS,
     DOCKER_DB_OPTIONS,

@@ -1,6 +1,6 @@
-from exasol.ai.mcp.server.cli.groups import cli
-import exasol.ai.mcp.server.cli.check_commands
-import exasol.ai.mcp.server.cli.cfg_commands
+from exasol.nb_connector.cli.groups import cli
+import exasol.nb_connector.cli.check_commands
+import exasol.nb_connector.cli.cfg_commands
 
 
 def main():

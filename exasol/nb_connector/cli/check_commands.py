@@ -1,5 +1,5 @@
 import click
-from exasol.ai.mcp.server.cli.groups import cli
+from exasol.nb_connector.cli.groups import cli
 from enum import Enum
 
 
