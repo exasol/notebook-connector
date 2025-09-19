@@ -1,19 +1,23 @@
-import click
 from pathlib import Path
 
+from exasol.nb_connector.cli.scs_options import ScsOption
 
 SCS_OPTIONS = [
-    click.option(
+    ScsOption(
         "--scs-file",
         metavar="FILE",
         type=Path,
+        required=True,
+        envvar="SCS_FILE",
+        show_envvar=True,
         help="File containing the Secure Configuration Storage (SCS)",
     ),
-    click.option(
+    ScsOption(
         "--scs-master-password",
         "scs_password",
         metavar="PASSWORD",
         type=str,
+        required=True,
         prompt=True,
         prompt_required=False,
         # show_envvar=True,
@@ -26,7 +30,7 @@ SCS_OPTIONS = [
 
 
 COMMON_CONFIGURE_OPTIONS = [
-    click.option(
+    ScsOption(
         "--db-schema",
         metavar="DB_SCHEMA",
         type=str,

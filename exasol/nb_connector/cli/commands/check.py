@@ -2,7 +2,7 @@ from pathlib import Path
 
 from exasol.nb_connector.cli.groups import cli
 from exasol.nb_connector.cli.options import SCS_OPTIONS
-from exasol.nb_connector.cli.util import add_options
+from exasol.nb_connector.cli.scs_options import click_options
 
 
 @cli.group(
@@ -13,13 +13,9 @@ def check():
     pass
 
 
-@check.command(
-    help="""Verify if all required parameters are saved in the SCS."""
-)
-@add_options(SCS_OPTIONS)
+@check.command(help="Verify if all required parameters are saved in the SCS.")
+@click_options(SCS_OPTIONS)
 def configuration(scs_file: Path, scs_password: str):
-    # conf = None
-    # b = get_backend(conf)
     pass
 
 
@@ -27,7 +23,7 @@ def configuration(scs_file: Path, scs_password: str):
     help="""Verify successful connection to the configured Exasol database
     instance."""
 )
-@add_options(SCS_OPTIONS)
+@click_options(SCS_OPTIONS)
 def connection(scs_file: Path, scs_password: str):
-    print(f'scs_file: {scs_file}')
-    print(f'scs_password: {scs_password}')
+    print(f"scs_file: {scs_file}")
+    print(f"scs_password: {scs_password}")

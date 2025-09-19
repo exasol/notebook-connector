@@ -1,45 +1,53 @@
 import click
 
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.cli.scs_options import ScsOption
 
 BUCKETFS_OPTIONS = [
-    click.option(
+    ScsOption(
         "--bucketfs-host",
         metavar="HOST",
         type=str,
         default="localhost",
         show_default=True,
         help="BucketFS host name",
+        scs_key=CKey.bfs_host_name,
     ),
-    click.option(
+    ScsOption(
         "--bucketfs-host-internal",
         metavar="HOST",
         type=str,
         default="localhost",
         show_default=True,
-        help="BucketFS Internal Host Name"),
-    click.option(
+        help="BucketFS Internal Host Name",
+        scs_key=CKey.bfs_internal_host_name,
+    ),
+    ScsOption(
         "--bucketfs-port",
         metavar="PORT",
         type=int,
         default=2580,
         show_default=True,
         help="BucketFS port",
+        scs_key="bucketfs_port",
     ),
-    click.option(
+    ScsOption(
         "--bucketfs-port-internal",
         metavar="PORT",
         type=int,
         default=2580,
         show_default=True,
         help="BucketFS internal port",
+        scs_key=CKey.bfs_internal_port,
     ),
-    click.option(
+    ScsOption(
         "--bucketfs-user",
         metavar="USERNAME",
         type=str,
         help="BucketFS user name",
+        scs_key=CKey.bfs_user,
     ),
-    click.option(
+    ScsOption(
         "--bucketfs-password",
         metavar="PASSWORD",
         type=str,
@@ -49,28 +57,32 @@ BUCKETFS_OPTIONS = [
         envvar="EXASOL_BUCKETFS_PASSWORD",
         show_envvar=True,
         help="BucketFS password",
+        scs_key=CKey.bfs_password,
     ),
-    click.option(
+    ScsOption(
         "--bucketfs-name",
         metavar="BFS_SERVICE",
         type=str,
         default="bfsdefault",
         show_default=True,
         help="BucketFS service name",
+        scs_key="bucketfs_name",
     ),
-    click.option(
+    ScsOption(
         "--bucket",
         metavar="BUCKET",
         type=str,
         default="default",
         show_default=True,
         help="BucketFS bucket name",
+        scs_key=CKey.bfs_bucket,
     ),
-    click.option(
+    ScsOption(
         "--bucketfs-use-encryption/--no-bucketfs-use-encryption",
         type=bool,
         default=True,
         show_default=True,
         help="Whether to encrypt communication with the BucketFS or not",
+        scs_key=CKey.bfs_encryption,
     ),
 ]
