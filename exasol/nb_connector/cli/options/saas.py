@@ -1,7 +1,8 @@
-import click
-
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.cli.scs_options import ScsOption
+from exasol.nb_connector.cli.scs_options import (
+    ScsOption,
+    ScsSecretOption,
+)
 
 EXTRA_SAAS_OPTIONS = [
     ScsOption(
@@ -20,6 +21,9 @@ EXTRA_SAAS_OPTIONS = [
         help="SaaS account ID",
         scs_key=CKey.saas_account_id,
     ),
+    # CKey.saas_database_id and CKey.saas_database_name can be used
+    # alternatively, see
+    # https://github.com/exasol/saas-api-python/blob/main/exasol/saas/client/api_access.py#L134
     ScsOption(
         "--saas-database-id",
         metavar="ID",
@@ -36,16 +40,11 @@ EXTRA_SAAS_OPTIONS = [
         scs_key=CKey.saas_database_name,
         scs_alternative_key=CKey.saas_database_id,
     ),
-    ScsOption(
+    ScsSecretOption(
         "--saas-token",
-        metavar="PAT",
-        type=str,
-        prompt=True,
-        prompt_required=False,
-        hide_input=True,
-        envvar="EXASOL_SAAS_TOKEN",
-        show_envvar=True,
-        help="SaaS personal access token",
+        envvar="SCS_EXASOL_SAAS_TOKEN",
+        prompt="Exasol SaaS personal access token (PAT)",
         scs_key=CKey.saas_token,
+        metavar="PAT",
     ),
 ]

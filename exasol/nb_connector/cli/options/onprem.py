@@ -1,7 +1,8 @@
-import click
-
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.cli.scs_options import ScsOption
+from exasol.nb_connector.cli.scs_options import (
+    ScsOption,
+    ScsSecretOption,
+)
 
 ONPREM_DB_OPTIONS = [
     ScsOption(
@@ -29,16 +30,10 @@ ONPREM_DB_OPTIONS = [
         help="Database user name",
         scs_key=CKey.db_user,
     ),
-    ScsOption(
+    ScsSecretOption(
         "--db-password",
-        metavar="PASSWORD",
-        type=str,
-        prompt=True,
-        prompt_required=False,
-        hide_input=True,
-        envvar="EXASOL_DB_PASSWORD",
-        show_envvar=True,
-        help="Database password",
+        envvar="SCS_EXASOL_DB_PASSWORD",
+        prompt="Exasol database password",
         scs_key=CKey.db_password,
     ),
     ScsOption(

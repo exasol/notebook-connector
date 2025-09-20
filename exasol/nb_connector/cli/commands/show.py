@@ -5,13 +5,11 @@ from exasol.nb_connector.cli.options import SCS_OPTIONS
 from exasol.nb_connector.cli.scs_options import click_options
 
 
-@cli.command(
-    help="""Show the configuration currently saved to the Secure Configuration
-    Storage."""
-)
+@cli.command()
 @click_options(SCS_OPTIONS)
-def show(
-    scs_file: Path,
-    scs_password: str,
-):
+def show(scs_file: Path):
+    """
+    Show the configuration currently saved to the Secure Configuration
+    Storage.
+    """
     pass

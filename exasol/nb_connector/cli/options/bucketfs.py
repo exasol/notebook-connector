@@ -1,7 +1,8 @@
-import click
-
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.cli.scs_options import ScsOption
+from exasol.nb_connector.cli.scs_options import (
+    ScsOption,
+    ScsSecretOption,
+)
 
 BUCKETFS_OPTIONS = [
     ScsOption(
@@ -47,16 +48,10 @@ BUCKETFS_OPTIONS = [
         help="BucketFS user name",
         scs_key=CKey.bfs_user,
     ),
-    ScsOption(
+    ScsSecretOption(
         "--bucketfs-password",
-        metavar="PASSWORD",
-        type=str,
-        prompt=True,
-        prompt_required=False,
-        hide_input=True,
-        envvar="EXASOL_BUCKETFS_PASSWORD",
-        show_envvar=True,
-        help="BucketFS password",
+        envvar="SCS_BUCKETFS_PASSWORD",
+        prompt="BucketFS write password",
         scs_key=CKey.bfs_password,
     ),
     ScsOption(
