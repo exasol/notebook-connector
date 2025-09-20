@@ -10,7 +10,6 @@ EXTRA_SAAS_OPTIONS = [
         metavar="URL",
         type=str,
         default="https://cloud.exasol.com",
-        show_default=True,
         help="SaaS service URL",
         scs_key=CKey.saas_url,
     ),

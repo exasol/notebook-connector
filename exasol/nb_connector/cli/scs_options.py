@@ -55,7 +55,11 @@ class ScsOption(ScsArgument):
         self.scs_required = scs_required
 
     def decorate(self, func):
-        decorator = click.option(*self._args, **self._kwargs)
+        decorator = click.option(
+            *self._args,
+            **self._kwargs,
+            show_default=True,
+        )
         return decorator(func)
 
 

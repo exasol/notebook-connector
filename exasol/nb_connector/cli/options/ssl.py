@@ -8,7 +8,6 @@ SSL_OPTIONS = [
         "--ssl-use-cert-validation/--no-ssl-use-cert-validation",
         type=bool,
         default=True,
-        show_default=True,
         help="Whether to validate SSL certificates or not",
         scs_key=CKey.cert_vld,
     ),
