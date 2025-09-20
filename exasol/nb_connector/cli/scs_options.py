@@ -54,17 +54,6 @@ class ScsOption(ScsArgument):
         self.scs_alternative_key = scs_alternative_key
         self.scs_required = scs_required
 
-#     @property
-#     def cli_option(self) -> str:
-#         return self._args[0]
-#
-#     @property
-#     def param_name(self) -> str:
-#         for arg in self._args:
-#             if not arg.startswith("--"):
-#                 return arg
-#         return re.sub(r"/--.*$", "", self.cli_option)[2:].replace("-", "_")
-#
     def decorate(self, func):
         decorator = click.option(*self._args, **self._kwargs)
         return decorator(func)
