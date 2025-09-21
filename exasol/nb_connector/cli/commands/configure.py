@@ -1,10 +1,12 @@
+from pathlib import Path
+
 from exasol.nb_connector.cli.groups import cli
 from exasol.nb_connector.cli.options import (
     DOCKER_DB_OPTIONS,
     ONPREM_OPTIONS,
     SAAS_OPTIONS,
 )
-from exasol.nb_connector.cli.scs_options import click_options
+from exasol.nb_connector.cli.param_wrappers import add_params
 
 
 @cli.group()
@@ -16,8 +18,8 @@ def configure():
 
 
 @configure.command("onprem")
-@click_options(ONPREM_OPTIONS)
-def configure_onprem(**kwargs):
+@add_params(ONPREM_OPTIONS)
+def configure_onprem(scs_file: Path, **kwargs):
     """
     Configure connection to an Exasol on-premise instance.
     """
@@ -25,8 +27,8 @@ def configure_onprem(**kwargs):
 
 
 @configure.command("saas")
-@click_options(SAAS_OPTIONS)
-def configure_saas(**kwargs):
+@add_params(SAAS_OPTIONS)
+def configure_saas(scs_file: Path, **kwargs):
     """
     Configure connection to an Exasol SaaS instance.
 
@@ -37,8 +39,8 @@ def configure_saas(**kwargs):
 
 
 @configure.command("docker-db")
-@click_options(DOCKER_DB_OPTIONS)
-def configure_docker_db(**kwargs):
+@add_params(DOCKER_DB_OPTIONS)
+def configure_docker_db(scs_file: Path, **kwargs):
     """
     Configure connection to an Exasol Docker instance.
     """

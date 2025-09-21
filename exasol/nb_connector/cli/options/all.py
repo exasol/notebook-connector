@@ -2,7 +2,7 @@ from pathlib import Path
 
 import click
 
-from exasol.nb_connector.cli.scs_options import (
+from exasol.nb_connector.cli.param_wrappers import (
     ScsArgument,
     ScsOption,
 )
@@ -18,7 +18,7 @@ SCS_OPTIONS = [
 ]
 
 
-COMMON_CONFIGURE_OPTIONS = [
+COMMON_OPTIONS = [
     ScsOption(
         "--db-schema",
         metavar="DB_SCHEMA",

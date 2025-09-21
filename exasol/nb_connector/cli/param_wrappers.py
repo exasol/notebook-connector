@@ -1,3 +1,7 @@
+"""
+Wrappers for adding custom properties to click parameters, e.g. SCS key.
+"""
+
 import click
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
@@ -67,6 +71,7 @@ class ScsSecretOption(ScsOption):
     """
     Represents a CLI option to be stored into SCS.
     """
+
     def __init__(
         self,
         name: str,
@@ -87,8 +92,7 @@ class ScsSecretOption(ScsOption):
         self.prompt = prompt
         self.name = name
 
-
-def click_options(scs_options: list[ScsOption]):
+def add_params(scs_options: list[ScsOption]):
     def multi_decorator(func):
         for o in reversed(scs_options):
             func = o.decorate(func)

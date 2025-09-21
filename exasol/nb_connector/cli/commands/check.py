@@ -2,7 +2,7 @@ from pathlib import Path
 
 from exasol.nb_connector.cli.groups import cli
 from exasol.nb_connector.cli.options import SCS_OPTIONS
-from exasol.nb_connector.cli.scs_options import click_options
+from exasol.nb_connector.cli.param_wrappers import add_params
 
 
 @cli.group()
@@ -15,19 +15,20 @@ def check():
 
 
 @check.command()
-@click_options(SCS_OPTIONS)
+@add_params(SCS_OPTIONS)
 def configuration(scs_file: Path):
     """
     Verify if all required parameters are saved in the SCS.
     """
-    pass
+    result = processing.check_scs_content(scs_file)
+    sys.exit(result)
 
 
 @check.command()
-@click_options(SCS_OPTIONS)
+@add_params(SCS_OPTIONS)
 def connection(scs_file: Path):
     """
     Verify successful connection to the configured Exasol database
     instance.
     """
-    print(f"scs_file: {scs_file}")
+    pass

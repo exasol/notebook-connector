@@ -2,7 +2,7 @@ import click
 
 from exasol.nb_connector.ai_lab_config import Accelerator
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.cli.scs_options import ScsOption
+from exasol.nb_connector.cli.param_wrappers import ScsOption
 
 EXTRA_DOCKER_DB_OPTIONS = [
     ScsOption(
