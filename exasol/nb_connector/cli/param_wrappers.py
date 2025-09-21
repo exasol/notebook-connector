@@ -51,12 +51,14 @@ class ScsOption(ScsArgument):
         scs_key: CKey | None = None,
         scs_alternative_key: CKey | None = None,
         scs_required: bool = True,
+        get_default_from: str|None = None,
         **kwargs,
     ):
         super().__init__(*args, scs_key=scs_key, **kwargs)
         self.scs_key = scs_key
         self.scs_alternative_key = scs_alternative_key
         self.scs_required = scs_required
+        self.get_default_from = get_default_from
 
     def decorate(self, func):
         decorator = click.option(
