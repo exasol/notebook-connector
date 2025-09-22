@@ -17,7 +17,7 @@ BUCKETFS_OPTIONS = [
         "--bucketfs-host-internal",
         metavar="HOST",
         type=str,
-        help="BucketFS Internal Host Name [reads default from --bucketfs-host]",
+        help="BucketFS internal host name [reads default from --bucketfs-host]",
         scs_key=CKey.bfs_internal_host_name,
         get_default_from="bucketfs_host",
     ),

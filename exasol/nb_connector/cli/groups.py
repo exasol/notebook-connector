@@ -4,7 +4,7 @@ import click
 @click.group()
 def cli():
     """
-    Manage Application configuration data in the Secure Configuration
+    Manage application configuration data in the Secure Configuration
     Storage (SCS).
 
     You can set environment variables SCS_FILE and SCS_MASTER_PASSWORD
