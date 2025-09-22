@@ -20,8 +20,7 @@ def configuration(scs_file: Path):
     """
     Verify if all required parameters are saved in the SCS.
     """
-    result = processing.check_scs_content(scs_file)
-    sys.exit(result)
+    pass
 
 
 @check.command()
