@@ -18,7 +18,7 @@ from exasol.nb_connector.cli.param_wrappers import add_params
 )
 def check(scs_file: Path, connect: bool):
     """
-    Check the configuration current saved to the Secure Configuration
+    Check the configuration currently saved to the Secure Configuration
     Storage and verify if it contains all required parameters.
 
     Optionally also verify if a connection to the configured Exasol database
