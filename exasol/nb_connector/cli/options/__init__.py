@@ -1,4 +1,4 @@
-from exasol.nb_connector.cli.options.all import (
+from exasol.nb_connector.cli.options.common import (
     COMMON_OPTIONS,
     SCS_OPTIONS,
 )
