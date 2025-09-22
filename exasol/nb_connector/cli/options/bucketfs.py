@@ -27,7 +27,7 @@ BUCKETFS_OPTIONS = [
         type=int,
         default=2580,
         help="BucketFS port",
-        scs_key="bucketfs_port",
+        scs_key=CKey.bfs_port,
     ),
     ScsOption(
         "--bucketfs-port-internal",
@@ -57,7 +57,7 @@ BUCKETFS_OPTIONS = [
         type=str,
         default="bfsdefault",
         help="BucketFS service name",
-        scs_key="bucketfs_name",
+        scs_key=CKey.bfs_service,
     ),
     ScsOption(
         "--bucket",

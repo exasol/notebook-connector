@@ -104,7 +104,7 @@ class ScsSecretOption(ScsOption):
         self.name = name
 
 
-def add_params(scs_options: list[ScsOption]):
+def add_params(scs_options: list[ScsArgument]):
     def multi_decorator(func):
         for o in reversed(scs_options):
             func = o.decorate(func)
