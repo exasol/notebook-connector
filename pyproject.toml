@@ -116,6 +116,7 @@ force_grid_wrap = 2
 
 
 [tool.pylint.master]
+ignored-modules = [ "exasol.ai.text" ]
 fail-under = 8.0
 
 [tool.mypy]
