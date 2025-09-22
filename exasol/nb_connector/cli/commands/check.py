@@ -1,33 +1,28 @@
+import sys
 from pathlib import Path
+
+import click
 
 from exasol.nb_connector.cli.groups import cli
 from exasol.nb_connector.cli.options import SCS_OPTIONS
 from exasol.nb_connector.cli.param_wrappers import add_params
+from exasol.nb_connector.cli.processing import processing
 
 
-@cli.group()
-def check():
+@cli.command()
+@add_params(SCS_OPTIONS)
+@click.option(
+    "--connect",
+    is_flag=True,
+    help="""Verify if connecting to the configured Exasol database instance
+    succeeds.""",
+)
+def check(scs_file: Path, connect: bool):
     """
     Check the configuration current contained in the Secure Configuration
-    Storage.
-    """
-    pass
+    Storage and verify if it contains all required parameters.
 
-
-@check.command()
-@add_params(SCS_OPTIONS)
-def configuration(scs_file: Path):
-    """
-    Verify if all required parameters are saved in the SCS.
-    """
-    pass
-
-
-@check.command()
-@add_params(SCS_OPTIONS)
-def connection(scs_file: Path):
-    """
-    Verify successful connection to the configured Exasol database
-    instance.
+    Optionally also verify if a connection to the configured Exasol database
+    instance is successful.
     """
     pass
