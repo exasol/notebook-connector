@@ -15,7 +15,7 @@ class ScsArgument:
     def __init__(self, *args, scs_key: CKey | None = None, **kwargs):
         self._args = args
         self.scs_key = scs_key
-        self._kwargs = dict(kwargs)
+        self._kwargs = kwargs
 
     def decorate(self, func):
         """
