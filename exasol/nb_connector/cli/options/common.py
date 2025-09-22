@@ -17,6 +17,13 @@ SCS_OPTIONS = [
     ),
 ]
 
+SAVE_OPTIONS = [
+    ScsOption(
+        "--overwrite-backend/--no-overwrite-backend",
+        is_flag=True,
+        help="Whether to overwrite a different backend in the SCS.",
+    )
+]
 
 COMMON_OPTIONS = [
     ScsOption(
