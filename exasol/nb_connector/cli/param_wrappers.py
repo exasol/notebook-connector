@@ -89,15 +89,19 @@ class ScsSecretOption(ScsOption):
         envvar: str,
         prompt: str,
         scs_key: CKey,
+        *args,
         metavar: str = "PASSWORD",
+        **kwargs,
     ):
         super().__init__(
             name,
+            *args,
             metavar=metavar,
             type=bool,
             is_flag=True,
             help=f"{prompt}  [env var: {envvar}]",
             scs_key=scs_key,
+            **kwargs,
         )
         self.envvar = envvar
         self.prompt = prompt
