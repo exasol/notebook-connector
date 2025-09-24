@@ -3,6 +3,11 @@ from exasol.nb_connector.ai_lab_config import StorageBackend
 
 
 class ScsMock:
+    """
+    Instead of using a real Secure Configuration Storage, this mock
+    simpulates it using a simple dict().
+    """
+
     def __init__(
         self,
         backend: StorageBackend | None = None,
