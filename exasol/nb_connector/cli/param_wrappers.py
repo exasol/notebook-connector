@@ -165,9 +165,7 @@ class ScsSecretOption(ScsOption):
         self.name = name
 
     def displayed_value(self, scs: Secrets) -> str | None:
-        if self.scs_key:
-            return "****" if scs.get(self.scs_key) else None
-        return None
+        return "****" if self.scs_key and scs.get(self.scs_key) else None
 
     def get_secret(self, interactive: Any) -> str:
         """
