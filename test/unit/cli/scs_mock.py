@@ -6,7 +6,7 @@ class ScsMock:
     def __init__(
         self,
         backend: StorageBackend | None = None,
-        use_itde: bool|None = None,
+        use_itde: bool | None = None,
     ):
         self._dict = dict()
         if backend:
