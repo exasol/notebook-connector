@@ -2,6 +2,7 @@ from pathlib import Path
 
 import click
 
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.cli.param_wrappers import (
     ScsArgument,
     ScsOption,
@@ -31,5 +32,6 @@ COMMON_OPTIONS = [
         metavar="DB_SCHEMA",
         type=str,
         help="Database schema for installing UDFs of Exasol extensions",
+        scs_key=CKey.db_schema,
     )
 ]

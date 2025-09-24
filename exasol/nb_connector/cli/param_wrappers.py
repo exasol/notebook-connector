@@ -2,9 +2,16 @@
 Wrappers for adding custom properties to click parameters, e.g. SCS key.
 """
 
+import getpass
+import os
+import re
+from typing import Any
+
 import click
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.cli import reporting as report
+from exasol.nb_connector.secret_store import Secrets
 
 
 class ScsArgument:
@@ -16,6 +23,20 @@ class ScsArgument:
         self._args = args
         self.scs_key = scs_key
         self._kwargs = kwargs
+
+    @property
+    def arg_name(self) -> str:
+        return self._args[0]
+
+    def needs_entry(self, scs: Secrets) -> bool:
+        return False
+
+    def displayed_value(self, scs: Secrets) -> str | None:
+        return None
+
+    @property
+    def default(self) -> Any:
+        return self._kwargs.get("default")
 
     def decorate(self, func):
         """
@@ -65,6 +86,18 @@ class ScsOption(ScsArgument):
         self.scs_required = scs_required
         self.get_default_from = get_default_from
 
+    def cli_option(self, full=False) -> str:
+        raw = self._args[0]
+        return raw if full else re.sub(r"/--.*$", "", raw)
+
+    @property
+    def arg_name(self) -> str:
+        for arg in self._args:
+            if not arg.startswith("--"):
+                return arg
+        name = self.cli_option()
+        return name[2:].replace("-", "_")
+
     def decorate(self, func):
         """
         This method is to be called when decorating the functions in the
@@ -76,6 +109,30 @@ class ScsOption(ScsArgument):
             show_default=True,
         )
         return decorator(func)
+
+    def displayed_value(self, scs: Secrets) -> str | None:
+        return scs.get(self.scs_key) if self.scs_key else None
+
+    def needs_entry(self, scs: Secrets) -> bool:
+        """
+        Return True, if the current option is configured to be saved to
+        the SCS but SCS does not yet contain a value.
+        """
+
+        def has_value() -> bool:
+            if not self.scs_key:
+                return False
+            if scs.get(self.scs_key) is not None:
+                return True
+            if alt := self.scs_alternative_key:
+                return scs.get(alt) is not None
+            return False
+
+        return bool(self.scs_key) and self.scs_required and not has_value()
+
+    def __repr__(self) -> str:
+        cls_name = type(self).__name__
+        return f"{cls_name}<{self.cli_option(full=True)}>"
 
 
 class ScsSecretOption(ScsOption):
@@ -106,6 +163,24 @@ class ScsSecretOption(ScsOption):
         self.envvar = envvar
         self.prompt = prompt
         self.name = name
+
+    def displayed_value(self, scs: Secrets) -> str | None:
+        if self.scs_key:
+            return "****" if scs.get(self.scs_key) else None
+        return None
+
+    def get_secret(self, interactive: Any) -> str:
+        """
+        If interactive is True and the related environment variable is not
+        set then ask for the secret interactively.
+        """
+        if value := os.getenv(self.envvar):
+            report.info(f"Reading {self.name} from environment variable {self.envvar}.")
+            return value
+        if not interactive:
+            return ""
+        prompt = f"{self.prompt} (option {self.name}): "
+        return getpass.getpass(prompt)
 
 
 def add_params(scs_options: list[ScsArgument]):
