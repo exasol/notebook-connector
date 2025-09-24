@@ -116,6 +116,7 @@ force_grid_wrap = 2
 
 
 [tool.pylint.master]
+ignored-modules = [ "exasol.ai.text" ]
 fail-under = 8.0
 
 [tool.mypy]
@@ -146,3 +147,6 @@ max-module-lines = 800
 projectKey = "com.exasol:notebook-connector"
 hostUrl = "https://sonarcloud.io"
 organization = "exasol"
+
+[tool.poetry.plugins."console_scripts"]
+scs = 'exasol.nb_connector.cli.main:main'
