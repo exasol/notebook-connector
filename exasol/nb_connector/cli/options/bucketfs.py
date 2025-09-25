@@ -41,7 +41,7 @@ BUCKETFS_OPTIONS = [
         "--bucketfs-user",
         metavar="USERNAME",
         type=str,
-        # should we add "w" as default here?
+        default="w",
         help="BucketFS user name",
         scs_key=CKey.bfs_user,
     ),

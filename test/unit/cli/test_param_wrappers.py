@@ -209,7 +209,7 @@ def sample_secret():
 
 def test_get_secret_from_env(monkeypatch, sample_secret, capsys):
     expected = "password from env"
-    monkeypatch.setattr(os, "getenv", Mock(return_value=expected))
+    monkeypatch.setitem(os.environ, "ENV_VAR", expected)
     assert sample_secret.get_secret(interactive=True) == expected
     assert "Reading --opt from environment variable" in capsys.readouterr().out
 

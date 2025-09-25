@@ -56,6 +56,10 @@ class ScsArgument(ScsParam):
         super().__init__(scs_key, **kwargs)
         self.name = name
 
+    @property
+    def arg_name(self) -> str:
+        return self.name
+
     def decorate(self, func):
         """
         This method is to be called when decorating the functions in the
