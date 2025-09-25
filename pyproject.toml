@@ -116,6 +116,8 @@ force_grid_wrap = 2
 
 
 [tool.pylint.master]
+# Module exasol.ai.text is compiled via Cython, released as binary.
+# So pylint cannot verify types there.
 ignored-modules = [ "exasol.ai.text" ]
 fail-under = 8.0
 
