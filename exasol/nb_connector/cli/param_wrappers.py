@@ -19,6 +19,7 @@ class ScsParam:
     """
     Abstract base class for ScsArgument and ScsOption.
     """
+
     def __init__(self, scs_key: CKey | None = None, **kwargs):
         self.scs_key = scs_key
         self._kwargs = kwargs
