@@ -10,6 +10,7 @@ import pytest
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.cli.param_wrappers import (
     ScsArgument,
+    ScsParam,
     ScsOption,
     ScsSecretOption,
 )
@@ -19,16 +20,15 @@ def select_atts(obj: any, atts: dict[str, any]) -> dict[str, any]:
     return {k: getattr(obj, k) for k in atts}
 
 
-def get_click_params(scs_arg: ScsArgument):
+def get_click_params(scs_arg: ScsParam):
     return scs_arg.decorate(lambda: None).__click_params__
 
 
 def test_scs_argument():
     testee = ScsArgument("arg_name", envvar="KWARG_ENVVAR")
     expected = {
-        "arg_name": "arg_name",
+        "name": "arg_name",
         "scs_key": None,
-        "_args": ("arg_name",),
         "_kwargs": {"envvar": "KWARG_ENVVAR"},
     }
     assert expected == select_atts(testee, expected)

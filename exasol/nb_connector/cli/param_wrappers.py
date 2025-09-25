@@ -5,6 +5,7 @@ Wrappers for adding custom properties to click parameters, e.g. SCS key.
 import getpass
 import os
 import re
+from abc import abstractmethod
 from typing import Any
 
 import click
@@ -14,29 +15,45 @@ from exasol.nb_connector.cli import reporting as report
 from exasol.nb_connector.secret_store import Secrets
 
 
-class ScsArgument:
+class ScsParam:
     """
-    Represents a CLI argument for the SCS command.
+    Abstract base class for ScsArgument and ScsOption.
     """
-
-    def __init__(self, *args, scs_key: CKey | None = None, **kwargs):
-        self._args = args
+    def __init__(self, scs_key: CKey | None = None, **kwargs):
         self.scs_key = scs_key
         self._kwargs = kwargs
 
     @property
     def arg_name(self) -> str:
-        return self._args[0]
+        return ""
 
     def needs_entry(self, scs: Secrets) -> bool:
         return False
 
-    def displayed_value(self, scs: Secrets) -> str | None:
-        return None
-
     @property
     def default(self) -> Any:
         return self._kwargs.get("default")
+
+    def displayed_value(self, scs: Secrets) -> str | None:
+        return None
+
+    @abstractmethod
+    def decorate(self, func):
+        """
+        This method is to be called when decorating the functions in the
+        actual CLI declaration.
+        """
+        pass
+
+
+class ScsArgument(ScsParam):
+    """
+    Represents a CLI argument for the SCS command.
+    """
+
+    def __init__(self, name: str, scs_key: CKey | None = None, **kwargs):
+        super().__init__(scs_key, **kwargs)
+        self.name = name
 
     def decorate(self, func):
         """
@@ -44,11 +61,11 @@ class ScsArgument:
         actual CLI declaration. Hence, ScsArgument calls click.argument()
         under the hood.
         """
-        decorator = click.argument(*self._args, **self._kwargs)
+        decorator = click.argument(self.name, **self._kwargs)
         return decorator(func)
 
 
-class ScsOption(ScsArgument):
+class ScsOption(ScsParam):
     """
     CLI option for saving and checking values to the Secure Configuration
     Storage (SCS).
@@ -74,6 +91,7 @@ class ScsOption(ScsArgument):
 
     def __init__(
         self,
+        cli_option,
         *args,
         scs_key: CKey | None = None,
         scs_alternative_key: CKey | None = None,
@@ -81,13 +99,15 @@ class ScsOption(ScsArgument):
         get_default_from: str | None = None,
         **kwargs,
     ):
-        super().__init__(*args, scs_key=scs_key, **kwargs)
+        super().__init__(scs_key=scs_key, **kwargs)
+        self._cli_option = cli_option
+        self._args = args
         self.scs_alternative_key = scs_alternative_key
         self.scs_required = scs_required
         self.get_default_from = get_default_from
 
     def cli_option(self, full=False) -> str:
-        raw = self._args[0]
+        raw = self._cli_option
         return raw if full else re.sub(r"/--.*$", "", raw)
 
     @property
@@ -104,6 +124,7 @@ class ScsOption(ScsArgument):
         actual CLI declaration. ScsOption calls click.option().
         """
         decorator = click.option(
+            self._cli_option,
             *self._args,
             **self._kwargs,
             show_default=True,
