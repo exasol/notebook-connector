@@ -54,7 +54,7 @@ class OptionMapper:
     value, i.e. the name of the actual database user.
 
     This class helps mapping both instants as P1 usually contains additional
-    information, in particular the key for the SCS fror saving the parameter's
+    information, in particular the key for the SCS for saving the parameter's
     value.
 
     * Given the arg name (P2) find the (P1) instance of the parameter.
