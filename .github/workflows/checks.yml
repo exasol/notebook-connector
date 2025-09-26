@@ -4,6 +4,7 @@ on:
   workflow_call:
 
 jobs:
+
   Version-Check:
     name: Version
     runs-on: ubuntu-24.04
@@ -56,6 +57,7 @@ jobs:
     permissions:
       contents: read
     if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
