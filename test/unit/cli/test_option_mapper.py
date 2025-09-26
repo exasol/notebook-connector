@@ -19,7 +19,7 @@ from exasol.nb_connector.cli.processing import option_mapper
 from exasol.nb_connector.cli.processing.option_mapper import (
     SELECT_BACKEND_OPTION,
     USE_ITDE_OPTION,
-    BackendConfiguration,
+    BackendSelector,
     OptionMapper,
     ScsCliError,
     get_option_mapper,
@@ -48,7 +48,7 @@ TEST_SCENARIOS = [
 
 
 def test_empty_backend_configuration():
-    testee = BackendConfiguration(ScsMock())
+    testee = BackendSelector(ScsMock())
     assert not testee.knows_backend
     assert not testee.knows_itde_usage
     assert not testee.is_valid
@@ -67,7 +67,7 @@ def test_empty_backend_configuration():
 )
 def test_partial_backend_configuration(backend, use_itde):
     scs_mock = ScsMock(backend, use_itde)
-    testee = BackendConfiguration(scs_mock)
+    testee = BackendSelector(scs_mock)
     assert testee.knows_backend == (backend is not None)
     assert testee.knows_itde_usage == (use_itde is not None)
     assert not testee.is_valid
@@ -78,7 +78,7 @@ def test_partial_backend_configuration(backend, use_itde):
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
 def test_valid_backend_configuration(scenario):
     scs_mock = ScsMock(scenario.backend, scenario.use_itde)
-    testee = BackendConfiguration(scs_mock)
+    testee = BackendSelector(scs_mock)
     assert testee.knows_backend
     assert testee.knows_itde_usage
     assert testee.backend_name == scenario.name

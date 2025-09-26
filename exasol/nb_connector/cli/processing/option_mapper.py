@@ -5,8 +5,6 @@ import os
 from pathlib import Path
 from typing import Any
 
-import click
-
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.cli import reporting as report
@@ -16,7 +14,7 @@ from exasol.nb_connector.cli.options import (
     SAAS_OPTIONS,
 )
 from exasol.nb_connector.cli.param_wrappers import ScsOption
-from exasol.nb_connector.connections import get_backend
+from exasol.nb_connector.cli.processing.backend_selector import BackendSelector
 from exasol.nb_connector.secret_store import Secrets
 
 
@@ -25,10 +23,6 @@ class ScsCliError(Exception):
     Indicates an error when saving or checking CLI options wrt. the Secure
     Configuration Storage (SCS).
     """
-
-
-def get_bool(scs: Secrets, key: str | CKey) -> bool:
-    return scs.get(key, "False") == "True"
 
 
 SELECT_BACKEND_OPTION = ScsOption("backend", scs_key=CKey.storage_backend)
@@ -96,7 +90,7 @@ class OptionMapper:
             o.cli_option(full=True) for o in self.options if o.needs_entry(self.scs)
         ]
         if not missing:
-            config = BackendConfiguration(self.scs)
+            config = BackendSelector(self.scs)
             report.success(
                 "Configuration is complete for an "
                 f"Exasol {config.backend_name} instance."
@@ -125,59 +119,6 @@ def get_scs(scs_file: Path) -> Secrets:
     return Secrets(scs_file, scs_password)
 
 
-class BackendConfiguration:
-    """
-    Based on an instance of Secrets (SCS) this class provides the
-    following convenient features:
-
-    * Tell whether a particular backend is properly selected.
-
-    * Access the properties of the selection using proper types StorageBackend
-      and bool.
-
-    * Get the user-friendly display name of the selected backend, e.g. "Docker".
-
-    * Check of another backend selection is allowed wrt. to the current,
-      i.e. "matches".
-    """
-
-    def __init__(self, scs: Secrets):
-        self._scs = scs
-
-    @property
-    def knows_backend(self) -> bool:
-        return bool(self._scs.get(CKey.storage_backend))
-
-    @property
-    def knows_itde_usage(self) -> bool:
-        return bool(self._scs.get(CKey.use_itde))
-
-    @property
-    def backend(self) -> StorageBackend:
-        return get_backend(self._scs)
-
-    @property
-    def backend_name(self) -> str:
-        if self.backend == StorageBackend.saas:
-            return "SaaS"
-        if self.use_itde:
-            return "Docker"
-        return "on-premise"
-
-    @property
-    def use_itde(self) -> bool:
-        return get_bool(self._scs, CKey.use_itde)
-
-    @property
-    def is_valid(self) -> bool:
-        return self.knows_backend and self.knows_itde_usage
-
-    def allows(self, backend: StorageBackend, use_itde: bool) -> bool:
-        if not self.is_valid:
-            return True
-        return backend == self.backend and use_itde == self.use_itde
-
-
 def get_option_mapper(scs_file: Path) -> OptionMapper | None:
     """
     Return an instance of an OptionMapper if the SCS contains a proper
@@ -185,7 +126,7 @@ def get_option_mapper(scs_file: Path) -> OptionMapper | None:
     """
 
     scs = get_scs(scs_file)
-    config = BackendConfiguration(scs)
+    config = BackendSelector(scs)
     if not config.knows_backend:
         report.error(f"SCS {scs_file} does not contain any backend.")
         return None
