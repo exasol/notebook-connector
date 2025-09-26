@@ -140,6 +140,13 @@ def get_option_mapper(scs_file: Path) -> OptionMapper | None:
     """
     Return an instance of an OptionMapper if the SCS contains a proper
     backend selection. Otherwise report an error and return None.
+
+    This function is designed to be called only once in the CLI application.
+    Otherwise it will always ask for the SCS master password and potentially
+    report errors in case of no backend being selected.
+
+    If you want to instantiate the OptionMapper more often, then simply use
+    its constructor.
     """
 
     scs = get_scs(scs_file)
