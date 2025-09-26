@@ -13,7 +13,10 @@ from exasol.nb_connector.cli.options import (
     ONPREM_OPTIONS,
     SAAS_OPTIONS,
 )
-from exasol.nb_connector.cli.param_wrappers import ScsOption, ScsParam
+from exasol.nb_connector.cli.param_wrappers import (
+    ScsOption,
+    ScsParam,
+)
 from exasol.nb_connector.cli.processing.backend_selector import BackendSelector
 from exasol.nb_connector.secret_store import Secrets
 
@@ -82,9 +85,7 @@ class OptionSet:
             if not ref or values[o.arg_name] is not None:
                 continue
             other = self.find_option(ref)
-            report.info(
-                f"Using {other.cli_option()} as default for {o.cli_option()}."
-            )
+            report.info(f"Using {other.cli_option()} as default for {o.cli_option()}.")
             values[o.arg_name] = values[other.arg_name]
 
         return values

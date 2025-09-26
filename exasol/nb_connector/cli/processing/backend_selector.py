@@ -59,5 +59,3 @@ class BackendSelector:
         if not self.is_valid:
             return True
         return backend == self.backend and use_itde == self.use_itde
-
-
