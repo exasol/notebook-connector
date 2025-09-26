@@ -45,23 +45,11 @@ def get_options(
 
 class OptionMapper:
     """
-    The lifecycle of a CLI parameter comprises two phases: P1) The initial
-    definition of the parameter. P2) When the parameter is instantiated with a
-    value.
-
-    (P1) may contain a CLI name like "--db-username" while in (P2) the
-    parameter is represented as an arg name, e.g. "db_username", but also a
-    value, i.e. the name of the actual database user.
-
-    This class helps mapping both instants as P1 usually contains additional
-    information, in particular the key for the SCS fror saving the parameter's
-    value.
-
-    * Given the arg name (P2) find the (P1) instance of the parameter.
+    * Find an option by its underscored name.
 
     * Transfer option values as default to other options.
 
-    * Check the SCS content fore completeness.
+    * Check the SCS content for completeness.
     """
 
     def __init__(self, scs: Secrets, backend: StorageBackend, use_itde: bool):
