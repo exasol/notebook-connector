@@ -53,9 +53,27 @@ class BackendSelector:
 
     @property
     def is_valid(self) -> bool:
+        """
+        Tells whether the current backend selection is valid wrt. whether
+        it's saas, onprem, or docker. For a backend selection to be valid, the
+        backend must be known and whether the ITDE should be used.
+
+        This property does *NOT* tell, whether the SCS contains all required
+        connection options for the particular selected backend.
+        """
         return self.knows_backend and self.knows_itde_usage
 
     def allows(self, backend: StorageBackend, use_itde: bool) -> bool:
+        """
+        This method can be used if the user selected a backend in the past
+        and wants to add additional connection options later on.
+
+        The SCS CLI wants to allow that only if sticking to the same backend,
+        incl. the option whether or not to use the ITDE.
+
+        If no backend has been selected yet (method is_valid returns False),
+        then adding connection options is always allowed.
+        """
         if not self.is_valid:
             return True
         return backend == self.backend and use_itde == self.use_itde
