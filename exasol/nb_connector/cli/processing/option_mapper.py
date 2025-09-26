@@ -13,7 +13,7 @@ from exasol.nb_connector.cli.options import (
     ONPREM_OPTIONS,
     SAAS_OPTIONS,
 )
-from exasol.nb_connector.cli.param_wrappers import ScsOption
+from exasol.nb_connector.cli.param_wrappers import ScsOption, ScsParam
 from exasol.nb_connector.cli.processing.backend_selector import BackendSelector
 from exasol.nb_connector.secret_store import Secrets
 
@@ -32,7 +32,7 @@ USE_ITDE_OPTION = ScsOption("use_itde", scs_key=CKey.use_itde)
 def get_options(
     backend: StorageBackend,
     use_itde: bool,
-) -> list[ScsOption]:
+) -> list[ScsParam]:
     def specific_options():
         if backend == StorageBackend.saas:
             return SAAS_OPTIONS
@@ -45,11 +45,23 @@ def get_options(
 
 class OptionMapper:
     """
-    * Find an option by its underscored name.
+    The lifecycle of a CLI parameter comprises two phases: P1) The initial
+    definition of the parameter. P2) When the parameter is instantiated with a
+    value.
+
+    (P1) may contain a CLI name like "--db-username" while in (P2) the
+    parameter is represented as an arg name, e.g. "db_username", but also a
+    value, i.e. the name of the actual database user.
+
+    This class helps mapping both instants as P1 usually contains additional
+    information, in particular the key for the SCS fror saving the parameter's
+    value.
+
+    * Given the arg name (P2) find the (P1) instance of the parameter.
 
     * Transfer option values as default to other options.
 
-    * Check the SCS content for completeness.
+    * Check the SCS content fore completeness.
     """
 
     def __init__(self, scs: Secrets, backend: StorageBackend, use_itde: bool):
@@ -73,18 +85,17 @@ class OptionMapper:
         Some options may specify another option to get their default value
         from, e.g. --bucketfs-host-internal reads its default value from
         --bucketfs-host.
-
-        This function modifies the passed dict by transfering the default
-        values and returns the modified dict.
         """
         for o in self.options:
-            ref = o.scs_key and o.get_default_from
-            if ref and values[o.arg_name] is None:
-                other = self.find_option(ref)
-                report.info(
-                    f"Using {other.cli_option()} as default for {o.cli_option()}."
-                )
-                values[o.arg_name] = values[other.arg_name]
+            ref = o.get_default_from if isinstance(o, ScsOption) else None
+            if not ref or values[o.arg_name] is not None:
+                continue
+            other = self.find_option(ref)
+            report.info(
+                f"Using {other.cli_option()} as default for {o.cli_option()}."
+            )
+            values[o.arg_name] = values[other.arg_name]
+
         return values
 
     def check(self) -> bool:
