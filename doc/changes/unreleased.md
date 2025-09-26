@@ -9,7 +9,7 @@ Additionally the release includes a CLI for populating the Secure Configuration 
 ## Features
 
 * #258: Added initial SCS CLI
-* #263: Add functions for handling a set of options for SCS CLI
+* #263: Added functions for handling a set of options for SCS CLI
 
 ## Refactorings
 
