@@ -130,12 +130,12 @@ class BackendConfiguration:
     Based on an instance of Secrets (SCS) this class provides the
     following convenient features:
 
-    * Tell whether a particular backend is properly selected
+    * Tell whether a particular backend is properly selected.
 
     * Access the properties of the selection using proper types StorageBackend
       and bool.
 
-    * Get the user-friendly display name of the selected backend, e.g. "Docker"
+    * Get the user-friendly display name of the selected backend, e.g. "Docker".
 
     * Check of another backend selection is allowed wrt. to the current,
       i.e. "matches".
