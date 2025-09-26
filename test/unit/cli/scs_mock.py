@@ -5,7 +5,7 @@ from _pytest.monkeypatch import MonkeyPatch
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ai_lab_config import StorageBackend
-from exasol.nb_connector.cli.processing import option_mapper
+from exasol.nb_connector.cli.processing import option_set
 
 
 class ScsMock:
@@ -48,7 +48,7 @@ class ScsPatcher:
         self._module = module
 
     def disable_reporting(self, func: str):
-        self._monkeypatch.setattr(option_mapper.report, func, Mock())
+        self._monkeypatch.setattr(option_set.report, func, Mock())
 
     def patch(
         self,

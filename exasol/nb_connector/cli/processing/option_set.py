@@ -43,7 +43,7 @@ def get_options(
     return [SELECT_BACKEND_OPTION, USE_ITDE_OPTION] + specific_options()
 
 
-class OptionMapper:
+class OptionSet:
     """
     * Find an option by its underscored name.
 
@@ -127,16 +127,16 @@ def get_scs(scs_file: Path) -> Secrets:
     return Secrets(scs_file, scs_password)
 
 
-def get_option_mapper(scs_file: Path) -> OptionMapper | None:
+def get_option_set(scs_file: Path) -> OptionSet | None:
     """
-    Return an instance of an OptionMapper if the SCS contains a proper
+    Return an instance of an OptionSet if the SCS contains a proper
     backend selection. Otherwise report an error and return None.
 
     This function is designed to be called only once in the CLI application.
     Otherwise it will always ask for the SCS master password and potentially
     report errors in case of no backend being selected.
 
-    If you want to instantiate the OptionMapper more often, then simply use
+    If you want to instantiate the OptionSet more often, then simply use
     its constructor.
     """
 
@@ -151,4 +151,4 @@ def get_option_mapper(scs_file: Path) -> OptionMapper | None:
             "to use an Exasol Docker instance (ITDE)."
         )
         return None
-    return OptionMapper(scs, config.backend, config.use_itde)
+    return OptionSet(scs, config.backend, config.use_itde)
