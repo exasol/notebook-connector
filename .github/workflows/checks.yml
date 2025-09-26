@@ -176,23 +176,6 @@ jobs:
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
-      # - name: Free disk space
-      #   uses: jlumbroso/free-disk-space@main
-      #   with:
-      #     tool-cache: true
-      #     large-packages: false
-      # - name: Free disk space by removing large directories
-      #   run: |
-      #     sudo rm -rf /usr/local/graalvm/
-      #     sudo rm -rf /usr/local/.ghcup/
-      #     sudo rm -rf /usr/local/share/powershell
-      #     sudo rm -rf /usr/local/share/chromium
-      #     sudo rm -rf /usr/local/lib/node_modules
-      #     sudo rm -rf /opt/ghc
-      # 
-      # - name: Allow unprivileged user namespaces
-      #   run: |
-      #     sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v1
@@ -204,12 +187,13 @@ jobs:
 
       - name: Run Tests and Collect Coverage
         run: |
-          poetry run -- nox -s test:unit -- --coverage \
-          -W 'ignore::DeprecationWarning:luigi:' \
-          -W 'ignore::DeprecationWarning:pkg_resources:' \
-          -W 'ignore:pkg_resources is deprecated as an API:DeprecationWarning' \
-          -W 'ignore:Deprecated call to \`pkg_resources.declare_namespace:DeprecationWarning' \
-          -W 'ignore::DeprecationWarning:exasol_integration_test_docker_environment:'
+          poetry run -- nox -s test:unit -- --coverage 
+          # \
+          # -W 'ignore::DeprecationWarning:luigi:' \
+          # -W 'ignore::DeprecationWarning:pkg_resources:' \
+          # -W 'ignore:pkg_resources is deprecated as an API:DeprecationWarning' \
+          # -W 'ignore:Deprecated call to \`pkg_resources.declare_namespace:DeprecationWarning' \
+          # -W 'ignore::DeprecationWarning:exasol_integration_test_docker_environment:'
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4.6.2
