@@ -73,6 +73,9 @@ class OptionMapper:
         Some options may specify another option to get their default value
         from, e.g. --bucketfs-host-internal reads its default value from
         --bucketfs-host.
+
+        This function modifies the passed dict by transfering the default
+        values and returns the modified dict.
         """
         for o in self.options:
             ref = o.scs_key and o.get_default_from
