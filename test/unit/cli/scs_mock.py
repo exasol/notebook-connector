@@ -34,7 +34,7 @@ class ScsMock:
 
 class ScsPatcher:
     """
-    Enables to patch function function get_scs() in the specified module.
+    Enables to patch function function get_scs() in the specified module
     and to return an instance of ScsMock() instead, optionally already
     containing a backend selection.
     """

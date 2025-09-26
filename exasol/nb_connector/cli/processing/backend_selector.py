@@ -11,7 +11,7 @@ def get_bool(scs: Secrets, key: str | CKey) -> bool:
 class BackendSelector:
     """
     Based on an instance of Secrets (SCS) this class provides the
-    following convenient features:
+    following features:
 
     * Tell whether a particular backend is properly selected.
 
@@ -20,8 +20,8 @@ class BackendSelector:
 
     * Get the user-friendly display name of the selected backend, e.g. "Docker".
 
-    * Check of another backend selection is allowed wrt. to the current,
-      i.e. "matches".
+    * Check if another backend selection is allowed wrt. to the current,
+      i.e. "matches". This is also fine if no backend is selected, yet.
     """
 
     def __init__(self, scs: Secrets):
