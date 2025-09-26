@@ -24,6 +24,9 @@ class ScsParam:
         self.scs_key = scs_key
         self._kwargs = kwargs
 
+    def cli_option(self, full=False) -> str:
+        return ""
+
     @property
     def arg_name(self) -> str:
         return ""

@@ -59,7 +59,7 @@ class OptionSet:
         self.scs = scs
         self.options = get_options(backend, use_itde)
 
-    def find_option(self, arg_name: str) -> ScsOption:
+    def find_option(self, arg_name: str) -> ScsParam:
         """
         Find the full definition of a click parameter for the specified
         arg name.
