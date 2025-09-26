@@ -22,7 +22,7 @@ from exasol.nb_connector.secret_store import Secrets
 
 class ScsCliError(Exception):
     """
-    Indicates an error when saving or checking CLI options wrt. Secure
+    Indicates an error when saving or checking CLI options wrt. the Secure
     Configuration Storage (SCS).
     """
 
@@ -50,11 +50,20 @@ def get_options(
 
 
 class OptionMapper:
+    """
+    Map arguments to initial definitions of click
+    parameters. E.g. "db_username" to "--db-username".
+    """
+
     def __init__(self, scs: Secrets, backend: StorageBackend, use_itde: bool):
         self.scs = scs
         self.options = get_options(backend, use_itde)
 
     def find_option(self, arg_name: str) -> ScsOption:
+        """
+        Find the full definition of a click parameter for the specified
+        arg name.
+        """
         try:
             return next(o for o in self.options if o.arg_name == arg_name)
         except StopIteration:
@@ -65,7 +74,8 @@ class OptionMapper:
     def set_dynamic_defaults(self, values: dict[str, Any]) -> dict[str, Any]:
         """
         Some options may specify another option to get their default value
-        from.
+        from, e.g. --bucketfs-host-internal reads its default value from
+        --bucketfs-host.
         """
         for o in self.options:
             ref = o.scs_key and o.get_default_from
@@ -78,6 +88,10 @@ class OptionMapper:
         return values
 
     def check(self) -> bool:
+        """
+        Check if the content of the SCS is complete wrt. the selected
+        backend as the required options depend on the selected backend.
+        """
         missing = [
             o.cli_option(full=True) for o in self.options if o.needs_entry(self.scs)
         ]
@@ -96,6 +110,11 @@ class OptionMapper:
 
 
 def get_scs_master_password():
+    """
+    Retrieve the master password for the SCS either from the related
+    environment variable or by asking the user to type the password
+    interactively.
+    """
     if from_env := os.getenv("SCS_MASTER_PASSWORD"):
         return from_env
     return getpass.getpass("SCS master password: ")
@@ -107,6 +126,21 @@ def get_scs(scs_file: Path) -> Secrets:
 
 
 class BackendConfiguration:
+    """
+    Based on an instance of Secrets (SCS) this class provides the
+    following convenient features:
+
+    * Tell whether a particular backend is properly selected
+
+    * Access the properties of the selection using proper types StorageBackend
+      and bool.
+
+    * Get the user-friendly display name of the selected backend, e.g. "Docker"
+
+    * Check of another backend selection is allowed wrt. to the current,
+      i.e. "matches".
+    """
+
     def __init__(self, scs: Secrets):
         self._scs = scs
 
@@ -145,6 +179,11 @@ class BackendConfiguration:
 
 
 def get_option_mapper(scs_file: Path) -> OptionMapper | None:
+    """
+    Return an instance of an OptionMapper if the SCS contains a proper
+    backend selection. Otherwise report an error and return None.
+    """
+
     scs = get_scs(scs_file)
     config = BackendConfiguration(scs)
     if not config.knows_backend:

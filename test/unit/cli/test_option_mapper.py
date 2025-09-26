@@ -61,15 +61,15 @@ def test_empty_backend_configuration():
     [
         (StorageBackend.saas, None),
         (StorageBackend.onprem, None),
-        (None, "True"),
-        (None, "False"),
+        (None, True),
+        (None, False),
     ],
 )
 def test_partial_backend_configuration(backend, use_itde):
     scs_mock = ScsMock(backend, use_itde)
     testee = BackendConfiguration(scs_mock)
-    assert testee.knows_backend == bool(backend)
-    assert testee.knows_itde_usage == bool(use_itde)
+    assert testee.knows_backend == (backend is not None)
+    assert testee.knows_itde_usage == (use_itde is not None)
     assert not testee.is_valid
     for s in TEST_SCENARIOS:
         assert testee.allows(s.backend, s.use_itde)
