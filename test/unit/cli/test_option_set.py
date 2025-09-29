@@ -49,8 +49,6 @@ TEST_SCENARIOS = [
 
 def test_empty_backend_configuration():
     testee = BackendSelector(ScsMock())
-    assert not testee.knows_backend
-    assert not testee.knows_itde_usage
     assert not testee.is_valid
     for s in TEST_SCENARIOS:
         assert testee.allows(s.backend, s.use_itde)
@@ -59,7 +57,6 @@ def test_empty_backend_configuration():
 @pytest.mark.parametrize(
     "backend, use_itde",
     [
-        (StorageBackend.saas, None),
         (StorageBackend.onprem, None),
         (None, True),
         (None, False),
@@ -68,8 +65,6 @@ def test_empty_backend_configuration():
 def test_partial_backend_configuration(backend, use_itde):
     scs = ScsMock(backend, use_itde)
     testee = BackendSelector(scs)
-    assert testee.knows_backend == (backend is not None)
-    assert testee.knows_itde_usage == (use_itde is not None)
     assert not testee.is_valid
     for s in TEST_SCENARIOS:
         assert testee.allows(s.backend, s.use_itde)
@@ -79,34 +74,31 @@ def test_partial_backend_configuration(backend, use_itde):
 def test_valid_backend_configuration(scenario):
     scs = ScsMock(scenario.backend, scenario.use_itde)
     testee = BackendSelector(scs)
-    assert testee.knows_backend
-    assert testee.knows_itde_usage
-    assert testee.backend_name == scenario.name
-    assert testee.use_itde == scenario.use_itde
     assert testee.is_valid
+    assert testee.backend_name == scenario.name
     for s in TEST_SCENARIOS:
         expected = scenario == s
         assert testee.allows(s.backend, s.use_itde) == expected
 
 
-def test_option_set_backend_unknown(capsys, scs_patcher):
-    scs_patcher.patch()
+@pytest.mark.parametrize("backend", [
+    StorageBackend.onprem, None
+])
+def test_option_set_backend_unknown(backend, capsys, scs_patcher):
+    scs_patcher.patch(backend)
     actual = get_option_set(Path("/fictional/scs"))
     assert actual is None
     message = "Error: SCS /fictional/scs does not contain any backend."
     assert message in capsys.readouterr().out
 
 
-def test_option_set_use_itde_unknown(capsys, scs_patcher):
-    scs_patcher.patch(StorageBackend.saas)
-    actual = get_option_set(Path("/fictional/scs"))
-    assert actual is None
-    message = "does not contain whether to use an Exasol Docker instance"
-    assert message in capsys.readouterr().out
-
-
-def test_option_set_valid(scs_patcher):
-    scs_patcher.patch(StorageBackend.saas, True)
+@pytest.mark.parametrize("backend, use_itde", [
+    (StorageBackend.saas, None),
+    (StorageBackend.onprem, True),
+    (StorageBackend.onprem, False),
+])
+def test_option_set_valid(backend, use_itde, scs_patcher):
+    scs_patcher.patch(backend, use_itde)
     actual = get_option_set(Path("/fictional/scs"))
     assert isinstance(actual, OptionSet)
 

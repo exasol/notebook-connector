@@ -143,13 +143,7 @@ def get_option_set(scs_file: Path) -> OptionSet | None:
 
     scs = get_scs(scs_file)
     config = BackendSelector(scs)
-    if not config.knows_backend:
+    if not config.is_valid:
         report.error(f"SCS {scs_file} does not contain any backend.")
-        return None
-    if not config.knows_itde_usage:
-        report.error(
-            f"SCS {scs_file} does not contain whether "
-            "to use an Exasol Docker instance (ITDE)."
-        )
         return None
     return OptionSet(scs, config.backend, config.use_itde)

@@ -4,10 +4,6 @@ from exasol.nb_connector.connections import get_backend
 from exasol.nb_connector.secret_store import Secrets
 
 
-def get_bool(scs: Secrets, key: str | CKey) -> bool:
-    return scs.get(key, "False") == "True"
-
-
 class BackendSelector:
     """
     Based on an instance of Secrets (SCS) this class provides the
@@ -28,16 +24,12 @@ class BackendSelector:
         self._scs = scs
 
     @property
-    def knows_backend(self) -> bool:
-        return bool(self._scs.get(CKey.storage_backend))
-
-    @property
-    def knows_itde_usage(self) -> bool:
-        return bool(self._scs.get(CKey.use_itde))
-
-    @property
     def backend(self) -> StorageBackend:
         return get_backend(self._scs)
+
+    @property
+    def use_itde(self) -> bool:
+        return self._scs.get(CKey.use_itde, "False") == "True"
 
     @property
     def backend_name(self) -> str:
@@ -46,10 +38,6 @@ class BackendSelector:
         if self.use_itde:
             return "Docker"
         return "on-premise"
-
-    @property
-    def use_itde(self) -> bool:
-        return get_bool(self._scs, CKey.use_itde)
 
     @property
     def is_valid(self) -> bool:
@@ -61,7 +49,13 @@ class BackendSelector:
         This property does *NOT* tell, whether the SCS contains all required
         connection options for the particular selected backend.
         """
-        return self.knows_backend and self.knows_itde_usage
+        backend = self._scs.get(CKey.storage_backend)
+        if not backend:
+            return False
+        if self.backend == StorageBackend.saas:
+            return True
+        use_itde = self._scs.get(CKey.use_itde)
+        return use_itde is not None
 
     def allows(self, backend: StorageBackend, use_itde: bool) -> bool:
         """
