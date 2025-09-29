@@ -134,7 +134,7 @@ def assert_connection_exists(
 @contextmanager
 def language_definition_context(
     pyexasol_connection: ExaConnection, language_alias: str | None = None
-) -> Generator[None]:
+) -> Generator[None, None, None]:
     """
     A context manager that preserves the current language definitions at both
     SESSION and SYSTEM levels. Optionally creates a definition for the specified
