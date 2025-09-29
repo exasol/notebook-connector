@@ -81,9 +81,7 @@ def test_valid_backend_configuration(scenario):
         assert testee.allows(s.backend, s.use_itde) == expected
 
 
-@pytest.mark.parametrize("backend", [
-    StorageBackend.onprem, None
-])
+@pytest.mark.parametrize("backend", [StorageBackend.onprem, None])
 def test_option_set_backend_unknown(backend, capsys, scs_patcher):
     scs_patcher.patch(backend)
     actual = get_option_set(Path("/fictional/scs"))
@@ -92,11 +90,14 @@ def test_option_set_backend_unknown(backend, capsys, scs_patcher):
     assert message in capsys.readouterr().out
 
 
-@pytest.mark.parametrize("backend, use_itde", [
-    (StorageBackend.saas, None),
-    (StorageBackend.onprem, True),
-    (StorageBackend.onprem, False),
-])
+@pytest.mark.parametrize(
+    "backend, use_itde",
+    [
+        (StorageBackend.saas, None),
+        (StorageBackend.onprem, True),
+        (StorageBackend.onprem, False),
+    ],
+)
 def test_option_set_valid(backend, use_itde, scs_patcher):
     scs_patcher.patch(backend, use_itde)
     actual = get_option_set(Path("/fictional/scs"))
