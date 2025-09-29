@@ -51,7 +51,7 @@ def test_empty_backend_configuration():
     testee = BackendSelector(ScsMock())
     assert not testee.knows_backend
     for s in TEST_SCENARIOS:
-        assert testee.allows(s.backend, s.use_itde)
+        assert testee.matches(s.backend, s.use_itde)
 
 
 @pytest.mark.parametrize(
@@ -67,7 +67,7 @@ def test_partial_backend_configuration(backend, use_itde):
     testee = BackendSelector(scs)
     assert not testee.knows_backend
     for s in TEST_SCENARIOS:
-        assert testee.allows(s.backend, s.use_itde)
+        assert testee.matches(s.backend, s.use_itde)
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
@@ -78,7 +78,7 @@ def test_valid_backend_configuration(scenario):
     assert testee.backend_name == scenario.name
     for s in TEST_SCENARIOS:
         expected = (scenario.backend, scenario.use_itde) == (s.backend, s.use_itde)
-        assert testee.allows(s.backend, s.use_itde) == expected
+        assert testee.matches(s.backend, s.use_itde) == expected
 
 
 @pytest.mark.parametrize("backend", [StorageBackend.onprem, None])

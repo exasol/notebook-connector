@@ -53,16 +53,11 @@ class BackendSelector:
         use_itde = self._scs.get(CKey.use_itde)
         return use_itde is not None
 
-    def allows(self, backend: StorageBackend, use_itde: bool) -> bool:
+    def matches(self, backend: StorageBackend, use_itde: bool) -> bool:
         """
-        This method can be used if the user selected a backend in the past
-        and wants to add additional connection options later on.
-
-        The SCS CLI wants to allow that only if sticking to the same backend,
-        incl. the option whether or not to use the ITDE.
-
-        If no backend has been selected yet (property knows_backend is False),
-        then adding connection options is always allowed.
+        Tells whether the currently selected backend matches the specified
+        one.  If no backend has been selected yet (property knows_backend is
+        False), then the selection is rated to be matching, as well.
         """
         if not self.knows_backend:
             return True
