@@ -12,3 +12,4 @@ This release marks most of the NC's dependencies in file `pyproject.toml` as _op
 
 * #253: Made dependencies optional in file `pyproject.toml`
 * #260: Added unit tests for CLI param wrappers
+* #265: Fixed type hints in tests
