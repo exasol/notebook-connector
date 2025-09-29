@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 import types
+from test.utils.secrets import SecretsMock
 from unittest.mock import Mock
 
 from _pytest.monkeypatch import MonkeyPatch
@@ -9,14 +11,12 @@ from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.cli.processing import option_set
 
 
-from test.utils.secrets import SecretsMock
-
-
 class ScsMock(SecretsMock):
-    def __init__(self,
-                 backend: StorageBackend | None = None,
-                 use_itde: bool | None = None,
-                 ) -> ScsMock:
+    def __init__(
+        self,
+        backend: StorageBackend | None = None,
+        use_itde: bool | None = None,
+    ) -> ScsMock:
         super().__init__()
         if backend:
             self.save(CKey.storage_backend, backend.name)

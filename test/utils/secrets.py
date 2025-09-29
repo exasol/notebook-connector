@@ -27,4 +27,3 @@ class SecretsMock(Secrets):
         key = _ensure_str(key)
         self._mock[key] = value
         return self
-
