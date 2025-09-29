@@ -77,7 +77,7 @@ def test_valid_backend_configuration(scenario):
     assert testee.knows_backend
     assert testee.backend_name == scenario.name
     for s in TEST_SCENARIOS:
-        expected = scenario == s
+        expected = (scenario.backend, scenario.use_itde) == (s.backend, s.use_itde)
         assert testee.allows(s.backend, s.use_itde) == expected
 
 
