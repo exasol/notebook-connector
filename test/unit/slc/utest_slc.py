@@ -3,7 +3,7 @@ import json
 from collections.abc import Generator
 from pathlib import Path
 from test.unit.slc.util import (
-    SecretsMock,
+    SlcSecretsMock,
     not_raises,
 )
 from unittest.mock import (
@@ -69,7 +69,7 @@ class SlcFactory:
 
     @contextlib.contextmanager
     def context(self, slc_name: str, flavor: str):
-        secrets = SecretsMock(slc_name)
+        secrets = SlcSecretsMock(slc_name)
         self.git_repo_mock.clone_from.side_effect = simulate_clone(flavor)
         with current_directory(self.path):
             yield ScriptLanguageContainer.create(
@@ -117,7 +117,7 @@ def test_create(
 
 
 def test_repo_missing(sample_slc_name):
-    secrets = SecretsMock.for_slc(sample_slc_name, Path())
+    secrets = SlcSecretsMock.create(sample_slc_name, Path())
     with pytest.raises(SlcError, match="SLC Git repository not checked out"):
         ScriptLanguageContainer(secrets, sample_slc_name)
 

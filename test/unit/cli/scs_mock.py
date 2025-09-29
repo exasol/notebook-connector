@@ -8,14 +8,14 @@ from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.cli.processing import option_set
 
 
-from test.unit.slc.util import SecretsMock
+from test.utils.secrets import SecretsMock
 
 
 def scs_mock(
     backend: StorageBackend | None = None,
     use_itde: bool | None = None,
     ) -> SecretsMock:
-    scs = SecretsMock("some name")
+    scs = SecretsMock()
     if backend:
         scs.save(CKey.storage_backend, backend.name)
     if use_itde is not None:
