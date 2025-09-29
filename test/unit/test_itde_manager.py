@@ -1,6 +1,5 @@
 import logging
 from unittest import mock
-from typing import Generator
 
 import pytest
 from exasol_integration_test_docker_environment.lib.models.data.container_info import (
@@ -48,7 +47,7 @@ def env_info() -> EnvironmentInfo:
 
 
 @pytest.fixture
-def db_image_version(monkeypatch) -> Generator[str, None, None]:
+def db_image_version(monkeypatch) -> str:
     mocked_db_version = "8.31.0"
     monkeypatch.setenv(TEST_DB_VERSION_ENV_VAR, mocked_db_version)
     yield mocked_db_version
