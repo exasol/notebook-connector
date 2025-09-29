@@ -33,15 +33,13 @@ jobs:
     permissions:
       contents: read
 
-# Deactivated because SaaS Tests are broken because of breaking API changes in SaaS Rest API
-# See https://github.com/exasol/notebook-connector/issues/251
-#  saas-tests:
-#    name: SaaS
-#    needs: [ run-slow-tests ]
-#    uses: ./.github/workflows/tests-saas.yml
-#    secrets: inherit
-#    permissions:
-#      contents: read
+  saas-tests:
+    name: SaaS
+    needs: [ run-slow-tests ]
+    uses: ./.github/workflows/tests-saas.yml
+    secrets: inherit
+    permissions:
+      contents: read
 
   large-runner-tests:
     name: Large Runner

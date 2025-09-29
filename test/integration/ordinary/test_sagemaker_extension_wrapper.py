@@ -38,5 +38,5 @@ def test_initialize_sme_extension(secrets: Secrets, setup_itde):
             assert script_counts["SCRIPTING"] >= 4
             assert script_counts["UDF"] >= 5
             assert_connection_exists(
-                secrets.get(CKey.sme_aws_connection), pyexasol_connection
+                secrets[CKey.sme_aws_connection], pyexasol_connection
             )
