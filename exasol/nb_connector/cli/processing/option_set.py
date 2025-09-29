@@ -143,7 +143,7 @@ def get_option_set(scs_file: Path) -> OptionSet | None:
 
     scs = get_scs(scs_file)
     config = BackendSelector(scs)
-    if not config.is_valid:
+    if not config.knows_backend:
         report.error(f"SCS {scs_file} does not contain any backend.")
         return None
     return OptionSet(scs, config.backend, config.use_itde)

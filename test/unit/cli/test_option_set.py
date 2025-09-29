@@ -49,7 +49,7 @@ TEST_SCENARIOS = [
 
 def test_empty_backend_configuration():
     testee = BackendSelector(ScsMock())
-    assert not testee.is_valid
+    assert not testee.knows_backend
     for s in TEST_SCENARIOS:
         assert testee.allows(s.backend, s.use_itde)
 
@@ -65,7 +65,7 @@ def test_empty_backend_configuration():
 def test_partial_backend_configuration(backend, use_itde):
     scs = ScsMock(backend, use_itde)
     testee = BackendSelector(scs)
-    assert not testee.is_valid
+    assert not testee.knows_backend
     for s in TEST_SCENARIOS:
         assert testee.allows(s.backend, s.use_itde)
 
@@ -74,7 +74,7 @@ def test_partial_backend_configuration(backend, use_itde):
 def test_valid_backend_configuration(scenario):
     scs = ScsMock(scenario.backend, scenario.use_itde)
     testee = BackendSelector(scs)
-    assert testee.is_valid
+    assert testee.knows_backend
     assert testee.backend_name == scenario.name
     for s in TEST_SCENARIOS:
         expected = scenario == s
