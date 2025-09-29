@@ -1,6 +1,6 @@
 import contextlib
 import json
-from collections.abc import Iterator
+from collections.abc import Generator
 from pathlib import Path
 from test.unit.slc.util import (
     SecretsMock,
@@ -155,7 +155,7 @@ def test_legal_names(name, slc_factory):
 @pytest.fixture
 def slc_with_tmp_checkout_dir(
     sample_slc_name, slc_factory
-) -> Iterator[ScriptLanguageContainer]:
+) -> Generator[ScriptLanguageContainer, None, None]:
     with slc_factory.context(slc_name=sample_slc_name, flavor="Vanilla") as slc:
         yield slc
 

@@ -11,6 +11,10 @@ from exasol.nb_connector.slc.slc_compression_strategy import SlcCompressionStrat
 from exasol.nb_connector.slc.slc_flavor import SlcFlavor
 
 
+def _ensure_str(key: str | CKey) -> str:
+    return key.name if isinstance(key, CKey) else key
+
+
 class SecretsMock(Secrets):
     def __init__(
         self,
@@ -20,18 +24,18 @@ class SecretsMock(Secrets):
         self._mock: dict[str, str] = {}
 
     def get(self, key: str | CKey, default_value: str | None = None) -> str | None:
-        key = key.name if isinstance(key, CKey) else key
+        key = _ensure_str(key)
         return self._mock.get(key)
 
     def __getitem__(self, key: str | CKey) -> str:
-        key = key.name if isinstance(key, CKey) else key
+        key = _ensure_str(key)
         val = self._mock.get(key)
         if val is None:
             raise AttributeError(f'Unknown key "{key}"')
         return val
 
     def save(self, key: str | CKey, value: str) -> Secrets:
-        key = key.name if isinstance(key, CKey) else key
+        key = _ensure_str(key)
         self._mock[key] = value
         return self
 
