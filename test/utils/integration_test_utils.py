@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import contextlib
 import textwrap
-from typing.extensions import Never
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing.extensions import Never
 
 import pytest
 from pyexasol import ExaConnection
