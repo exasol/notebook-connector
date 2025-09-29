@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Generator
 from unittest import mock
 
 import pytest
@@ -47,7 +48,7 @@ def env_info() -> EnvironmentInfo:
 
 
 @pytest.fixture
-def db_image_version(monkeypatch) -> str:
+def db_image_version(monkeypatch) -> Generator[str, None, None]:
     mocked_db_version = "8.31.0"
     monkeypatch.setenv(TEST_DB_VERSION_ENV_VAR, mocked_db_version)
     yield mocked_db_version

@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import contextlib
 import textwrap
-from collections.abc import Iterator
+from collections.abc import (
+    Generator,
+    Iterator,
+)
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -105,7 +108,8 @@ def get_script_counts(
     result = pyexasol_connection.execute(
         f"""
             SELECT SCRIPT_TYPE, COUNT(*) FROM SYS.EXA_ALL_SCRIPTS
-            WHERE SCRIPT_SCHEMA='{secrets.get(AILabConfig.db_schema).upper()}' GROUP BY SCRIPT_TYPE;
+            WHERE SCRIPT_SCHEMA='{secrets[AILabConfig.db_schema].upper()}'
+            GROUP BY SCRIPT_TYPE;
         """
     ).fetchall()
     return dict(result)
@@ -130,7 +134,7 @@ def assert_connection_exists(
 @contextmanager
 def language_definition_context(
     pyexasol_connection: ExaConnection, language_alias: str | None = None
-) -> None:
+) -> Generator[None, None, None]:
     """
     A context manager that preserves the current language definitions at both
     SESSION and SYSTEM levels. Optionally creates a definition for the specified

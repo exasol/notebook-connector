@@ -2,6 +2,7 @@ import io
 import logging
 import subprocess
 import textwrap
+from collections.abc import Iterator
 from inspect import cleandoc
 from pathlib import Path
 
@@ -54,7 +55,7 @@ def dockerfile_content() -> str:
 
 
 @pytest.fixture
-def docker_image(dockerfile_content) -> Image:
+def docker_image(dockerfile_content) -> Iterator[Image]:
     with ContextDockerClient() as client:
         image, _ = client.images.build(
             fileobj=io.BytesIO(dockerfile_content.encode("UTF-8"))
