@@ -1,7 +1,7 @@
 import getpass
 import itertools
 import os
-from test.unit.cli.scs_mock import scs_mock
+from test.unit.cli.scs_mock import ScsMock
 from typing import Any
 from unittest.mock import Mock
 
@@ -131,7 +131,7 @@ def test_displayed_value(has_key, scs_content, expected):
     """
 
     key = CKey.saas_url
-    scs = scs_mock()
+    scs = ScsMock()
     if scs_content:
         scs.save(key, "sample value")
     scs_key = key if has_key else None
@@ -148,7 +148,7 @@ def test_needs_entry(key, required, alt_key, value, alt_value):
     key2 = CKey.saas_database_name
     scs_key = key1 if key else None
     scs_alt_key = key2 if alt_key else None
-    scs = scs_mock()
+    scs = ScsMock()
     if value:
         scs.save(key1, "some value")
     if alt_value:
@@ -188,7 +188,7 @@ def test_secret_option(metavar):
         CKey.db_password,
         **kwargs,
     )
-    scs = scs_mock()
+    scs = ScsMock()
     scs.save(CKey.db_password, "sample value")
     assert testee.displayed_value(scs) == "****"
     params = get_click_params(testee)

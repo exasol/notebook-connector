@@ -1,3 +1,4 @@
+from __future__ import annotations
 import types
 from unittest.mock import Mock
 
@@ -11,16 +12,16 @@ from exasol.nb_connector.cli.processing import option_set
 from test.utils.secrets import SecretsMock
 
 
-def scs_mock(
-    backend: StorageBackend | None = None,
-    use_itde: bool | None = None,
-    ) -> SecretsMock:
-    scs = SecretsMock()
-    if backend:
-        scs.save(CKey.storage_backend, backend.name)
-    if use_itde is not None:
-        scs.save(CKey.use_itde, str(use_itde))
-    return scs
+class ScsMock(SecretsMock):
+    def __init__(self,
+                 backend: StorageBackend | None = None,
+                 use_itde: bool | None = None,
+                 ) -> ScsMock:
+        super().__init__()
+        if backend:
+            self.save(CKey.storage_backend, backend.name)
+        if use_itde is not None:
+            self.save(CKey.use_itde, str(use_itde))
 
 
 class ScsPatcher:
@@ -45,8 +46,8 @@ class ScsPatcher:
         self,
         backend: StorageBackend | None = None,
         use_itde: bool | None = None,
-    ) -> SecretsMock:
-        scs = scs_mock(backend, use_itde)
+    ) -> ScsMock:
+        scs = ScsMock(backend, use_itde)
         getter = Mock(return_value=scs)
         self._monkeypatch.setattr(self._module, "get_scs", getter)
         return scs

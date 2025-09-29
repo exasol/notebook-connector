@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 from test.unit.cli.scs_mock import (
-    scs_mock,
+    ScsMock,
     ScsPatcher,
 )
 
@@ -48,7 +48,7 @@ TEST_SCENARIOS = [
 
 
 def test_empty_backend_configuration():
-    testee = BackendSelector(scs_mock())
+    testee = BackendSelector(ScsMock())
     assert not testee.knows_backend
     assert not testee.knows_itde_usage
     assert not testee.is_valid
@@ -66,7 +66,7 @@ def test_empty_backend_configuration():
     ],
 )
 def test_partial_backend_configuration(backend, use_itde):
-    scs = scs_mock(backend, use_itde)
+    scs = ScsMock(backend, use_itde)
     testee = BackendSelector(scs)
     assert testee.knows_backend == (backend is not None)
     assert testee.knows_itde_usage == (use_itde is not None)
@@ -77,7 +77,7 @@ def test_partial_backend_configuration(backend, use_itde):
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
 def test_valid_backend_configuration(scenario):
-    scs = scs_mock(scenario.backend, scenario.use_itde)
+    scs = ScsMock(scenario.backend, scenario.use_itde)
     testee = BackendSelector(scs)
     assert testee.knows_backend
     assert testee.knows_itde_usage
