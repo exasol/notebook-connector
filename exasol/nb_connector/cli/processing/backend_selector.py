@@ -42,7 +42,7 @@ class BackendSelector:
     @property
     def knows_backend(self) -> bool:
         """
-        Tells whether the current backend selection tells whether it's
+        Tells whether the current backend selection unambiguous points to
         saas, onprem, or docker.
         """
         backend = self._scs.get(CKey.storage_backend)
