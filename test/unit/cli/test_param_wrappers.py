@@ -2,6 +2,7 @@ import getpass
 import itertools
 import os
 from test.unit.cli.scs_mock import ScsMock
+from typing import Any
 from unittest.mock import Mock
 
 import click
@@ -16,7 +17,7 @@ from exasol.nb_connector.cli.param_wrappers import (
 )
 
 
-def select_atts(obj: any, atts: dict[str, any]) -> dict[str, any]:
+def select_atts(obj: Any, atts: dict[str, Any]) -> dict[str, Any]:
     return {k: getattr(obj, k) for k in atts}
 
 

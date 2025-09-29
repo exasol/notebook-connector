@@ -32,8 +32,8 @@ def test_initialize_te_extension(secrets: Secrets, setup_itde):
             script_counts = get_script_counts(pyexasol_connection, secrets)
             assert script_counts["UDF"] > 5
             assert_connection_exists(
-                secrets.get(CKey.bfs_connection_name), pyexasol_connection
+                secrets[CKey.bfs_connection_name], pyexasol_connection
             )
             assert_connection_exists(
-                secrets.get(CKey.te_hf_connection), pyexasol_connection
+                secrets[CKey.te_hf_connection], pyexasol_connection
             )

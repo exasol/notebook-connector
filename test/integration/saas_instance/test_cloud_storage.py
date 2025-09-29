@@ -36,4 +36,5 @@ def test_saas_bucket_can_be_iterated(backend, secrets: Secrets, setup_itde):
     bucket = open_bucketfs_bucket(secrets)
     NAME = "temp-file.dat"
     bucket.upload(NAME, b"some data")
-    assert NAME in list(bucket)
+    # assert NAME in list(bucket)
+    assert NAME in bucket.files

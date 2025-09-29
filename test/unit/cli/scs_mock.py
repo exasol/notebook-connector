@@ -13,7 +13,7 @@ class ScsMock:
         backend: StorageBackend | None = None,
         use_itde: bool | None = None,
     ):
-        self._dict = dict()
+        self._dict: dict[str, str] = {}
         if backend:
             self.save(CKey.storage_backend, backend.name)
         if use_itde is not None:

@@ -127,7 +127,6 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
     "exasol/nb_connector/extension_wrapper_common",
-    "test.*",
     # not yet include py.typed
     "docker.*",
     "ibis.*",
