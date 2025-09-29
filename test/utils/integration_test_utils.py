@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import contextlib
 import textwrap
-from collections.abc import Iterator
+from collections.abc import (
+    Generator,
+    Iterator,
+)
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import NoReturn
 
 import pytest
 from pyexasol import ExaConnection
@@ -132,7 +134,7 @@ def assert_connection_exists(
 @contextmanager
 def language_definition_context(
     pyexasol_connection: ExaConnection, language_alias: str | None = None
-) -> Iterator[NoReturn]:
+) -> Generator[None]:
     """
     A context manager that preserves the current language definitions at both
     SESSION and SYSTEM levels. Optionally creates a definition for the specified
