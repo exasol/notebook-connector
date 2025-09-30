@@ -1,5 +1,9 @@
+import sys
 from pathlib import Path
 
+from exasol.nb_connector.ai_lab_config import (
+    StorageBackend,
+)
 from exasol.nb_connector.cli.groups import cli
 from exasol.nb_connector.cli.options import (
     DOCKER_DB_OPTIONS,
@@ -7,6 +11,7 @@ from exasol.nb_connector.cli.options import (
     SAAS_OPTIONS,
 )
 from exasol.nb_connector.cli.param_wrappers import add_params
+from exasol.nb_connector.cli.processing import processing
 
 
 @cli.group()
@@ -23,7 +28,13 @@ def configure_onprem(scs_file: Path, **kwargs):
     """
     Configure connection to an Exasol on-premise instance.
     """
-    pass
+    result = processing.save(
+        scs_file,
+        StorageBackend.onprem,
+        use_itde=False,
+        values=kwargs,
+    )
+    sys.exit(result)
 
 
 @configure.command("saas")
@@ -35,7 +46,13 @@ def configure_saas(scs_file: Path, **kwargs):
     Configuring one of the parameters --saas-database-id and
     --saas-database-name is sufficient.
     """
-    pass
+    result = processing.save(
+        scs_file,
+        StorageBackend.saas,
+        use_itde=False,
+        values=kwargs,
+    )
+    sys.exit(result)
 
 
 @configure.command("docker-db")
@@ -44,4 +61,10 @@ def configure_docker_db(scs_file: Path, **kwargs):
     """
     Configure connection to an Exasol Docker instance.
     """
-    pass
+    result = processing.save(
+        scs_file,
+        StorageBackend.onprem,
+        use_itde=True,
+        values=kwargs,
+    )
+    sys.exit(result)
