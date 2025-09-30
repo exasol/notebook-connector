@@ -9,7 +9,7 @@ def _ensure_str(key: str | CKey) -> str:
 
 
 class SecretsMock(Secrets):
-    def __init__(self):
+    def __init__(self) -> None:
         self._mock: dict[str, str] = {}
 
     def get(self, key: str | CKey, default_value: str | None = None) -> str | None:

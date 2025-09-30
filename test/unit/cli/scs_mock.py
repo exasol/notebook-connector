@@ -16,7 +16,7 @@ class ScsMock(SecretsMock):
         self,
         backend: StorageBackend | None = None,
         use_itde: bool | None = None,
-    ) -> ScsMock:
+    ):
         super().__init__()
         if backend:
             self.save(CKey.storage_backend, backend.name)

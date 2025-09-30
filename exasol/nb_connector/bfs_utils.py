@@ -10,7 +10,7 @@ import exasol.bucketfs as bfs
 _logger = logging.getLogger(__name__)
 
 
-def _file_in_bucket(file_name: str, bucket: bfs.Bucket) -> bool:
+def _file_in_bucket(file_name: str, bucket: bfs.BucketLike) -> bool:
     """
     Checks that given file name is present in bucket.
     :param file_name: name to check
@@ -18,7 +18,7 @@ def _file_in_bucket(file_name: str, bucket: bfs.Bucket) -> bool:
     :return: True if name is present, else False
     """
     try:
-        return file_name in list(bucket)
+        return file_name in bucket.files
     except TypeError as e:
         # SaaSBucket is not iterable, need to handle it here
         if e.args[0].endswith("not iterable"):
