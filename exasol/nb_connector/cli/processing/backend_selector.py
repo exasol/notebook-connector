@@ -16,8 +16,7 @@ class BackendSelector:
 
     * Get the user-friendly display name of the selected backend, e.g. "Docker".
 
-    * Check if another backend selection is allowed wrt. to the current,
-      i.e. "matches". This is also fine if no backend is selected, yet.
+    * Checks if a proposed backend conflicts with the previously made selection.
     """
 
     def __init__(self, scs: Secrets):
@@ -42,8 +41,8 @@ class BackendSelector:
     @property
     def knows_backend(self) -> bool:
         """
-        Tells whether the current backend selection unambiguous points to
-        saas, onprem, or docker.
+        Tells whether the current backend selection unambiguously points
+        to saas, onprem, or docker.
         """
         backend = self._scs.get(CKey.storage_backend)
         if not backend:
