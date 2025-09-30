@@ -24,6 +24,9 @@ class ScsParam:
         self.scs_key = scs_key
         self._kwargs = kwargs
 
+    def cli_option(self, full=False) -> str:
+        return ""
+
     @property
     def arg_name(self) -> str:
         return ""
@@ -55,6 +58,10 @@ class ScsArgument(ScsParam):
     def __init__(self, name: str, scs_key: CKey | None = None, **kwargs):
         super().__init__(scs_key, **kwargs)
         self.name = name
+
+    @property
+    def arg_name(self) -> str:
+        return self.name
 
     def decorate(self, func):
         """

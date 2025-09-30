@@ -27,7 +27,7 @@ def _file_in_bucket(file_name: str, bucket: bfs.Bucket) -> bool:
 
 
 def put_file(
-    bucket: bfs.BucketLike, file_path: pathlib.Path, skip_if_exists: bool = True
+    bucket: bfs.Bucket, file_path: pathlib.Path, skip_if_exists: bool = True
 ) -> bfs.path.BucketPath:
     """
     Uploads given file into bucketfs
