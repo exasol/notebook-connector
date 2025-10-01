@@ -145,9 +145,7 @@ def test_check_failure(scenario, scs_patcher, capsys):
         o.cli_option(full=True) for o in scenario.params if o.scs_key and o.scs_required
     ]
     scs_patcher.patch(scenario.backend, scenario.use_itde)
-    expected = (
-        f"{len(options)} options are not" f" yet configured: {', '.join(options)}"
-    )
+    expected = f"{len(options)} options are not yet configured: {', '.join(options)}"
     testee = get_option_set(Path("/fictional/scs"))
     with pytest.raises(ScsCliError, match=expected):
         testee.check()
