@@ -5,6 +5,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+import click
+
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.cli import reporting as report
@@ -18,6 +20,7 @@ from exasol.nb_connector.cli.processing.option_set import (
     SELECT_BACKEND_OPTION,
     USE_ITDE_OPTION,
     OptionSet,
+    get_option_set,
     get_scs,
 )
 
@@ -57,4 +60,20 @@ def save(
             continue
         if secret := option.get_secret(interactive=bool(value)):
             scs.save(option.scs_key, secret)
+    return 0
+
+
+def show_scs_content(scs_file: Path) -> int:
+    """
+    If the SCS contains a proper backend selection, then show the SCS
+    content for this context.
+    """
+    option_set = get_option_set(scs_file)
+    if not option_set:
+        return 1
+    for o in option_set.options:
+        value = o.scs_key and o.displayed_value(option_set.scs)
+        if value is not None:
+            value = value or '""'
+            click.echo(f"{o.cli_option()}: {value}")
     return 0
