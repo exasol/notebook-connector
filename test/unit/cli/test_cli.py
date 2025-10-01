@@ -1,9 +1,6 @@
-import getpass
 import itertools
 import os
 from inspect import cleandoc
-from pathlib import Path
-from unittest.mock import Mock
 
 import click
 import pytest
@@ -34,15 +31,12 @@ def test_missing_scs_file(args):
 
 
 @pytest.fixture
-def scs_file(tmp_path) -> Path:
-    return tmp_path / "sample.sqlite"
-
-
-@pytest.fixture
-def sample_scs(scs_file, monkeypatch) -> Secrets:
-    password = "sample password"
-    monkeypatch.setitem(os.environ, "SCS_MASTER_PASSWORD", password)
-    return Secrets(scs_file, password)
+def scs_with_env(secrets, monkeypatch) -> Secrets:
+    """
+    Uses fixture `secrets` from conftest.py
+    """
+    monkeypatch.setitem(os.environ, "SCS_MASTER_PASSWORD", secrets._master_password)
+    return secrets
 
 
 @pytest.mark.parametrize(
@@ -53,17 +47,17 @@ def sample_scs(scs_file, monkeypatch) -> Secrets:
         ("docker-db", "Docker"),
     ],
 )
-def test_configure(backend, expected, sample_scs):
+def test_configure(backend, expected, scs_with_env):
     result = CliRunner().invoke(
         commands.configure,
-        [backend, str(sample_scs.db_file)],
+        [backend, str(scs_with_env.db_file)],
     )
     assert result.exit_code == 0
-    assert BackendSelector(sample_scs).backend_name == expected
+    assert BackendSelector(scs_with_env).backend_name == expected
 
 
 @pytest.mark.parametrize(
-    "command, kwargs, secrets, expected_show",
+    "command, kwargs, env_opts, expected_show",
     [
         (
             "docker-db",
@@ -129,15 +123,15 @@ def test_configure(backend, expected, sample_scs):
         ),
     ],
 )
-def test_round_trip(command, kwargs, secrets, expected_show, monkeypatch, sample_scs):
+def test_round_trip(command, kwargs, env_opts, expected_show, monkeypatch, scs_with_env):
     def cmd_args():
         yield from [command, scs_file, "--db-schema", "SSS"]
-        yield from secrets.keys()
+        yield from env_opts.keys()
         yield from itertools.chain.from_iterable(kwargs.items())
 
-    scs_file = str(sample_scs.db_file)
-    for i, arg in enumerate(secrets):
-        env_var = secrets[arg]
+    scs_file = str(scs_with_env.db_file)
+    for i, arg in enumerate(env_opts):
+        env_var = env_opts[arg]
         monkeypatch.setitem(os.environ, env_var, f"secret {i+1}")
     result = CliRunner().invoke(commands.configure, cmd_args())
     assert result.exit_code == 0

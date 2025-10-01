@@ -30,6 +30,21 @@ def test_save_overwrite_with_warning(scs_patcher, capsys):
     assert "Warning: Overwriting" in capsys.readouterr().out
 
 
+def test_change_value(scs_patcher):
+    def save_saas_url(url: str) -> str:
+        processing.save(
+            scs_file=Path("/fictional/scs"),
+            backend=StorageBackend.saas,
+            use_itde=False,
+            values={"saas_url": url},
+        )
+        return url
+
+    scs_mock = scs_patcher.patch()
+    save_saas_url("H1") == scs_mock.get(CKey.saas_url)
+    save_saas_url("H2") == scs_mock.get(CKey.saas_url)
+
+
 def test_save_dynamic_defaults(scs_patcher):
     scs_patcher.disable_reporting("info")
     scs_mock = scs_patcher.patch()

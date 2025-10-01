@@ -74,7 +74,6 @@ def show_scs_content(scs_file: Path) -> int:
     for o in option_set.options:
         value = o.scs_key and o.displayed_value(option_set.scs)
         if value is not None:
-            if value == "":
-                value = f'"{value}"'
+            value = value or '""'
             click.echo(f"{o.cli_option()}: {value}")
     return 0
