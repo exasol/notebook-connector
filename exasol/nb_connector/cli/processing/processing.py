@@ -20,6 +20,7 @@ from exasol.nb_connector.cli.processing.option_set import (
     SELECT_BACKEND_OPTION,
     USE_ITDE_OPTION,
     OptionSet,
+    ScsCliError,
     get_option_set,
     get_scs,
 )
@@ -35,7 +36,7 @@ def save(
     backend: StorageBackend,
     use_itde: bool,
     values: dict[str, Any],
-) -> int:
+):
     """
     Save the provided values to SCS using the keys inferred from backend
     and use_itde.
@@ -63,25 +64,22 @@ def save(
             continue
         if secret := option.get_secret(interactive=bool(value)):
             scs.save(option.scs_key, secret)
-    return 0
 
 
-def verify_connection(scs: Secrets) -> int:
+def verify_connection(scs: Secrets) -> None:
     if BackendSelector(scs).use_itde:
         # Question: Is it OK, to let bring_itde_up modify the SCS content, here?
         False and bring_itde_up(scs)
         report.warning(f"Bring up ITDE currently disabled")
-        return 1
+        return
     try:
         open_pyexasol_connection(scs).execute("SELECT 1 FROM DUAL").fetchone()
     except Exception as ex:
-        report.error(f"Failed to connect to the configured database {ex}")
-        return 1
+        raise ScsCliError(f"Failed to connect to the configured database {ex}")
     report.success("Connection to the configured database instance was successful.")
-    return 0
 
 
-def check_scs(scs_file: Path, connect: bool) -> int:
+def check_scs(scs_file: Path, connect: bool) -> None:
     """
     Check the SCS content for completeness.  Infer the required keys from
     backend and use_itde if these are contained in the SCS already.
@@ -90,22 +88,19 @@ def check_scs(scs_file: Path, connect: bool) -> int:
     configured Exasol database instance is successful.
     """
     options = get_option_set(scs_file)
-    if not options or not options.check():
-        return 1
-    return 0 if not connect else verify_connection(options.scs)
+    options.check()
+    if connect:
+        verify_connection(options.scs)
 
 
-def show_scs_content(scs_file: Path) -> int:
+def show_scs_content(scs_file: Path) -> None:
     """
     If the SCS contains a proper backend selection, then show the SCS
     content for this context.
     """
-    option_set = get_option_set(scs_file)
-    if not option_set:
-        return 1
-    for o in option_set.options:
-        value = o.scs_key and o.displayed_value(option_set.scs)
+    oset = get_option_set(scs_file)
+    for o in oset.options:
+        value = o.scs_key and o.displayed_value(oset.scs)
         if value is not None:
             value = value or '""'
             click.echo(f"{o.cli_option()}: {value}")
-    return 0

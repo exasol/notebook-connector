@@ -18,13 +18,12 @@ def scs_patcher(monkeypatch):
 
 def test_save_overwrite_with_warning(scs_patcher, capsys):
     scs_mock = scs_patcher.patch(StorageBackend.saas, use_itde=False)
-    actual = processing.save(
+    processing.save(
         scs_file=Path("/fictional/scs"),
         backend=StorageBackend.onprem,
         use_itde=True,
         values={},
     )
-    assert actual == 0
     assert get_backend(scs_mock) == StorageBackend.onprem
     assert scs_mock.get(CKey.use_itde) == "True"
     assert "Warning: Overwriting" in capsys.readouterr().out

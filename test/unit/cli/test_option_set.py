@@ -84,10 +84,8 @@ def test_valid_backend_configuration(scenario):
 @pytest.mark.parametrize("backend", [StorageBackend.onprem, None])
 def test_option_set_backend_unknown(backend, capsys, scs_patcher):
     scs_patcher.patch(backend)
-    actual = get_option_set(Path("/fictional/scs"))
-    assert actual is None
-    message = "Error: SCS /fictional/scs does not contain any backend."
-    assert message in capsys.readouterr().out
+    with pytest.raises(ScsCliError, match="SCS .* does not contain any backend"):
+        get_option_set(Path("/fictional/scs"))
 
 
 @pytest.mark.parametrize(
@@ -147,12 +145,13 @@ def test_check_failure(scenario, scs_patcher, capsys):
         o.cli_option(full=True) for o in scenario.params if o.scs_key and o.scs_required
     ]
     scs_patcher.patch(scenario.backend, scenario.use_itde)
-    testee = get_option_set(Path("/fictional/scs"))
-    assert not testee.check()
-    assert capsys.readouterr().out == (
-        f"Error: {len(options)} options are not"
-        f" yet configured: {', '.join(options)}.\n"
+    expected = (
+        f"{len(options)} options are not"
+        f" yet configured: {', '.join(options)}"
     )
+    testee = get_option_set(Path("/fictional/scs"))
+    with pytest.raises(ScsCliError, match=expected):
+        testee.check()
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
@@ -161,8 +160,8 @@ def test_check_success(scenario, scs_patcher, capsys):
     scs_mock = scs_patcher.patch(scenario.backend, scenario.use_itde)
     for o in options:
         scs_mock.save(o.scs_key, "value")
-    testee = get_option_set(Path("/fictional/scs"))
-    assert testee.check()
-    assert capsys.readouterr().out == (
-        f"Configuration is complete for an Exasol {scenario.name} instance.\n"
+    get_option_set(Path("/fictional/scs")).check()
+    assert (
+        f"Configuration is complete for an Exasol {scenario.name} instance"
+        in capsys.readouterr().out 
     )

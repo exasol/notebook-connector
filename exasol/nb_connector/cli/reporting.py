@@ -9,7 +9,7 @@ def success(text: str):
     click.echo(click.style(text, fg="green"))
 
 
-def error(text: str):
+def error(text: str | Exception):
     click.echo(click.style(f"Error: {text}", fg="bright_red"))
 
 

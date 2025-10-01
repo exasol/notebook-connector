@@ -90,7 +90,7 @@ class OptionSet:
 
         return values
 
-    def check(self) -> bool:
+    def check(self):
         """
         Check if the content of the SCS is complete wrt. the selected
         backend as the required options depend on the selected backend.
@@ -104,12 +104,11 @@ class OptionSet:
                 "Configuration is complete for an "
                 f"Exasol {config.backend_name} instance."
             )
-            return True
+            return
         formatted = ", ".join(missing)
         n = len(missing)
         prefix = "1 option is" if n == 1 else f"{n} options are"
-        report.error(f"{prefix} not yet configured: {formatted}.")
-        return False
+        raise ScsCliError(f"{prefix} not yet configured: {formatted}.")
 
 
 def get_scs_master_password():
@@ -128,7 +127,7 @@ def get_scs(scs_file: Path) -> Secrets:
     return Secrets(scs_file, scs_password)
 
 
-def get_option_set(scs_file: Path) -> OptionSet | None:
+def get_option_set(scs_file: Path) -> OptionSet:
     """
     Return an instance of an OptionSet if the SCS contains a proper
     backend selection. Otherwise report an error and return None.
@@ -144,6 +143,7 @@ def get_option_set(scs_file: Path) -> OptionSet | None:
     scs = get_scs(scs_file)
     config = BackendSelector(scs)
     if not config.knows_backend:
-        report.error(f"SCS {scs_file} does not contain any backend.")
-        return None
+        raise ScsCliError(f"SCS {scs_file} does not contain any backend.")
+        # report.error(f"SCS {scs_file} does not contain any backend.")
+        # return None
     return OptionSet(scs, config.backend, config.use_itde)
