@@ -23,6 +23,9 @@ from exasol.nb_connector.cli.processing.option_set import (
     get_option_set,
     get_scs,
 )
+from exasol.nb_connector.connections import open_pyexasol_connection
+from exasol.nb_connector.itde_manager import bring_itde_up
+from exasol.nb_connector.secret_store import Secrets
 
 LOG = logging.getLogger(__name__)
 
@@ -61,6 +64,35 @@ def save(
         if secret := option.get_secret(interactive=bool(value)):
             scs.save(option.scs_key, secret)
     return 0
+
+
+def verify_connection(scs: Secrets) -> int:
+    if BackendSelector(scs).use_itde:
+        # Question: Is it OK, to let bring_itde_up modify the SCS content, here?
+        False and bring_itde_up(scs)
+        report.warning(f"Bring up ITDE currently disabled")
+        return 1
+    try:
+        open_pyexasol_connection(scs).execute("SELECT 1 FROM DUAL").fetchone()
+    except Exception as ex:
+        report.error(f"Failed to connect to the configured database {ex}")
+        return 1
+    report.success("Connection to the configured database instance was successful.")
+    return 0
+
+
+def check_scs(scs_file: Path, connect: bool) -> int:
+    """
+    Check the SCS content for completeness.  Infer the required keys from
+    backend and use_itde if these are contained in the SCS already.
+
+    If parameter `connect` is True then also verify if a connection to the
+    configured Exasol database instance is successful.
+    """
+    options = get_option_set(scs_file)
+    if not options or not options.check():
+        return 1
+    return 0 if not connect else verify_connection(options.scs)
 
 
 def show_scs_content(scs_file: Path) -> int:

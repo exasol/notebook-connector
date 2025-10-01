@@ -12,6 +12,7 @@ Additionally the release includes a CLI for populating the Secure Configuration 
 * #263: Added functions for handling a set of options for SCS CLI
 * #267: Implemented modify operations for the SCS
 * #269: Implemented showing SCS content
+* #271: Implemented checking SCS content
 
 ## Refactorings
 
