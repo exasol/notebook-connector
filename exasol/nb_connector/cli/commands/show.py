@@ -1,12 +1,12 @@
 import sys
 from pathlib import Path
 
+from exasol.nb_connector.cli import reporting as report
 from exasol.nb_connector.cli.groups import cli
 from exasol.nb_connector.cli.options import SCS_OPTIONS
 from exasol.nb_connector.cli.param_wrappers import add_params
 from exasol.nb_connector.cli.processing import processing
 from exasol.nb_connector.cli.processing.option_set import ScsCliError
-from exasol.nb_connector.cli import reporting as report
 
 
 @cli.command()

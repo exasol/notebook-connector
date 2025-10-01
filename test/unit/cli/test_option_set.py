@@ -146,8 +146,7 @@ def test_check_failure(scenario, scs_patcher, capsys):
     ]
     scs_patcher.patch(scenario.backend, scenario.use_itde)
     expected = (
-        f"{len(options)} options are not"
-        f" yet configured: {', '.join(options)}"
+        f"{len(options)} options are not" f" yet configured: {', '.join(options)}"
     )
     testee = get_option_set(Path("/fictional/scs"))
     with pytest.raises(ScsCliError, match=expected):
@@ -163,5 +162,5 @@ def test_check_success(scenario, scs_patcher, capsys):
     get_option_set(Path("/fictional/scs")).check()
     assert (
         f"Configuration is complete for an Exasol {scenario.name} instance"
-        in capsys.readouterr().out 
+        in capsys.readouterr().out
     )

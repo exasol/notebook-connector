@@ -1,7 +1,7 @@
 import getpass
 import itertools
-from typing import Iterator
 import os
+from collections.abc import Iterator
 from inspect import cleandoc
 from pathlib import Path
 from test.utils.integration_test_utils import sample_db_file
