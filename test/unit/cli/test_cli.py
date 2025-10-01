@@ -123,7 +123,9 @@ def test_configure(backend, expected, scs_with_env):
         ),
     ],
 )
-def test_round_trip(command, kwargs, env_opts, expected_show, monkeypatch, scs_with_env):
+def test_round_trip(
+    command, kwargs, env_opts, expected_show, monkeypatch, scs_with_env
+):
     def cmd_args():
         yield from [command, scs_file, "--db-schema", "SSS"]
         yield from env_opts.keys()
