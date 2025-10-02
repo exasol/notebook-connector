@@ -130,7 +130,7 @@ def get_scs(scs_file: Path) -> Secrets:
 def get_option_set(scs_file: Path) -> OptionSet:
     """
     Return an instance of an OptionSet if the SCS contains a proper
-    backend selection. Otherwise report an error and return None.
+    backend selection.  Otherwise raise an ScsCliError.
 
     This function is designed to be called only once in the CLI application.
     Otherwise it will always ask for the SCS master password and potentially

@@ -67,6 +67,10 @@ def save(
 
 
 def verify_connection(scs: Secrets) -> None:
+    """
+    Verify if successful connection to the configured backend is possible.
+    Raise an ScsCliError otherwise.
+    """
     if BackendSelector(scs).use_itde:
         # Question: Is it OK, to let bring_itde_up modify the SCS content, here?
         False and bring_itde_up(scs)
@@ -86,6 +90,14 @@ def check_scs(scs_file: Path, connect: bool) -> None:
 
     If parameter `connect` is True then also verify if a connection to the
     configured Exasol database instance is successful.
+
+    The function raises an ScsCliError in any of the following cases:
+
+    * The SCS does not select any backend.
+
+    * The options are incomplete for configuring access to the selected backend.
+
+    * Connecting to the configured backend was requested but failed.
     """
     options = get_option_set(scs_file)
     options.check()
