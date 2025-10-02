@@ -20,9 +20,13 @@ from exasol.nb_connector.cli.processing.option_set import (
     SELECT_BACKEND_OPTION,
     USE_ITDE_OPTION,
     OptionSet,
+    ScsCliError,
     get_option_set,
     get_scs,
 )
+from exasol.nb_connector.connections import open_pyexasol_connection
+from exasol.nb_connector.itde_manager import bring_itde_up
+from exasol.nb_connector.secret_store import Secrets
 
 LOG = logging.getLogger(__name__)
 
@@ -32,7 +36,7 @@ def save(
     backend: StorageBackend,
     use_itde: bool,
     values: dict[str, Any],
-) -> int:
+):
     """
     Save the provided values to SCS using the keys inferred from backend
     and use_itde.
@@ -60,20 +64,55 @@ def save(
             continue
         if secret := option.get_secret(interactive=bool(value)):
             scs.save(option.scs_key, secret)
-    return 0
 
 
-def show_scs_content(scs_file: Path) -> int:
+def verify_connection(scs: Secrets) -> None:
+    """
+    Verify if successful connection to the configured backend is possible.
+    Raise an ScsCliError otherwise.
+    """
+    if BackendSelector(scs).use_itde:
+        # Question: Is it OK, to let bring_itde_up modify the SCS content, here?
+        False and bring_itde_up(scs)
+        report.warning(f"Bring up ITDE currently disabled")
+        return
+    try:
+        open_pyexasol_connection(scs).execute("SELECT 1 FROM DUAL").fetchone()
+    except Exception as ex:
+        raise ScsCliError(f"Failed to connect to the configured database {ex}")
+    report.success("Connection to the configured database instance was successful.")
+
+
+def check_scs(scs_file: Path, connect: bool) -> None:
+    """
+    Check the SCS content for completeness.  Infer the required keys from
+    backend and use_itde if these are contained in the SCS already.
+
+    If parameter `connect` is True then also verify if a connection to the
+    configured Exasol database instance is successful.
+
+    The function raises an ScsCliError in any of the following cases:
+
+    * The SCS does not select any backend.
+
+    * The options are incomplete for configuring access to the selected backend.
+
+    * Connecting to the configured backend was requested but failed.
+    """
+    options = get_option_set(scs_file)
+    options.check()
+    if connect:
+        verify_connection(options.scs)
+
+
+def show_scs_content(scs_file: Path) -> None:
     """
     If the SCS contains a proper backend selection, then show the SCS
     content for this context.
     """
-    option_set = get_option_set(scs_file)
-    if not option_set:
-        return 1
-    for o in option_set.options:
-        value = o.scs_key and o.displayed_value(option_set.scs)
+    oset = get_option_set(scs_file)
+    for o in oset.options:
+        value = o.scs_key and o.displayed_value(oset.scs)
         if value is not None:
             value = value or '""'
             click.echo(f"{o.cli_option()}: {value}")
-    return 0

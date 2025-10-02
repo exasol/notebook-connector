@@ -28,13 +28,12 @@ def configure_onprem(scs_file: Path, **kwargs):
     """
     Configure connection to an Exasol on-premise instance.
     """
-    result = processing.save(
+    processing.save(
         scs_file,
         StorageBackend.onprem,
         use_itde=False,
         values=kwargs,
     )
-    sys.exit(result)
 
 
 @configure.command("saas")
@@ -46,13 +45,12 @@ def configure_saas(scs_file: Path, **kwargs):
     Configuring one of the parameters --saas-database-id and
     --saas-database-name is sufficient.
     """
-    result = processing.save(
+    processing.save(
         scs_file,
         StorageBackend.saas,
         use_itde=False,
         values=kwargs,
     )
-    sys.exit(result)
 
 
 @configure.command("docker-db")
@@ -61,10 +59,9 @@ def configure_docker_db(scs_file: Path, **kwargs):
     """
     Configure connection to an Exasol Docker instance.
     """
-    result = processing.save(
+    processing.save(
         scs_file,
         StorageBackend.onprem,
         use_itde=True,
         values=kwargs,
     )
-    sys.exit(result)
