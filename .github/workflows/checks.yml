@@ -43,7 +43,7 @@ jobs:
           poetry run --
           pytest test/integration/ordinary/itest_cli.py
           -rA --setup-show
-          --backend=onprem
+          --backend=all
           --itde-nameserver 8.8.8.8
 
 
