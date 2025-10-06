@@ -5,6 +5,47 @@ on:
 
 jobs:
 
+  Experimental-iTests:
+    name: Version
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          large-packages: false
+          haskell: true
+
+      - name: Free disk space by removing large directories
+        run: |
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/lib/node_modules
+
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v1
+
+      - name: Run Experimental iTests
+        # additional-db-parameter -etlCheckCertsDefault=0
+        # --itde-additional-db-parameter -etlCheckCertsDefault=0
+        run: >
+          poetry run --
+          pytest test/integration/ordinary/itest_cli.py
+          -rA --setup-show
+          --backend=onprem
+          --itde-nameserver 8.8.8.8
+
+
   Version-Check:
     name: Version
     runs-on: ubuntu-24.04
@@ -193,16 +234,6 @@ jobs:
 
       - name: Run Tests and Collect Coverage
         run: poetry run -- nox -s test:unit -- --coverage
-
-      - name: Run Experimental iTests
-        # additional-db-parameter -etlCheckCertsDefault=0
-        # --itde-additional-db-parameter -etlCheckCertsDefault=0
-        run: >
-          poetry run --
-          pytest test/integration/ordinary/itest_cli.py
-          -rA --setup-show
-          --backend=onprem
-          --itde-nameserver 8.8.8.8
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4.6.2

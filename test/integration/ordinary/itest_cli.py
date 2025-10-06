@@ -4,6 +4,7 @@ from pathlib import Path
 from test.utils.integration_test_utils import sample_db_file
 from urllib.parse import urlparse
 
+import pyexasol
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from click.testing import CliRunner
@@ -31,7 +32,9 @@ def scs_file_path() -> Iterator[Path]:
 #     return OnpremDBConfig("192.168.124.221", 8563, "sys", "exasol")
 
 
-def test_x1(backend_aware_database_params):
+def test_x1(use_onprem, backend_aware_database_params):
+    if not use_onprem:
+        pytest.skip("This test requires an on-premise database")
     params = backend_aware_database_params
     print(f"{params}")
     with pyexasol.connect(**params, compression=True) as conn:
@@ -69,7 +72,7 @@ def test_roundtrip_onprem(
         "--db-username",
         exasol_config.username,
         "--db-password",  # from env
-        "--no-db-use-encryption",  # TODO: verify!
+        "--db-use-encryption",  # TODO: verify!
         "--bucketfs-host",
         exasol_config.host,
         "--bucketfs-user",
