@@ -21,14 +21,19 @@ def scs_file_path() -> Iterator[Path]:
         yield file
 
 
-@pytest.fixture(scope="session", autouse=True)
-def xbackend_aware_onprem_database_async():
-    yield None
+# @pytest.fixture(scope="session", autouse=True)
+# def xbackend_aware_onprem_database_async():
+#     yield None
+#
+#
+# @pytest.fixture(scope="session")
+# def xexasol_config(request) -> OnpremDBConfig:
+#     return OnpremDBConfig("192.168.124.221", 8563, "sys", "exasol")
 
 
-@pytest.fixture(scope="session")
-def xexasol_config(request) -> OnpremDBConfig:
-    return OnpremDBConfig("192.168.124.221", 8563, "sys", "exasol")
+def test_x1(pyexasol_connection):
+    row = pyexasol_connection.execute("SELECT 1 FROM DUAL").fetchone()
+    print(f'"SELECT 1 FROM DUAL" returned {row[0]}')
 
 
 def test_roundtrip_onprem(
