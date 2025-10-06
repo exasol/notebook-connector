@@ -27,6 +27,7 @@ def test_roundtrip_onprem(
     exasol_config: OnpremDBConfig,
     bucketfs_config: OnpremBfsConfig,
     monkeypatch: MonkeyPatch,
+    backend_aware_database_params,
 ) -> None:
     if not use_onprem:
         pytest.skip("This test requires an on-premise database")

@@ -37,7 +37,7 @@ jobs:
           - file: itest_slc.py
             extra_param: "--package-manager pip --compression-strategy none"
           - file: itest_cli.py
-            extra_param: ""
+            extra_param: "--backend=onprem --itde-nameserver 8.8.8.8"
 
     steps:
 
