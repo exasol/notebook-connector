@@ -21,6 +21,16 @@ def scs_file_path() -> Iterator[Path]:
         yield file
 
 
+@pytest.fixture(scope="session", autouse=True)
+def xbackend_aware_onprem_database_async():
+    yield None
+
+
+@pytest.fixture(scope="session")
+def xexasol_config(request) -> OnpremDBConfig:
+    return OnpremDBConfig("192.168.124.221", 8563, "sys", "exasol")
+
+
 def test_roundtrip_onprem(
     use_onprem: bool,
     scs_file_path: Path,
@@ -48,7 +58,7 @@ def test_roundtrip_onprem(
         [
             "onprem",
             "--db-host-name",
-            "exasol_config.host",
+            exasol_config.host,
             "--db-port",
             str(exasol_config.port),
             "--db-username",
@@ -74,5 +84,5 @@ def test_roundtrip_onprem(
         ],
     )
     assert result.exit_code == 0, result.output
-    result = CliRunner().invoke(commands.check, [scs_file])
+    result = CliRunner().invoke(commands.check, [scs_file, "--connect"])
     assert result.exit_code == 0, result.output
