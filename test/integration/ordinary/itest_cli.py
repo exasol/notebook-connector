@@ -1,7 +1,8 @@
 import os
+from collections.abc import Iterator
 from pathlib import Path
 from test.utils.integration_test_utils import sample_db_file
-from typing import Iterator
+from urllib.parse import urlparse
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -39,7 +40,9 @@ def test_roundtrip_onprem(
         monkeypatch.setitem(os.environ, env_var, value)
 
     scs_file = str(scs_file_path)
-    bfs_url = bucketfs_config.url.split(":")
+    bfs_url = urlparse(bucketfs_config.url)
+    bfs_port = str(bfs_url.port) if bfs_url.port else "2580"
+
     result = CliRunner().invoke(
         commands.configure,
         [
@@ -53,9 +56,9 @@ def test_roundtrip_onprem(
             "--db-password",  # from env
             "--db-use-encryption",  # TODO: verify!
             "--bucketfs-host",
-            bfs_url[0],
+            exasol_config.host,
             "--bucketfs-port",
-            bfs_url[1],
+            bfs_port,
             "--bucketfs-user",
             bucketfs_config.username,
             "--bucketfs-password",  # from env
