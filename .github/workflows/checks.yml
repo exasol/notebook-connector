@@ -45,7 +45,10 @@ jobs:
           -rA --setup-show
           --backend=all
           --itde-nameserver 8.8.8.8
-
+        env:
+          SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+          SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+          SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
 
   Version-Check:
     name: Version

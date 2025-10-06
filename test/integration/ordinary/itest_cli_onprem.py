@@ -43,14 +43,21 @@ def test_roundtrip_saas(
         monkeypatch.setitem(os.environ, env_var, value)
 
     scs_file = str(scs_file_path)
-    result = CliRunner().invoke(commands.configure, [
-        "saas",
-         "--saas-url", saas_host,
-         "--saas-account-id", saas_account_id,
-         "--saas-database-id", backend_aware_saas_database_id,
-         "--saas-token", # from env
-         "--db-schema", "SSS",
-    ])
+    result = CliRunner().invoke(
+        commands.configure,
+        [
+            "saas",
+            "--saas-url",
+            saas_host,
+            "--saas-account-id",
+            saas_account_id,
+            "--saas-database-id",
+            backend_aware_saas_database_id,
+            "--saas-token",  # from env
+            "--db-schema",
+            "SSS",
+        ],
+    )
     assert result.exit_code == 0
     result = CliRunner().invoke(commands.check, ["--connect"])
     assert result.exit_code == 0
