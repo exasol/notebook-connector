@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+from test.utils.integration_test_utils import sample_db_file
+from typing import Iterator
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -12,9 +14,15 @@ from exasol.pytest_backend.itde import (
 from exasol.nb_connector.cli import commands
 
 
+@pytest.fixture
+def scs_file_path() -> Iterator[Path]:
+    with sample_db_file() as file:
+        yield file
+
+
 def test_roundtrip_onprem(
     use_onprem: bool,
-    sample_db_file: Path,
+    scs_file_path: Path,
     exasol_config: OnpremDBConfig,
     bucketfs_config: OnpremBfsConfig,
     monkeypatch: MonkeyPatch,
@@ -30,7 +38,7 @@ def test_roundtrip_onprem(
     for env_var, value in secrets.items():
         monkeypatch.setitem(os.environ, env_var, value)
 
-    scs_file = str(sample_db_file)
+    scs_file = str(scs_file_path)
     bfs_url = bucketfs_config.url.split(":")
     result = CliRunner().invoke(
         commands.configure,
