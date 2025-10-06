@@ -33,7 +33,7 @@ def scs_file_path() -> Iterator[Path]:
 
 def test_x1(backend_aware_database_params):
     params = backend_aware_database_params
-    print(f'{params}')
+    print(f"{params}")
     with pyexasol.connect(**params, compression=True) as conn:
         row = conn.execute("SELECT 1 FROM DUAL").fetchone()
     print(f'"SELECT 1 FROM DUAL" returned {row[0]}')
