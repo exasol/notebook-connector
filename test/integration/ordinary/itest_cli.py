@@ -43,7 +43,8 @@ def test_roundtrip_onprem(
     result = CliRunner().invoke(
         commands.configure,
         [
-            "onprem" "--db-host-name",
+            "onprem",
+            "--db-host-name",
             exasol_config.host,
             "--db-port",
             str(exasol_config.port),
@@ -69,6 +70,6 @@ def test_roundtrip_onprem(
             scs_file,
         ],
     )
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
     result = CliRunner().invoke(commands.check, [scs_file])
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
