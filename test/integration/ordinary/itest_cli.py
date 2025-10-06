@@ -32,24 +32,35 @@ def test_roundtrip_onprem(
 
     scs_file = str(sample_db_file)
     bfs_url = bucketfs_config.url.split(":")
-    result = CliRunner().invoke(commands.configure, [
-        "onprem"
-        "--db-host-name", exasol_config.host,
-        "--db-port", str(exasol_config.port),
-        "--db-username", exasol_config.username,
-        "--db-password", # from env
-        "--db-use-encryption",  # TODO: verify!
-        "--bucketfs-host", bfs_url[0],
-        "--bucketfs-port", bfs_url[1],
-        "--bucketfs-user", bucketfs_config.username,
-        "--bucketfs-password", # from env
-        "--bucketfs-name", "bfsdefault",
-        "--bucket", "default",
-        "--no-bucketfs-use-encryption",
-        "--no-ssl-use-cert-validation",
-        "--db-schema", "SSS",
-        scs_file,
-    ])
+    result = CliRunner().invoke(
+        commands.configure,
+        [
+            "onprem" "--db-host-name",
+            exasol_config.host,
+            "--db-port",
+            str(exasol_config.port),
+            "--db-username",
+            exasol_config.username,
+            "--db-password",  # from env
+            "--db-use-encryption",  # TODO: verify!
+            "--bucketfs-host",
+            bfs_url[0],
+            "--bucketfs-port",
+            bfs_url[1],
+            "--bucketfs-user",
+            bucketfs_config.username,
+            "--bucketfs-password",  # from env
+            "--bucketfs-name",
+            "bfsdefault",
+            "--bucket",
+            "default",
+            "--no-bucketfs-use-encryption",
+            "--no-ssl-use-cert-validation",
+            "--db-schema",
+            "SSS",
+            scs_file,
+        ],
+    )
     assert result.exit_code == 0
     result = CliRunner().invoke(commands.check, [scs_file])
     assert result.exit_code == 0
