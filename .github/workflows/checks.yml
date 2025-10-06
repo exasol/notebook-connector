@@ -6,7 +6,7 @@ on:
 jobs:
 
   Experimental-iTests:
-    name: Version
+    name: Exp.iTests
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -34,6 +34,9 @@ jobs:
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v1
+
+      - name: Install All Optional Dependencies (aka. "extras")
+        run: poetry install --all-extras
 
       - name: Run Experimental iTests
         # additional-db-parameter -etlCheckCertsDefault=0
