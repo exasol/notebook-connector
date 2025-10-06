@@ -31,8 +31,11 @@ def scs_file_path() -> Iterator[Path]:
 #     return OnpremDBConfig("192.168.124.221", 8563, "sys", "exasol")
 
 
-def test_x1(pyexasol_connection):
-    row = pyexasol_connection.execute("SELECT 1 FROM DUAL").fetchone()
+def test_x1(backend_aware_database_params):
+    params = backend_aware_database_params
+    print(f'{params}')
+    with pyexasol.connect(**params, compression=True) as conn:
+        row = conn.execute("SELECT 1 FROM DUAL").fetchone()
     print(f'"SELECT 1 FROM DUAL" returned {row[0]}')
 
 
@@ -46,8 +49,8 @@ def test_roundtrip_onprem(
     if not use_onprem:
         pytest.skip("This test requires an on-premise database")
 
-    print(f'DB Config: {exasol_config}')
-    print(f'BFS Config: {bucketfs_config}')
+    print(f"DB Config: {exasol_config}")
+    print(f"BFS Config: {bucketfs_config}")
     secrets = {
         "SCS_MASTER_PASSWORD": "abc",
         "SCS_EXASOL_DB_PASSWORD": exasol_config.password,
