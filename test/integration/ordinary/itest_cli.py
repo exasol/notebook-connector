@@ -48,7 +48,7 @@ def test_roundtrip_onprem(
         [
             "onprem",
             "--db-host-name",
-            exasol_config.host,
+            "exasol_config.host",
             "--db-port",
             str(exasol_config.port),
             "--db-username",
