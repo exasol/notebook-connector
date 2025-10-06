@@ -36,7 +36,7 @@ jobs:
             extra_param: "--package-manager conda --compression-strategy gzip"
           - file: itest_slc.py
             extra_param: "--package-manager pip --compression-strategy none"
-          - file: itest_cli.py
+          - file: itest_cli_onprem.py
             extra_param: "--backend=onprem --itde-nameserver 8.8.8.8"
 
     steps:

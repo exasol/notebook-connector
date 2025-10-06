@@ -41,7 +41,7 @@ jobs:
       - name: Run Experimental iTests
         run: >
           poetry run --
-          pytest test/integration/ordinary/itest_cli.py
+          pytest test/integration/ordinary/itest_cli_onprem.py
           -rA --setup-show
           --backend=all
           --itde-nameserver 8.8.8.8
