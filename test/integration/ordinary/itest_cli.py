@@ -4,7 +4,6 @@ from pathlib import Path
 from test.utils.integration_test_utils import sample_db_file
 from urllib.parse import urlparse
 
-import pyexasol
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from click.testing import CliRunner
@@ -20,26 +19,6 @@ from exasol.nb_connector.cli import commands
 def scs_file_path() -> Iterator[Path]:
     with sample_db_file() as file:
         yield file
-
-
-# @pytest.fixture(scope="session", autouse=True)
-# def xbackend_aware_onprem_database_async():
-#     yield None
-#
-#
-# @pytest.fixture(scope="session")
-# def xexasol_config(request) -> OnpremDBConfig:
-#     return OnpremDBConfig("192.168.124.221", 8563, "sys", "exasol")
-
-
-def test_x1(use_onprem, backend_aware_database_params):
-    if not use_onprem:
-        pytest.skip("This test requires an on-premise database")
-    params = backend_aware_database_params
-    print(f"{params}")
-    with pyexasol.connect(**params, compression=True) as conn:
-        row = conn.execute("SELECT 1 FROM DUAL").fetchone()
-    print(f'"SELECT 1 FROM DUAL" returned {row[0]}')
 
 
 def test_roundtrip_onprem(
@@ -72,7 +51,7 @@ def test_roundtrip_onprem(
         "--db-username",
         exasol_config.username,
         "--db-password",  # from env
-        "--db-use-encryption",  # TODO: verify!
+        "--db-use-encryption",
         "--bucketfs-host",
         exasol_config.host,
         "--bucketfs-user",
@@ -88,9 +67,7 @@ def test_roundtrip_onprem(
         "SSS",
     ]
 
-    # scs_file = str(scs_file_path)
     bfs_url = urlparse(bucketfs_config.url)
-    # bfs_port = str(bfs_url.port) if bfs_url.port else "2580"
     if bfs_url.port:
         options += ["--bucketfs-port", str(bfs_url.port)]
 

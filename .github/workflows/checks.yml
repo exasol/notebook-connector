@@ -39,8 +39,6 @@ jobs:
         run: poetry install --all-extras
 
       - name: Run Experimental iTests
-        # additional-db-parameter -etlCheckCertsDefault=0
-        # --itde-additional-db-parameter -etlCheckCertsDefault=0
         run: >
           poetry run --
           pytest test/integration/ordinary/itest_cli.py
