@@ -64,7 +64,7 @@ def test_roundtrip_onprem(
             "--db-username",
             exasol_config.username,
             "--db-password",  # from env
-            "--db-use-encryption",  # TODO: verify!
+            "--no-db-use-encryption",  # TODO: verify!
             "--bucketfs-host",
             exasol_config.host,
             "--bucketfs-port",
