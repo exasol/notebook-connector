@@ -10,28 +10,7 @@ import exasol.bucketfs as bfs
 import pytest
 
 import exasol.nb_connector.cli.processing.bucketfs_access as bfs_access
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.cli.processing.option_set import ScsCliError
-
-# @pytest.fixture
-# def bfs_scs():
-#     import os
-#     password = os.getenv("BUCKETFS_PASSWORD")
-#     scs = ScsMock(StorageBackend.onprem, use_itde=False)
-#     scs.save(CKey.bfs_host_name, "192.168.124.221")
-#     # scs.save(CKey.bfs_internal_host, "")
-#     scs.save(CKey.bfs_port, "2580")
-#     # scs.save(CKey.bfs_internal_port, "")
-#     scs.save(CKey.bfs_user, "w")
-#     scs.save(CKey.bfs_password, password)
-#     scs.save(CKey.bfs_service, "bfsdefault")
-#     scs.save(CKey.bfs_bucket, "default")
-#     scs.save(CKey.bfs_encryption, "False")
-#     return scs
-#
-#
-# def test_x1(bfs_scs):
-#     bfs_access.verify_bucketfs_access(bfs_scs)
 
 
 @pytest.fixture
