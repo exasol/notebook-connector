@@ -5,6 +5,51 @@ on:
 
 jobs:
 
+  Experimental-iTests:
+    name: Exp.iTests
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          large-packages: false
+          haskell: true
+
+      - name: Free disk space by removing large directories
+        run: |
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/lib/node_modules
+
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v1
+
+      - name: Install All Optional Dependencies (aka. "extras")
+        run: poetry install --all-extras
+
+      - name: Run Experimental iTests
+        run: >
+          poetry run --
+          pytest test/integration/ordinary/itest_cli_onprem.py
+          -rA --setup-show
+          --backend=all
+          --itde-nameserver 8.8.8.8
+        env:
+          SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+          SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+          SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
+
   Version-Check:
     name: Version
     runs-on: ubuntu-24.04

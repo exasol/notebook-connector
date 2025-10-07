@@ -8,6 +8,7 @@ jobs:
   fast-checks:
     name: Fast
     uses: ./.github/workflows/checks.yml
+    secrets: inherit
     permissions:
       contents: read
 
