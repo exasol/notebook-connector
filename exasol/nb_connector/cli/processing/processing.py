@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import traceback
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -72,7 +73,10 @@ def verify_connection(scs: Secrets) -> None:
     try:
         open_pyexasol_connection(scs).execute("SELECT 1 FROM DUAL").fetchone()
     except Exception as ex:
-        raise ScsCliError(f"Failed to connect to the configured database {ex}")
+        stacktrace = traceback.format_exc()
+        raise ScsCliError(
+            f"Failed to connect to the configured database {stacktrace}"
+        ) from ex
     report.success("Connection to the configured database instance was successful.")
 
 
