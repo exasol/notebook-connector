@@ -107,7 +107,10 @@ def check_scs(scs_file: Path, connect: bool) -> None:
         return
     scs = options.scs
     if BackendSelector(scs).use_itde:
-        report.warning("Verification of connection with ITDE is not implemented, yet.")
+        report.warning(
+            "Connection verification for Docker-DB"
+            " (via ITDE) is not implemented, yet."
+        )
         return
     verify_connection(scs)
     verify_bucketfs_access(scs)
