@@ -3,9 +3,12 @@ from pathlib import Path
 
 import click
 
+from exasol.nb_connector.cli import reporting as report
 from exasol.nb_connector.cli.groups import cli
 from exasol.nb_connector.cli.options import SCS_OPTIONS
 from exasol.nb_connector.cli.param_wrappers import add_params
+from exasol.nb_connector.cli.processing import processing
+from exasol.nb_connector.cli.processing.option_set import ScsCliError
 
 
 @cli.command()
@@ -24,4 +27,8 @@ def check(scs_file: Path, connect: bool):
     Optionally also verify if a connection to the configured Exasol database
     instance is successful.
     """
-    pass
+    try:
+        processing.check_scs(scs_file, connect)
+    except ScsCliError as ex:
+        report.error(ex)
+        sys.exit(1)

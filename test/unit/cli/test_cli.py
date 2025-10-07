@@ -1,6 +1,11 @@
+import getpass
 import itertools
 import os
+from collections.abc import Iterator
 from inspect import cleandoc
+from pathlib import Path
+from test.utils.integration_test_utils import sample_db_file
+from unittest.mock import Mock
 
 import click
 import pytest
@@ -16,9 +21,15 @@ def assert_error(result: click.testing.Result, message: str):
     assert message in result.output
 
 
+def assert_success(result: click.testing.Result, message: str):
+    assert result.exit_code == 0
+    assert message in result.output
+
+
 @pytest.mark.parametrize(
     "args",
     [
+        (commands.check, []),
         (commands.configure, ["onprem"]),
         (commands.configure, ["saas"]),
         (commands.configure, ["docker-db"]),
@@ -28,6 +39,20 @@ def assert_error(result: click.testing.Result, message: str):
 def test_missing_scs_file(args):
     result = CliRunner().invoke(*args)
     assert_error(result, "Error: Missing argument 'SCS_FILE'")
+
+
+@pytest.fixture
+def scs_file() -> Iterator[Path]:
+    with sample_db_file() as scs_file:
+        yield scs_file
+
+
+def test_check_ask_for_master_password(monkeypatch, scs_file):
+    mock = Mock(return_value="interactive password")
+    monkeypatch.setattr(getpass, "getpass", mock)
+    result = CliRunner().invoke(commands.check, [str(scs_file)])
+    assert mock.called
+    assert_error(result, f"{scs_file} does not contain any backend")
 
 
 @pytest.fixture
@@ -124,7 +149,13 @@ def test_configure(backend, expected, scs_with_env):
     ],
 )
 def test_round_trip(
-    command, kwargs, env_opts, expected_show, monkeypatch, scs_with_env
+    command,
+    kwargs,
+    env_opts,
+    expected_show,
+    monkeypatch,
+    scs_with_env,
+    pyexasol_connection_mock,
 ):
     def cmd_args():
         yield from [command, scs_file, "--db-schema", "SSS"]
@@ -137,5 +168,16 @@ def test_round_trip(
         monkeypatch.setitem(os.environ, env_var, f"secret {i+1}")
     result = CliRunner().invoke(commands.configure, cmd_args())
     assert result.exit_code == 0
+
+    result = CliRunner().invoke(commands.check, [scs_file, "--connect"])
+    assert_success(result, f"Configuration is complete")
+    if command == "docker-db":
+        assert not pyexasol_connection_mock.called
+        assert (
+            "Warning: Verification of connection with ITDE is not implemented, yet."
+            in result.output
+        )
+    else:
+        assert pyexasol_connection_mock.called
     result = CliRunner().invoke(commands.show, [scs_file])
     assert cleandoc(expected_show) in result.output
