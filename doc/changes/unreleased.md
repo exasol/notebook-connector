@@ -13,6 +13,7 @@ Additionally the release includes a CLI for populating the Secure Configuration 
 * #267: Implemented modify operations for the SCS
 * #269: Implemented showing SCS content
 * #271: Implemented checking SCS content
+* #271: Added verification of access to BucketFS
 
 ## Refactorings
 
