@@ -7,7 +7,6 @@ from typing import Any
 
 import click
 
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.cli import reporting as report
 from exasol.nb_connector.cli.param_wrappers import (
@@ -25,7 +24,6 @@ from exasol.nb_connector.cli.processing.option_set import (
     get_scs,
 )
 from exasol.nb_connector.connections import open_pyexasol_connection
-from exasol.nb_connector.itde_manager import bring_itde_up
 from exasol.nb_connector.secret_store import Secrets
 
 LOG = logging.getLogger(__name__)
@@ -70,11 +68,17 @@ def verify_connection(scs: Secrets) -> None:
     """
     Verify if successful connection to the configured backend is possible.
     Raise an ScsCliError otherwise.
+
+    For Docker-DB (ITDE) the connection is not verified currently, as
+
+    * Startup of ITDE takes quite some time which is considered inconvienient
+      for the user
+
+    * Connect does not verify parameters actually configured by the user but
+      rather parameters selected by ITDE
     """
     if BackendSelector(scs).use_itde:
-        # Question: Is it OK, to let bring_itde_up modify the SCS content, here?
-        False and bring_itde_up(scs)
-        report.warning(f"Bring up ITDE currently disabled")
+        report.warning(f"Verification of connection with ITDE is not implemented, yet.")
         return
     try:
         open_pyexasol_connection(scs).execute("SELECT 1 FROM DUAL").fetchone()
