@@ -114,9 +114,9 @@ def show_scs_content(scs_file: Path) -> None:
     If the SCS contains a proper backend selection, then show the SCS
     content for this context.
     """
-    oset = get_option_set(scs_file)
-    for o in oset.options:
-        value = o.scs_key and o.displayed_value(oset.scs)
+    option_set = get_option_set(scs_file)
+    for o in option_set.options:
+        value = o.scs_key and o.displayed_value(option_set.scs)
         if value is not None:
             value = value or '""'
             click.echo(f"{o.cli_option()}: {value}")
