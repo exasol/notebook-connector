@@ -121,8 +121,8 @@ def show_scs_content(scs_file: Path) -> None:
     content for this context.
     """
     option_set = get_option_set(scs_file)
-    for o in option_set.options:
-        value = o.scs_key and o.displayed_value(option_set.scs)
+    for option in option_set.options:
+        value = option.scs_key and option.displayed_value(option_set.scs)
         if value is not None:
             value = value or '""'
-            click.echo(f"{o.cli_option()}: {value}")
+            click.echo(f"{option.cli_option()}: {value}")
