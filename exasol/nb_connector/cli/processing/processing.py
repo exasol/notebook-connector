@@ -68,18 +68,7 @@ def verify_connection(scs: Secrets) -> None:
     """
     Verify if successful connection to the configured backend is possible.
     Raise an ScsCliError otherwise.
-
-    For Docker-DB (ITDE) the connection is not verified currently, as
-
-    * Startup of ITDE takes quite some time which is considered inconvienient
-      for the user
-
-    * Connect does not verify parameters actually configured by the user but
-      rather parameters selected by ITDE
     """
-    if BackendSelector(scs).use_itde:
-        report.warning(f"Verification of connection with ITDE is not implemented, yet.")
-        return
     try:
         open_pyexasol_connection(scs).execute("SELECT 1 FROM DUAL").fetchone()
     except Exception as ex:
@@ -102,11 +91,24 @@ def check_scs(scs_file: Path, connect: bool) -> None:
     * The options are incomplete for configuring access to the selected backend.
 
     * Connecting to the configured backend was requested but failed.
+
+    For Docker-DB (ITDE) the connection is not verified currently, as
+
+    * Startup of ITDE takes quite some time which is considered inconvienient
+      for the user
+
+    * Connect does not verify parameters actually configured by the user but
+      rather parameters selected by ITDE
     """
     options = get_option_set(scs_file)
     options.check()
-    if connect:
-        verify_connection(options.scs)
+    if not connect:
+        return
+    scs = options.scs
+    if BackendSelector(scs).use_itde:
+        report.warning(f"Verification of connection with ITDE is not implemented, yet.")
+        return
+    verify_connection(scs)
 
 
 def show_scs_content(scs_file: Path) -> None:
