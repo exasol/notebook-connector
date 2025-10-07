@@ -149,7 +149,13 @@ def test_configure(backend, expected, scs_with_env):
     ],
 )
 def test_round_trip(
-    command, kwargs, env_opts, expected_show, monkeypatch, scs_with_env
+    command,
+    kwargs,
+    env_opts,
+    expected_show,
+    monkeypatch,
+    scs_with_env,
+    pyexasol_connection_mock,
 ):
     def cmd_args():
         yield from [command, scs_file, "--db-schema", "SSS"]
@@ -162,7 +168,16 @@ def test_round_trip(
         monkeypatch.setitem(os.environ, env_var, f"secret {i+1}")
     result = CliRunner().invoke(commands.configure, cmd_args())
     assert result.exit_code == 0
-    result = CliRunner().invoke(commands.check, [scs_file])
+
+    result = CliRunner().invoke(commands.check, [scs_file, "--connect"])
     assert_success(result, f"Configuration is complete")
+    if command == "docker-db":
+        assert not pyexasol_connection_mock.called
+        assert (
+            "Warning: Verification of connection with ITDE is not implemented, yet."
+            in result.output
+        )
+    else:
+        assert pyexasol_connection_mock.called
     result = CliRunner().invoke(commands.show, [scs_file])
     assert cleandoc(expected_show) in result.output
