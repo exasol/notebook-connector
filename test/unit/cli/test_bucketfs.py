@@ -40,6 +40,12 @@ def test_iterdir_fails(bfs_mock):
 
 
 def mock_bfs_file(bfs_mock: Mock, method: str, side_effect: Any) -> Mock:
+    """
+    Simulate the (mocked) BucketFS to contain a file and a particular
+    method of the file having the specified side effect, e.g. raise an
+    exception or return a specific value, e.g. content for method
+    "file.read()".
+    """
     bfs_file = Mock()
     getattr(bfs_file, method).side_effect = side_effect
     bfs_mock.__truediv__.return_value = bfs_file
