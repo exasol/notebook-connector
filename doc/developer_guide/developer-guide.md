@@ -13,7 +13,7 @@ poetry run -- nox -s release:prepare -- --type {major,minor,patch}
 poetry run -- nox -s release:trigger
 ```
 
-For further information, please refer to section [How to Release](https://exasol.github.io/python-toolbox/main/user_guide/how_to_release.html) in the PTB's User Guide.
+For further information, please refer to section [How to Release](https://exasol.github.io/python-toolbox/main/user_guide/features/creating_a_release.html) in the PTB's User Guide.
 
 ## Selecting the Versions for SLCT and SLCR
 
@@ -22,7 +22,7 @@ NC contains multiple dependencies including the following
 | Dependency | Defined in | Example |
 |------------|------------|---------|
 | `script-languages-container-tool` (SLCT) | File [pyproject.toml](https://github.com/exasol/notebook-connector/blob/main/pyproject.toml) | `exasol-script-languages-container-tool = "^1.0.0"` |
-| A release of the Exasol Script Language Containers `script-languages-release` (SLCR) | File [exasol/nb_connector/slct_manager.py](https://github.com/exasol/notebook-connector/blob/main/exasol/nb_connector/slct_manager.py) | `SLC_RELEASE_TAG = "9.1.0"` |
+| A release of the Exasol Script Language Containers `script-languages-release` (SLCR) | File [exasol/nb_connector/slct/constants.py](https://github.com/exasol/notebook-connector/blob/main/exasol/nb_connector/slc/constants.py) | `SLC_RELEASE_TAG = "9.1.0"` |
 
 Additionally, each version of the SLCR depends on a specific version of the SLCT, see the SLCR release letters and the file `pyproject.toml` used by any specific released version of the SLCR.
 
@@ -42,7 +42,7 @@ In this case the dependencies shown in the table above are ✅ **valid** as NC's
 Check if the referred version of SLCR is also compatible with the version of SLCT:
 
 1. Go to [SLCR releases](https://github.com/exasol/script-languages-release/releases)
-2. Search for the SLCR version referenced in NC's file `exasol/nb_connector/slct_manager.py`
+2. Search for the SLCR version referenced in NC's file `exasol/nb_connector/slc/constants.py`
 3. Check if in the SLCR release, file  `pyproject.toml`, dependency `script-languages-container-tools` has the same major version
 
 ### Impact on NC Tests
