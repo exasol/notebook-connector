@@ -156,6 +156,7 @@ def test_round_trip(
     monkeypatch,
     scs_with_env,
     pyexasol_connection_mock,
+    verify_bucketfs_access_mock,
 ):
     def cmd_args():
         yield from [command, scs_file, "--db-schema", "SSS"]
@@ -173,11 +174,13 @@ def test_round_trip(
     assert_success(result, f"Configuration is complete")
     if command == "docker-db":
         assert not pyexasol_connection_mock.called
+        assert not verify_bucketfs_access_mock.called
         assert (
-            "Warning: Verification of connection with ITDE is not implemented, yet."
-            in result.output
-        )
+            "Warning: Connection verification for Docker-DB"
+            " (via ITDE) is not implemented, yet."
+        ) in result.output
     else:
         assert pyexasol_connection_mock.called
+        assert verify_bucketfs_access_mock.called
     result = CliRunner().invoke(commands.show, [scs_file])
     assert cleandoc(expected_show) in result.output
