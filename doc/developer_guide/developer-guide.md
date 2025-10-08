@@ -1,4 +1,4 @@
-# Notebook Connector Developer Guide
+# Developer Guide
 
 ## How to Release?
 
@@ -9,7 +9,7 @@ Creating a new release of the NC requires 3 steps
 3. Trigger the release process
 
 ```shell
-poetry run -- nox -s release:prepare -- --type {major,minor,patch} <additional-options>
+poetry run -- nox -s release:prepare -- --type {major,minor,patch}
 poetry run -- nox -s release:trigger
 ```
 

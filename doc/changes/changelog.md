@@ -32,7 +32,10 @@ unreleased
 changes_2.0.0
 changes_1.0.0
 changes_0.6.0
+changes_0.5.1
 changes_0.5.0
+changes_0.4.2
+changes_0.4.1
 changes_0.4.0
 changes_0.3.0
 changes_0.2.9
@@ -47,5 +50,4 @@ changes_0.2.1
 changes_0.2.0
 changes_0.1.0
 changes_0.0.1
-
 ```
