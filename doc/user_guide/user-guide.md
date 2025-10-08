@@ -1,4 +1,4 @@
-# Notebook Connector User Guide
+# User Guide
 
 ## Installing the Notebook Connector (NC)
 

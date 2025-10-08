@@ -14,6 +14,7 @@ Additionally the release includes a CLI for populating the Secure Configuration 
 * #269: Implemented showing SCS content
 * #271: Implemented checking SCS content
 * #274: Added verification of access to BucketFS
+* #276: Enabled publishing the documentation to HTML
 
 ## Refactorings
 
