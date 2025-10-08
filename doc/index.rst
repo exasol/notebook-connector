@@ -2,7 +2,7 @@ Exasol Notebook Connector
 #########################
 
 The Notebook Connector manages connection configurations and additional
-tools for Jupyter notebook applications provided by Exasol company.
+tools for Jupyter notebook applications provided by Exasol.
 
 .. toctree::
    :maxdepth: 2
