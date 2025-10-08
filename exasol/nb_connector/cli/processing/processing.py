@@ -10,12 +10,9 @@ import click
 
 from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.cli import reporting as report
-from exasol.nb_connector.cli.param_wrappers import (
-    ScsSecretOption,
-)
-from exasol.nb_connector.cli.processing.backend_selector import (
-    BackendSelector,
-)
+from exasol.nb_connector.cli.param_wrappers import ScsSecretOption
+from exasol.nb_connector.cli.processing.backend_selector import BackendSelector
+from exasol.nb_connector.cli.processing.bucketfs_access import verify_bucketfs_access
 from exasol.nb_connector.cli.processing.option_set import (
     SELECT_BACKEND_OPTION,
     USE_ITDE_OPTION,
@@ -110,9 +107,13 @@ def check_scs(scs_file: Path, connect: bool) -> None:
         return
     scs = options.scs
     if BackendSelector(scs).use_itde:
-        report.warning(f"Verification of connection with ITDE is not implemented, yet.")
+        report.warning(
+            "Connection verification for Docker-DB"
+            " (via ITDE) is not implemented, yet."
+        )
         return
     verify_connection(scs)
+    verify_bucketfs_access(scs)
 
 
 def show_scs_content(scs_file: Path) -> None:
