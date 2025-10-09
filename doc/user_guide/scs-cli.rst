@@ -37,7 +37,7 @@ Master Password and SCS File
 
 As said in the `User Guide`_, the SCS is secured by a *master password*.
 
-.. _user guide: user-guide.html#secure-configuration-storage-scs
+.. _user guide: user-guide
 
 To avoid the master password or any other secret to show up in the history of
 your command line shell (e.g. ``~/.bash_history``) the CLI only allows the
