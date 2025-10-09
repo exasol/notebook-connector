@@ -32,6 +32,7 @@ tools for Jupyter notebook applications provided by Exasol.
    :hidden:
 
    user_guide/user-guide
+   user_guide/scs-cli
    developer_guide/developer-guide
    changes/changelog
 

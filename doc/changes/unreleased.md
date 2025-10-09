@@ -16,6 +16,10 @@ Additionally the release includes a CLI for populating the Secure Configuration 
 * #274: Added verification of access to BucketFS
 * #276: Enabled publishing the documentation to HTML
 
+## Documentation
+
+* #278: Added user guide for SCS CLI
+
 ## Refactorings
 
 * #253: Made dependencies optional in file `pyproject.toml`

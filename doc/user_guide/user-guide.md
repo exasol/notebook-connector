@@ -30,9 +30,34 @@ pip install --dry-run --ignore-installed --quiet --report=- \
   | jq --raw-output '.install[0].metadata.provides_extra|join(",")'
 ```
 
+## Secure Configuration Storage (SCS)
+
+NC provides a _Secure Configuration Storage_ for configuring a connection to
+an Exasol database with support for on-premise, SaaS, and Docker-DB instances.
+
+Besides the connection data such as host, port, user, and password the SCS can
+also store arbitrary additional configuration items, such as URL endpoints,
+credentials, etc. in particular for interacting with cloud services.
+
+The SCS keeps all these configuration options across multiple sessions
+encrypted and secured by a master password. The SCS is based on
+[coleifer/sqlcipher3](https://github.com/coleifer/sqlcipher3) which uses an
+encrypted version of an SQLite database. The database is stored in an
+ordinary, yet encrypted, file and allows storing the configuration items as
+string in a simple key-value style.
+
+Other Exasol products e.g. the [MCP
+Server](https://github.com/exasol/mcp-server) accept the SCS for connecting to
+an Exasol database instance.
+
+For convenient, yet flexible usage, the SCS can be accessed by a Python API
+and also offers a command line interface for interactive use by humans.
+
+See [SCS command line interface](scs-cli.rst) for detailed instructions.
+
 ## Managing Script Language Containers (SLCs)
 
-The Notebook Connector (NC) supports building different flavors of [Exasol Script Language Containers](https://github.com/exasol/script-languages-release) (SLCs) using the [script-languages-container-tool](https://github.com/exasol/script-languages-container-tool).
+NC supports building different flavors of [Exasol Script Language Containers](https://github.com/exasol/script-languages-release) (SLCs) using the [script-languages-container-tool](https://github.com/exasol/script-languages-container-tool).
 
 The specific options for building an SLC are stored in the Secure Configuration Storage (SCS).  Each SLC is identified by an arbitrary unique name used as index into the SCS for finding the related options.
 
