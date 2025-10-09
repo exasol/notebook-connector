@@ -35,9 +35,7 @@ information, here is an example:
 Master Password and SCS File
 ****************************
 
-As said in the `User Guide`_, the SCS is secured by a *master password*.
-
-.. _user guide: user-guide
+As said in the User Guide, the SCS is secured by a *master password*.
 
 To avoid the master password or any other secret to show up in the history of
 your command line shell (e.g. ``~/.bash_history``) the CLI only allows the
