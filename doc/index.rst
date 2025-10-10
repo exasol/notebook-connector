@@ -9,17 +9,23 @@ tools for Jupyter notebook applications provided by Exasol.
     :padding: 0
     :class-container: surface
 
-    .. grid-item-card:: :octicon:`history` User Guide
+    .. grid-item-card:: :octicon:`person` User Guide
         :link: user_guide/user-guide
         :link-type: doc
 
         Resource for users to understand how to utilize this project and its features.
 
-    .. grid-item-card:: :octicon:`history` Developer Guide
+    .. grid-item-card:: :octicon:`tools` Developer Guide
         :link: developer_guide/developer-guide
         :link-type: doc
 
         Instructions and best practices to help developers contribute to the project and set up their development environment.
+
+    .. grid-item-card:: :octicon:`gear` API Doc
+        :link: api
+        :link-type: doc
+
+        API documentation
 
     .. grid-item-card:: :octicon:`history` Changes
         :link: changes/changelog
@@ -33,5 +39,5 @@ tools for Jupyter notebook applications provided by Exasol.
 
    user_guide/user-guide
    developer_guide/developer-guide
+   api
    changes/changelog
-

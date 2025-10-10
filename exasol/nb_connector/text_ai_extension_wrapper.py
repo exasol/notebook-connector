@@ -123,6 +123,7 @@ def initialize_text_ai_extension(
     Possible steps:
 
     * Call the Text-AI Extension's language container deployment API.
+
     If given a version, downloads the specified released version of the extension
     and uploads it to the BucketFS.
 
@@ -135,7 +136,7 @@ def initialize_text_ai_extension(
     of the key is defined in the ACTIVATION_KEY constant.
 
     * Install default transformers models into
-    the Bucketfs using Transformers Extensions upload model functionality.
+      the Bucketfs using Transformers Extensions upload model functionality.
 
     * Install Text-AI specific scripts.
 
