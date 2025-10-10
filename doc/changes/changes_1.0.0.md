@@ -23,7 +23,7 @@ Additionally, the new `ScriptLanguageContainer` class supports adding conda pack
 
 Also, the release contains several internal improvements.
 
-See the NC [User Guide](../user_guide/user-guide.md) for details.
+See the NC [User Guide](../user_guide/user-guide.rst) for details.
 
 ## Features
 
