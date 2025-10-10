@@ -18,6 +18,7 @@ Additionally the release includes a CLI for populating the Secure Configuration 
 
 ## Documentation
 
+* #280: Migrated documentation from MD to RST
 * #278: Added user guide for SCS CLI
 
 ## Refactorings
