@@ -14,7 +14,7 @@ def random_string(length: int = 10) -> str:
     return "".join(random.choice(string.ascii_uppercase) for _ in range(length))
 
 
-def random_file_name(other_than: list[str]) -> bfs.path.PathLike:
+def random_file_name(other_than: list[str]) -> str:
     result = None
     while result is None or result in other_than:
         infix = random_string()
