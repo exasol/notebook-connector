@@ -27,4 +27,4 @@ Additionally the release includes a CLI for populating the Secure Configuration 
 * #260: Added unit tests for CLI param wrappers
 * #265: Fixed type hints in tests
 * #251: Re-enabled SaaS integration tests
-* #255: Used `download_transformers_model()` from TE
+* #255: Used `install_huggingface_model()` from TE
