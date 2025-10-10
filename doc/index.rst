@@ -9,13 +9,13 @@ tools for Jupyter notebook applications provided by Exasol.
     :padding: 0
     :class-container: surface
 
-    .. grid-item-card:: :octicon:`history` User Guide
+    .. grid-item-card:: :octicon:`person` User Guide
         :link: user_guide/user-guide
         :link-type: doc
 
         Resource for users to understand how to utilize this project and its features.
 
-    .. grid-item-card:: :octicon:`history` Developer Guide
+    .. grid-item-card:: :octicon:`tools` Developer Guide
         :link: developer_guide/developer-guide
         :link-type: doc
 
@@ -32,6 +32,7 @@ tools for Jupyter notebook applications provided by Exasol.
    :hidden:
 
    user_guide/user-guide
+   user_guide/scs-cli
    developer_guide/developer-guide
    changes/changelog
 
