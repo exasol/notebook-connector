@@ -3,7 +3,10 @@ from dataclasses import dataclass
 from typing import Any
 
 from exasol.ai.text.extractors.bucketfs_model_repository import BucketFSRepository
-from exasol.ai.text.impl.utils.transformers_utils import download_transformers_model
+from exasol_transformers_extension.utils.bucketfs_model_specification import (
+    BucketFSModelSpecification,
+)
+from exasol_transformers_extension.utils.model_utils import install_huggingface_model
 from yaspin import yaspin
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
@@ -52,11 +55,13 @@ def install_model(conf: Secrets, model: TransformerModel) -> None:
     with yaspin(text=f"- Huggingface model {model.name}") as spinner:
         if not _interactive_usage():
             spinner.hide()
-        download_transformers_model(
+        sub_dir = ensure_model_subdir_config_value(conf)
+        model_spec = BucketFSModelSpecification(
+            model.name, model.task_type, "", sub_dir
+        )
+        install_huggingface_model(
             bucketfs_location=bucketfs_location,
-            sub_dir=ensure_model_subdir_config_value(conf),
-            task_type=model.task_type,
-            model_name=model.name,
+            model_spec=model_spec,
             model_factory=model.factory,
         )
     spinner.ok(CHECKMARK)
