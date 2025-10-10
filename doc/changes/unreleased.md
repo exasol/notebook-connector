@@ -19,6 +19,7 @@ Additionally the release includes a CLI for populating the Secure Configuration 
 ## Documentation
 
 * #280: Migrated documentation from MD to RST
+* #225: Added API documentation
 
 ## Refactorings
 

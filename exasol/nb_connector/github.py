@@ -63,6 +63,7 @@ def retrieve_jar(
 ) -> pathlib.Path:
     """
     Returns latest jar file for the project, possibly using local cache.
+
     :param project: project to be used
     :param use_local_cache: should local cache be used or file always retrieved anew
     :param storage_path: path to be used for downloading.
