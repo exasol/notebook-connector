@@ -21,6 +21,12 @@ tools for Jupyter notebook applications provided by Exasol.
 
         Instructions and best practices to help developers contribute to the project and set up their development environment.
 
+    .. grid-item-card:: :octicon:`gear` API Doc
+        :link: api
+        :link-type: doc
+
+        API documentation
+
     .. grid-item-card:: :octicon:`history` Changes
         :link: changes/changelog
         :link-type: doc
@@ -34,5 +40,5 @@ tools for Jupyter notebook applications provided by Exasol.
    user_guide/user-guide
    user_guide/scs-cli
    developer_guide/developer-guide
+   api
    changes/changelog
-

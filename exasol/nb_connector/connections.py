@@ -144,17 +144,20 @@ def open_pyexasol_connection(conf: Secrets, **kwargs) -> pyexasol.ExaConnection:
     Parameters in kwargs override the correspondent values in the configuration.
 
     The configuration should provide the following parameters:
+
     On-Prem:
         - Server address and port (db_host_name, db_port),
         - Client security credentials (db_user, db_password).
+
     Saas:
         - SaaS service url (saas_url),
         - SaaS account id (saas_account_id),
         - Database id or name (saas_database_id or saas_database_name),
         - Client security credentials (saas_token).
+
     Optional parameters include:
-    - Secured comm flag (db_encryption),
-    - Some of the SSL options (cert_vld, trusted_ca, client_cert).
+        - Secured comm flag (db_encryption),
+        - Some of the SSL options (cert_vld, trusted_ca, client_cert).
 
     If the schema is not provided then it should be set explicitly in every SQL statement.
     For other optional parameters the default settings are as per the pyexasol interface.
@@ -171,17 +174,20 @@ def open_sqlalchemy_connection(conf: Secrets):
     Sets the default schema if it is defined in the configuration.
 
     The configuration should provide the following parameters:
+
     On-Prem:
         - Server address and port (db_host_name, db_port),
         - Client security credentials (db_user, db_password).
+
     Saas:
         - SaaS service url (saas_url),
         - SaaS account id (saas_account_id),
         - Database id or name (saas_database_id or saas_database_name),
         - Client security credentials (saas_token).
+
     Optional parameters include:
-    - Secured comm flag (db_encryption).
-    - Validation of the server's TLS/SSL certificate by the client (cert_vld).
+        - Secured comm flag (db_encryption).
+        - Validation of the server's TLS/SSL certificate by the client (cert_vld).
 
     If the schema is not provided then it should be set explicitly in every SQL statement.
     For other optional parameters the default settings are as per the Exasol SQLAlchemy interface.
@@ -263,18 +269,21 @@ def open_bucketfs_bucket(conf: Secrets) -> bfs.BucketLike:
     Supports both On-Prem and Saas backends.
 
     The configuration should provide the following parameters;
+
     On-Prem:
         - Host name and port of the BucketFS service (bfs_host_name or db_host_name, bfs_port),
         - Client security credentials (bfs_user, bfs_password).
         - Bucket name (bfs_bucket)
-        Optional parameters include:
-        - Secured comm flag (bfs_encryption), defaults to False.
-        - Some of the SSL options (cert_vld, trusted_ca).
+
     Saas:
         - SaaS service url (saas_url),
         - SaaS account id (saas_account_id),
         - Database id or name (saas_database_id or saas_database_name),
         - Client security credentials (saas_token).
+
+    Optional parameters include:
+        - Secured comm flag (bfs_encryption), defaults to False.
+        - Some of the SSL options (cert_vld, trusted_ca).
     """
 
     if get_backend(conf) == StorageBackend.onprem:
