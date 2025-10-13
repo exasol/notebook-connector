@@ -1,5 +1,5 @@
-SCS Command Line Interface (CLI)
-################################
+:octicon:`terminal` SCS Command Line Interface (CLI)
+####################################################
 
 You can invoke NC's command line interface for the Secure Configuration
 Storage (SCS) by running ``poetry run scs``.
