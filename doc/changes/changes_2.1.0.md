@@ -1,0 +1,38 @@
+# 2.1.0 - 2025-10-13
+## Summary
+
+This release marks most of the NC's dependencies in file `pyproject.toml` as _optional_.  Please see updated installation instructions in the NC User Guide.
+
+Additionally the release includes a CLI for populating the Secure Configuration Storage (SCS).
+
+## Features
+
+* #258: Added initial SCS CLI
+* #263: Added functions for handling a set of options for SCS CLI
+* #267: Implemented modify operations for the SCS
+* #269: Implemented showing SCS content
+* #271: Implemented checking SCS content
+* #274: Added verification of access to BucketFS
+* #276: Enabled publishing the documentation to HTML
+
+## Documentation
+
+* #280: Migrated documentation from MD to RST
+* #225: Added API documentation
+* #278: Added user guide for SCS CLI
+
+## Refactorings
+
+* #253: Made dependencies optional in file `pyproject.toml`
+* #260: Added unit tests for CLI param wrappers
+* #265: Fixed type hints in tests
+* #251: Re-enabled SaaS integration tests
+* #255: Used `install_huggingface_model()` from TE
+
+## Dependency Updates
+
+### `main`
+* Updated dependency `exasol-saas-api:2.2.0` to `2.3.0`
+* Updated dependency `exasol-transformers-extension:2.2.1` to `2.3.0`
+* Removed dependency `requests:2.32.4`
+* Removed dependency `types-requests:2.32.4.20250611`
