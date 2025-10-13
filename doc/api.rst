@@ -23,7 +23,6 @@ exasol.nb_connector.connections
 *******************************
 
 .. autofunction:: exasol.nb_connector.connections.open_pyexasol_connection
-.. autofunction:: exasol.nb_connector.connections.open_bucketfs_connection
 .. autofunction:: exasol.nb_connector.connections.open_bucketfs_bucket
 .. autofunction:: exasol.nb_connector.connections.open_bucketfs_location
 .. autofunction:: exasol.nb_connector.connections.get_saas_database_id

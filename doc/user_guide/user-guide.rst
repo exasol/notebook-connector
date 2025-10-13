@@ -1,6 +1,12 @@
 :octicon:`person` User Guide
 ############################
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+
+   scs-cli
+
 Installing the Notebook Connector (NC)
 **************************************
 
