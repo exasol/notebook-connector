@@ -19,6 +19,9 @@ jobs:
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v1
 
+      - name: Install All Optional Dependencies (aka. "extras")
+        run: poetry install --all-extras
+
       - name: Build Documentation
         run: |
           poetry run -- nox -s docs:multiversion
