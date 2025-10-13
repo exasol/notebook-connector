@@ -1,8 +1,8 @@
-:octicon:`terminal` SCS Command Line Interface (CLI)
-####################################################
+:octicon:`terminal` Command Line Interface for the Secure Configuration Storage (SCS)
+#####################################################################################
 
-You can invoke NC's command line interface for the Secure Configuration
-Storage (SCS) by running ``poetry run scs``.
+You can invoke Notebook Connector's command line interface for the Secure
+Configuration Storage (SCS) by running ``poetry run scs``.
 
 The command line interface for accessing the SCS offers 3 main commands
 
@@ -10,7 +10,9 @@ The command line interface for accessing the SCS offers 3 main commands
 
 * ``show``: :ref:`Show <show>` the currently configured database connection.
 
-* ``check``: :ref:`Check <check>` whether the configuration is complete and optionally verify the configuration by connecting to the configured Exasol database instance.
+* ``check``: :ref:`Check <check>` whether the configuration is complete and
+  optionally verify the configuration by connecting to the configured Exasol
+  database instance.
 
 Help
 ****
@@ -80,7 +82,7 @@ instance:
 
 .. code-block:: shell
 
-    poetry run -- scs configure saas <SCS file>
+    scs configure saas <SCS file>
 
 The available configuration options are specific to each of the instance
 variants. Variant ``onprem`` requires to specify ``--db-host-name``, for
@@ -92,9 +94,9 @@ related environment variables for secrets, e.g. ``SCS_EXASOL_DB_PASSWORD`` for
 
 .. code-block:: shell
 
-    poetry run -- scs configure onprem --help
-    poetry run -- scs configure saas --help
-    poetry run -- scs configure docker-db --help
+    scs configure onprem --help
+    scs configure saas --help
+    scs configure docker-db --help
 
 
 Incremental Configuration
@@ -120,7 +122,7 @@ In the output passwords and other sensitive data are replaced by asterisks
 
 .. code-block:: shell
 
-        poetry run -- scs show <SCS file>
+        scs show <SCS file>
 
 Here is the output for a partially configured connection to an Exasol SaaS instance:
 
@@ -147,7 +149,7 @@ statement and accessing the BucketFS.
 
 .. code-block:: shell
 
-    poetry run -- scs check --connect <SCS file>
+    scs check --connect <SCS file>
 
 Here is the output when having started configuring a connection to an Exasol
 SaaS instance without providing any further options, yet:
