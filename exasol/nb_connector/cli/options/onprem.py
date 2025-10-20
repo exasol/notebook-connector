@@ -9,7 +9,6 @@ ONPREM_DB_OPTIONS = [
         "--db-host-name",
         metavar="HOST",
         type=str,
-        default="localhost",
         help="Database connection host name",
         scs_key=CKey.db_host_name,
     ),
