@@ -27,17 +27,6 @@ from exasol.nb_connector.secret_store import Secrets
 LOG = logging.getLogger(__name__)
 
 
-def add_defaults(values: dict[str, Any], options: OptionSet) -> dict[str, Any]:
-    for option in options:
-        if (
-            option.default
-            and not args.arg_name in values
-            and scs.get(option.scs_key) is None
-        ):
-            values[option.arg_name] = option.default
-    return values
-
-
 def save(
     scs_file: Path,
     backend: StorageBackend,
@@ -59,6 +48,7 @@ def save(
     values[SELECT_BACKEND_OPTION.arg_name] = backend.name
     values[USE_ITDE_OPTION.arg_name] = use_itde
     # options.set_dynamic_defaults(values)
+    # values.update(options.default_values(values))
     for arg_name, value in values.items():
         if value is None:
             continue

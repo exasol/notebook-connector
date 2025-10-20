@@ -104,14 +104,17 @@ class ScsOption(ScsParam):
         scs_key: CKey | None = None,
         scs_alternative_key: CKey | None = None,
         scs_required: bool = True,
+        # default: Any = None,
         # get_default_from: str | None = None,
         **kwargs,
     ):
+        # kwarg help=help if default is None else f"{help} [default: {default}]"
         super().__init__(scs_key=scs_key, **kwargs)
         self._cli_option = cli_option
         self._args = args
         self.scs_alternative_key = scs_alternative_key
         self.scs_required = scs_required
+        # self.default = default
         # self.get_default_from = get_default_from
 
     def cli_option(self, full=False) -> str:

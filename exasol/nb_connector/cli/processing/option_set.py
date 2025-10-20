@@ -59,6 +59,15 @@ class OptionSet:
         self.scs = scs
         self.options = get_options(backend, use_itde)
 
+    def default_values(self, values: dict[str, Any]) -> dict[str, Any]:
+        def use_default(option: ScsParam) -> bool:
+            return (
+                option.default is not None
+                and not args.arg_name in values
+                and self.scs.get(option.scs_key) is None
+            )
+        return { o.arg_name: o.default for o in self.options if use_default(o) }
+    
     def find_option(self, arg_name: str) -> ScsParam:
         """
         Find the full definition of a click parameter for the specified
