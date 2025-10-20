@@ -58,7 +58,7 @@ def save(
     options = OptionSet(scs, backend, use_itde)
     values[SELECT_BACKEND_OPTION.arg_name] = backend.name
     values[USE_ITDE_OPTION.arg_name] = use_itde
-    options.set_dynamic_defaults(values)
+    # options.set_dynamic_defaults(values)
     for arg_name, value in values.items():
         if value is None:
             continue

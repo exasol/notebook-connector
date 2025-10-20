@@ -71,25 +71,6 @@ class OptionSet:
                 f"Couldn't find any option with parameter name {arg_name}."
             )
 
-    def set_dynamic_defaults(self, values: dict[str, Any]) -> dict[str, Any]:
-        """
-        Some options may specify another option to get their default value
-        from, e.g. --bucketfs-host-internal reads its default value from
-        --bucketfs-host.
-
-        This function modifies the passed dict by transfering the default
-        values and returns the modified dict.
-        """
-        for o in self.options:
-            ref = o.get_default_from if isinstance(o, ScsOption) else None
-            if not ref or values[o.arg_name] is not None:
-                continue
-            other = self.find_option(ref)
-            report.info(f"Using {other.cli_option()} as default for {o.cli_option()}.")
-            values[o.arg_name] = values[other.arg_name]
-
-        return values
-
     def check(self):
         """
         Check if the content of the SCS is complete wrt. the selected

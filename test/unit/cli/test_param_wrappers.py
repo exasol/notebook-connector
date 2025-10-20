@@ -54,7 +54,7 @@ def test_scs_option():
         scs_key=CKey.saas_database_name,
         scs_alternative_key=CKey.saas_database_id,
         scs_required=False,
-        get_default_from="other_arg",
+        # get_default_from="other_arg",
         envvar="KWARG_ENVVAR",
         metavar="NAME",
         type=str,
@@ -65,7 +65,7 @@ def test_scs_option():
         "scs_key": CKey.saas_database_name,
         "scs_alternative_key": CKey.saas_database_id,
         "scs_required": False,
-        "get_default_from": "other_arg",
+        # "get_default_from": "other_arg",
     }
     assert expected == select_atts(testee, expected)
 
