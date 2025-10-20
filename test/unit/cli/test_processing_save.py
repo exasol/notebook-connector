@@ -44,8 +44,10 @@ def test_change_value(scs_patcher):
     save_saas_url("H2") == scs_mock.get(CKey.saas_url)
 
 
-@pytest.mark.skip("""Removed dynamic defaults for Buckets options
---bucketfs-host-internal and --bucketfs-port-internal""")
+@pytest.mark.skip(
+    """Removed dynamic defaults for Buckets options
+--bucketfs-host-internal and --bucketfs-port-internal"""
+)
 def test_save_dynamic_defaults(scs_patcher):
     scs_patcher.disable_reporting("info")
     scs_mock = scs_patcher.patch()

@@ -67,7 +67,8 @@ class OptionSet:
                 and option.scs_key
                 and self.scs.get(option.scs_key) is None
             )
-        return { o.arg_name: o.default for o in self.options if use_default(o) }
+
+        return {o.arg_name: o.default for o in self.options if use_default(o)}
 
     def find_option(self, arg_name: str) -> ScsParam:
         """
