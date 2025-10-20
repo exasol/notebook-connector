@@ -17,7 +17,7 @@ BUCKETFS_OPTIONS = [
         metavar="HOST",
         type=str,
         default="localhost",
-        help="BucketFS internal host name [reads default from --bucketfs-host]",
+        help="BucketFS internal host name",
         scs_key=CKey.bfs_internal_host_name,
     ),
     ScsOption(
@@ -33,7 +33,7 @@ BUCKETFS_OPTIONS = [
         metavar="PORT",
         type=int,
         default=2580,
-        help="BucketFS internal port [reads default from --bucketfs-port]",
+        help="BucketFS internal port",
         scs_key=CKey.bfs_internal_port,
     ),
     ScsOption(
