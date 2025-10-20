@@ -118,6 +118,8 @@ def test_find_unknown_option(scs_patcher):
         testee.find_option("unknown_arg")
 
 
+@pytest.mark.skip("""Removed dynamic defaults for Buckets options
+--bucketfs-host-internal and --bucketfs-port-internal""")
 def test_dynamic_defaults(scs_patcher, capsys):
     scs_patcher.patch(StorageBackend.onprem, False)
     testee = get_option_set(Path("/fictional/scs"))
