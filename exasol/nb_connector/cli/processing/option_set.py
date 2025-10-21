@@ -68,6 +68,7 @@ class OptionSet:
 
         For details, see https://github.com/exasol/notebook-connector/issues/285.
         """
+
         def use_default(option: ScsParam) -> bool:
             return bool(
                 option.default is not None
