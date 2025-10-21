@@ -105,12 +105,11 @@ class ScsOption(ScsParam):
         scs_alternative_key: CKey | None = None,
         scs_required: bool = True,
         default: Any = None,
-        default_help: str | None = None,
         help: str | None = None,
         **kwargs,
     ):
         _help = (
-            help if default is None else f"{help} [default: {default_help or default}]"
+            help if default is None else f"{help} [default: {default}]"
         )
         super().__init__(scs_key=scs_key, help=_help, default=None, **kwargs)
         self._cli_option = cli_option
