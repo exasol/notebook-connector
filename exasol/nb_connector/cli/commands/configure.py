@@ -22,9 +22,6 @@ def configure():
     pass
 
 
-import click
-
-
 @configure.command("onprem")
 @add_params(ONPREM_OPTIONS)
 def configure_onprem(scs_file: Path, **kwargs):
