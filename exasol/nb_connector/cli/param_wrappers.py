@@ -22,7 +22,7 @@ class ScsParam:
 
     def __init__(self, scs_key: CKey | None = None, **kwargs):
         self.scs_key = scs_key
-        self._kwargs = kwargs
+        self._kwargs = dict(kwargs)
 
     def cli_option(self, full=False) -> str:
         return ""
@@ -104,22 +104,30 @@ class ScsOption(ScsParam):
         scs_key: CKey | None = None,
         scs_alternative_key: CKey | None = None,
         scs_required: bool = True,
-        # default: Any = None,
-        # get_default_from: str | None = None,
+        default: Any = None,
+        default_help: str  | None = None,
+        help: str | None = None,
         **kwargs,
     ):
-        # kwarg help=help if default is None else f"{help} [default: {default}]"
-        super().__init__(scs_key=scs_key, **kwargs)
+        _help = (
+            help
+            if default is None
+            else f"{help} [default: {default_help or default}]"
+        )
+        super().__init__(scs_key=scs_key, help=_help, default=None, **kwargs)
         self._cli_option = cli_option
         self._args = args
         self.scs_alternative_key = scs_alternative_key
         self.scs_required = scs_required
-        # self.default = default
-        # self.get_default_from = get_default_from
+        self._default = default
 
     def cli_option(self, full=False) -> str:
         raw = self._cli_option
         return raw if full else re.sub(r"/--.*$", "", raw)
+
+    @property
+    def default(self) -> Any:
+        return self._default
 
     @property
     def arg_name(self) -> str:

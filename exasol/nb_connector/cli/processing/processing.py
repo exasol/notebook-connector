@@ -48,7 +48,9 @@ def save(
     values[SELECT_BACKEND_OPTION.arg_name] = backend.name
     values[USE_ITDE_OPTION.arg_name] = use_itde
     # options.set_dynamic_defaults(values)
-    # values.update(options.default_values(values))
+    # dv = options.default_values(values)
+    # print(f'default values: {dv}')
+    values.update(options.default_values(values))
     for arg_name, value in values.items():
         if value is None:
             continue
@@ -57,6 +59,7 @@ def save(
             continue
         if not isinstance(option, ScsSecretOption):
             content = value.value if isinstance(value, Enum) else str(value)
+            # print(f'saving {option} {content} (type {type(content)})')
             scs.save(option.scs_key, content)
             continue
         if secret := option.get_secret(interactive=bool(value)):

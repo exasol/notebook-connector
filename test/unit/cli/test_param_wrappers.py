@@ -76,8 +76,8 @@ def test_scs_option():
         "envvar": "KWARG_ENVVAR",
         "metavar": "NAME",
         "type": click.STRING,
-        "default": "Robert",
-        "help": "SaaS database name",
+        # "default": "Robert",
+        "help": "SaaS database name [default: Robert]",
     }
     assert expected == select_atts(params[0], expected)
 

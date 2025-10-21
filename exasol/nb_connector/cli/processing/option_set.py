@@ -63,7 +63,7 @@ class OptionSet:
         def use_default(option: ScsParam) -> bool:
             return bool(
                 option.default is not None
-                and not option.arg_name in values
+                and values.get(option.arg_name) is None
                 and option.scs_key
                 and self.scs.get(option.scs_key) is None
             )

@@ -38,6 +38,16 @@ class Scenario:
     use_itde: bool
     params: list[ScsArgument]
 
+    @property
+    def uniq_params(self) -> list[ScsArgument]:
+        result = []
+        names = []
+        for p in self.params:
+            if p.arg_name not in names:
+                result.append(p)
+                names.append(p.arg_name)
+        return result
+
 
 TEST_SCENARIOS = [
     Scenario("SaaS", StorageBackend.saas, True, SAAS_OPTIONS),
@@ -107,8 +117,8 @@ def test_find_option(scenario, scs_patcher):
     scs_patcher.patch(scenario.backend, scenario.use_itde)
     testee = get_option_set(Path("/fictional/scs"))
     assert testee.options == [SELECT_BACKEND_OPTION, USE_ITDE_OPTION] + scenario.params
-    actual = [testee.find_option(p.arg_name) for p in scenario.params]
-    assert actual == scenario.params
+    actual = [testee.find_option(p.arg_name) for p in scenario.uniq_params]
+    assert actual == scenario.uniq_params
 
 
 def test_find_unknown_option(scs_patcher):
@@ -116,31 +126,6 @@ def test_find_unknown_option(scs_patcher):
     testee = get_option_set(Path("/fictional/scs"))
     with pytest.raises(ScsCliError):
         testee.find_option("unknown_arg")
-
-
-@pytest.mark.skip(
-    """Removed dynamic defaults for Buckets options
---bucketfs-host-internal and --bucketfs-port-internal"""
-)
-def test_dynamic_defaults(scs_patcher, capsys):
-    scs_patcher.patch(StorageBackend.onprem, False)
-    testee = get_option_set(Path("/fictional/scs"))
-    actual = testee.set_dynamic_defaults(
-        {
-            "bucketfs_host": "some-host",
-            "bucketfs_port": 9999,
-            "bucketfs_host_internal": None,
-            "bucketfs_port_internal": None,
-        }
-    )
-    output = capsys.readouterr().out
-    for infix in ["host", "port"]:
-        a = f"bucketfs_{infix}"
-        b = f"bucketfs_{infix}_internal"
-        assert actual[a] == actual[b]
-        a = a.replace("_", "-")
-        b = b.replace("_", "-")
-        assert f"Using --{a} as default for --{b}" in output
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
