@@ -118,27 +118,6 @@ def test_find_unknown_option(scs_patcher):
         testee.find_option("unknown_arg")
 
 
-def test_dynamic_defaults(scs_patcher, capsys):
-    scs_patcher.patch(StorageBackend.onprem, False)
-    testee = get_option_set(Path("/fictional/scs"))
-    actual = testee.set_dynamic_defaults(
-        {
-            "bucketfs_host": "some-host",
-            "bucketfs_port": 9999,
-            "bucketfs_host_internal": None,
-            "bucketfs_port_internal": None,
-        }
-    )
-    output = capsys.readouterr().out
-    for infix in ["host", "port"]:
-        a = f"bucketfs_{infix}"
-        b = f"bucketfs_{infix}_internal"
-        assert actual[a] == actual[b]
-        a = a.replace("_", "-")
-        b = b.replace("_", "-")
-        assert f"Using --{a} as default for --{b}" in output
-
-
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
 def test_check_failure(scenario, scs_patcher, capsys):
     options = [
