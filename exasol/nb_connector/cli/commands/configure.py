@@ -21,7 +21,9 @@ def configure():
     """
     pass
 
+
 import click
+
 
 @configure.command("onprem")
 @add_params(ONPREM_OPTIONS)

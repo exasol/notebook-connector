@@ -3,7 +3,6 @@ from pathlib import Path
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.cli.param_wrappers import ScsOption
 
-
 SSL_OPTIONS = [
     ScsOption(
         "--ssl-use-cert-validation/--no-ssl-use-cert-validation",
