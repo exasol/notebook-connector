@@ -63,8 +63,9 @@ class OptionSet:
         """
         Return a dict of option arg names and default values.
 
-        The dict contains only entries for options that are neither specified
-        explicitly, nor stored in the SCS, yet.
+        The dict contains only entries for options with a defined default
+        value, that are neither specified explicitly, nor stored in the SCS,
+        yet.
 
         For details, see https://github.com/exasol/notebook-connector/issues/285.
         """
