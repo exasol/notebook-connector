@@ -60,6 +60,14 @@ class OptionSet:
         self.options = get_options(backend, use_itde)
 
     def default_values(self, values: dict[str, Any]) -> dict[str, Any]:
+        """
+        Return a dict of option arg names and default values.
+
+        The dict contains only entries for options that are neither specified
+        explicitly, nor stored in the SCS, yet.
+
+        For details, see https://github.com/exasol/notebook-connector/issues/285.
+        """
         def use_default(option: ScsParam) -> bool:
             return bool(
                 option.default is not None

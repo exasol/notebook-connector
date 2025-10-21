@@ -47,7 +47,10 @@ def test_save_default(scs_patcher):
     assert scs_mock.get(CKey.cert_vld) == "True"
 
 
-def test_default_dont_overwrite(scs_patcher):
+def test_defaults_dont_overwrite_user_values(scs_patcher):
+    """
+    See https://github.com/exasol/notebook-connector/issues/285
+    """
     scs_mock = scs_patcher.patch(StorageBackend.onprem, use_itde=False)
     scs_mock.save(CKey.cert_vld, "False")
     _save_only_default_values(scs_mock)
