@@ -113,7 +113,7 @@ To run UI tests using [Playwright](https://playwright.dev/) and Pytest, follow t
 
 3. **Run UI tests and update Solara snapshots**
 
-   Use the following command to run UI tests and update the reference snapshots used for visual comparison:
+   Use the following command to run UI tests and update the reference [solara](https://solara.dev/) snapshots used for visual comparison:
 
    .. code-block:: bash
 
