@@ -3,8 +3,6 @@ import playwright.sync_api
 import solara
 from IPython.display import display
 
-# import display
-
 
 def test_widget_button_solara(
     solara_test, page_session: playwright.sync_api.Page, assert_solara_snapshot
