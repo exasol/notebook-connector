@@ -19,6 +19,7 @@ dependencies = [
   "sqlcipher3-binary (>= 0.5.0); sys_platform==\"linux\"",
   "sqlcipher3 (>= 0.5.0); sys_platform==\"darwin\" or sys_platform==\"win32\"",
   "exasol-saas-api (>=0.9.0, <3)", # needed to get database id for database name
+  "pytest-ipywidgets (>=1.52.0,<2.0.0)",
 ]
 
 [project.optional-dependencies]
