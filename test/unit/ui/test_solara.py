@@ -22,6 +22,7 @@ def app_box_and_rc(app_name, kernel_context):
             root = solara.RoutingProvider(
                 children=[el], routes=app.routes, pathname="/"
             )
+            # rc = render context 
             box, rc = solara.render(root, handle_error=False)
             yield box, rc
     finally:
