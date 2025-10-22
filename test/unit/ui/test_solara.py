@@ -17,6 +17,7 @@ def app_box_and_rc(app_name, kernel_context):
     app.init()
     try:
         with kernel_context:
+            # get root widget
             el = app.run()
             root = solara.RoutingProvider(
                 children=[el], routes=app.routes, pathname="/"
