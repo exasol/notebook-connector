@@ -1,3 +1,6 @@
+"""
+TODO: docstring
+"""
 import ipywidgets
 
 text = ipywidgets.Text(value="init")
