@@ -2,7 +2,7 @@
 #####################################################################################
 
 You can invoke Notebook Connector's command line interface for the Secure
-Configuration Storage (SCS) by running ``poetry run scs``.
+Configuration Storage (SCS) by running ``scs``.
 
 The command line interface for accessing the SCS offers 3 main commands
 

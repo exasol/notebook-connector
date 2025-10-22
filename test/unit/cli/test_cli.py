@@ -22,7 +22,7 @@ def assert_error(result: click.testing.Result, message: str):
 
 
 def assert_success(result: click.testing.Result, message: str):
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
     assert message in result.output
 
 
@@ -91,7 +91,7 @@ def test_configure(backend, expected, scs_with_env):
             """
             backend: onprem
             use_itde: True
-            --db-mem-size: 2
+            --db-mem-size: 8
             --db-disk-size: 2
             --accelerator: none
             --db-schema: SSS
@@ -100,6 +100,10 @@ def test_configure(backend, expected, scs_with_env):
         (
             "onprem",
             {
+                "--db-host-name": "localhost",
+                "--bucketfs-host": "localhost",
+                "--bucketfs-name": "bfsdefault",
+                "--bucket": "default",
                 "--db-username": "UUU",
             },
             {

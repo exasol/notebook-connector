@@ -9,7 +9,7 @@ EXTRA_DOCKER_DB_OPTIONS = [
         "--db-mem-size",
         type=int,
         metavar="GiB",
-        default=2,
+        default=8,
         help="Database memory size (GiB)",
         scs_key=CKey.mem_size,
     ),

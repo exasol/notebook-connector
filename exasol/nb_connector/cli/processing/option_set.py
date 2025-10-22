@@ -59,6 +59,27 @@ class OptionSet:
         self.scs = scs
         self.options = get_options(backend, use_itde)
 
+    def default_values(self, values: dict[str, Any]) -> dict[str, Any]:
+        """
+        Return a dict of option arg names and default values.
+
+        The dict contains only entries for options with a defined default
+        value, that are neither specified explicitly, nor stored in the SCS,
+        yet.
+
+        For details, see https://github.com/exasol/notebook-connector/issues/285.
+        """
+
+        def use_default(option: ScsParam) -> bool:
+            return bool(
+                option.default is not None
+                and values.get(option.arg_name) is None
+                and option.scs_key
+                and self.scs.get(option.scs_key) is None
+            )
+
+        return {o.arg_name: o.default for o in self.options if use_default(o)}
+
     def find_option(self, arg_name: str) -> ScsParam:
         """
         Find the full definition of a click parameter for the specified
@@ -70,25 +91,6 @@ class OptionSet:
             raise ScsCliError(
                 f"Couldn't find any option with parameter name {arg_name}."
             )
-
-    def set_dynamic_defaults(self, values: dict[str, Any]) -> dict[str, Any]:
-        """
-        Some options may specify another option to get their default value
-        from, e.g. --bucketfs-host-internal reads its default value from
-        --bucketfs-host.
-
-        This function modifies the passed dict by transfering the default
-        values and returns the modified dict.
-        """
-        for o in self.options:
-            ref = o.get_default_from if isinstance(o, ScsOption) else None
-            if not ref or values[o.arg_name] is not None:
-                continue
-            other = self.find_option(ref)
-            report.info(f"Using {other.cli_option()} as default for {o.cli_option()}.")
-            values[o.arg_name] = values[other.arg_name]
-
-        return values
 
     def check(self):
         """
