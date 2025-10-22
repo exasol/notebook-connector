@@ -9,6 +9,12 @@ import ipyvuetify
 def test_widget_button_solara(
     solara_test, page_session: playwright.sync_api.Page, assert_solara_snapshot
 ):
+    """
+       Test that clicking an ipywidgets.Button updates its description.
+
+       Simulates a button click in a browser using Playwright, checks that the button text
+       changes as expected, and verifies the result with a UI snapshot.
+       """
     button = widgets.Button(description="Click Me!")
 
     def change_description(obj):

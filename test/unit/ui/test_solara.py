@@ -15,7 +15,7 @@ reload.reloader.start()
 
 @contextmanager
 def app_box_and_rc(app_name, kernel_context):
-    app = AppScript(app_name)
+    app = AppScript(str(app_name))
     app.init()
     try:
         with kernel_context:
@@ -36,7 +36,6 @@ def test_notebook_widget(kernel_context, no_kernel_context):
     The fixture no_kernel_context is not used directly in this test but is required, though, to
     make the test pass.
     """
-    print("JS23",APP_SRC)
     with app_box_and_rc(APP_SRC, kernel_context) as (box, rc):
         button = rc.find(ipywidgets.Button).widget
         text = rc.find(ipywidgets.Text).widget
@@ -48,6 +47,14 @@ def test_notebook_widget(kernel_context, no_kernel_context):
 
 
 def test_ipywidgets_update_global_state():
+    """
+    Test that clicking an ipywidgets.Button correctly updates a global state dictionary
+    with the current value of an ipywidgets.Text widget.
+
+    This test simulates user input by setting the value of the Text widget,
+    confirms that the global state does not update before the button is clicked,
+    and then checks that clicking the button updates the global state as expected.
+    """
     import ipywidgets as widgets
 
     global_state = {"username": ""}
