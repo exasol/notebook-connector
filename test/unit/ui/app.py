@@ -11,6 +11,7 @@ Widgets:
 - Text: Displays a string, initially "init".
 - Button: When clicked, sets the text widget's value to "click".
 """
+
 import ipywidgets
 
 text = ipywidgets.Text(value="init")

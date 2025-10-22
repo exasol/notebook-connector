@@ -117,6 +117,6 @@ To run UI tests using [Playwright](https://playwright.dev/) and Pytest, follow t
 
    .. code-block:: bash
 
-      pytest tests/ui/*.py --solara-update-snapshots
+      pytest test/ui/*.py --solara-update-snapshots
 
    This will overwrite existing snapshots with new ones generated during the test.

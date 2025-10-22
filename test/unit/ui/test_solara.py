@@ -1,17 +1,18 @@
+import importlib.resources
 import logging
+from contextlib import contextmanager
 from pathlib import Path
 
 import ipywidgets
 import solara
 from solara.server import reload
 from solara.server.app import AppScript
-import importlib.resources
-from contextlib import contextmanager
 
 logger = logging.getLogger("solara.server.app_test")
 
 APP_SRC = importlib.resources.files("test.unit.ui") / "app.py"
 reload.reloader.start()
+
 
 @contextmanager
 def app_box_and_rc(app_name, kernel_context):
@@ -65,7 +66,7 @@ def test_ipywidgets_update_global_state():
         global_state["username"] = textbox.value
 
     button.on_click(on_click)
-    textbox.value = "alice" # Simulate user input
-    assert global_state["username"] == "" # assert global state is unchanged
-    button.click() # Simulate button click
-    assert global_state["username"] == "alice" 
+    textbox.value = "alice"  # Simulate user input
+    assert global_state["username"] == ""  # assert global state is unchanged
+    button.click()  # Simulate button click
+    assert global_state["username"] == "alice"
