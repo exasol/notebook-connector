@@ -50,11 +50,7 @@ def test_ipywidgets_update_global_state():
         global_state["username"] = textbox.value
 
     button.on_click(on_click)
-    # Simulate user input
-    textbox.value = "alice"
-    assert global_state["username"] == ""
-    # Simulate button click by calling event handler
-    button.click()
-    # Alternatively, you can call the handler directly if you saved it
-    # Assert
-    assert global_state["username"] == "alice"
+    textbox.value = "alice" # Simulate user input
+    assert global_state["username"] == "" # assert global state is unchanged
+    button.click() # Simulate button click
+    assert global_state["username"] == "alice" 
