@@ -28,6 +28,10 @@ def app_box_and_rc(app_name, kernel_context):
 
 
 def test_notebook_widget(kernel_context, no_kernel_context):
+    """
+    The fixture no_kernel_context is not used directly in this test but is required, though, to
+    make the test pass. 
+    """    
     name = str(HERE / "app.py")
     for box, rc in app_box_and_rc(name, kernel_context):
         button = rc.find(ipywidgets.Button).widget
