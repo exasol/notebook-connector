@@ -111,7 +111,6 @@ To run UI tests using [Playwright](https://playwright.dev/) and Pytest, follow t
 
       playwright install-deps
 
-
 3. **Run UI tests and update Solara snapshots**
 
    Use the following command to run UI tests and update the reference snapshots used for visual comparison:
