@@ -120,4 +120,4 @@ To run UI tests using Playwright and Pytest, follow these steps to ensure all de
 
       pytest tests/ui/*.py --solara-update-snapshots
 
-   This will overwrite existing snapshots with new ones generated during the test. Make sure to review the changes before committing them to version control to avoid unintended updates.
+   This will overwrite existing snapshots with new ones generated during the test.
