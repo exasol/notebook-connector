@@ -93,7 +93,7 @@ NC tests as well, e.g. the name of the flavor used in the tests.
 UI Testing Setup
 ================
 
-To run UI tests using Playwright and Pytest, follow these steps to ensure all dependencies are installed and snapshots are updated correctly.
+To run UI tests using [Playwright](https://playwright.dev/) and Pytest, follow these steps to ensure all dependencies are installed and snapshots are updated correctly.
 
 1. **Install Playwright browser binaries**
 
