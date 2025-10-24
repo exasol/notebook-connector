@@ -22,7 +22,8 @@ def random_file_name(other_than: list[str]) -> str:
     return result
 
 
-from typing import Iterator
+from collections.abc import Iterator
+
 
 def files_in(bfsloc: bfs.path.PathLike) -> Iterator[bfs.path.PathLike]:
     try:
