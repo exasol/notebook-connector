@@ -29,7 +29,7 @@ def files_in(bfsloc: bfs.path.PathLike) -> list[bfs.path.PathLike]:
     try:
         return list(bfsloc.iterdir())
     except FileNotFoundError:
-        return iter([])
+        return []
 
 
 def verify_bucketfs_access(scs: Secrets) -> None:
