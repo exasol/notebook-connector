@@ -22,9 +22,18 @@ def random_file_name(other_than: list[str]) -> str:
     return result
 
 
+from typing import Iterator
+
+def files_in(bfsloc: bfs.path.PathLike) -> Iterator[bfs.path.PathLike]:
+    try:
+        return list(bfsloc.iterdir())
+    except FileNotFoundError:
+        return iter([])
+
+
 def verify_bucketfs_access(scs: Secrets) -> None:
     bfs_root = open_bucketfs_location(scs)
-    existing = [f.name for f in bfs_root.iterdir()]
+    existing = [f.name for f in files_in(bfs_root)]
     file = bfs_root / random_file_name(other_than=existing)
     content = random_string(length=100)
     try:
