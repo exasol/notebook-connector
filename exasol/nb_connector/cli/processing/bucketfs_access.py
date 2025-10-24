@@ -25,7 +25,7 @@ def random_file_name(other_than: list[str]) -> str:
 from collections.abc import Iterator
 
 
-def files_in(bfsloc: bfs.path.PathLike) -> Iterator[bfs.path.PathLike]:
+def files_in(bfsloc: bfs.path.PathLike) -> list[bfs.path.PathLike]:
     try:
         return list(bfsloc.iterdir())
     except FileNotFoundError:
