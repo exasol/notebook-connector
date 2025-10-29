@@ -1,6 +1,6 @@
 """
 A simple ipywidgets application demonstrating interactive widget behavior.
-This file is being called from test_solara.py
+This file is being called from test/unit/ui/test_solara.py
 
 This module defines a basic user interface with a text box and a button using ipywidgets.
 The text box is initially set to "init". When the button is clicked, the text box's value
