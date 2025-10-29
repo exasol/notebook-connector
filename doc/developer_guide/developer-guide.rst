@@ -88,3 +88,35 @@ particular flavor to be present.
 
 In consequence, updating the SLCR version potentially may require updating the
 NC tests as well, e.g. the name of the flavor used in the tests.
+
+
+UI Testing Setup
+================
+
+To run UI tests using [Playwright](https://playwright.dev/) and Pytest, follow these steps to ensure all dependencies are installed and snapshots are updated correctly.
+
+1. **Install Playwright browser binaries**
+
+   This command installs the required browser (Chromium) for Playwright:
+
+   .. code-block:: bash
+
+      playwright install chromium
+
+2. **Install system dependencies for Playwright**
+
+   This is necessary especially on Linux systems to ensure all required libraries are available:
+
+   .. code-block:: bash
+
+      playwright install-deps
+
+3. **Run UI tests and update Solara snapshots**
+
+   Use the following command to run UI tests and update the reference [solara](https://solara.dev/) snapshots used for visual comparison:
+
+   .. code-block:: bash
+
+      pytest test/ui/*.py --solara-update-snapshots
+
+   This will overwrite existing snapshots with new ones generated during the test.
