@@ -38,7 +38,7 @@ slc = [
   "exasol-script-languages-container-tool (>=3, <4)",
   "GitPython (>=2.1.0)",
 ]
-ibis = [ "ibis-framework [exasol] (>=9.1.0, <10)" ]
+ibis = [ "ibis-framework [exasol] (>=11, <12)" ]
 transformers = [
   "exasol-transformers-extension (>=2.2.1, <3)",
   "yaspin (>=3.1.0, <4)",
