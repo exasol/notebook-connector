@@ -9,13 +9,7 @@ def test_access_store_ui_screenshot(solara_test, page_session):
     display(get_access_store_ui())
     box_element = page_session.locator(":text('Configuration Store')").locator('..').locator('..')
     box_element.wait_for()
-    screenshot = box_element.screenshot()
-    with open("./configuration_store_box.png", "wb") as f:
-        f.write(screenshot)
-
-    with open("./configuration_store_box.png", "rb") as f:
-        image_data = f.read()
-    assert image_data == screenshot
+    assert_solara_snapshot(box_element.screenshot())
 
 def test_enter_password_and_click_open(solara_test, page_session):
     display(get_access_store_ui())
