@@ -1,28 +1,12 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# <div style="text-align: right;">
-#   <img src="https://raw.githubusercontent.com/exasol/ai-lab/refs/heads/main/assets/Exasol_Logo_2025_Dark.svg" style="width:200px; margin: 10px;" />
-# </div>
-# 
-# # UI Styles and Layouts
-# 
-# <b>This notebook is not supposed to be used on its own.<b>
-# 
-# ## Assumptions about the UI layout
-# The UI design aims to provide a convenient way of setting up various configuration parameters.
-# 
-# A user form would consist of one or more blocks of data laid out vertically or horizontally. The positioning of these blocks is defined by the `outer_layout` property.
-# 
-# A block includes a collection of UI elements. Each element is represented by a pair of widgets - a Label with the description of an element and the input widget, e.g. a Text. The layout of the elements within the block is defined by the `group_layout` property.
-# 
-# The layout of the description Label and the input widget is defined by the `row_layout` property. As the name suggests, an input and its description are assumed to be placed next to one another in a row, although such design is not strictly required.
-# 
-# A block may include a header Label where one can put the name of the input data group. `header_style` and `header_layout` define respectively the style and the layout of such labels.
-# 
-# Likewise, the Labels of input elements have their style and layout defined by the `label_style` and `label_layout` properties. The input elements themselves have similar properties - `input_style` and `input_layout`.
-# 
-# A user form may include one or more buttons. Their style and layout are defined as `button_style` and `button_layout`.
+"""
+The UI design aims to provide a convenient way of setting up various configuration parameters.
+A user form would consist of one or more blocks of data laid out vertically or horizontally. The positioning of these blocks is defined by the `outer_layout` property.
+A block includes a collection of UI elements. Each element is represented by a pair of widgets - a Label with the description of an element and the input widget, e.g. a Text. The layout of the elements within the block is defined by the `group_layout` property.
+The layout of the description Label and the input widget is defined by the `row_layout` property. As the name suggests, an input and its description are assumed to be placed next to one another in a row, although such design is not strictly required.
+A block may include a header Label where one can put the name of the input data group. `header_style` and `header_layout` define respectively the style and the layout of such labels.
+Likewise, the Labels of input elements have their style and layout defined by the `label_style` and `label_layout` properties. The input elements themselves have similar properties - `input_style` and `input_layout`.
+A user form may include one or more buttons. Their style and layout are defined as `button_style` and `button_layout`.
+"""
 
 # In[ ]:
 
@@ -45,7 +29,7 @@ def get_config_styles():
         row_layout: widgets.Layout = field(default_factory=widgets.Layout)
         group_layout: widgets.Layout = field(default_factory=widgets.Layout)
         outer_layout: widgets.Layout = field(default_factory=widgets.Layout)
-        
+
     return UI_Look(
         header_style = {'background': 'Beige'},
         header_layout = widgets.Layout(display='flex', justify_content='center', border='solid 1px'),
@@ -53,10 +37,9 @@ def get_config_styles():
         input_layout = widgets.Layout(max_width='200px'),
         button_style = {'button_color': 'LightCyan'},
         button_layout = widgets.Layout(border='solid 1px', margin='12px 0 0 0'),
-        row_layout = widgets.Layout(display='flex', flex_flow='row', max_width='350px', justify_content='space-between', 
+        row_layout = widgets.Layout(display='flex', flex_flow='row', max_width='350px', justify_content='space-between',
                                     padding='0 0 0 10px'),
-        group_layout = widgets.Layout(display='flex', flex_flow='column', border='solid 1px', max_width='350px', 
+        group_layout = widgets.Layout(display='flex', flex_flow='column', border='solid 1px', max_width='350px',
                                       margin='12px 0 0 0'),
         outer_layout = widgets.Layout(display='flex', flex_flow='column', align_items='stretch', padding='0 0 0 50px')
     )
-

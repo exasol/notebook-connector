@@ -1,9 +1,6 @@
-from exasol.nb_connector.utils import upward_file_search
 from exasol.nb_connector.ui.ui_styles import get_config_styles
 from exasol.nb_connector.ui.popup_message_ui import popup_message
 
-
-from enum import Enum
 from pathlib import Path
 import ipywidgets as widgets
 from IPython import get_ipython
