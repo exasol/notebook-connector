@@ -1,8 +1,7 @@
 from exasol.nb_connector.ui.access_store_ui import get_access_store_ui
 from IPython.display import display
 
-
-def test_access_store_ui_screenshot(solara_test, page_session, assert_solara_snapshot):
+def test_access_store_ui_screenshot(solara_test, page_session, assert_solara_snapshot,playwright):
     display(get_access_store_ui())
     box_element = page_session.locator(":text('Configuration Store')").locator('..').locator('..')
     box_element.wait_for()
@@ -18,8 +17,8 @@ def test_enter_password_and_click_open(solara_test, page_session,assert_solara_s
     open_button.wait_for()
     open_button.click()
 
+    page_session.wait_for_timeout(1000)
+
     box_element = page_session.locator(":text('Configuration Store')").locator('..').locator('..')
     box_element.wait_for()
-    box_element.screenshot()
-
     assert_solara_snapshot(box_element.screenshot())
