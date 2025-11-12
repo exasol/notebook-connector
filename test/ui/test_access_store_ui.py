@@ -1,17 +1,14 @@
-import pytest
-
 from exasol.nb_connector.ui.access_store_ui import get_access_store_ui
 from IPython.display import display
 
 
-
-def test_access_store_ui_screenshot(solara_test, page_session):
+def test_access_store_ui_screenshot(solara_test, page_session, assert_solara_snapshot):
     display(get_access_store_ui())
     box_element = page_session.locator(":text('Configuration Store')").locator('..').locator('..')
     box_element.wait_for()
     assert_solara_snapshot(box_element.screenshot())
 
-def test_enter_password_and_click_open(solara_test, page_session):
+def test_enter_password_and_click_open(solara_test, page_session,assert_solara_snapshot):
     display(get_access_store_ui())
     password_input = page_session.locator("input[type='password']")
     password_input.wait_for()
@@ -21,6 +18,8 @@ def test_enter_password_and_click_open(solara_test, page_session):
     open_button.wait_for()
     open_button.click()
 
-    with open("./ai_lab_secure_configuration_storage.sqlite", "rb") as f:
-        data = f.read()
-    assert data
+    box_element = page_session.locator(":text('Configuration Store')").locator('..').locator('..')
+    box_element.wait_for()
+    box_element.screenshot()
+
+    assert_solara_snapshot(box_element.screenshot())

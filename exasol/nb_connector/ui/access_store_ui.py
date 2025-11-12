@@ -43,7 +43,8 @@ def get_access_store_ui(root_dir: str = '.') -> widgets.Widget:
             open_btn.icon = 'check'
         finally:
             # Save the file in the shared store.
-            get_ipython().run_line_magic('store', 'sb_store_file')
+            if ipython and hasattr(ipython, 'run_line_magic'):
+                ipython.run_line_magic('store', 'sb_store_file')
             del sb_store_file
 
     def on_value_change(change):
