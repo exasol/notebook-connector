@@ -71,7 +71,7 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
             db_mem_size="4 GiB",
             db_disk_size="10 GiB",
             docker_db_image_version=db_image_version,
-            docker_runtime=None,
+            accelerator=(),
             docker_environment_variable=(),
             additional_db_parameter=("-etlCheckCertsDefault=0",),
             log_level=logging.getLevelName(logging.INFO),
