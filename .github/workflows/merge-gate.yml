@@ -55,6 +55,13 @@ jobs:
     permissions:
       contents: read
 
+  ui-tests:
+    name: GPU
+    needs: [ run-slow-tests ]
+    uses: ./.github/workflows/tests-ui.yml
+    permissions:
+      contents: read
+
   # This job ensures inputs have been executed successfully.
   approve-merge:
     name: Allow Merge
@@ -63,7 +70,7 @@ jobs:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
     # Removed saas-tests from being required
-    needs: [ fast-checks, large-runner-tests, ordinary-itests, gpu-tests ]
+    needs: [ fast-checks, large-runner-tests, ordinary-itests, gpu-tests, ui-tests ]
 
     # Each job requires a step, so we added this dummy step.
     steps:
