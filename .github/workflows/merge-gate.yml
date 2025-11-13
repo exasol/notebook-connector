@@ -56,7 +56,7 @@ jobs:
       contents: read
 
   ui-tests:
-    name: GPU
+    name: UI
     needs: [ run-slow-tests ]
     uses: ./.github/workflows/tests-ui.yml
     permissions:
