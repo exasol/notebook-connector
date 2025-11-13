@@ -87,7 +87,6 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
         additional_db_parameter: tuple[str, ...] = ("-etlCheckCertsDefault=0",)
         itde_accelerator: tuple[str, ...] = ()
         if accelerator == Accelerator.nvidia.value:
-            docker_runtime = "nvidia"
             additional_db_parameter = additional_db_parameter + (
                 "-enableAcceleratorDeviceDetection=1",
             )
@@ -99,7 +98,6 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
             db_mem_size=mem_size,
             db_disk_size=disk_size,
             docker_db_image_version=db_version,
-            docker_runtime=docker_runtime,
             docker_environment_variable=docker_environment_variable,
             accelerator=itde_accelerator,
             additional_db_parameter=additional_db_parameter,

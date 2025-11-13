@@ -97,13 +97,12 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
 
 @mock.patch("exasol_integration_test_docker_environment.lib.api.spawn_test_environment")
 @pytest.mark.parametrize(
-    "accelerator, expected_docker_runtime, expected_docker_environment_variable, expected_additional_db_parameter",
+    "accelerator, expected_accelerator, expected_additional_db_parameter",
     [
-        (Accelerator.none.value, None, (), ("-etlCheckCertsDefault=0",)),
+        (Accelerator.none.value, (), ("-etlCheckCertsDefault=0",)),
         (
             Accelerator.nvidia.value,
-            "nvidia",
-            ("NVIDIA_VISIBLE_DEVICES=all",),
+            ("nvidia=all",),
             (
                 "-etlCheckCertsDefault=0",
                 "-enableAcceleratorDeviceDetection=1",
@@ -117,8 +116,7 @@ def test_bring_itde_up_with_accelerator(
     env_info,
     db_image_version,
     accelerator,
-    expected_docker_runtime,
-    expected_docker_environment_variable,
+    expected_accelerator,
     expected_additional_db_parameter,
 ):
     mock_spawn_env.return_value = (env_info, None)
@@ -134,8 +132,8 @@ def test_bring_itde_up_with_accelerator(
             db_mem_size="4 GiB",
             db_disk_size="10 GiB",
             docker_db_image_version=db_image_version,
-            docker_runtime=expected_docker_runtime,
-            docker_environment_variable=expected_docker_environment_variable,
+            docker_environment_variable=(),
+            accelerator=expected_accelerator,
             additional_db_parameter=expected_additional_db_parameter,
             log_level=logging.getLevelName(logging.INFO),
         )
