@@ -1,3 +1,3 @@
 # Unreleased
  * #287: working examples for functional UI
- * #297: Access store UI - iypnb to python conversion and GitHub workflow addition
+ * #297: Added Access store UI tests and GitHub workflow addition
