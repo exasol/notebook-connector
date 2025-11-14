@@ -43,7 +43,7 @@ transformers = [
   "exasol-transformers-extension (>=3.0.0, <4)",
   "yaspin (>=3.1.0, <4)",
 ]
-text-ai = [ "exasol-text-ai-extension (>=0.1.0, <3.0.0)" ]
+text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
 sagemaker = [ "exasol-sagemaker-extension (>=0.11.5)" ]
 
 
