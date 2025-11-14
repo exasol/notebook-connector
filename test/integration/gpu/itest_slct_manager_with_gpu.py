@@ -73,7 +73,7 @@ def test_upload_slc_with_new_packages(
         == f"{sample_slc.language_alias}=localzmq+protobuf:///bfsdefault/default/container/{DEFAULT_GPU_FLAVOR}-release-{sample_slc.language_alias}?lang=python#buckets/bfsdefault/default/container/{DEFAULT_GPU_FLAVOR}-release-{sample_slc.language_alias}/exaudf/exaudfclient"
     )
 
-
+@pytest.mark.skip(reason="broken, re-enable with https://github.com/exasol/notebook-connector/issues/301")
 @pytest.mark.dependency(
     name="udf_with_new_packages", depends=["upload_slc_with_new_packages"]
 )

@@ -1,6 +1,8 @@
 from inspect import cleandoc
 from test.integration.ordinary.test_itde_manager import remove_itde
 
+import pytest
+
 from exasol.nb_connector.ai_lab_config import (
     Accelerator,
     AILabConfig,
@@ -15,7 +17,7 @@ DB_VOLUME_NAME = "db_container_DemoDb_volume"
 
 DB_CONTAINER_NAME = "db_container_DemoDb"
 
-
+@pytest.mark.skip(reason="broken, re-enable with https://github.com/exasol/notebook-connector/issues/301")
 def test_itde_with_gpu(secrets):
 
     try:
