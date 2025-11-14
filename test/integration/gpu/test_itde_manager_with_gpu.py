@@ -17,7 +17,10 @@ DB_VOLUME_NAME = "db_container_DemoDb_volume"
 
 DB_CONTAINER_NAME = "db_container_DemoDb"
 
-@pytest.mark.skip(reason="broken, re-enable with https://github.com/exasol/notebook-connector/issues/301")
+
+@pytest.mark.skip(
+    reason="broken, re-enable with https://github.com/exasol/notebook-connector/issues/301"
+)
 def test_itde_with_gpu(secrets):
 
     try:
