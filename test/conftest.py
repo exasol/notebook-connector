@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from test.bucketfs_protocol import BucketFSProtocol
 from test.package_manager import PackageManager
 from test.utils.integration_test_utils import sample_db_file
 
@@ -39,6 +40,15 @@ def pytest_addoption(parser):
         help="Compression Strategy to use",
     )
 
+    parser.addoption(
+        "--bucketfs-protocol",
+        action="store",
+        type=BucketFSProtocol,
+        choices=list(BucketFSProtocol),
+        default="https",
+        help="BucketFS Protocol to use for SLC tests",
+    )
+
 
 @pytest.fixture(scope="session")
 def package_manager(request) -> PackageManager:
@@ -50,3 +60,9 @@ def package_manager(request) -> PackageManager:
 def compression_strategy(request) -> CompressionStrategy:
     val = request.config.getoption("--compression-strategy")
     return CompressionStrategy(val)
+
+
+@pytest.fixture(scope="session")
+def bucketfs_protocol(request) -> BucketFSProtocol:
+    val = request.config.getoption("--bucketfs-protocol")
+    return BucketFSProtocol(val)

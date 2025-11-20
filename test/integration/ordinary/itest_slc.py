@@ -3,6 +3,7 @@ import textwrap
 from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from test.bucketfs_protocol import BucketFSProtocol
 from test.package_manager import PackageManager
 from test.utils.integration_test_utils import setup_itde_module
 
@@ -155,23 +156,22 @@ def expected_activation_key(slc: ScriptLanguageContainer) -> str:
     )
 
 
+@pytest.fixture
+def configure_bucketfs_protocol(bucketfs_protocol, secrets: Secrets):
+    if bucketfs_protocol == BucketFSProtocol.HTTPS:
+        secrets.save(CKey.bfs_encryption, "True")
+        secrets.save(CKey.cert_vld, "False")
+
+
 @pytest.mark.dependency(name="deploy_slc")
-def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
-    sample_slc.deploy()
-    assert sample_slc.activation_key == expected_activation_key(sample_slc)
-
-
-@pytest.mark.dependency(name="deploy_slc_https", depends=["deploy_slc"])
-def test_deploy_https(
-    sample_slc: ScriptLanguageContainer, secrets: Secrets, setup_itde_module
+def test_deploy(
+    sample_slc: ScriptLanguageContainer, setup_itde_module, configure_bucketfs_protocol
 ):
-    secrets.save(CKey.bfs_encryption, "True")
-    secrets.save(CKey.cert_vld, "False")
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
 
-@pytest.mark.dependency(name="append_custom_pip_packages", depends=["deploy_slc_https"])
+@pytest.mark.dependency(name="append_custom_pip_packages", depends=["deploy_slc"])
 def test_append_custom_pip_packages(
     sample_slc: ScriptLanguageContainer,
     custom_packages: list[tuple[str, str, str]],
