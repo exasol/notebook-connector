@@ -28,7 +28,7 @@ sqlalchemy = [ "sqlalchemy-exasol (>=5.0.0, <6)" ]
 pyexasol = [ "pyexasol (>=0.26.0, <2)" ]
 bucketfs = [ "exasol-bucketfs (>=1.0.1, <3)" ]
 docker-db = [
-  "exasol-integration-test-docker-environment (>=4, <5)",
+  "exasol-integration-test-docker-environment (>=4.4.1, <5)",
   "ifaddr (>=0.2.0, <0.3)",
 ]
 # The version of SLCT is dictated by its usage in the python-extension-common,

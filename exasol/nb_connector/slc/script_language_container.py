@@ -5,6 +5,7 @@ from collections import namedtuple
 from pathlib import (
     Path,
 )
+from typing import Any
 
 import requests
 from exasol.slc import api as exaslct_api
@@ -25,6 +26,7 @@ from exasol.nb_connector.slc.workspace import (
     Workspace,
     current_directory,
 )
+from exasol.nb_connector.utils import optional_str_to_bool
 
 PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
 CondaPackageDefinition = namedtuple("CondaPackageDefinition", ["pkg", "version"])
@@ -193,7 +195,7 @@ class ScriptLanguageContainer:
         Deploys the current script-languages-container to the database and
         stores the activation string in the Secure Configuration Storage.
         """
-        bfs_params = {
+        bfs_params: dict[str, Any] = {
             k: self.secrets.get(v)
             for k, v in [
                 ("bucketfs_host", CKey.bfs_host_name),
@@ -204,6 +206,15 @@ class ScriptLanguageContainer:
                 ("bucket", CKey.bfs_bucket),
             ]
         }
+        bucketfs_use_https = optional_str_to_bool(self.secrets.get(CKey.bfs_encryption))
+        if bucketfs_use_https is not None:
+            bfs_params["bucketfs_use_https"] = bucketfs_use_https
+        use_ssl_cert_validation = optional_str_to_bool(self.secrets.get(CKey.cert_vld))
+        if use_ssl_cert_validation is not None:
+            bfs_params["use_ssl_cert_validation"] = use_ssl_cert_validation
+        ssl_cert_path = self.secrets.get(CKey.trusted_ca)
+        if ssl_cert_path is not None:
+            bfs_params["ssl_cert_path"] = ssl_cert_path
 
         with current_directory(self.checkout_dir):
             result = exaslct_api.deploy(
