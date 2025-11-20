@@ -10,8 +10,8 @@ import pytest
 from docker.models.images import Image as DockerImage
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
@@ -160,8 +160,11 @@ def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
+
 @pytest.mark.dependency(name="deploy_slc_https", depends=["deploy_slc"])
-def test_deploy_https(sample_slc: ScriptLanguageContainer, secrets: Secrets, setup_itde_module):
+def test_deploy_https(
+    sample_slc: ScriptLanguageContainer, secrets: Secrets, setup_itde_module
+):
     secrets.save(CKey.bfs_encryption, "True")
     secrets.save(CKey.cert_vld, "False")
     sample_slc.deploy()
