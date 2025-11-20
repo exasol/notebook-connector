@@ -164,7 +164,6 @@ def configure_bucketfs_protocol(bucketfs_protocol, secrets_module: Secrets):
         secrets_module.save(CKey.bfs_port, "2581")
 
 
-
 @pytest.mark.dependency(name="deploy_slc")
 def test_deploy(
     sample_slc: ScriptLanguageContainer, setup_itde_module, configure_bucketfs_protocol
@@ -172,9 +171,13 @@ def test_deploy(
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
 
+
 @pytest.mark.dependency(name="deploy_cert_fails")
 def test_deploy_cert_fails(
-    sample_slc: ScriptLanguageContainer, setup_itde_module, secrets_module, configure_bucketfs_protocol
+    sample_slc: ScriptLanguageContainer,
+    setup_itde_module,
+    secrets_module,
+    configure_bucketfs_protocol,
 ):
     if configure_bucketfs_protocol == BucketFSProtocol.HTTPS:
         secrets_module.save(CKey.cert_vld, "True")
