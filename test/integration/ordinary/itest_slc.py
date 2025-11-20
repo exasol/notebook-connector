@@ -162,6 +162,7 @@ def configure_bucketfs_protocol(bucketfs_protocol, secrets_module: Secrets):
         secrets_module.save(CKey.bfs_encryption, "True")
         secrets_module.save(CKey.cert_vld, "False")
         secrets_module.save(CKey.bfs_port, "2581")
+        raise Exception("TEEEEEST")
 
 
 @pytest.mark.dependency(name="deploy_slc")
