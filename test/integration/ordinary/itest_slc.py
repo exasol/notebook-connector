@@ -3,6 +3,7 @@ import textwrap
 from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from test.bucketfs_protocol import BucketFSProtocol
 from test.package_manager import PackageManager
 from test.utils.integration_test_utils import setup_itde_module
 
@@ -10,7 +11,11 @@ import pytest
 from docker.models.images import Image as DockerImage
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
+from exasol_integration_test_docker_environment.lib.models.api_errors import (
+    TaskRuntimeError,
+)
 
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
@@ -154,7 +159,30 @@ def expected_activation_key(slc: ScriptLanguageContainer) -> str:
     )
 
 
-@pytest.mark.dependency(name="deploy_slc")
+@pytest.fixture(scope="module")
+def configure_bucketfs_protocol(bucketfs_protocol, secrets_module: Secrets):
+    if bucketfs_protocol == BucketFSProtocol.HTTPS:
+        secrets_module.save(CKey.bfs_encryption, "True")
+        secrets_module.save(CKey.cert_vld, "False")
+        secrets_module.save(CKey.bfs_port, "2581")
+
+
+@pytest.mark.dependency(name="deploy_cert_fails")
+def test_deploy_cert_fails(
+    sample_slc: ScriptLanguageContainer,
+    setup_itde_module,
+    secrets_module,
+    bucketfs_protocol,
+    configure_bucketfs_protocol,
+):
+    if bucketfs_protocol == BucketFSProtocol.HTTPS:
+        secrets_module.save(CKey.cert_vld, "True")
+        with pytest.raises(TaskRuntimeError):
+            sample_slc.deploy()
+        secrets_module.save(CKey.cert_vld, "False")
+
+
+@pytest.mark.dependency(name="deploy_slc", depends=["deploy_cert_fails"])
 def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
