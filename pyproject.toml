@@ -47,7 +47,6 @@ text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
 sagemaker = [ "exasol-sagemaker-extension (>=0.11.5)" ]
 
 
-
 [project.urls]
 Homepage = "https://github.io/exasol/notebook-connector"
 Documentation = "https://github.io/exasol/notebook-connector"

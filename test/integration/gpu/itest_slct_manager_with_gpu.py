@@ -74,9 +74,6 @@ def test_upload_slc_with_new_packages(
     )
 
 
-@pytest.mark.skip(
-    reason="broken, re-enable with https://github.com/exasol/notebook-connector/issues/301"
-)
 @pytest.mark.dependency(
     name="udf_with_new_packages", depends=["upload_slc_with_new_packages"]
 )
