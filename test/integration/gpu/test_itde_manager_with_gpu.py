@@ -1,6 +1,8 @@
 from inspect import cleandoc
 from test.integration.ordinary.test_itde_manager import remove_itde
 
+import pytest
+
 from exasol.nb_connector.ai_lab_config import (
     Accelerator,
     AILabConfig,

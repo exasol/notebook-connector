@@ -1,6 +1,6 @@
 [project]
 name = "exasol-notebook-connector"
-version = "2.2.1"
+version = "2.2.2"
 requires-python = ">=3.10,<3.13"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [{ include = "exasol" }, ]
@@ -40,7 +40,7 @@ slc = [
 ]
 ibis = [ "ibis-framework [exasol] (>=11, <12)" ]
 transformers = [
-  "exasol-transformers-extension (>=2.2.1, <3)",
+  "exasol-transformers-extension (>=3.0.0, <4)",
   "yaspin (>=3.1.0, <4)",
 ]
 text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
