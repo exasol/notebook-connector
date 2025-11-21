@@ -42,14 +42,15 @@ def is_sb_file_exists(generated_db_file_path : str) -> Path:
     assert generated_db_file_exists
     return generated_db_file
 
-
-def test_access_store_ui_screenshot(solara_test, page_session, assert_solara_snapshot,playwright):
+def test_access_store_ui_screenshot(solara_test, page_session, assert_solara_snapshot,playwright,tmp_path,monkeypatch):
+    monkeypatch.chdir(tmp_path)
     display(get_access_store_ui())
     box_element = page_session.locator(":text('Configuration Store')").locator('..').locator('..')
     box_element.wait_for()
     assert_solara_snapshot(box_element.screenshot())
 
-def test_enter_password_and_click_open(solara_test, page_session,assert_solara_snapshot):
+def test_enter_password_and_click_open(solara_test, page_session,assert_solara_snapshot,tmp_path,monkeypatch):
+    monkeypatch.chdir(tmp_path)
     dummy_password = "dummy123"
     display(get_access_store_ui())
     password_input = page_session.locator("input[type='password']")
@@ -60,7 +61,8 @@ def test_enter_password_and_click_open(solara_test, page_session,assert_solara_s
     generated_db_file = is_sb_file_exists("ai_lab_secure_configuration_storage.sqlite")
     verify_content(dummy_password, generated_db_file)
 
-def test_valid_store_password(solara_test, page_session,assert_solara_snapshot):
+def test_valid_store_password(solara_test, page_session,assert_solara_snapshot,tmp_path,monkeypatch):
+    monkeypatch.chdir(tmp_path)
     dummy_password = "dummy123"
     dummy_sb_store_file = "ai_lab_secure_dummy.sqlite"
     display(get_access_store_ui())
@@ -71,7 +73,8 @@ def test_valid_store_password(solara_test, page_session,assert_solara_snapshot):
     generated_db_file = is_sb_file_exists(dummy_sb_store_file)
     verify_content(dummy_password, generated_db_file)
 
-def test_invalid_store_password(solara_test, page_session,assert_solara_snapshot):
+def test_invalid_store_password(solara_test, page_session,assert_solara_snapshot,tmp_path,monkeypatch):
+    monkeypatch.chdir(tmp_path)
     with pytest.raises(InvalidPassword) as exception:
         dummy_password = "dummy123"
         dummy_sb_store_file = "ai_lab_invalid_dummy.sqlite"
