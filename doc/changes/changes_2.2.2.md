@@ -1,7 +1,8 @@
 # 2.2.2 - 2025-11-25
+
 ## Summary
 
-This release updates dependencies enabling PyExasol versions ≥ 1.0. It also updated the Exasol-Transformers-Extension to 3.0.0 and Script-LanguagesContainer to version 10.1.0.
+This release updates dependencies enabling PyExasol versions ≥ 1.0. It also updates the Exasol-Transformers-Extension to 3.0.0 and Script-LanguagesContainer to version 10.1.0.
 
 ## Bugs
 
