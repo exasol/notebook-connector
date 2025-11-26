@@ -61,7 +61,7 @@ def test_enter_password_and_click_open(solara_test, page_session,assert_solara_s
     generated_db_file = is_sb_file_exists("ai_lab_secure_configuration_storage.sqlite")
     verify_content(dummy_password, generated_db_file)
 
-def test_valid_store_password(solara_test, page_session,assert_solara_snapshot,tmp_path,monkeypatch):
+def test_non_default_store_file(solara_test, page_session,assert_solara_snapshot,tmp_path,monkeypatch):
     monkeypatch.chdir(tmp_path)
     dummy_password = "dummy123"
     dummy_sb_store_file = "ai_lab_secure_dummy.sqlite"
