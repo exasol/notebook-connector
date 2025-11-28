@@ -13,8 +13,11 @@ def get_access_store_ui(root_dir: str = '.') -> widgets.Widget:
     # Try to find the file name in the shared store.
     # Create a global variable only temporarily.
     ipython = get_ipython()
+
+    # Added this if condition just to enable testing
     if ipython and hasattr(ipython, 'run_line_magic'):
         ipython.run_line_magic('store', '-r') # reloads variables in the IPython user namespace persistence mechanism.
+
     if 'sb_store_file' in globals():
         global sb_store_file
         sb_store_file_ = sb_store_file
@@ -43,6 +46,7 @@ def get_access_store_ui(root_dir: str = '.') -> widgets.Widget:
             open_btn.icon = 'check'
         finally:
             # Save the file in the shared store.
+            # Added this if condition just to enable testing
             if ipython and hasattr(ipython, 'run_line_magic'):
                 ipython.run_line_magic('store', 'sb_store_file')
             del sb_store_file
