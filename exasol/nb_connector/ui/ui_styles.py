@@ -13,7 +13,11 @@ A user form may include one or more buttons. Their style and layout are defined 
 
 def get_config_styles():
 
-    from dataclasses import dataclass, field
+    from dataclasses import (
+        dataclass,
+        field,
+    )
+
     import ipywidgets as widgets
 
     @dataclass(frozen=True)
@@ -31,15 +35,32 @@ def get_config_styles():
         outer_layout: widgets.Layout = field(default_factory=widgets.Layout)
 
     return UI_Look(
-        header_style = {'background': 'Beige'},
-        header_layout = widgets.Layout(display='flex', justify_content='center', border='solid 1px'),
-        label_layout = widgets.Layout(max_width='130px'),
-        input_layout = widgets.Layout(max_width='200px'),
-        button_style = {'button_color': 'LightCyan'},
-        button_layout = widgets.Layout(border='solid 1px', margin='12px 0 0 0'),
-        row_layout = widgets.Layout(display='flex', flex_flow='row', max_width='350px', justify_content='space-between',
-                                    padding='0 0 0 10px'),
-        group_layout = widgets.Layout(display='flex', flex_flow='column', border='solid 1px', max_width='350px',
-                                      margin='12px 0 0 0'),
-        outer_layout = widgets.Layout(display='flex', flex_flow='column', align_items='stretch', padding='0 0 0 50px')
+        header_style={"background": "Beige"},
+        header_layout=widgets.Layout(
+            display="flex", justify_content="center", border="solid 1px"
+        ),
+        label_layout=widgets.Layout(max_width="130px"),
+        input_layout=widgets.Layout(max_width="200px"),
+        button_style={"button_color": "LightCyan"},
+        button_layout=widgets.Layout(border="solid 1px", margin="12px 0 0 0"),
+        row_layout=widgets.Layout(
+            display="flex",
+            flex_flow="row",
+            max_width="350px",
+            justify_content="space-between",
+            padding="0 0 0 10px",
+        ),
+        group_layout=widgets.Layout(
+            display="flex",
+            flex_flow="column",
+            border="solid 1px",
+            max_width="350px",
+            margin="12px 0 0 0",
+        ),
+        outer_layout=widgets.Layout(
+            display="flex",
+            flex_flow="column",
+            align_items="stretch",
+            padding="0 0 0 50px",
+        ),
     )

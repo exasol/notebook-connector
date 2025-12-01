@@ -1,14 +1,16 @@
-import pytest
-
-from exasol.nb_connector.secret_store import Secrets, InvalidPassword
-from exasol.nb_connector.ui.access_store_ui import get_access_store_ui
-from IPython.display import display
 from pathlib import Path
+
+from IPython.display import display
+
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.ui.access_store_ui import get_access_store_ui
 
 
 def assert_screenshot(assert_solara_snapshot, page_session):
     page_session.wait_for_timeout(1000)
-    box_element = page_session.locator(":text('Configuration Store')").locator('..').locator('..')
+    box_element = (
+        page_session.locator(":text('Configuration Store')").locator("..").locator("..")
+    )
     box_element.wait_for()
     assert_solara_snapshot(box_element.screenshot())
 
@@ -24,7 +26,7 @@ def fill_store_file_name(dummy_sb_store_file: str, page_session):
     sb_store_file_input.fill(dummy_sb_store_file)
 
 
-def open_db(page_session):
+def click_open_db(page_session):
     open_button = page_session.locator("button:text('Open')")
     open_button.wait_for()
     open_button.click()
@@ -44,65 +46,57 @@ def is_sb_file_exists(generated_db_file_path: str) -> Path:
     return generated_db_file
 
 
-def test_access_store_ui_screenshot(solara_test, page_session, assert_solara_snapshot, playwright, tmp_path,
-                                    monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    display(get_access_store_ui())
-    box_element = page_session.locator(":text('Configuration Store')").locator('..').locator('..')
+def test_access_store_ui_screenshot(
+    solara_test, page_session, assert_solara_snapshot, playwright, tmp_path
+):
+    display(get_access_store_ui(str(tmp_path)))
+    box_element = (
+        page_session.locator(":text('Configuration Store')").locator("..").locator("..")
+    )
     box_element.wait_for()
     assert_solara_snapshot(box_element.screenshot())
 
 
-def test_enter_password_and_click_open(solara_test, page_session, assert_solara_snapshot, tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
+def test_enter_password_and_click_open(
+    solara_test, page_session, assert_solara_snapshot, tmp_path
+):
     dummy_password = "dummy123"
-    display(get_access_store_ui())
+    display(get_access_store_ui(str(tmp_path)))
     password_input = page_session.locator("input[type='password']")
     password_input.wait_for()
     password_input.fill(dummy_password)
-    open_db(page_session)
+    click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
-    generated_db_file = is_sb_file_exists("ai_lab_secure_configuration_storage.sqlite")
+    generated_db_file = is_sb_file_exists(
+        str(tmp_path / "ai_lab_secure_configuration_storage.sqlite")
+    )
     verify_content(dummy_password, generated_db_file)
 
-def test_non_default_store_file(solara_test, page_session,assert_solara_snapshot,tmp_path,monkeypatch):
-    monkeypatch.chdir(tmp_path)
+
+def test_non_default_store_file(
+    solara_test, page_session, assert_solara_snapshot, tmp_path
+):
     dummy_password = "dummy123"
     dummy_sb_store_file = "ai_lab_secure_dummy.sqlite"
-    display(get_access_store_ui())
+    display(get_access_store_ui(str(tmp_path)))
     fill_store_file_name(dummy_sb_store_file, page_session)
     fill_store_password(dummy_password, page_session)
-    open_db(page_session)
+    click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
-    generated_db_file = is_sb_file_exists(dummy_sb_store_file)
-    verify_content(dummy_password, generated_db_file)
-
-def test_valid_store_password_2(solara_test, page_session, assert_solara_snapshot, tmp_path, monkeypatch,secrets):
-    monkeypatch.chdir(tmp_path)
-    dummy_password = "dummy123"
-    dummy_sb_store_file = tmp_path / "ai_lab_secure_dummy.sqlite"
-    display(get_access_store_ui())
-    fill_store_file_name(str(dummy_sb_store_file), page_session)
-    fill_store_password(dummy_password, page_session)
-    open_db(page_session)
-    assert_screenshot(assert_solara_snapshot, page_session)
-    generated_db_file = is_sb_file_exists(str(dummy_sb_store_file))
+    generated_db_file = is_sb_file_exists(str(tmp_path / dummy_sb_store_file))
     verify_content(dummy_password, generated_db_file)
 
 
-def test_invalid_store_password(solara_test, page_session, assert_solara_snapshot, tmp_path, monkeypatch ):
-
-    monkeypatch.chdir(tmp_path)
+def test_invalid_store_password(
+    solara_test, page_session, assert_solara_snapshot, tmp_path
+):
     sqlite = "sample.sqlite"
-    secrets = Secrets(db_file=Path(sqlite), master_password="abc")
+    secrets = Secrets(db_file=tmp_path / sqlite, master_password="abc")
     secrets.save("abc_key", "abc_value")
-    display(get_access_store_ui())
+    display(get_access_store_ui(str(tmp_path)))
     fill_store_file_name(sqlite, page_session)
     fill_store_password("wrong_password", page_session)
-    open_db(page_session)
+    click_open_db(page_session)
+    # take screenshot
+    page_session.wait_for_timeout(1000)
     assert_screenshot(assert_solara_snapshot, page_session)
-    with open("dummy_screenshot.png","wb") as file:
-        file.write(page_session.screenshot())
-
-
-
