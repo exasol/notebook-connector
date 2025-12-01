@@ -21,9 +21,9 @@ def fill_store_password(dummy_password: str, page_session):
     password_input.fill(dummy_password)
 
 
-def fill_store_file_name(dummy_sb_store_file: str, page_session):
-    sb_store_file_input = page_session.locator("input[type='text']")
-    sb_store_file_input.fill(dummy_sb_store_file)
+def fill_store_file_name(dummy_db_store_file: str, page_session):
+    db_store_file_input = page_session.locator("input[type='text']")
+    db_store_file_input.fill(dummy_db_store_file)
 
 
 def click_open_db(page_session):
@@ -33,13 +33,15 @@ def click_open_db(page_session):
 
 
 def verify_content(dummy_password: str, generated_db_file: Path):
-    # checking if the file has the correct content
+    """checking if the file has the correct content
+    """
     secrets = Secrets(db_file=generated_db_file, master_password=dummy_password)
     assert list(secrets.keys()) == []
 
 
-def is_sb_file_exists(generated_db_file_path: str) -> Path:
-    # checking if the file is created
+def is_db_file_exists(generated_db_file_path: str) -> Path:
+    """checking if the file is created
+    """
     generated_db_file = Path(generated_db_file_path)
     generated_db_file_exists = generated_db_file.exists()
     assert generated_db_file_exists
@@ -49,6 +51,9 @@ def is_sb_file_exists(generated_db_file_path: str) -> Path:
 def test_access_store_ui_screenshot(
     solara_test, page_session, assert_solara_snapshot, playwright, tmp_path
 ):
+    """
+    test to check if the get_access_store_ui function displays the UI elements
+    """
     display(get_access_store_ui(str(tmp_path)))
     box_element = (
         page_session.locator(":text('Configuration Store')").locator("..").locator("..")
@@ -60,6 +65,9 @@ def test_access_store_ui_screenshot(
 def test_enter_password_and_click_open(
     solara_test, page_session, assert_solara_snapshot, tmp_path
 ):
+    """
+    test to validate if the open button is pressed and file is created
+    """
     dummy_password = "dummy123"
     display(get_access_store_ui(str(tmp_path)))
     password_input = page_session.locator("input[type='password']")
@@ -67,7 +75,7 @@ def test_enter_password_and_click_open(
     password_input.fill(dummy_password)
     click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
-    generated_db_file = is_sb_file_exists(
+    generated_db_file = is_db_file_exists(
         str(tmp_path / "ai_lab_secure_configuration_storage.sqlite")
     )
     verify_content(dummy_password, generated_db_file)
@@ -76,20 +84,26 @@ def test_enter_password_and_click_open(
 def test_non_default_store_file(
     solara_test, page_session, assert_solara_snapshot, tmp_path
 ):
+    """
+    test to validate if the file accepts the correct password
+    """
     dummy_password = "dummy123"
-    dummy_sb_store_file = "ai_lab_secure_dummy.sqlite"
+    dummy_db_store_file = "ai_lab_secure_dummy.sqlite"
     display(get_access_store_ui(str(tmp_path)))
-    fill_store_file_name(dummy_sb_store_file, page_session)
+    fill_store_file_name(dummy_db_store_file, page_session)
     fill_store_password(dummy_password, page_session)
     click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
-    generated_db_file = is_sb_file_exists(str(tmp_path / dummy_sb_store_file))
+    generated_db_file = is_db_file_exists(str(tmp_path / dummy_db_store_file))
     verify_content(dummy_password, generated_db_file)
 
 
 def test_invalid_store_password(
     solara_test, page_session, assert_solara_snapshot, tmp_path
 ):
+    """
+    test to validate if the file fails to accept the wrong password
+    """
     sqlite = "sample.sqlite"
     secrets = Secrets(db_file=tmp_path / sqlite, master_password="abc")
     secrets.save("abc_key", "abc_value")
