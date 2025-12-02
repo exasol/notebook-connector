@@ -84,10 +84,7 @@ def test_enter_password_and_click_open(
     password_input.fill(dummy_password)
     click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
-    generated_db_file = is_db_file_exists(
-        str(tmp_path / "ai_lab_secure_configuration_storage.sqlite")
-    )
-    verify_content(dummy_password, generated_db_file)
+    assert Secrets(dummy_password, generated_db_file).keys() == []
 
 
 def test_non_default_store_file(
