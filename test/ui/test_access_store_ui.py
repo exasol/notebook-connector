@@ -104,7 +104,7 @@ def test_non_default_store_file(
     verify_content(dummy_password, generated_db_file)
 
 
-def test_invalid_store_password(
+def test_invalid_password(
     solara_test, page_session, assert_solara_snapshot, tmp_path
 ):
     """
