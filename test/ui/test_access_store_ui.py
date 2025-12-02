@@ -17,7 +17,7 @@ def assert_screenshot(assert_solara_snapshot, page_session):
     If the actual screenshot differs from the expected, then solara save the actual to folder
     test-results for comparison. You can also decide to copy the actual as expected to make
     the test succeed next time, see the developer guide for details.
-    """    
+    """
     page_session.wait_for_timeout(1000)
     box_element = (
         page_session.locator(":text('Configuration Store')").locator("..").locator("..")
@@ -106,9 +106,7 @@ def test_non_default_store_file(
     verify_content(password, generated_scs_file)
 
 
-def test_invalid_password(
-    solara_test, page_session, assert_solara_snapshot, tmp_path
-):
+def test_invalid_password(solara_test, page_session, assert_solara_snapshot, tmp_path):
     """
     test to validate if the file fails to accept the wrong password
     """
