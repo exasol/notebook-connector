@@ -26,7 +26,7 @@ def assert_screenshot(assert_solara_snapshot, page_session):
     assert_solara_snapshot(box_element.screenshot())
 
 
-def fill_store_password(dummy_password: str, page_session):
+def fill_store_password(password: str, page_session):
     password_input = page_session.locator("input[type='password']")
     password_input.wait_for()
     password_input.fill(dummy_password)
