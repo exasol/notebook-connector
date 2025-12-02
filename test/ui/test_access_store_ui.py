@@ -11,6 +11,13 @@ from exasol.nb_connector.ui.access_store_ui import get_access_store_ui
 
 
 def assert_screenshot(assert_solara_snapshot, page_session):
+    """
+    Creates an actual screenshot and asserts if the screenshot is identical to the expectation.
+    The expected screenshots are located in folder ui_screenshots.
+    If the actual screenshot differs from the expected, then solara save the actual to folder
+    test-results for comparison. You can also decide to copy the actual as expected to make
+    the test succeed next time, see the developer guide for details.
+    """    
     page_session.wait_for_timeout(1000)
     box_element = (
         page_session.locator(":text('Configuration Store')").locator("..").locator("..")
