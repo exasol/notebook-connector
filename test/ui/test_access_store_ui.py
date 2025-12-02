@@ -14,6 +14,8 @@ def assert_screenshot(assert_solara_snapshot, page_session):
     test-results for comparison. You can also decide to copy the actual as expected to make
     the test succeed next time, see the developer guide for details.
     """
+    # wait for the page to load before finding the element in UI followed by screenshot assertion.
+    # As of now, we didn't find another way to wait for the action.
     page_session.wait_for_timeout(1000)
     box_element = (
         page_session.locator(":text('Configuration Store')").locator("..").locator("..")
@@ -24,7 +26,6 @@ def assert_screenshot(assert_solara_snapshot, page_session):
 
 def fill_scs_password(password: str, page_session):
     password_field = page_session.locator("input[type='password']")
-    password_field.wait_for()
     password_field.fill(password)
 
 
@@ -35,7 +36,6 @@ def fill_scs_file_name(scs_file: str, page_session):
 
 def click_open_db(page_session):
     open_button = page_session.locator("button:text('Open')")
-    open_button.wait_for()
     open_button.click()
 
 
@@ -62,7 +62,6 @@ def test_access_store_ui_screenshot(
     box_element = (
         page_session.locator(":text('Configuration Store')").locator("..").locator("..")
     )
-    box_element.wait_for()
     assert_solara_snapshot(box_element.screenshot())
 
 
@@ -75,7 +74,6 @@ def test_enter_password_and_click_open(
     password = "dummy123"
     display(get_access_store_ui(str(tmp_path)))
     password_field = page_session.locator("input[type='password']")
-    password_field.wait_for()
     password_field.fill(password)
     click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
@@ -114,5 +112,4 @@ def test_invalid_password(solara_test, page_session, assert_solara_snapshot, tmp
     fill_scs_password("wrong_password", page_session)
     click_open_db(page_session)
     # take screenshot
-    page_session.wait_for_timeout(1000)
     assert_screenshot(assert_solara_snapshot, page_session)
