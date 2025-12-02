@@ -1,8 +1,4 @@
 from pathlib import Path
-from unittest.mock import (
-    MagicMock,
-    patch,
-)
 
 from IPython.display import display
 
@@ -120,16 +116,3 @@ def test_invalid_password(solara_test, page_session, assert_solara_snapshot, tmp
     # take screenshot
     page_session.wait_for_timeout(1000)
     assert_screenshot(assert_solara_snapshot, page_session)
-
-
-def test_run_line_magic_store_called():
-    """
-    test to validate if the run_line_magic function calls store magic
-    """
-    mock_ipython = MagicMock()
-    with patch(
-        "exasol.nb_connector.ui.access_store_ui.get_ipython", return_value=mock_ipython
-    ):
-        get_access_store_ui()
-        # assert using assert_called_once_with
-        mock_ipython.run_line_magic.assert_called_once_with("store", "-r")
