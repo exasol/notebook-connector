@@ -26,15 +26,15 @@ def assert_screenshot(assert_solara_snapshot, page_session):
     assert_solara_snapshot(box_element.screenshot())
 
 
-def fill_store_password(password: str, page_session):
-    password_input = page_session.locator("input[type='password']")
-    password_input.wait_for()
-    password_input.fill(dummy_password)
+def fill_scs_password(password: str, page_session):
+    password_field = page_session.locator("input[type='password']")
+    password_field.wait_for()
+    password_field.fill(password)
 
 
-def fill_store_file_name(dummy_db_store_file: str, page_session):
-    db_store_file_input = page_session.locator("input[type='text']")
-    db_store_file_input.fill(dummy_db_store_file)
+def fill_scs_file_name(scs_file: str, page_session):
+    scs_file_textfield = page_session.locator("input[type='text']")
+    scs_file_textfield.fill(scs_file)
 
 
 def click_open_db(page_session):
@@ -43,18 +43,17 @@ def click_open_db(page_session):
     open_button.click()
 
 
-def verify_content(dummy_password: str, generated_db_file: Path):
+def verify_content(password: str, scs_file: Path):
     """checking if the file has the correct content"""
-    secrets = Secrets(db_file=generated_db_file, master_password=dummy_password)
+    secrets = Secrets(db_file=scs_file, master_password=password)
     assert list(secrets.keys()) == []
 
 
-def is_db_file_exists(generated_db_file_path: str) -> Path:
+def is_db_file_exists(scs_file_path: str) -> Path:
     """checking if the file is created"""
-    generated_db_file = Path(generated_db_file_path)
-    generated_db_file_exists = generated_db_file.exists()
-    assert generated_db_file_exists
-    return generated_db_file
+    scs_file = Path(scs_file_path)
+    assert scs_file.exists()
+    return scs_file
 
 
 def test_access_store_ui_screenshot(
@@ -77,14 +76,17 @@ def test_enter_password_and_click_open(
     """
     test to validate if the open button is pressed and file is created
     """
-    dummy_password = "dummy123"
+    password = "dummy123"
     display(get_access_store_ui(str(tmp_path)))
-    password_input = page_session.locator("input[type='password']")
-    password_input.wait_for()
-    password_input.fill(dummy_password)
+    password_field = page_session.locator("input[type='password']")
+    password_field.wait_for()
+    password_field.fill(password)
     click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
-    assert Secrets(dummy_password, generated_db_file).keys() == []
+    generated_scs_file = is_db_file_exists(
+        str(tmp_path / "ai_lab_secure_configuration_storage.sqlite")
+    )
+    verify_content(password, generated_scs_file)
 
 
 def test_non_default_store_file(
@@ -93,15 +95,15 @@ def test_non_default_store_file(
     """
     test to validate if the file accepts the correct password
     """
-    dummy_password = "dummy123"
-    dummy_db_store_file = "ai_lab_secure_dummy.sqlite"
+    password = "dummy123"
+    scs_file = "ai_lab_secure_dummy.sqlite"
     display(get_access_store_ui(str(tmp_path)))
-    fill_store_file_name(dummy_db_store_file, page_session)
-    fill_store_password(dummy_password, page_session)
+    fill_scs_file_name(scs_file, page_session)
+    fill_scs_password(password, page_session)
     click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
-    generated_db_file = is_db_file_exists(str(tmp_path / dummy_db_store_file))
-    verify_content(dummy_password, generated_db_file)
+    generated_scs_file = is_db_file_exists(str(tmp_path / scs_file))
+    verify_content(password, generated_scs_file)
 
 
 def test_invalid_password(
@@ -110,12 +112,12 @@ def test_invalid_password(
     """
     test to validate if the file fails to accept the wrong password
     """
-    sqlite = "sample.sqlite"
-    secrets = Secrets(db_file=tmp_path / sqlite, master_password="abc")
+    scs_file = "sample.scs_file"
+    secrets = Secrets(db_file=tmp_path / scs_file, master_password="abc")
     secrets.save("abc_key", "abc_value")
     display(get_access_store_ui(str(tmp_path)))
-    fill_store_file_name(sqlite, page_session)
-    fill_store_password("wrong_password", page_session)
+    fill_scs_file_name(scs_file, page_session)
+    fill_scs_password("wrong_password", page_session)
     click_open_db(page_session)
     # take screenshot
     page_session.wait_for_timeout(1000)
