@@ -93,7 +93,8 @@ NC tests as well, e.g. the name of the flavor used in the tests.
 UI Testing Setup
 ================
 
-To run UI tests using [Playwright](https://playwright.dev/) and Pytest, follow these steps to ensure all dependencies are installed and snapshots are updated correctly.
+To run UI tests using [Playwright](https://playwright.dev/) and Pytest, follow
+these steps to ensure all dependencies are installed and snapshots are updated correctly.
 
 1. **Install Playwright browser binaries**
 
@@ -120,3 +121,10 @@ To run UI tests using [Playwright](https://playwright.dev/) and Pytest, follow t
       pytest test/ui/*.py --solara-update-snapshots
 
    This will overwrite existing snapshots with new ones generated during the test.
+
+Note: Reference images for tests must be stored in the $proj_root/ui_snapshots folder,
+placed in the appropriate subfolders. During testing, Solara will look for these images
+in the ui_snapshots directory. Runtime images created by tests are stored in the test-results
+folder and deleted after each test. If a test fails, the runtime image remains in test-results.
+Optionally, If the runtime image matches the expected output and there is no expected reference image,
+you can move the runtime image from test-results to the ui_snapshots directory.
