@@ -25,8 +25,8 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
     if "sb_store_file" in globals():
         # pylint: disable=undefined-variable
         global sb_store_file
-        sb_store_file_ = sb_store_file
-        del sb_store_file
+        sb_store_file_ = sb_store_file  # type: ignore
+        del sb_store_file  # type: ignore
     else:
         sb_store_file_ = "ai_lab_secure_configuration_storage.sqlite"
 

@@ -16,7 +16,7 @@ class IPRetriever:
 
 
 def retrieve_networks_of_container(
-    container: docker.models.containers.Container,
+    container: docker.models.containers.Container,  # type: ignore
 ) -> list[dict[str, Any]]:
     container.reload()
     network_settings = container.attrs["NetworkSettings"]
