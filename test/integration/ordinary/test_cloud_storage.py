@@ -30,10 +30,8 @@ def test_cloud_storage_setup_scripts(secrets: Secrets, setup_itde):
         assert counts["UDF"] == 3
 
 
-def test_saas_bucket_can_be_iterated(backend, secrets: Secrets, setup_itde):
-    if backend != "saas":
-        pytest.skip("The test runs only with SaaS database")
-    bucket = open_bucketfs_bucket(secrets)
-    NAME = "temp-file.dat"
-    bucket.upload(NAME, b"some data")
-    assert NAME in bucket.files
+# Implementation of test case test_saas_bucket_can_be_iterated() was wrong as
+# it used the content of the secret store to access the ITDE rather than a
+# SaaS database instance as indicated by the name of the test.
+#
+# See https://github.com/exasol/bucketfs-python/issues/259
