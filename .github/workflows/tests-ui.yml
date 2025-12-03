@@ -48,4 +48,4 @@ jobs:
         run: poetry run -- playwright install chromium
 
       - name: UI Tests
-        run: poetry run -- pytest -rA --setup-show test/integration/ui/
+        run: poetry run -- pytest -rA --setup-show test/integration/ui/ --solara-update-snapshots
