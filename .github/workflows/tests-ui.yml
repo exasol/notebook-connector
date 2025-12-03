@@ -44,5 +44,8 @@ jobs:
         run: |
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      - name: Tests
+      - name: Install Playwright for UI Tests
+        run: playwright install chromium
+
+      - name: UI Tests
         run: poetry run -- pytest -rA --setup-show test/integration/ui/
