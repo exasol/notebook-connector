@@ -7,6 +7,8 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.popup_message_ui import popup_message
 from exasol.nb_connector.ui.ui_styles import get_config_styles
 
+# pylint: disable=global-variable-undefined
+
 
 def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
 
@@ -21,7 +23,8 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
         )  # reloads variables in the IPython user namespace persistence mechanism.
 
     if "sb_store_file" in globals():
-        global sb_store_file  # pylint: disable=undefined-variable
+        # pylint: disable=undefined-variable
+        global sb_store_file
         sb_store_file_ = sb_store_file
         del sb_store_file
     else:
