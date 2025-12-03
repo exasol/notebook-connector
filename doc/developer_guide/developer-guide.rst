@@ -129,9 +129,8 @@ To run UI tests using `Playwright <https://playwright.dev/>`_ Pytest, follow the
 Different Categories of UI Test Cases
 =====================================
 
-The UI tests with solara and playwright come in different categories,
-differing in nature, the approach used for testing and abilities regarding the
-following aspects:
+The UI tests with solara and playwright come in multiple categories, differing
+in:
 
 * In which folder are the tests located?
 * Which fixtures are used?
