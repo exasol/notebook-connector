@@ -45,4 +45,4 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Tests
-        run: poetry run -- pytest -rA --setup-show test/ui/
+        run: poetry run -- pytest -rA --setup-show test/integration/ui/

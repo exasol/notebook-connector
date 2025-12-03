@@ -59,10 +59,7 @@ def test_access_store_ui_screenshot(
     test to check if the get_access_store_ui function displays the UI elements
     """
     display(get_access_store_ui(str(tmp_path)))
-    box_element = (
-        page_session.locator(":text('Configuration Store')").locator("..").locator("..")
-    )
-    assert_solara_snapshot(box_element.screenshot())
+    assert_screenshot(assert_solara_snapshot, page_session)
 
 
 def test_enter_password_and_click_open(

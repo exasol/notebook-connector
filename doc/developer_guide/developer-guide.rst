@@ -118,7 +118,7 @@ these steps to ensure all dependencies are installed and snapshots are updated c
 
    .. code-block:: bash
 
-      pytest test/ui/*.py --solara-update-snapshots
+      pytest test/integration/ui/*.py --solara-update-snapshots
 
    This will overwrite existing snapshots with new ones generated during the test.
 
