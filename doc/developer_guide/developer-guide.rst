@@ -93,10 +93,27 @@ NC tests as well, e.g. the name of the flavor used in the tests.
 UI Tests
 ********
 
+NC's UI tests are using ``ipwidgets`` which depends on `solara
+<https://solara.dev/>`_. There is also a `playwright pytest-plugin
+<https://pypi.org/project/pytest-playwright/>`_ but NC does not have an
+explicit python dependency to it.
+
+Solara is able to create snapshots of the actual displayed UI and to compare
+the snapshot with an expectation.
+
+NC uses the following directories for storing the screenshots:
+
+* Folder ``ui_snapshots/`` reference (aka. expected) screenshots
+* Folder ``test-results/`` actual screenshots, excluded in ``.gitignore``
+
+Solara only keeps the actual screenshot if different from the expected.
+
+
 Setup and Execution
 ===================
 
-To run UI tests using `Playwright <https://playwright.dev/>`_ Pytest, follow these steps to ensure all dependencies are installed and snapshots are updated correctly.
+To run UI tests using ``Playwright``, follow these steps to ensure all
+dependencies are installed and snapshots are updated correctly.
 
 1. **Install Playwright browser binaries**
 
@@ -117,7 +134,7 @@ To run UI tests using `Playwright <https://playwright.dev/>`_ Pytest, follow the
 3. **Run UI tests and update Solara snapshots**
 
    Use the following command to run UI tests and update the reference
-   `solara <https://solara.dev/>`_ snapshots used for visual comparison:
+   (aka. expected) snapshots used for visual comparison by ``solara``:
 
    .. code-block:: bash
 
