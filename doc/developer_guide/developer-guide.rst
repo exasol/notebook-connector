@@ -90,10 +90,13 @@ In consequence, updating the SLCR version potentially may require updating the
 NC tests as well, e.g. the name of the flavor used in the tests.
 
 
-UI Testing Setup
-================
+UI Tests
+********
 
-To run UI tests using [Playwright](https://playwright.dev/) and Pytest, follow these steps to ensure all dependencies are installed and snapshots are updated correctly.
+Setup and Execution
+===================
+
+To run UI tests using `Playwright <https://playwright.dev/>`_ Pytest, follow these steps to ensure all dependencies are installed and snapshots are updated correctly.
 
 1. **Install Playwright browser binaries**
 
@@ -113,10 +116,59 @@ To run UI tests using [Playwright](https://playwright.dev/) and Pytest, follow t
 
 3. **Run UI tests and update Solara snapshots**
 
-   Use the following command to run UI tests and update the reference [solara](https://solara.dev/) snapshots used for visual comparison:
+   Use the following command to run UI tests and update the reference
+   `solara <https://solara.dev/>`_ snapshots used for visual comparison:
 
    .. code-block:: bash
 
       pytest test/ui/*.py --solara-update-snapshots
 
    This will overwrite existing snapshots with new ones generated during the test.
+
+
+Different Categories of UI Test Cases
+=====================================
+
+The UI tests with solara and playwright come in different categories,
+differing in nature, the approach used for testing and abilities regarding the
+following aspects:
+
+* In which folder are the tests located?
+* Which fixtures are used?
+* Can they take screenshots?
+* Can they execute `store magic <https://ipython.readthedocs.io/en/stable/config/extensions/storemagic.html>`_?
+* What is the return value of ``IPython.get_ipython()``?
+
+.. list-table:: Categories of UI tests
+   :header-rows: 1
+   :stub-columns: 1
+
+   * -
+     - UI unit tests
+     - Solara Tests with Fixtures
+     - Visual UI Tests
+   * - Located in folder
+     - ``test/unit/ui/``
+     - ``test/unit/ui/``
+     - ``test/integration/ui/``
+   * - Fixtures
+     - none
+     - ``kernel_context`` ``no_kernel_context``
+     -  ``solara_test`` ``page_session`` ``assert_solara_snapshot``
+   * - Take Screenshots?
+     - no
+     - no
+     - yes
+   * - Execute Store magic?
+     - no (patching ``get_ipython`` is possible)
+     - no
+     - no
+   * - Return value of ``IPython .get_ipython()``
+     - ``None``, but can be patched for verifying the call to store magic
+     - ``None``, tests use ipywidgets and fixture ``kernel_context``
+     - ``None``, tests use playwright and solara
+   * - Example
+     - ``test_access_store_ui _store_read_and_write``
+     - ``test_notebook_widget``
+     - ``test_widget_button_solara``
+
