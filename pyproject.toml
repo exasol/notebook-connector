@@ -1,6 +1,6 @@
 [project]
 name = "exasol-notebook-connector"
-version = "2.2.2"
+version = "2.2.3"
 requires-python = ">=3.10,<3.13"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [{ include = "exasol" }, ]
