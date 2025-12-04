@@ -141,12 +141,6 @@ dependencies are installed and snapshots are updated correctly.
 
    This will overwrite existing snapshots with new ones generated during the test.
 
-Note: Reference images for tests must be stored in the $proj_root/ui_snapshots folder,
-placed in the appropriate subfolders. During testing, Solara will look for these images
-in the ui_snapshots directory. Runtime images created by tests are stored in the test-results
-folder and deleted after each test. If a test fails, the runtime image remains in test-results.
-Optionally, If the runtime image matches the expected output and there is no expected reference image,
-you can move the runtime image from test-results to the ui_snapshots directory.
 
 Different Categories of UI Test Cases
 =====================================
