@@ -110,7 +110,6 @@ Solara only keeps the actual screenshot if different from the expected.
 
 
 Setup and Execution
-===================
 
 To run UI tests using ``Playwright``, follow these steps to ensure all
 dependencies are installed and snapshots are updated correctly.
@@ -138,7 +137,7 @@ dependencies are installed and snapshots are updated correctly.
 
    .. code-block:: bash
 
-      pytest test/ui/*.py --solara-update-snapshots
+      pytest test/integration/ui/*.py --solara-update-snapshots
 
    This will overwrite existing snapshots with new ones generated during the test.
 
@@ -187,4 +186,3 @@ in:
      - ``test_access_store_ui _store_read_and_write``
      - ``test_notebook_widget``
      - ``test_widget_button_solara``
-

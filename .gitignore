@@ -12,3 +12,5 @@ __pycache__/
 # drawio backup files
 /doc/user_guide/*.bkp
 .workspace
+# actual screenshots created by solara if different from expected in folder `ui_screenshots/`.
+/test-results
