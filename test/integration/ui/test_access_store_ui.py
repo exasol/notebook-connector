@@ -68,8 +68,7 @@ def test_enter_password_and_click_open(
     """
     password = "dummy123"
     display(get_access_store_ui(str(tmp_path)))
-    password_field = page_session.locator("input[type='password']")
-    password_field.fill(password)
+    fill_scs_password(password, page_session)
     click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
     generated_scs_file = tmp_path / DEFAULT_FILE_NAME
