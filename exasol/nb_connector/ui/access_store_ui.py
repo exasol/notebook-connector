@@ -3,11 +3,16 @@ from pathlib import Path
 import ipywidgets as widgets
 from IPython import get_ipython
 
-from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.secret_store import (
+    InvalidPassword,
+    Secrets,
+)
 from exasol.nb_connector.ui.popup_message_ui import popup_message
 from exasol.nb_connector.ui.ui_styles import get_config_styles
 
 # pylint: disable=global-variable-undefined
+
+DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
 
 
 def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
@@ -28,7 +33,7 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
         sb_store_file_ = sb_store_file  # type: ignore
         del sb_store_file  # type: ignore
     else:
-        sb_store_file_ = "ai_lab_secure_configuration_storage.sqlite"
+        sb_store_file_ = DEFAULT_FILE_NAME
 
     ui_look = get_config_styles()
 
@@ -59,7 +64,7 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
         try:
             ai_lab_config = Secrets(Path(root_dir) / sb_store_file, password_txt.value)
             ai_lab_config.connection()
-        except:
+        except InvalidPassword as e:
             popup_message(
                 "Failed to open the store. Please check that the password is correct"
             )

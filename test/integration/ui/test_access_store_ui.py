@@ -3,16 +3,20 @@ from pathlib import Path
 from IPython.display import display
 
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ui.access_store_ui import get_access_store_ui
+from exasol.nb_connector.ui.access_store_ui import (
+    DEFAULT_FILE_NAME,
+    get_access_store_ui,
+)
 
 
 def assert_screenshot(assert_solara_snapshot, page_session):
     """
-    Creates an actual screenshot and asserts if the screenshot is identical to the expectation.
-    The expected screenshots are located in folder ui_screenshots.
-    If the actual screenshot differs from the expected, then solara save the actual to folder
-    test-results for comparison. You can also decide to copy the actual as expected to make
-    the test succeed next time, see the developer guide for details.
+    Creates an actual screenshot and asserts if the screenshot is identical to the
+    expectation. The expected screenshots are located in folder ui_screenshots.
+    If the actual screenshot differs from the expected, then solara save the
+    actual to folder test-results for comparison. You can also decide to copy
+    the actual as expected to make the test succeed next time,
+    see the developer guide for details.
     """
     # wait for the page to load before finding the element in UI followed by screenshot assertion.
     # As of now, we didn't find another way to wait for the action.
@@ -42,7 +46,7 @@ def click_open_db(page_session):
 def verify_content(password: str, scs_file: Path):
     """checking if the file has the correct content"""
     secrets = Secrets(db_file=scs_file, master_password=password)
-    assert list(secrets.keys()) == []
+    assert not list(secrets.keys())
 
 
 def is_db_file_exists(scs_file_path: str) -> Path:
@@ -53,7 +57,7 @@ def is_db_file_exists(scs_file_path: str) -> Path:
 
 
 def test_access_store_ui_screenshot(
-    solara_test, page_session, assert_solara_snapshot, playwright, tmp_path
+    solara_test, page_session, assert_solara_snapshot, tmp_path
 ):
     """
     test to check if the get_access_store_ui function displays the UI elements
@@ -74,9 +78,7 @@ def test_enter_password_and_click_open(
     password_field.fill(password)
     click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
-    generated_scs_file = is_db_file_exists(
-        str(tmp_path / "ai_lab_secure_configuration_storage.sqlite")
-    )
+    generated_scs_file = is_db_file_exists(str(tmp_path / DEFAULT_FILE_NAME))
     verify_content(password, generated_scs_file)
 
 
