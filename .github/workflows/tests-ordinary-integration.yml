@@ -38,6 +38,8 @@ jobs:
             extra_param: "--package-manager pip --compression-strategy none"
           - file: itest_slc.py
             extra_param: "--package-manager pip --compression-strategy none --bucketfs-protocol https"
+          - file: test_cloud_storage.py
+            extra_param: ""
 
     steps:
 
