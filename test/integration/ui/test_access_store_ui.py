@@ -18,7 +18,8 @@ def assert_screenshot(assert_solara_snapshot, page_session):
     the actual as expected to make the test succeed next time,
     see the developer guide for details.
     """
-    # wait for the page to load before finding the element in UI followed by screenshot assertion.
+    # wait for the page to load before finding the element in UI followed
+    # by screenshot assertion.
     # As of now, we didn't find another way to wait for the action.
     page_session.wait_for_timeout(1000)
     box_element = (
@@ -49,13 +50,6 @@ def verify_content(password: str, scs_file: Path):
     assert not list(secrets.keys())
 
 
-def is_db_file_exists(scs_file_path: str) -> Path:
-    """checking if the file is created"""
-    scs_file = Path(scs_file_path)
-    assert scs_file.exists()
-    return scs_file
-
-
 def test_access_store_ui_screenshot(
     solara_test, page_session, assert_solara_snapshot, tmp_path
 ):
@@ -78,8 +72,9 @@ def test_enter_password_and_click_open(
     password_field.fill(password)
     click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
-    generated_scs_file = is_db_file_exists(str(tmp_path / DEFAULT_FILE_NAME))
-    verify_content(password, generated_scs_file)
+    generated_scs_file = tmp_path / DEFAULT_FILE_NAME
+    assert generated_scs_file.exists()
+    assert not list(Secrets(generated_scs_file, password).keys())
 
 
 def test_non_default_store_file(
@@ -95,8 +90,9 @@ def test_non_default_store_file(
     fill_scs_password(password, page_session)
     click_open_db(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
-    generated_scs_file = is_db_file_exists(str(tmp_path / scs_file))
-    verify_content(password, generated_scs_file)
+    generated_scs_file = tmp_path / scs_file
+    assert generated_scs_file.exists()
+    assert not list(Secrets(generated_scs_file, password).keys())
 
 
 def test_invalid_password(solara_test, page_session, assert_solara_snapshot, tmp_path):
