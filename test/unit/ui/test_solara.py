@@ -1,12 +1,9 @@
 import importlib.resources
 import logging
-from contextlib import contextmanager
-from pathlib import Path
+from test.unit.ui.util import solara_app_utils as solara
 
 import ipywidgets
-import solara
 from solara.server import reload
-from solara.server.app import AppScript
 
 logger = logging.getLogger("solara.server.app_test")
 
@@ -14,30 +11,12 @@ APP_SRC = importlib.resources.files("test.unit.ui") / "app.py"
 reload.reloader.start()
 
 
-@contextmanager
-def app_box_and_rc(app_name, kernel_context):
-    app = AppScript(str(app_name))
-    app.init()
-    try:
-        with kernel_context:
-            # get root widget
-            el = app.run()
-            root = solara.RoutingProvider(
-                children=[el], routes=app.routes, pathname="/"
-            )
-            # rc = render context
-            box, rc = solara.render(root, handle_error=False)
-            yield box, rc
-    finally:
-        app.close()
-
-
 def test_notebook_widget(kernel_context, no_kernel_context):
     """
     The fixture no_kernel_context is not used directly in this test but is required, though, to
     make the test pass.
     """
-    with app_box_and_rc(APP_SRC, kernel_context) as (box, rc):
+    with solara.app_box_and_rc(APP_SRC, kernel_context) as (box, rc):
         button = rc.find(ipywidgets.Button).widget
         text = rc.find(ipywidgets.Text).widget
         assert isinstance(button, ipywidgets.Button)

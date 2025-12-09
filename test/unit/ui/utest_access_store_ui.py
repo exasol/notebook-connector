@@ -1,3 +1,7 @@
+"""
+Unit tests for Access Store UI
+"""
+
 from unittest.mock import (
     MagicMock,
     patch,
@@ -9,6 +13,7 @@ from exasol.nb_connector.ui.access_store_ui import get_access_store_ui
 
 
 def test_access_store_ui_store_read_and_write(tmp_path):
+    """Test for the store magic read and write function"""
     mock_ipython = MagicMock()
     with patch(
         "exasol.nb_connector.ui.access_store_ui.get_ipython", return_value=mock_ipython
