@@ -2,7 +2,6 @@
 Unit tests for Access Store UI
 """
 
-
 from unittest.mock import (
     MagicMock,
     patch,

@@ -1,5 +1,7 @@
 import importlib.resources
 import logging
+from test.unit.ui.access_store_ui.access_store_ui_app import DEFAULT_FILE_NAME
+from test.unit.ui.util import solara_app_utils as solara
 from unittest.mock import (
     MagicMock,
 )
@@ -7,9 +9,6 @@ from unittest.mock import (
 import ipywidgets
 import pytest
 from solara.server import reload
-
-from test.unit.ui.access_store_ui.access_store_ui_app import DEFAULT_FILE_NAME
-from test.unit.ui.util import solara_app_utils as solara
 
 logger = logging.getLogger("solara.server.access_store_app_test")
 

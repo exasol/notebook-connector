@@ -76,7 +76,7 @@ open_btn.on_click(open_or_create_config_store)
 file_txt.observe(on_value_change, names=["value"])
 password_txt.observe(on_value_change, names=["value"])
 
-# Group and layout for the UI
+
 group_items = [
     header_lbl,
     widgets.Box([file_lbl, file_txt], layout=ui_look.row_layout),
