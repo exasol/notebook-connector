@@ -69,4 +69,4 @@ def test_run_cell_test():
     """
 
     # Execute the cell
-    result = shell.run_cell(ipython_code)
+    result = run_cell(ipython_code)
