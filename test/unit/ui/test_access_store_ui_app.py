@@ -44,17 +44,7 @@ def test_run_cell_test():
 
     shell = IPython.core.interactiveshell.InteractiveShell.instance()
     ipython_code = """
-    import IPython.core.interactiveshell
-
-    shell = IPython.core.interactiveshell.InteractiveShell.instance()
-    # This code is executed in an IPython context
-    script_path = "test/unit/ui/access_store_ui_app.py"
-
-    print("--- Running IPython script ---")
-    shell.run_line_magic("run", script_path)
-
-    print("--- Back in Python script ---")
-    app = shell.user_ns["app"]
+# here needs to go the content of access_store_ui_app.py
 
     password = app.children[0].children[0].children[2].children[1]
     password.value = "password"
