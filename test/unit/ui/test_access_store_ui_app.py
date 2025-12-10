@@ -36,3 +36,37 @@ def test_new_read_test():
     test_button.click()
 
     assert shell.user_ns["sb_store_file"] == ""
+
+
+
+def test_run_cell_test():
+    import IPython.core.interactiveshell
+
+    shell = IPython.core.interactiveshell.InteractiveShell.instance()
+    ipython_code = """
+    import IPython.core.interactiveshell
+
+    shell = IPython.core.interactiveshell.InteractiveShell.instance()
+    # This code is executed in an IPython context
+    script_path = "test/unit/ui/access_store_ui_app.py"
+
+    print("--- Running IPython script ---")
+    shell.run_line_magic("run", script_path)
+
+    print("--- Back in Python script ---")
+    app = shell.user_ns["app"]
+
+    password = app.children[0].children[0].children[2].children[1]
+    password.value = "password"
+
+    open_button = app.children[0].children[1]
+    open_button.click()
+
+    test_button = app.children[2]
+    test_button.click()
+
+    assert shell.user_ns["sb_store_file"] == ""
+    """
+
+    # Execute the cell
+    result = shell.run_cell(ipython_code)

@@ -20,7 +20,7 @@ def read_store_magic(btn):
         ipython = get_ipython()
         # del ipython.user_ns['sb_store_file']
         #
-        ipython.run_line_magic("store", "-r")
+        ipython.run_cell_magic("store", "-r")
 
         test_text.value = ipython.user_ns["sb_store_file"]
     except Exception as e:

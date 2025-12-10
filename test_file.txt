@@ -1,1 +1,1 @@
-'FakeIPython' object has no attribute 'run_line_magic'
+'FakeIPython' object has no attribute 'run_cell_magic'
