@@ -40,9 +40,7 @@ def test_new_read_test():
 
 
 def test_run_cell_test():
-    import IPython.core.interactiveshell
-
-    shell = IPython.core.interactiveshell.InteractiveShell.instance()
+    from IPython.terminal.embed import run_cell
     ipython_code = """
 # here needs to go the content of access_store_ui_app.py
 
