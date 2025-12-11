@@ -5,3 +5,7 @@
 ## Documentation
 
 * #304: Described UI test categories in Developer Guide
+
+## Refactoring
+
+* #314: Added more robust for class ScriptLanguageContainer
