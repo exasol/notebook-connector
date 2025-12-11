@@ -28,7 +28,7 @@ def kernel_context():
 def no_kernel_context(kernel_context):
     """
     Fixture for setting up the no kernel context
-    We need just to make the test pass
+    We need this method just to make the test pass
     """
     context = solara.server.kernel_context.get_current_context()
     solara.server.kernel_context.set_current_context(None)
