@@ -3,13 +3,11 @@ from __future__ import annotations
 import logging
 import re
 from collections import namedtuple
-from os import write
 from pathlib import (
     Path,
 )
 from typing import (
     Any,
-    Type,
 )
 
 import requests

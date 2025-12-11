@@ -143,10 +143,11 @@ def test_create(
     )
 
 
-def test_repo_missing(sample_slc_name):
-    secrets = SlcSecretsMock.create(sample_slc_name, "aflavor")
-    with pytest.raises(SlcError, match="SLC Git repository not checked out"):
-        ScriptLanguageContainer(secrets, sample_slc_name)
+def test_repo_missing(sample_slc_name, tmp_path):
+    with current_directory(tmp_path):
+        secrets = SlcSecretsMock.create(sample_slc_name, "aflavor")
+        with pytest.raises(SlcError, match="SLC Git repository not checked out"):
+            ScriptLanguageContainer(secrets, sample_slc_name)
 
 
 @pytest.mark.parametrize(
@@ -172,18 +173,18 @@ def test_illegal_names(name):
 
 
 @pytest.mark.parametrize("name", ["ABC", "ABC_123", "abc", "abc_123"])
-def test_legal_names(name, slc_factory):
+def test_legal_names(name, slc_factory_create):
     flavor = "Strawberry"
     with not_raises(SlcError):
-        with slc_factory.context(slc_name=name, flavor=flavor) as slc:
+        with slc_factory_create.context(slc_name=name, flavor=flavor) as slc:
             assert slc.flavor == flavor
 
 
 @pytest.fixture
 def slc_with_tmp_checkout_dir(
-    sample_slc_name, slc_factory
+    sample_slc_name, slc_factory_create
 ) -> Generator[ScriptLanguageContainer, None, None]:
-    with slc_factory.context(slc_name=sample_slc_name, flavor="Vanilla") as slc:
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor="Vanilla") as slc:
         yield slc
 
 
@@ -223,7 +224,7 @@ def mock_docker_client_context(image_tags: list[str]):
     return context
 
 
-def test_docker_image_tags(monkeypatch: MonkeyPatch, slc_factory):
+def test_docker_image_tags(monkeypatch: MonkeyPatch, slc_factory_create):
     """
     This test mocks the Docker client simulating to return a list of
     Docker images to be available on the current system.
@@ -248,7 +249,7 @@ def test_docker_image_tags(monkeypatch: MonkeyPatch, slc_factory):
         "ContextDockerClient",
         mock_docker_client_context(image_tags),
     )
-    with slc_factory.context("MY_SLC", flavor) as slc:
+    with slc_factory_create.context("MY_SLC", flavor) as slc:
         assert slc.docker_image_tags == expected
 
 
@@ -500,13 +501,17 @@ def test_slc_create_or_open_workspace_exists(
         with slc_factory_create.context(sample_slc_name, flavor) as testee:
             pass
 
-        ScriptLanguageContainer.create_or_open(testee.secrets, sample_slc_name, flavor)
-        assert slc_factory_create.git_repo_mock.clone_from.call_count == 1
-        assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
-        assert f"Secure Configuration Storage already contains a compression strategy for SLC name {sample_slc_name}."
-        assert f"Directory '{testee.checkout_dir}' is not empty. Skipping checkout...."
+            ScriptLanguageContainer.create_or_open(
+                testee.secrets, sample_slc_name, flavor
+            )
+            assert slc_factory_create.git_repo_mock.clone_from.call_count == 1
+            assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
+            assert f"Secure Configuration Storage already contains a compression strategy for SLC name {sample_slc_name}."
+            assert (
+                f"Directory '{testee.checkout_dir}' is not empty. Skipping checkout...."
+            )
 
-        _validate_slc(flavor, sample_slc_name, testee, slc_factory_create.path)
+            _validate_slc(flavor, sample_slc_name, testee, slc_factory_create.path)
 
 
 def write_package_file(file_path: Path, trailing_newline: bool):
