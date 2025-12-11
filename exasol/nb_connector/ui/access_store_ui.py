@@ -85,8 +85,9 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
 
             # Save the file in the shared store.
             # Added this if condition just to enable testing
-            if ipython and hasattr(ipython, "run_line_magic"):
-                ipython.run_line_magic("store", "sb_store_file")
+            # if ipython and hasattr(ipython, "run_line_magic"):
+            ipython.run_line_magic('load_ext', 'storemagic')
+            ipython.run_line_magic("store", "sb_store_file",sb_store_file)
             del sb_store_file
 
     def on_value_change(change):

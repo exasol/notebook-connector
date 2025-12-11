@@ -2,7 +2,8 @@ import importlib.resources
 import logging
 
 from solara.server import reload
-from tqdm.autonotebook import get_ipython
+
+from exasol.nb_connector.ui.access_store_ui import DEFAULT_FILE_NAME
 
 logger = logging.getLogger("solara.server.access_store_app_test")
 
@@ -13,29 +14,6 @@ reload.reloader.start()
 
 NEW_FILE_NAME = "new_file.sqlite"
 TEST_PASSWORD = "password"
-
-
-def test_shell():
-    import IPython.core.interactiveshell
-
-    shell = IPython.core.interactiveshell.InteractiveShell.instance()
-    ipython_code = """
-    print("testing shell print")
-    """
-    result = shell.run_cell(ipython_code)
-
-
-def test_dummy():
-    from IPython.testing.globalipapp import get_ipython
-    ipython = get_ipython()
-    ipython.run_cell("testing IPython.testing.globalipapp.get_ipython")
-
-def test_shell_store():
-    import IPython.core.interactiveshell
-    shell = IPython.core.interactiveshell.InteractiveShell.instance()
-    shell.run_line_magic("run", "test/unit/ui/access_store_ui_app.py")
-    assert "sb_store_file" in shell.user_ns.keys()
-
 
 def test_new_read_test():
     import IPython.core.interactiveshell
@@ -59,9 +37,8 @@ def test_new_read_test():
     handler = test_button._click_handlers.callbacks[0]
     handler(test_button)
     # test_button.click()
-    print(shell.user_ns.keys())
     assert "sb_store_file" in shell.user_ns, "sb_store_file was not set by test code!"
-    # assert shell.user_ns["sb_store_file"] == ""
+    assert shell.user_ns["sb_store_file"] == DEFAULT_FILE_NAME
 
 
 def test_run_cell_test():
@@ -124,25 +101,3 @@ def test_run_cell_test():
 
     # Execute the cell
     result = shell.run_cell(ipython_code)
-
-
-def test_magics():
-
-    from IPython import get_ipython
-    # from IPython.testing.globalipapp import get_ipython
-    line_magics = list(get_ipython().magics_manager.magics.get('line'))
-    cell_magics = list(get_ipython().magics_manager.magics.get('cell'))
-
-    print(line_magics)
-    print(cell_magics)
-
-
-
-def test_nonexistent_object():
-    import pytest
-    from IPython.testing.globalipapp import get_ipython
-    ip = get_ipython()
-    # ip.magic('load_ext %    store')
-    data="test_data.txt"
-    with pytest.raises(NameError):
-        ip.run_line_magic('store', 'data')
