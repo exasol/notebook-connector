@@ -1,103 +1,48 @@
-import importlib.resources
-import logging
-
-from solara.server import reload
-
-from exasol.nb_connector.ui.access_store_ui import DEFAULT_FILE_NAME
-
-logger = logging.getLogger("solara.server.access_store_app_test")
-
-ACCESS_STORE_APP_SRC = (
-        importlib.resources.files("test.unit.ui") / "access_store_ui_app.py"
-)
-reload.reloader.start()
-
-NEW_FILE_NAME = "new_file.sqlite"
-TEST_PASSWORD = "password"
-
-def test_new_read_test():
-    import IPython.core.interactiveshell
-
-    shell = IPython.core.interactiveshell.InteractiveShell.instance()
-    script_path = "test/unit/ui/access_store_ui_app.py"
-
-    print("--- Running IPython script ---")
-    shell.run_line_magic("run", script_path)
-
-    print("--- Back in Python script ---")
-    app = shell.user_ns["app"]
-
-    password = app.children[0].children[0].children[2].children[1]
-    password.value = "password"
-
-    open_button = app.children[0].children[1]
-    open_button.click()
-
-    test_button = app.children[2]
-    handler = test_button._click_handlers.callbacks[0]
-    handler(test_button)
-    # test_button.click()
-    assert "sb_store_file" in shell.user_ns, "sb_store_file was not set by test code!"
-    assert shell.user_ns["sb_store_file"] == DEFAULT_FILE_NAME
+import importlib
+import shutil
+import subprocess
 
 
-def test_run_cell_test():
-    # from IPython.terminal.embed import run_cell
-    import IPython.core.interactiveshell
-
-    shell = IPython.core.interactiveshell.InteractiveShell.instance()
-    ipython_code = """
-    # here needs to go the content of access_store_ui_app.py
-    
-    import IPython.core.interactiveshell
-
-    shell = IPython.core.interactiveshell.InteractiveShell.instance()
-    import ipywidgets
-    from IPython import get_ipython
-    
-    from exasol.nb_connector.ui import access_store_ui
-    
-    # from IPython.testing.globalipapp import get_ipython
-    
-    DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
-    # import and get ui
-    ui = access_store_ui.get_access_store_ui()
-    
-    
-    test_text = ipywidgets.Text(value="init")
-    test_btn = ipywidgets.Button(description="Test")
-    
-    
-    def read_store_magic(btn):
-        # raise Exception("Experiment")
-        try:
-            ipython = get_ipython()
-            ipython.run_line_magic("store", "-r")
-        
-            test_text.value = ipython.user_ns["sb_store_file"]
-            print(test_text.value)
-            print(ipython.user_ns["sb_store_file"])
-        except Exception as e:
-            with open("test_file.txt", "w") as f:
-                f.write(f"{e}")
-    
-    
-    test_btn.on_click(read_store_magic)
-    
-    items = [ui, test_text, test_btn]
-    app = ipywidgets.Box(items)
-
-    password = app.children[0].children[0].children[2].children[1]
-    password.value = "password"
-
-    open_button = app.children[0].children[1]
-    open_button.click()
-
-    test_button = app.children[2]
-    test_button.click()
-    print(shell.user_ns.keys())
-    assert shell.user_ns["sb_store_file"] == ""
+def test_store_magic_write(tmp_path, monkeypatch):
     """
+    test for store magic write functionality
+    """
+    # Copy the app file into tmp_path
+    source_app = importlib.resources.files("test.unit.ui") / "access_store_ui_app.py"
+    target_app = tmp_path / "access_store_ui_app.py"
+    shutil.copyfile(source_app, target_app)
+    # change current dir to tmp_path
+    monkeypatch.chdir(tmp_path)
+    # Name of the IPython file to run
+    script_file = target_app
 
-    # Execute the cell
-    result = shell.run_cell(ipython_code)
+    # The command to execute: 'ipython' followed by the script file path
+    # Note: On some systems,
+    # you might need 'python -m IPython' instead of just 'ipython'
+    command = ["ipython", script_file]
+
+    try:
+        # Run the command
+        result = subprocess.run(
+            command,
+            capture_output=True,  # Captures stdout and stderr
+            text=True,  # Decodes stdout/stderr as text
+            # Raises CalledProcessError if the command returns a non-zero exit code
+            check=True,
+        )
+
+        print("--- Subprocess Output (stdout) ---")
+        print(result.stdout)
+        print("--- Subprocess Errors (stderr) ---")
+        print(result.stderr)
+        print(f"Subprocess finished with return code: {result.returncode}")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing IPython script: {e}")
+        print(f"Stdout: {e.stdout}")
+        print(f"Stderr: {e.stderr}")
+        assert False
+    except FileNotFoundError:
+        # This might happen if 'ipython' is not in your system's PATH
+        print("Error: The 'ipython' command was not found. Check your PATH.")
+        assert False

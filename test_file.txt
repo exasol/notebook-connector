@@ -1,1 +1,0 @@
-'FakeIPython' object has no attribute 'run_cell_magic'

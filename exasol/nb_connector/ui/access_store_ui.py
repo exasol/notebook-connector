@@ -74,20 +74,8 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
         else:
             open_btn.icon = "check"
         finally:
-            #TODO remove the below code - just added to check if magic store happens
-            import IPython.core.interactiveshell
-            shell = IPython.core.interactiveshell.InteractiveShell.instance()
-            # shell.run_line_magic("run", "test/unit/ui/access_store_ui_app.py")
-            # print(shell.user_ns)
-            shell.user_ns["sb_store_file"]=sb_store_file
-            # assert ("sb_store_file" in shell.user_ns.keys())
-            #TODO remove the above code - just added to check if magic store happens
-
             # Save the file in the shared store.
-            # Added this if condition just to enable testing
-            # if ipython and hasattr(ipython, "run_line_magic"):
-            ipython.run_line_magic('load_ext', 'storemagic')
-            ipython.run_line_magic("store", "sb_store_file",sb_store_file)
+            ipython.run_line_magic("store", "sb_store_file")
             del sb_store_file
 
     def on_value_change(change):
@@ -106,4 +94,3 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
     items = [widgets.Box(group_items, layout=ui_look.group_layout), open_btn]
     ui = widgets.Box(items, layout=ui_look.outer_layout)
     return ui
-
