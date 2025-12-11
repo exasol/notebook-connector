@@ -20,7 +20,8 @@ def read_store_magic(btn):
     user_ns = ipython.user_ns
     try:
         print("read_store_magic function try block")
-        ipython.run_cell_magic("store", "-r", "")
+        if ipython and hasattr(ipython, "run_line_magic"):
+            ipython.run_cell_magic("store", "-r", "")
         value = user_ns.get("sb_store_file", None)  # Safely get the value
         if value is not None:
             test_text.value = value

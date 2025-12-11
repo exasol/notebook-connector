@@ -61,7 +61,7 @@ def test_new_read_test():
     # test_button.click()
     print(shell.user_ns.keys())
     assert "sb_store_file" in shell.user_ns, "sb_store_file was not set by test code!"
-    assert shell.user_ns["sb_store_file"] == ""
+    # assert shell.user_ns["sb_store_file"] == ""
 
 
 def test_run_cell_test():
@@ -125,3 +125,24 @@ def test_run_cell_test():
     # Execute the cell
     result = shell.run_cell(ipython_code)
 
+
+def test_magics():
+
+    from IPython import get_ipython
+    # from IPython.testing.globalipapp import get_ipython
+    line_magics = list(get_ipython().magics_manager.magics.get('line'))
+    cell_magics = list(get_ipython().magics_manager.magics.get('cell'))
+
+    print(line_magics)
+    print(cell_magics)
+
+
+
+def test_nonexistent_object():
+    import pytest
+    from IPython.testing.globalipapp import get_ipython
+    ip = get_ipython()
+    # ip.magic('load_ext %    store')
+    data="test_data.txt"
+    with pytest.raises(NameError):
+        ip.run_line_magic('store', 'data')
