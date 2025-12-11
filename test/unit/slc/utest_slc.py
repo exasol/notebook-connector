@@ -5,12 +5,11 @@ import textwrap
 from collections.abc import Generator
 from inspect import cleandoc
 from pathlib import Path
-from typing import Callable
-
 from test.unit.slc.util import (
     SlcSecretsMock,
     not_raises,
 )
+from typing import Callable
 from unittest.mock import (
     Mock,
     create_autospec,
@@ -28,7 +27,10 @@ from exasol.nb_connector.slc import (
     script_language_container,
     workspace,
 )
-from exasol.nb_connector.slc.script_language_container import ScriptLanguageContainer, PipPackageDefinition
+from exasol.nb_connector.slc.script_language_container import (
+    PipPackageDefinition,
+    ScriptLanguageContainer,
+)
 from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
     SlcFlavor,
@@ -89,6 +91,7 @@ class SlcFactory:
 def slc_factory_create(tmp_path, git_repo_mock):
     return SlcFactory(tmp_path, git_repo_mock, ScriptLanguageContainer.create)
 
+
 @pytest.fixture
 def slc_factory_create_or_open(tmp_path, git_repo_mock):
     return SlcFactory(tmp_path, git_repo_mock, ScriptLanguageContainer.create_or_open)
@@ -97,13 +100,12 @@ def slc_factory_create_or_open(tmp_path, git_repo_mock):
 def _validate_slc(flavor_name, sample_slc_name, slc, path):
     assert slc.language_alias == f"custom_slc_{sample_slc_name}"
     assert slc.secrets.SLC_FLAVOR_CUDA == flavor_name
-    checkout_dir = (
-            path / constants.WORKSPACE_DIR / sample_slc_name / "git-clone"
-    )
+    checkout_dir = path / constants.WORKSPACE_DIR / sample_slc_name / "git-clone"
     assert slc.checkout_dir == checkout_dir
     assert slc.flavor_path.is_dir()
     assert (
-            slc.flavor_path == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor_name
+        slc.flavor_path
+        == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor_name
     )
     assert slc.custom_pip_file.parts[-3:] == (
         "flavor_customization",
@@ -117,7 +119,12 @@ def _validate_slc(flavor_name, sample_slc_name, slc, path):
 def slc_factory_create_select_method(request, tmp_path, git_repo_mock):
     return SlcFactory(tmp_path, git_repo_mock, request.param)
 
-@pytest.mark.parametrize("slc_factory_create_select_method", [ScriptLanguageContainer.create, ScriptLanguageContainer.create_or_open], indirect=True)
+
+@pytest.mark.parametrize(
+    "slc_factory_create_select_method",
+    [ScriptLanguageContainer.create, ScriptLanguageContainer.create_or_open],
+    indirect=True,
+)
 def test_create(
     sample_slc_name,
     caplog,
@@ -131,12 +138,13 @@ def test_create(
     assert "Cloning into" in caplog.text
     assert "Fetching submodules" in caplog.text
 
-    _validate_slc(flavor, sample_slc_name, testee, slc_factory_create_select_method.path)
-
+    _validate_slc(
+        flavor, sample_slc_name, testee, slc_factory_create_select_method.path
+    )
 
 
 def test_repo_missing(sample_slc_name):
-    secrets = SlcSecretsMock.create(sample_slc_name, 'aflavor')
+    secrets = SlcSecretsMock.create(sample_slc_name, "aflavor")
     with pytest.raises(SlcError, match="SLC Git repository not checked out"):
         ScriptLanguageContainer(secrets, sample_slc_name)
 
@@ -455,7 +463,10 @@ def test_list_available_flavors(requests_get_mock):
     ]
     assert available_flavors == expected_flavors
 
-def test_slc_create_or_open_exists_in_secret_store(caplog, sample_slc_name, git_repo_mock, tmp_path):
+
+def test_slc_create_or_open_exists_in_secret_store(
+    caplog, sample_slc_name, git_repo_mock, tmp_path
+):
     flavor_name = "Strawberry"
     flavor = SlcFlavor(sample_slc_name)
     secrets = SlcSecretsMock(sample_slc_name)
@@ -464,7 +475,9 @@ def test_slc_create_or_open_exists_in_secret_store(caplog, sample_slc_name, git_
 
     with current_directory(tmp_path):
         with caplog.at_level(logging.INFO):
-            slc = ScriptLanguageContainer.create_or_open(secrets, sample_slc_name, flavor_name)
+            slc = ScriptLanguageContainer.create_or_open(
+                secrets, sample_slc_name, flavor_name
+            )
 
             assert "Fetching submodules" in caplog.text
             assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
@@ -475,7 +488,9 @@ def test_slc_create_or_open_exists_in_secret_store(caplog, sample_slc_name, git_
 
             _validate_slc(flavor_name, sample_slc_name, slc, tmp_path)
 
-def test_slc_create_or_open_workspace_exists(sample_slc_name,
+
+def test_slc_create_or_open_workspace_exists(
+    sample_slc_name,
     caplog,
     slc_factory_create,
     git_repo_mock,
@@ -491,21 +506,26 @@ def test_slc_create_or_open_workspace_exists(sample_slc_name,
         assert f"Secure Configuration Storage already contains a compression strategy for SLC name {sample_slc_name}."
         assert f"Directory '{testee.checkout_dir}' is not empty. Skipping checkout...."
 
-
         _validate_slc(flavor, sample_slc_name, testee, slc_factory_create.path)
 
+
 def write_package_file(file_path: Path, trailing_newline: bool):
-    content = textwrap.dedent("""
+    content = textwrap.dedent(
+        """
     package_a|v1.2.3
     package_b|v4.5.6
     package_c|v5.6.7
-    """).lstrip('\n')
+    """
+    ).lstrip("\n")
     if not trailing_newline:
-        content = content.rstrip('\n')
+        content = content.rstrip("\n")
     file_path.parent.mkdir(parents=True, exist_ok=True)
     file_path.write_text(content)
 
-@pytest.fixture(params=[True, False], ids=["with_trailing_newline", "without_trailing_newline"])
+
+@pytest.fixture(
+    params=[True, False], ids=["with_trailing_newline", "without_trailing_newline"]
+)
 def slc_with_packages(request, sample_slc_name, slc_factory_create):
     flavor = "Strawberry"
     with slc_factory_create.context(sample_slc_name, flavor) as testee:
@@ -513,28 +533,46 @@ def slc_with_packages(request, sample_slc_name, slc_factory_create):
         write_package_file(testee.custom_conda_file, request.param)
         yield testee
 
+
 def test_add_new_pip_package(slc_with_packages):
-    slc_with_packages.append_custom_pip_packages([PipPackageDefinition("package_d", "v10.0")])
-    expected_content = textwrap.dedent("""
+    slc_with_packages.append_custom_pip_packages(
+        [PipPackageDefinition("package_d", "v10.0")]
+    )
+    expected_content = textwrap.dedent(
+        """
     package_a|v1.2.3
     package_b|v4.5.6
     package_c|v5.6.7
     package_d|v10.0
-    """).lstrip('\n')
+    """
+    ).lstrip("\n")
     assert slc_with_packages.custom_pip_file.read_text() == expected_content
 
 
 def test_add_existing_pip_package_same_version(caplog, slc_with_packages):
     with caplog.at_level(logging.INFO):
-        slc_with_packages.append_custom_pip_packages([PipPackageDefinition("package_a", "v1.2.3")])
-        expected_content = textwrap.dedent("""
+        slc_with_packages.append_custom_pip_packages(
+            [PipPackageDefinition("package_a", "v1.2.3")]
+        )
+        expected_content = textwrap.dedent(
+            """
         package_a|v1.2.3
         package_b|v4.5.6
         package_c|v5.6.7
-        """)
-        assert slc_with_packages.custom_pip_file.read_text().strip() == expected_content.strip()
-        assert "Package already exists: PipPackageDefinition(pkg='package_a', version='v1.2.3')" in caplog.text
+        """
+        )
+        assert (
+            slc_with_packages.custom_pip_file.read_text().strip()
+            == expected_content.strip()
+        )
+        assert (
+            "Package already exists: PipPackageDefinition(pkg='package_a', version='v1.2.3')"
+            in caplog.text
+        )
+
 
 def test_add_existing_pip_package_different_version(caplog, slc_with_packages):
     with pytest.raises(SlcError, match=r"Package already exists"):
-        slc_with_packages.append_custom_pip_packages([PipPackageDefinition("package_a", "v9.9.9")])
+        slc_with_packages.append_custom_pip_packages(
+            [PipPackageDefinition("package_a", "v9.9.9")]
+        )

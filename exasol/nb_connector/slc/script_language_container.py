@@ -7,7 +7,10 @@ from os import write
 from pathlib import (
     Path,
 )
-from typing import Any, Type
+from typing import (
+    Any,
+    Type,
+)
 
 import requests
 from exasol.slc import api as exaslct_api
@@ -43,24 +46,29 @@ def _verify_name(slc_name: str) -> None:
             f' regular expression "{NAME_PATTERN}".'
         )
 
-def _read_packages(file_path: Path, package_definition: Type) -> list:
+
+def _read_packages(file_path: Path, package_definition: type) -> list:
     packages = []
-    with file_path.open('r', encoding='utf-8') as f:
+    with file_path.open("r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
-            if not line or line.startswith('#'):
+            if not line or line.startswith("#"):
                 continue  # skip empty or commented lines
             # Take everything before the '|' as package name
-            package, version = line.split('|', 1)
+            package, version = line.split("|", 1)
             packages.append(package_definition(package, version))
     return packages
 
+
 def _ends_with_newline(file_path: Path) -> bool:
     content = file_path.read_text()
-    return content.endswith('\n')
+    return content.endswith("\n")
+
 
 def _append_packages(
-    file_path: Path,  package_definition: Type, packages: list[PipPackageDefinition] | list[CondaPackageDefinition]
+    file_path: Path,
+    package_definition: type,
+    packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
 ):
     """
     Appends packages to the custom packages file.
@@ -75,7 +83,10 @@ def _append_packages(
                 if package.version == original_package.version:
                     logging.warning("Package already exists: %s", original_package)
                 else:
-                    raise SlcError("Package already exists: %s but with different version", original_package)
+                    raise SlcError(
+                        "Package already exists: %s but with different version",
+                        original_package,
+                    )
         if add_package:
             filtered_packages.append(package)
     ends_with_newline = _ends_with_newline(file_path)
@@ -172,7 +183,8 @@ class ScriptLanguageContainer:
         if slc_flavor.exists(secrets):
             logging.info(
                 "Secure Configuration Storage already contains a"
-                f" flavor for SLC name %s.", name
+                f" flavor for SLC name %s.",
+                name,
             )
         else:
             slc_flavor.save(secrets, flavor)
