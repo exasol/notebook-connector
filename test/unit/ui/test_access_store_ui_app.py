@@ -1,3 +1,6 @@
+"""
+Test module for access_store_ui_app.py
+"""
 import importlib
 import shutil
 import subprocess
