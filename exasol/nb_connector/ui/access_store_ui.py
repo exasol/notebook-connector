@@ -25,10 +25,10 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
     ipython = get_ipython()
 
     # Added this if condition just to enable testing
-    # if ipython and hasattr(ipython, "run_line_magic"):
-    ipython.run_line_magic(
-        "store", "-r"
-    )  # reloads variables in the IPython user namespace persistence mechanism.
+    if ipython and hasattr(ipython, "run_line_magic"):
+        ipython.run_line_magic(
+            "store", "-r"
+        )  # reloads variables in the IPython user namespace persistence mechanism.
 
     if "sb_store_file" in globals():
         # pylint: disable=undefined-variable
