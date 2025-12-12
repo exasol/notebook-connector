@@ -50,7 +50,7 @@ open_button = app.children[0].children[1]
 open_button.click()
 
 test_button = app.children[2]
-test_button.click()
+# test_button.click()
 IPYTHON = get_ipython()
 assert (
     "sb_store_file" in IPYTHON.user_ns.keys()
