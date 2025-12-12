@@ -24,6 +24,8 @@ def read_store_magic(btn):
     ipython = get_ipython()
     user_ns = ipython.user_ns
     try:
+        user_ns["sb_store_file"] = None
+        ipython.run_line_magic("reload_ext", "storemagic")
         ipython.run_line_magic("store", "-r")
         value = user_ns.get("sb_store_file", None)  # Safely get the value
         if value is not None:
