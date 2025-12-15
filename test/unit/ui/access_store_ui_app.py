@@ -27,7 +27,7 @@ def read_store_magic(btn):
     user_ns = ipython.user_ns
     try:
         ipython.run_line_magic("store", "-r")
-        value = user_ns.get("sb_store_file", None)  # Safely get the value
+        value = globals().get("sb_store_file")
         if value is not None:
             test_text.value = value
             print("sb_store_file:", value)
