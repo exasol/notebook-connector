@@ -63,17 +63,12 @@ def _ends_with_newline(file_path: Path) -> bool:
     return content.endswith("\n")
 
 
-def _append_packages(
-    file_path: Path,
-    package_definition: type,
-    packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-):
-    """
-    Appends packages to the custom packages file.
-    """
-    original_packages = _read_packages(file_path, package_definition)
+def _filter_packages(
+    original_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
+    new_packages: list[PipPackageDefinition],
+) -> list[PipPackageDefinition]:
     filtered_packages = []
-    for package in packages:
+    for package in new_packages:
         add_package = True
         for original_package in original_packages:
             if package.pkg == original_package.pkg:
@@ -87,6 +82,19 @@ def _append_packages(
                     )
         if add_package:
             filtered_packages.append(package)
+    return filtered_packages
+
+
+def _append_packages(
+    file_path: Path,
+    package_definition: type,
+    packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
+):
+    """
+    Appends packages to the custom packages file.
+    """
+    original_packages = _read_packages(file_path, package_definition)
+    filtered_packages = _filter_packages(original_packages, packages)
     ends_with_newline = _ends_with_newline(file_path)
     if filtered_packages:
         with open(file_path, "a") as f:
@@ -181,7 +189,7 @@ class ScriptLanguageContainer:
         if slc_flavor.exists(secrets):
             logging.info(
                 "Secure Configuration Storage already contains a"
-                f" flavor for SLC name %s.",
+                " flavor for SLC name %s.",
                 name,
             )
         else:
