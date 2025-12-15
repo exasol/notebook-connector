@@ -6,9 +6,8 @@ import os
 import shutil
 from pathlib import Path
 
-from git import Repo
-
 from exasol.nb_connector.slc import constants
+from exasol.nb_connector.slc.git_access import GitAccessIf
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.INFO)
@@ -29,12 +28,13 @@ def current_directory(dir: Path):
 
 
 class Workspace:
-    def __init__(self, root_dir: Path):
+    def __init__(self, root_dir: Path, git_access: GitAccessIf):
         self.root_dir = root_dir
+        self._git_access = git_access
 
     @classmethod
-    def for_slc(cls, name: str) -> Workspace:
-        return cls(Path.cwd() / constants.WORKSPACE_DIR / name)
+    def for_slc(cls, name: str, git_access: GitAccessIf) -> Workspace:
+        return cls(Path.cwd() / constants.WORKSPACE_DIR / name, git_access)
 
     def clone_slc_repo(self):
         """
@@ -43,18 +43,20 @@ class Workspace:
         """
         path = self.git_clone_path
         if path.is_dir():
-            LOG.warning(f"Directory '{path}' is not empty. Skipping checkout....")
-            return
+            LOG.warning(f"Directory '{path}' is not empty. Checking consistency...")
+            try:
+                self._git_access.checkout_recursively(path)
+                return
+            except Exception as e:
+                LOG.warning(
+                    f"Git repository is inconsistent: {e}. Doing a fresh clone..."
+                )
+                shutil.rmtree(path)
 
         path.mkdir(parents=True, exist_ok=True)
-        LOG.info(f"Cloning into {path}...")
-        repo = Repo.clone_from(
-            "https://github.com/exasol/script-languages-release",
-            path,
-            branch=constants.SLC_RELEASE_TAG,
+        self._git_access.clone_from_recursively(
+            constants.SLC_GITHUB_REPO, path, constants.SLC_RELEASE_TAG
         )
-        LOG.info("Fetching submodules...")
-        repo.submodule_update(recursive=True)
 
     @property
     def git_clone_path(self) -> Path:

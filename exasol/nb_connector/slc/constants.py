@@ -23,3 +23,8 @@ Check the developer guide (./doc/developer-guide.md) for more information.
 """
 
 WORKSPACE_DIR = "slc_workspace"
+
+SLC_GITHUB_REPO = "https://github.com/exasol/script-languages-release"
+"""
+Github URL which is used as base for the Script-Languages-Container.
+"""

@@ -20,6 +20,10 @@ from exasol_integration_test_docker_environment.lib.docker import (
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
+from exasol.nb_connector.slc.git_access import (
+    GitAccess,
+    GitAccessIf,
+)
 from exasol.nb_connector.slc.slc_compression_strategy import SlcCompressionStrategy
 from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
@@ -122,22 +126,18 @@ class ScriptLanguageContainer:
     constants.SLC_RELEASE_TAG.
     """
 
-    GITHUB_URL = f"https://github.com/exasol/script-languages-release/releases/tag/{constants.SLC_RELEASE_TAG}"
-    """
-    Hyperlink to the GitHub tag which is being used.
-    """
-
     def __init__(
         self,
         secrets: Secrets,
         name: str,
+        git_access: GitAccessIf = GitAccess(),
     ):
         self.secrets = secrets
         self.name = name
         _verify_name(name)
         self.flavor = SlcFlavor(name).verify(secrets)
         self.compression_strategy = SlcCompressionStrategy(name).verify(secrets)
-        self.workspace = Workspace.for_slc(name)
+        self.workspace = Workspace.for_slc(name, git_access)
         if not self.checkout_dir.is_dir():
             raise SlcError(
                 f"SLC Git repository not checked out to {self.checkout_dir}."
@@ -156,6 +156,7 @@ class ScriptLanguageContainer:
         name: str,
         flavor: str,
         compression_strategy: CompressionStrategy = CompressionStrategy.GZIP,
+        git_access: GitAccessIf = GitAccess(),
     ) -> ScriptLanguageContainer:
         _verify_name(name)
         slc_flavor = SlcFlavor(name)
@@ -172,9 +173,9 @@ class ScriptLanguageContainer:
             )
         slc_flavor.save(secrets, flavor)
         slc_compression_strategy.save(secrets, compression_strategy)
-        workspace = Workspace.for_slc(name)
+        workspace = Workspace.for_slc(name, git_access)
         workspace.clone_slc_repo()
-        return cls(secrets=secrets, name=name)
+        return cls(secrets=secrets, name=name, git_access=git_access)
 
     @classmethod
     def create_or_open(
@@ -183,6 +184,7 @@ class ScriptLanguageContainer:
         name: str,
         flavor: str,
         compression_strategy: CompressionStrategy = CompressionStrategy.GZIP,
+        git_access: GitAccessIf = GitAccess(),
     ) -> ScriptLanguageContainer:
         _verify_name(name)
         slc_flavor = SlcFlavor(name)
@@ -203,9 +205,9 @@ class ScriptLanguageContainer:
             )
         else:
             slc_compression_strategy.save(secrets, compression_strategy)
-        workspace = Workspace.for_slc(name)
+        workspace = Workspace.for_slc(name, git_access)
         workspace.clone_slc_repo()
-        return cls(secrets=secrets, name=name)
+        return cls(secrets=secrets, name=name, git_access=git_access)
 
     @property
     def language_alias(self) -> str:

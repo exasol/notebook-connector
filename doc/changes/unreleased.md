@@ -9,3 +9,4 @@
 ## Refactoring
 
 * #314: Added more robust for class ScriptLanguageContainer
+* #316: Implemented consistency check for workspace in ScriptLanguageContainer.create()
