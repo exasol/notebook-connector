@@ -35,11 +35,10 @@ def test_ipywidgets_update_global_state():
     confirms that the global state does not update before the button is clicked,
     and then checks that clicking the button updates the global state as expected.
     """
-    import ipywidgets as widgets
 
     global_state = {"username": ""}
-    textbox = widgets.Text()
-    button = widgets.Button(description="Submit")
+    textbox = ipywidgets.Text()
+    button = ipywidgets.Button(description="Submit")
 
     def on_click(b):
         global_state["username"] = textbox.value

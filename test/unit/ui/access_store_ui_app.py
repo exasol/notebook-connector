@@ -9,6 +9,8 @@ from IPython import get_ipython
 
 from exasol.nb_connector.ui import access_store_ui
 
+# pylint: disable=undefined-variable
+global sb_store_file
 DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
 
 ui = access_store_ui.get_access_store_ui()
@@ -24,8 +26,6 @@ def read_store_magic(btn):
     ipython = get_ipython()
     user_ns = ipython.user_ns
     try:
-        user_ns["sb_store_file"] = None
-        ipython.run_line_magic("reload_ext", "storemagic")
         ipython.run_line_magic("store", "-r")
         value = user_ns.get("sb_store_file", None)  # Safely get the value
         if value is not None:
