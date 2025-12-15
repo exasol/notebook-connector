@@ -55,4 +55,4 @@ IPYTHON = get_ipython()
 assert (
     "sb_store_file" in globals()
 ), "sb_store_file was not set by test code!"
-assert IPYTHON.user_ns["sb_store_file"] == DEFAULT_FILE_NAME
+assert globals()["sb_store_file"] == DEFAULT_FILE_NAME
