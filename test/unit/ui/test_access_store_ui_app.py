@@ -11,8 +11,6 @@ def test_store_magic_write(tmp_path, monkeypatch):
     """
     test for store magic write functionality
     """
-    # pylint: disable=undefined-variable
-    global sb_store_file
     # Copy the app file into tmp_path
     source_app = importlib.resources.files("test.unit.ui") / "access_store_ui_app.py"
     target_app = tmp_path / "access_store_ui_app.py"

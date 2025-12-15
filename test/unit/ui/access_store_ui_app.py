@@ -9,8 +9,6 @@ from IPython import get_ipython
 
 from exasol.nb_connector.ui import access_store_ui
 
-# pylint: disable=undefined-variable
-global sb_store_file
 DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
 
 ui = access_store_ui.get_access_store_ui()
