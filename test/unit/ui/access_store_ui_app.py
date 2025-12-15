@@ -9,6 +9,8 @@ from IPython import get_ipython
 
 from exasol.nb_connector.ui import access_store_ui
 
+# pylint: disable=undefined-variable
+global sb_store_file
 DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
 
 ui = access_store_ui.get_access_store_ui()
@@ -21,11 +23,12 @@ def read_store_magic(btn):
     """
     Called when a test_button is clicked to fetch the sb_store_file from store magic
     """
+    global sb_store_file
     ipython = get_ipython()
     user_ns = ipython.user_ns
     try:
         ipython.run_line_magic("store", "-r")
-        value = globals().get("sb_store_file")
+        value = user_ns.get("sb_store_file", None)  # Safely get the value
         if value is not None:
             test_text.value = value
             print("sb_store_file:", value)
@@ -50,5 +53,7 @@ open_button.click()
 test_button = app.children[2]
 # test_button.click()
 IPYTHON = get_ipython()
-assert "sb_store_file" in globals(), "sb_store_file was not set by test code!"
-assert globals()["sb_store_file"] == DEFAULT_FILE_NAME
+assert (
+    "sb_store_file" in IPYTHON.user_ns.keys()
+), "sb_store_file was not set by test code!"
+assert IPYTHON.user_ns["sb_store_file"] == DEFAULT_FILE_NAME
