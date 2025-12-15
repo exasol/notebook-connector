@@ -65,8 +65,8 @@ def _ends_with_newline(file_path: Path) -> bool:
 
 def _filter_packages(
     original_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-    new_packages: list[PipPackageDefinition],
-) -> list[PipPackageDefinition]:
+    new_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
+) -> list[PipPackageDefinition | CondaPackageDefinition]:
     filtered_packages = []
     for package in new_packages:
         add_package = True
