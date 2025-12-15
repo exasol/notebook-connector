@@ -1,4 +1,5 @@
 import os
+import shutil
 import textwrap
 from collections.abc import Iterator
 from pathlib import Path
@@ -323,3 +324,32 @@ def test_clean_export(
     sample_slc.workspace.cleanup_export_path()
     assert not export_path_exists(sample_slc)
     assert export_path_exists(other_slc)
+
+
+@pytest.fixture()
+def temp_cwd_func(tmp_path: Path):
+    old_cwd = Path.cwd()
+    with TemporaryDirectory() as tmpdir:
+        new_cwd = Path(tmpdir)
+        os.chdir(new_cwd)
+        yield new_cwd
+    os.chdir(old_cwd)
+
+
+def test_fresh_clone_if_repo_is_corrupt(
+    temp_cwd_func,
+    secrets_module: Secrets,
+    default_flavor: str,
+    compression_strategy: CompressionStrategy,
+):
+    slc_name = "slc_corrupt_repo"
+    slc = create_slc(secrets_module, slc_name, default_flavor, compression_strategy)
+
+    repo_path = slc.workspace.git_clone_path
+    marker_file = repo_path / "marker_file"
+    marker_file.write_text("marker")
+    shutil.move(repo_path / ".git", repo_path / ".git_")
+
+    ScriptLanguageContainer.create_or_open(secrets_module, slc_name, default_flavor)
+
+    assert not marker_file.exists()
