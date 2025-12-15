@@ -47,7 +47,7 @@ open_button = app.children[0].children[1]
 open_button.click()
 
 test_button = app.children[2]
-# test_button.click()
+test_button.click()
 IPYTHON = get_ipython()
 assert "sb_store_file" in globals(), "sb_store_file was not set by test code!"
 assert globals()["sb_store_file"] == sb_store_file
