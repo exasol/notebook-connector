@@ -9,7 +9,7 @@ from IPython import get_ipython
 
 from exasol.nb_connector.ui import access_store_ui
 
-DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
+sb_store_file = "ai_lab_secure_configuration_storage.sqlite"
 
 ui = access_store_ui.get_access_store_ui()
 
@@ -50,4 +50,4 @@ test_button = app.children[2]
 # test_button.click()
 IPYTHON = get_ipython()
 assert "sb_store_file" in globals(), "sb_store_file was not set by test code!"
-assert globals()["sb_store_file"] == DEFAULT_FILE_NAME
+assert globals()["sb_store_file"] == sb_store_file
