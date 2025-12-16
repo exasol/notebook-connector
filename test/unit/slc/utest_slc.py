@@ -623,12 +623,12 @@ def test_restore_pip_package_file(sample_slc_name, slc_factory_create, git_acces
             slc.restore_custom_pip_file()
             assert git_access.checkout_file.mock_calls == [
                 mock.call(
-                    slc.workspace.git_clone_path,
+                    slc.workspace.git_clone_path / "script-languages",
                     Path("flavors")
                     / flavor
                     / "flavor_customization"
                     / "packages"
-                    / "pip_packages",
+                    / "python3_pip_packages",
                 )
             ]
 
@@ -642,7 +642,7 @@ def test_restore_conda_package_file(
             slc.restore_custom_conda_file()
             assert git_access.checkout_file.mock_calls == [
                 mock.call(
-                    slc.workspace.git_clone_path,
+                    slc.workspace.git_clone_path / "script-languages",
                     Path("flavors")
                     / flavor
                     / "flavor_customization"
