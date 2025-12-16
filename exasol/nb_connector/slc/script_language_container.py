@@ -335,9 +335,9 @@ class ScriptLanguageContainer:
                 "Secure Configuration Storage does not contains an activation key."
             ) from ex
 
-    def rebuild_activation_key(self, add_to_secret_store: bool) -> str:
+    def regenerate_activation_key(self, add_to_secret_store: bool) -> str:
         """
-        Rebuilds the language activation string for the uploaded script-language-container.
+        Generates the language activation string for the uploaded script-language-container.
         Can be used in `ALTER SESSION` or `ALTER_SYSTEM` SQL commands to activate
         the language of the uploaded script-language-container.
         This method can be used as fallback if the deploy-function failed for some reason,

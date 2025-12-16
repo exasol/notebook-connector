@@ -187,7 +187,7 @@ def test_deploy_cert_fails(
 def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
-    assert sample_slc.rebuild_activation_key(False) == sample_slc.secrets.get(
+    assert sample_slc.regenerate_activation_key(False) == sample_slc.secrets.get(
         sample_slc._alias_key
     )
 
