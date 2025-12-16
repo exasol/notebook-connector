@@ -22,10 +22,10 @@ test_btn.on_click(read_store_magic)
 items = [ui, test_text, test_btn]
 app = ipywidgets.Box(items)
 
-password = app.children[0].children[0].children[2].children[1]
+password = ui.children[0].children[2].children[1]
 password.value = "password"
 
-open_button = app.children[0].children[1]
+open_button = ui.children[1]
 open_button.click()
 
 ipython = get_ipython()
