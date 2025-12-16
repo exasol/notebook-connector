@@ -13,8 +13,6 @@ sb_store_file = "ai_lab_secure_configuration_storage.sqlite"
 
 ui = access_store_ui.get_access_store_ui()
 
-test_text = ipywidgets.Text(value="init")
-test_btn = ipywidgets.Button(description="Test")
 
 
 def read_store_magic(btn):
