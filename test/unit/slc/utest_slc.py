@@ -1,6 +1,5 @@
 import contextlib
 import logging
-import shutil
 import textwrap
 from collections.abc import Generator
 from pathlib import Path
@@ -21,6 +20,7 @@ import requests
 from _pytest.monkeypatch import MonkeyPatch
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.slc import (
     constants,
     script_language_container,
@@ -48,7 +48,14 @@ def git_access_mock(monkeypatch: MonkeyPatch):
     @contextlib.contextmanager
     def context(flavor: str):
         def create_dir(url: str, dir: Path, branch: str):
-            (dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor).mkdir(parents=True)
+            flavor_base_path = (
+                dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor / "flavor_base"
+            )
+            flavor_base_path.mkdir(parents=True)
+            language_definition = flavor_base_path / "language_definition"
+            language_definition.write_text(
+                "PYTHON3=localzmq+protobuf:///{{ bucketfs_name }}/{{ bucket_name }}/{{ path_in_bucket }}{{ release_name }}?lang=python#buckets/{{ bucketfs_name }}/{{ bucket_name }}/{{ path_in_bucket }}{{ release_name }}/exaudf/exaudfclient"
+            )
             return Mock()
 
         mock = create_autospec(GitAccess)
@@ -613,3 +620,21 @@ def test_make_fresh_clone_if_repo_is_corrupt(
             f"Git repository is inconsistent: something went wrong. Doing a fresh clone..."
             in caplog.text
         )
+
+
+@pytest.mark.parametrize("add_to_secret_store", [True, False])
+def test_language_definition(add_to_secret_store, sample_slc_name, slc_factory_create):
+    flavor = "Strawberry"
+
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        slc.secrets.save(CKey.bfs_service, "test_bfs")
+        slc.secrets.save(CKey.bfs_bucket, "test_bucket")
+        language_definition = slc.language_definition(add_to_secret_store)
+        assert (
+            language_definition
+            == "custom_slc_CUDA=localzmq+protobuf:///test_bfs/test_bfs/container/custom_slc_CUDA?lang=python#buckets/test_bfs/test_bfs/container/custom_slc_CUDA/exaudf/exaudfclient"
+        )
+        if add_to_secret_store:
+            assert slc.secrets.get(slc._alias_key) == language_definition
+        else:
+            assert slc.secrets.get(slc._alias_key) is None

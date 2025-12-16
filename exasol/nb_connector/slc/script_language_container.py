@@ -12,6 +12,9 @@ from typing import (
 
 import requests
 from exasol.slc import api as exaslct_api
+from exasol.slc.api.get_language_definition_builder import (
+    get_language_definition_builder,
+)
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import (
     ContextDockerClient,
@@ -267,11 +270,7 @@ class ScriptLanguageContainer:
                 compression_strategy=self.compression_strategy,
             )
 
-    def deploy(self):
-        """
-        Deploys the current script-languages-container to the database and
-        stores the activation string in the Secure Configuration Storage.
-        """
+    def _generate_bfs_params_from_secret_store(self):
         bfs_params: dict[str, Any] = {
             k: self.secrets.get(v)
             for k, v in [
@@ -283,6 +282,7 @@ class ScriptLanguageContainer:
                 ("bucket", CKey.bfs_bucket),
             ]
         }
+
         bucketfs_use_https = optional_str_to_bool(self.secrets.get(CKey.bfs_encryption))
         if bucketfs_use_https is not None:
             bfs_params["bucketfs_use_https"] = bucketfs_use_https
@@ -292,6 +292,14 @@ class ScriptLanguageContainer:
         ssl_cert_path = self.secrets.get(CKey.trusted_ca)
         if ssl_cert_path is not None:
             bfs_params["ssl_cert_path"] = ssl_cert_path
+        return bfs_params
+
+    def deploy(self):
+        """
+        Deploys the current script-languages-container to the database and
+        stores the activation string in the Secure Configuration Storage.
+        """
+        bfs_params = self._generate_bfs_params_from_secret_store()
 
         with current_directory(self.checkout_dir):
             result = exaslct_api.deploy(
@@ -308,6 +316,24 @@ class ScriptLanguageContainer:
             builder.add_custom_alias(components[0].alias, self.language_alias)
             lang_def = builder.generate_definition()
             self.secrets.save(self._alias_key, lang_def)
+
+    def language_definition(self, add_to_secret_store: bool) -> str:
+        bfs_params = self._generate_bfs_params_from_secret_store()
+
+        with current_directory(self.checkout_dir):
+            builder = get_language_definition_builder(
+                flavor_path=str(self._flavor_path_rel),
+                bucketfs_name=bfs_params["bucketfs_name"],
+                bucket_name=bfs_params["bucketfs_name"],
+                path_in_bucket=constants.PATH_IN_BUCKET,
+                container_name=self.language_alias,
+            )
+            components = builder.generate_definition_components()
+            builder.add_custom_alias(components[0].alias, self.language_alias)
+            lang_def = builder.generate_definition()
+            if add_to_secret_store:
+                self.secrets.save(self._alias_key, lang_def)
+            return lang_def
 
     @property
     def _alias_key(self):
