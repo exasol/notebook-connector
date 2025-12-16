@@ -623,18 +623,20 @@ def test_make_fresh_clone_if_repo_is_corrupt(
 
 
 @pytest.mark.parametrize("add_to_secret_store", [True, False])
-def test_language_definition(add_to_secret_store, sample_slc_name, slc_factory_create):
+def test_rebuild_activation_key(
+    add_to_secret_store, sample_slc_name, slc_factory_create
+):
     flavor = "Strawberry"
 
     with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
         slc.secrets.save(CKey.bfs_service, "test_bfs")
         slc.secrets.save(CKey.bfs_bucket, "test_bucket")
-        language_definition = slc.language_definition(add_to_secret_store)
+        language_activation = slc.rebuild_activation_key(add_to_secret_store)
         assert (
-            language_definition
+            language_activation
             == "custom_slc_CUDA=localzmq+protobuf:///test_bfs/test_bucket/container/Strawberry-release-custom_slc_CUDA?lang=python#buckets/test_bfs/test_bucket/container/Strawberry-release-custom_slc_CUDA/exaudf/exaudfclient"
         )
         if add_to_secret_store:
-            assert slc.secrets.get(slc._alias_key) == language_definition
+            assert slc.secrets.get(slc._alias_key) == language_activation
         else:
             assert slc.secrets.get(slc._alias_key) is None

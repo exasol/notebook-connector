@@ -317,24 +317,6 @@ class ScriptLanguageContainer:
             lang_def = builder.generate_definition()
             self.secrets.save(self._alias_key, lang_def)
 
-    def language_definition(self, add_to_secret_store: bool) -> str:
-        bfs_params = self._generate_bfs_params_from_secret_store()
-
-        with current_directory(self.checkout_dir):
-            builder = get_language_definition_builder(
-                flavor_path=str(self._flavor_path_rel),
-                bucketfs_name=bfs_params["bucketfs_name"],
-                bucket_name=bfs_params["bucket"],
-                path_in_bucket=constants.PATH_IN_BUCKET,
-                container_name=f"{self.flavor}-release-{self.language_alias}",  # Currently this can't be retrieved from exaslct. Need to use a hard coded value here.
-            )
-            components = builder.generate_definition_components()
-            builder.add_custom_alias(components[0].alias, self.language_alias)
-            lang_def = builder.generate_definition()
-            if add_to_secret_store:
-                self.secrets.save(self._alias_key, lang_def)
-            return lang_def
-
     @property
     def _alias_key(self):
         return constants.SLC_ACTIVATION_KEY_PREFIX + self.language_alias
@@ -352,6 +334,31 @@ class ScriptLanguageContainer:
             raise SlcError(
                 "Secure Configuration Storage does not contains an activation key."
             ) from ex
+
+    def rebuild_activation_key(self, add_to_secret_store: bool) -> str:
+        """
+        Rebuilds the language activation string for the uploaded script-language-container.
+        Can be used in `ALTER SESSION` or `ALTER_SYSTEM` SQL commands to activate
+        the language of the uploaded script-language-container.
+        This method can be used as fallback if the deploy-function failed for some reason,
+        but the script-language-container was uploaded to the BucketFS.
+        """
+        bfs_params = self._generate_bfs_params_from_secret_store()
+
+        with current_directory(self.checkout_dir):
+            builder = get_language_definition_builder(
+                flavor_path=str(self._flavor_path_rel),
+                bucketfs_name=bfs_params["bucketfs_name"],
+                bucket_name=bfs_params["bucket"],
+                path_in_bucket=constants.PATH_IN_BUCKET,
+                container_name=f"{self.flavor}-release-{self.language_alias}",  # Currently this can't be retrieved from exaslct. Need to use a hard coded value here.
+            )
+            components = builder.generate_definition_components()
+            builder.add_custom_alias(components[0].alias, self.language_alias)
+            lang_def = builder.generate_definition()
+            if add_to_secret_store:
+                self.secrets.save(self._alias_key, lang_def)
+            return lang_def
 
     def append_custom_pip_packages(self, pip_packages: list[PipPackageDefinition]):
         """
