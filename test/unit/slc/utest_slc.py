@@ -632,7 +632,7 @@ def test_language_definition(add_to_secret_store, sample_slc_name, slc_factory_c
         language_definition = slc.language_definition(add_to_secret_store)
         assert (
             language_definition
-            == "custom_slc_CUDA=localzmq+protobuf:///test_bfs/test_bfs/container/custom_slc_CUDA?lang=python#buckets/test_bfs/test_bfs/container/custom_slc_CUDA/exaudf/exaudfclient"
+            == "custom_slc_CUDA=localzmq+protobuf:///test_bfs/test_bucket/container/Strawberry-release-custom_slc_CUDA?lang=python#buckets/test_bfs/test_bucket/container/Strawberry-release-custom_slc_CUDA/exaudf/exaudfclient"
         )
         if add_to_secret_store:
             assert slc.secrets.get(slc._alias_key) == language_definition

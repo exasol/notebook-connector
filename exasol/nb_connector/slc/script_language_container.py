@@ -324,9 +324,9 @@ class ScriptLanguageContainer:
             builder = get_language_definition_builder(
                 flavor_path=str(self._flavor_path_rel),
                 bucketfs_name=bfs_params["bucketfs_name"],
-                bucket_name=bfs_params["bucketfs_name"],
+                bucket_name=bfs_params["bucket"],
                 path_in_bucket=constants.PATH_IN_BUCKET,
-                container_name=self.language_alias,
+                container_name=f"{self.flavor}-release-{self.language_alias}",  # Currently this can't be retrieved from exaslct. Need to use a hard coded value here.
             )
             components = builder.generate_definition_components()
             builder.add_custom_alias(components[0].alias, self.language_alias)
