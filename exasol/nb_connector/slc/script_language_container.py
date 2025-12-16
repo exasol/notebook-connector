@@ -335,7 +335,7 @@ class ScriptLanguageContainer:
                 "Secure Configuration Storage does not contains an activation key."
             ) from ex
 
-    def regenerate_activation_key(self, add_to_secret_store: bool) -> str:
+    def generate_activation_key(self, add_to_secret_store: bool) -> str:
         """
         Generates the language activation string for the uploaded script-language-container.
         Can be used in `ALTER SESSION` or `ALTER_SYSTEM` SQL commands to activate
