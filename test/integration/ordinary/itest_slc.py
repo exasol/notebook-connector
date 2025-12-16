@@ -188,7 +188,7 @@ def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
     assert sample_slc.language_definition(False) == sample_slc.secrets.get(
-        sample_slc.secrets._alias_key
+        sample_slc._alias_key
     )
 
 
