@@ -15,9 +15,7 @@ def test_store_magic_write(tmp_path, monkeypatch):
     source_app = importlib.resources.files("test.unit.ui") / "access_store_ui_app.py"
     target_app = tmp_path / "access_store_ui_app.py"
     shutil.copyfile(source_app, target_app)
-    # change current dir to tmp_path
     monkeypatch.chdir(tmp_path)
-    # Name of the IPython file to run
     script_file = target_app
 
     # The command to execute: 'ipython' followed by the script file path

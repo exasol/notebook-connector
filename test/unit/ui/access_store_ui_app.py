@@ -2,9 +2,6 @@
 UI app for access store for testing only
 """
 
-import sys
-
-import ipywidgets
 from IPython import get_ipython
 
 from exasol.nb_connector.ui import access_store_ui
@@ -12,12 +9,6 @@ from exasol.nb_connector.ui import access_store_ui
 sb_store_file = "ai_lab_secure_configuration_storage.sqlite"
 
 ui = access_store_ui.get_access_store_ui()
-
-
-
-
-
-
 
 password = ui.children[0].children[2].children[1]
 password.value = "password"
