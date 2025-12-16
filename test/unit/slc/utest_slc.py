@@ -1,32 +1,32 @@
 import contextlib
-import json
 import logging
+import shutil
 import textwrap
 from collections.abc import Generator
-from inspect import cleandoc
 from pathlib import Path
 from test.unit.slc.util import (
     SlcSecretsMock,
     not_raises,
 )
-from typing import Callable
+from typing import (
+    Callable,
+)
 from unittest.mock import (
     Mock,
     create_autospec,
 )
 
-import git
 import pytest
 import requests
 from _pytest.monkeypatch import MonkeyPatch
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
-from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import (
     constants,
     script_language_container,
     workspace,
 )
+from exasol.nb_connector.slc.git_access import GitAccess
 from exasol.nb_connector.slc.script_language_container import (
     PipPackageDefinition,
     ScriptLanguageContainer,
@@ -44,24 +44,19 @@ def sample_slc_name() -> str:
 
 
 @pytest.fixture
-def git_repo_mock(monkeypatch: MonkeyPatch):
-    mock = create_autospec(git.Repo)
-    monkeypatch.setattr(workspace, "Repo", mock)
-    return mock
+def git_access_mock(monkeypatch: MonkeyPatch):
+    @contextlib.contextmanager
+    def context(flavor: str):
+        def create_dir(url: str, dir: Path, branch: str):
+            (dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor).mkdir(parents=True)
+            return Mock()
 
+        mock = create_autospec(GitAccess)
+        monkeypatch.setattr(workspace, "GitAccess", mock)
+        mock.clone_from_recursively.side_effect = create_dir
+        yield mock
 
-def simulate_clone(flavor: str):
-    """
-    This function can be set as side effect to method clone_from of the
-    git_repo_mock for simulating a successful checkout to the
-    ScriptLanguageContainer.
-    """
-
-    def create_dir(url: str, dir: Path, branch: str):
-        (dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor).mkdir(parents=True)
-        return Mock()
-
-    return create_dir
+    return context
 
 
 class SlcFactory:
@@ -70,31 +65,33 @@ class SlcFactory:
     a temporary directory and simulating the SLC Git repo to be cloned inside.
     """
 
-    def __init__(self, path: Path, git_repo_mock: Mock, creation_method: Callable):
+    def __init__(self, path: Path, creation_method: Callable, git_access_mock):
         self.path = path
-        self.git_repo_mock = git_repo_mock
         self.creation_method = creation_method
+        self.git_access_mock = git_access_mock
 
     @contextlib.contextmanager
-    def context(self, slc_name: str, flavor: str):
-        secrets = SlcSecretsMock(slc_name)
-        self.git_repo_mock.clone_from.side_effect = simulate_clone(flavor)
-        with current_directory(self.path):
-            yield self.creation_method(
-                secrets,
-                name=slc_name,
-                flavor=flavor,
-            )
+    def context(
+        self, slc_name: str, flavor: str
+    ) -> Generator[ScriptLanguageContainer, None, None]:
+        with self.git_access_mock(flavor):
+            secrets = SlcSecretsMock(slc_name)
+            with current_directory(self.path):
+                yield self.creation_method(
+                    secrets,
+                    name=slc_name,
+                    flavor=flavor,
+                )
 
 
 @pytest.fixture
-def slc_factory_create(tmp_path, git_repo_mock):
-    return SlcFactory(tmp_path, git_repo_mock, ScriptLanguageContainer.create)
+def slc_factory_create(tmp_path, git_access_mock):
+    return SlcFactory(tmp_path, ScriptLanguageContainer.create, git_access_mock)
 
 
 @pytest.fixture
-def slc_factory_create_or_open(tmp_path, git_repo_mock):
-    return SlcFactory(tmp_path, git_repo_mock, ScriptLanguageContainer.create_or_open)
+def slc_factory_create_or_open(tmp_path, git_access_mock):
+    return SlcFactory(tmp_path, ScriptLanguageContainer.create_or_open, git_access_mock)
 
 
 def _validate_slc(flavor_name, sample_slc_name, slc, path):
@@ -116,8 +113,8 @@ def _validate_slc(flavor_name, sample_slc_name, slc, path):
 
 
 @pytest.fixture
-def slc_factory_create_select_method(request, tmp_path, git_repo_mock):
-    return SlcFactory(tmp_path, git_repo_mock, request.param)
+def slc_factory_create_select_method(request, tmp_path, git_access_mock):
+    return SlcFactory(tmp_path, request.param, git_access_mock)
 
 
 @pytest.mark.parametrize(
@@ -133,10 +130,6 @@ def test_create(
     flavor = "Strawberry"
     with slc_factory_create_select_method.context(sample_slc_name, flavor) as testee:
         pass
-
-    assert slc_factory_create_select_method.git_repo_mock.clone_from.called
-    assert "Cloning into" in caplog.text
-    assert "Fetching submodules" in caplog.text
 
     _validate_slc(
         flavor, sample_slc_name, testee, slc_factory_create_select_method.path
@@ -466,52 +459,41 @@ def test_list_available_flavors(requests_get_mock):
 
 
 def test_slc_create_or_open_exists_in_secret_store(
-    caplog, sample_slc_name, git_repo_mock, tmp_path
+    caplog, sample_slc_name, tmp_path, git_access_mock
 ):
     flavor_name = "Strawberry"
     flavor = SlcFlavor(sample_slc_name)
     secrets = SlcSecretsMock(sample_slc_name)
     flavor.save(secrets, flavor_name)
-    git_repo_mock.clone_from.side_effect = simulate_clone(flavor_name)
 
     with current_directory(tmp_path):
-        with caplog.at_level(logging.INFO):
-            slc = ScriptLanguageContainer.create_or_open(
-                secrets, sample_slc_name, flavor_name
-            )
+        with git_access_mock(flavor_name) as _git_access_mock:
+            with caplog.at_level(logging.INFO):
+                slc = ScriptLanguageContainer.create_or_open(
+                    secrets, sample_slc_name, flavor_name
+                )
+                assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
+                assert _git_access_mock.clone_from_recursively.called
 
-            assert "Fetching submodules" in caplog.text
-            assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
-
-            assert git_repo_mock.clone_from.called
-            assert "Cloning into" in caplog.text
-            assert "Fetching submodules" in caplog.text
-
-            _validate_slc(flavor_name, sample_slc_name, slc, tmp_path)
+                _validate_slc(flavor_name, sample_slc_name, slc, tmp_path)
 
 
 def test_slc_create_or_open_workspace_exists(
-    sample_slc_name,
-    caplog,
-    slc_factory_create,
-    git_repo_mock,
+    sample_slc_name, caplog, slc_factory_create, git_access_mock
 ):
     flavor = "Strawberry"
     with caplog.at_level(logging.INFO):
-        with slc_factory_create.context(sample_slc_name, flavor) as testee:
-            pass
+        with git_access_mock(flavor) as _git_access_mock:
+            with slc_factory_create.context(sample_slc_name, flavor) as testee:
+                ScriptLanguageContainer.create_or_open(
+                    testee.secrets, sample_slc_name, flavor
+                )
+                assert not _git_access_mock.clone_from_recursively.called
+                assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
+                assert f"Secure Configuration Storage already contains a compression strategy for SLC name {sample_slc_name}."
+                assert f"Directory '{testee.checkout_dir}' is not empty. Skipping checkout...."
 
-            ScriptLanguageContainer.create_or_open(
-                testee.secrets, sample_slc_name, flavor
-            )
-            assert slc_factory_create.git_repo_mock.clone_from.call_count == 1
-            assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
-            assert f"Secure Configuration Storage already contains a compression strategy for SLC name {sample_slc_name}."
-            assert (
-                f"Directory '{testee.checkout_dir}' is not empty. Skipping checkout...."
-            )
-
-            _validate_slc(flavor, sample_slc_name, testee, slc_factory_create.path)
+                _validate_slc(flavor, sample_slc_name, testee, slc_factory_create.path)
 
 
 def write_package_file(file_path: Path, trailing_newline: bool):
@@ -580,4 +562,54 @@ def test_add_existing_pip_package_different_version(caplog, slc_with_packages):
     with pytest.raises(SlcError, match=r"Package already exists"):
         slc_with_packages.append_custom_pip_packages(
             [PipPackageDefinition("package_a", "v9.9.9")]
+        )
+
+
+@pytest.fixture
+def git_access_mock_checkout_fails(monkeypatch: MonkeyPatch):
+    @contextlib.contextmanager
+    def context(flavor: str):
+        def create_dir(url: str, dir: Path, branch: str):
+            (dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor).mkdir(parents=True)
+            return Mock()
+
+        def checkout_recursively(path: Path) -> None:
+            raise Exception("something went wrong")
+
+        mock = create_autospec(GitAccess)
+        monkeypatch.setattr(workspace, "GitAccess", mock)
+        mock.clone_from_recursively.side_effect = create_dir
+        mock.checkout_recursively.side_effect = checkout_recursively
+        yield mock
+
+    return context
+
+
+def test_make_fresh_clone_if_repo_is_corrupt(
+    caplog, tmp_path, sample_slc_name, git_access_mock_checkout_fails
+):
+    """
+    Validate that ScriptLanguageContainer.create_or_open() creates a fresh working copy
+    if GitAccessIf.checkout_recursively() raises an exception.
+    """
+
+    flavor = "Strawberry"
+    slc_factory = SlcFactory(
+        tmp_path, ScriptLanguageContainer.create, git_access_mock_checkout_fails
+    )
+
+    with slc_factory.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        assert slc.workspace.git_clone_path.is_dir()
+        marker = slc.workspace.git_clone_path / "test.txt"
+        marker.write_text("marker")
+        assert marker.exists()
+        ScriptLanguageContainer.create_or_open(
+            slc.secrets,
+            sample_slc_name,
+            flavor,
+        )
+        assert not marker.exists()
+        assert (
+            f"Git repository is inconsistent: something went wrong. Doing a fresh clone..."
+            in caplog.text
         )
