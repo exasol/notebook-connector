@@ -4,6 +4,8 @@ from pathlib import Path
 
 from git import Repo
 
+from exasol.nb_connector.slc import constants
+
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.INFO)
 
@@ -22,7 +24,7 @@ class GitAccess(GitAccessIf):
     def clone_from_recursively(self, url: str, path: Path, branch: str) -> None:
         LOG.info(f"Cloning into {path}...")
         repo = Repo.clone_from(
-            "https://github.com/exasol/script-languages-release",
+            constants.SLC_GITHUB_REPO,
             path,
             branch=branch,
         )
