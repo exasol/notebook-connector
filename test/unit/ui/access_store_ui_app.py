@@ -17,7 +17,6 @@ ui = access_store_ui.get_access_store_ui()
 
 
 
-test_btn.on_click(read_store_magic)
 
 
 password = ui.children[0].children[2].children[1]
