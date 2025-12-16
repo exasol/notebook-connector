@@ -15,22 +15,6 @@ ui = access_store_ui.get_access_store_ui()
 
 
 
-def read_store_magic(btn):
-    """
-    Called when a test_button is clicked to fetch the sb_store_file from store magic
-    """
-    ipython = get_ipython()
-    try:
-        ipython.run_line_magic("store", "-r")
-        value = globals().get("sb_store_file", None)  # Safely get the value
-        if value is not None:
-            test_text.value = value
-            print("sb_store_file:", value)
-        else:
-            test_text.value = "sb_store_file not set"
-            print("sb_store_file not set!")
-    except Exception as e:
-        print("Error in read_store_magic:", e, file=sys.stderr)
 
 
 test_btn.on_click(read_store_magic)
