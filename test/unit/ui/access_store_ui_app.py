@@ -19,4 +19,4 @@ open_button.click()
 ipython = get_ipython()
 ipython.run_line_magic("store", "-r")
 assert "sb_store_file" in globals(), "sb_store_file was not set by test code!"
-assert globals()["sb_store_file"] == sb_store_file
+assert globals()["sb_store_file"] == access_store_ui.DEFAULT_FILE_NAME
