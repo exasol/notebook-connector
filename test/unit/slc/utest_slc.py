@@ -10,10 +10,10 @@ from test.unit.slc.util import (
 )
 from typing import (
     Callable,
-    Optional,
 )
 from unittest.mock import (
     Mock,
+    create_autospec,
 )
 
 import pytest
@@ -24,8 +24,9 @@ from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol.nb_connector.slc import (
     constants,
     script_language_container,
+    workspace,
 )
-from exasol.nb_connector.slc.git_access import GitAccessIf
+from exasol.nb_connector.slc.git_access import GitAccess
 from exasol.nb_connector.slc.script_language_container import (
     PipPackageDefinition,
     ScriptLanguageContainer,
@@ -42,19 +43,20 @@ def sample_slc_name() -> str:
     return "CUDA"
 
 
-class GitAccessMock(GitAccessIf):
+@pytest.fixture
+def git_access_mock(monkeypatch: MonkeyPatch):
+    @contextlib.contextmanager
+    def context(flavor: str):
+        def create_dir(url: str, dir: Path, branch: str):
+            (dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor).mkdir(parents=True)
+            return Mock()
 
-    def __init__(self, flavor: str) -> None:
-        self.flavor = flavor
-        self.clone_from_recursively_mock = Mock()
-        self.checkout_recursively_mock = Mock()
+        mock = create_autospec(GitAccess)
+        monkeypatch.setattr(workspace, "GitAccess", mock)
+        mock.clone_from_recursively.side_effect = create_dir
+        yield mock
 
-    def clone_from_recursively(self, url: str, path: Path, branch: str) -> None:
-        (path / constants.FLAVORS_PATH_IN_SLC_REPO / self.flavor).mkdir(parents=True)
-        self.clone_from_recursively_mock(url, path, branch)
-
-    def checkout_recursively(self, path: Path) -> None:
-        self.checkout_recursively_mock(path)
+    return context
 
 
 class SlcFactory:
@@ -63,33 +65,33 @@ class SlcFactory:
     a temporary directory and simulating the SLC Git repo to be cloned inside.
     """
 
-    def __init__(self, path: Path, creation_method: Callable):
+    def __init__(self, path: Path, creation_method: Callable, git_access_mock):
         self.path = path
         self.creation_method = creation_method
+        self.git_access_mock = git_access_mock
 
     @contextlib.contextmanager
     def context(
         self, slc_name: str, flavor: str
     ) -> Generator[ScriptLanguageContainer, None, None]:
-        secrets = SlcSecretsMock(slc_name)
-        git_access = GitAccessMock(flavor)
-        with current_directory(self.path):
-            yield self.creation_method(
-                secrets,
-                name=slc_name,
-                flavor=flavor,
-                git_access=git_access,
-            )
+        with self.git_access_mock(flavor):
+            secrets = SlcSecretsMock(slc_name)
+            with current_directory(self.path):
+                yield self.creation_method(
+                    secrets,
+                    name=slc_name,
+                    flavor=flavor,
+                )
 
 
 @pytest.fixture
-def slc_factory_create(tmp_path):
-    return SlcFactory(tmp_path, ScriptLanguageContainer.create)
+def slc_factory_create(tmp_path, git_access_mock):
+    return SlcFactory(tmp_path, ScriptLanguageContainer.create, git_access_mock)
 
 
 @pytest.fixture
-def slc_factory_create_or_open(tmp_path):
-    return SlcFactory(tmp_path, ScriptLanguageContainer.create_or_open)
+def slc_factory_create_or_open(tmp_path, git_access_mock):
+    return SlcFactory(tmp_path, ScriptLanguageContainer.create_or_open, git_access_mock)
 
 
 def _validate_slc(flavor_name, sample_slc_name, slc, path):
@@ -111,8 +113,8 @@ def _validate_slc(flavor_name, sample_slc_name, slc, path):
 
 
 @pytest.fixture
-def slc_factory_create_select_method(request, tmp_path):
-    return SlcFactory(tmp_path, request.param)
+def slc_factory_create_select_method(request, tmp_path, git_access_mock):
+    return SlcFactory(tmp_path, request.param, git_access_mock)
 
 
 @pytest.mark.parametrize(
@@ -456,44 +458,42 @@ def test_list_available_flavors(requests_get_mock):
     assert available_flavors == expected_flavors
 
 
-def test_slc_create_or_open_exists_in_secret_store(caplog, sample_slc_name, tmp_path):
+def test_slc_create_or_open_exists_in_secret_store(
+    caplog, sample_slc_name, tmp_path, git_access_mock
+):
     flavor_name = "Strawberry"
     flavor = SlcFlavor(sample_slc_name)
     secrets = SlcSecretsMock(sample_slc_name)
     flavor.save(secrets, flavor_name)
-    git_access = GitAccessMock(flavor_name)
 
     with current_directory(tmp_path):
-        with caplog.at_level(logging.INFO):
-            slc = ScriptLanguageContainer.create_or_open(
-                secrets, sample_slc_name, flavor_name, git_access=git_access
-            )
-            assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
-            assert git_access.clone_from_recursively_mock.called
+        with git_access_mock(flavor_name) as _git_access_mock:
+            with caplog.at_level(logging.INFO):
+                slc = ScriptLanguageContainer.create_or_open(
+                    secrets, sample_slc_name, flavor_name
+                )
+                assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
+                assert _git_access_mock.clone_from_recursively.called
 
-            _validate_slc(flavor_name, sample_slc_name, slc, tmp_path)
+                _validate_slc(flavor_name, sample_slc_name, slc, tmp_path)
 
 
 def test_slc_create_or_open_workspace_exists(
-    sample_slc_name,
-    caplog,
-    slc_factory_create,
+    sample_slc_name, caplog, slc_factory_create, git_access_mock
 ):
     flavor = "Strawberry"
-    git_access = GitAccessMock(flavor)
     with caplog.at_level(logging.INFO):
-        with slc_factory_create.context(sample_slc_name, flavor) as testee:
-            ScriptLanguageContainer.create_or_open(
-                testee.secrets, sample_slc_name, flavor, git_access=git_access
-            )
-            assert not git_access.clone_from_recursively_mock.called
-            assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
-            assert f"Secure Configuration Storage already contains a compression strategy for SLC name {sample_slc_name}."
-            assert (
-                f"Directory '{testee.checkout_dir}' is not empty. Skipping checkout...."
-            )
+        with git_access_mock(flavor) as _git_access_mock:
+            with slc_factory_create.context(sample_slc_name, flavor) as testee:
+                ScriptLanguageContainer.create_or_open(
+                    testee.secrets, sample_slc_name, flavor
+                )
+                assert not _git_access_mock.clone_from_recursively.called
+                assert f"Secure Configuration Storage already contains a flavor for SLC name {sample_slc_name}."
+                assert f"Secure Configuration Storage already contains a compression strategy for SLC name {sample_slc_name}."
+                assert f"Directory '{testee.checkout_dir}' is not empty. Skipping checkout...."
 
-            _validate_slc(flavor, sample_slc_name, testee, slc_factory_create.path)
+                _validate_slc(flavor, sample_slc_name, testee, slc_factory_create.path)
 
 
 def write_package_file(file_path: Path, trailing_newline: bool):
@@ -565,17 +565,28 @@ def test_add_existing_pip_package_different_version(caplog, slc_with_packages):
         )
 
 
-class GitAccessMockCheckoutFails(GitAccessMock):
+@pytest.fixture
+def git_access_mock_checkout_fails(monkeypatch: MonkeyPatch):
+    @contextlib.contextmanager
+    def context(flavor: str):
+        def create_dir(url: str, dir: Path, branch: str):
+            (dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor).mkdir(parents=True)
+            return Mock()
 
-    def __init__(self, flavor: str):
-        super().__init__(flavor)
+        def checkout_recursively(path: Path) -> None:
+            raise Exception("something went wrong")
 
-    def checkout_recursively(self, path: Path) -> None:
-        raise Exception("something went wrong")
+        mock = create_autospec(GitAccess)
+        monkeypatch.setattr(workspace, "GitAccess", mock)
+        mock.clone_from_recursively.side_effect = create_dir
+        mock.checkout_recursively.side_effect = checkout_recursively
+        yield mock
+
+    return context
 
 
 def test_make_fresh_clone_if_repo_is_corrupt(
-    caplog, sample_slc_name, slc_factory_create
+    caplog, tmp_path, sample_slc_name, git_access_mock_checkout_fails
 ):
     """
     Validate that ScriptLanguageContainer.create_or_open() creates a fresh working copy
@@ -583,8 +594,11 @@ def test_make_fresh_clone_if_repo_is_corrupt(
     """
 
     flavor = "Strawberry"
+    slc_factory = SlcFactory(
+        tmp_path, ScriptLanguageContainer.create, git_access_mock_checkout_fails
+    )
 
-    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+    with slc_factory.context(slc_name=sample_slc_name, flavor=flavor) as slc:
         assert slc.workspace.git_clone_path.is_dir()
         marker = slc.workspace.git_clone_path / "test.txt"
         marker.write_text("marker")
@@ -593,10 +607,9 @@ def test_make_fresh_clone_if_repo_is_corrupt(
             slc.secrets,
             sample_slc_name,
             flavor,
-            git_access=GitAccessMockCheckoutFails(flavor),
         )
         assert not marker.exists()
         assert (
-            "Git repository is inconsistent: something went wrong. Doing a fresh clone..."
+            f"Git repository is inconsistent: something went wrong. Doing a fresh clone..."
             in caplog.text
         )

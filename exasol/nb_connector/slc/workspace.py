@@ -7,7 +7,7 @@ import shutil
 from pathlib import Path
 
 from exasol.nb_connector.slc import constants
-from exasol.nb_connector.slc.git_access import GitAccessIf
+from exasol.nb_connector.slc.git_access import GitAccess
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.INFO)
@@ -28,13 +28,12 @@ def current_directory(dir: Path):
 
 
 class Workspace:
-    def __init__(self, root_dir: Path, git_access: GitAccessIf):
+    def __init__(self, root_dir: Path):
         self.root_dir = root_dir
-        self._git_access = git_access
 
     @classmethod
-    def for_slc(cls, name: str, git_access: GitAccessIf) -> Workspace:
-        return cls(Path.cwd() / constants.WORKSPACE_DIR / name, git_access)
+    def for_slc(cls, name: str) -> Workspace:
+        return cls(Path.cwd() / constants.WORKSPACE_DIR / name)
 
     def clone_slc_repo(self):
         """
@@ -45,7 +44,7 @@ class Workspace:
         if path.is_dir():
             LOG.warning(f"Directory '{path}' is not empty. Checking consistency...")
             try:
-                self._git_access.checkout_recursively(path)
+                GitAccess.checkout_recursively(path)
                 return
             except Exception as e:
                 LOG.warning(
@@ -54,7 +53,7 @@ class Workspace:
                 shutil.rmtree(path)
 
         path.mkdir(parents=True, exist_ok=True)
-        self._git_access.clone_from_recursively(
+        GitAccess.clone_from_recursively(
             constants.SLC_GITHUB_REPO, path, constants.SLC_RELEASE_TAG
         )
 

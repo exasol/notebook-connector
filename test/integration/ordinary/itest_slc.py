@@ -27,8 +27,6 @@ from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
     constants,
 )
-import re
-
 
 DEFAULT_FLAVORS = {
     PackageManager.PIP: "template-Exasol-all-python-3.10",
@@ -343,7 +341,7 @@ def test_fresh_clone_if_repo_is_corrupt(
     secrets_module: Secrets,
     default_flavor: str,
     compression_strategy: CompressionStrategy,
-    caplog
+    caplog,
 ):
     slc_name = "slc_corrupt_repo"
     slc = create_slc(secrets_module, slc_name, default_flavor, compression_strategy)
@@ -356,5 +354,5 @@ def test_fresh_clone_if_repo_is_corrupt(
     ScriptLanguageContainer.create_or_open(secrets_module, slc_name, default_flavor)
 
     assert not marker_file.exists()
-    expected_error =  f"Git repository is inconsistent: {temp_cwd_func}/slc_workspace/{slc_name}/git-clone. Doing a fresh clone..."
+    expected_error = f"Git repository is inconsistent: {temp_cwd_func}/slc_workspace/{slc_name}/git-clone. Doing a fresh clone..."
     assert expected_error in caplog.text
