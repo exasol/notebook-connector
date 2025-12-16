@@ -10,3 +10,7 @@
 
 * #314: Added more robust for class ScriptLanguageContainer
 * #316: Implemented consistency check for workspace in ScriptLanguageContainer.create()
+
+## Features
+
+* #319: Add restore_package_file method to class ScriptLanguagesContainer
