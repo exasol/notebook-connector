@@ -19,8 +19,6 @@ ui = access_store_ui.get_access_store_ui()
 
 test_btn.on_click(read_store_magic)
 
-items = [ui, test_text, test_btn]
-app = ipywidgets.Box(items)
 
 password = ui.children[0].children[2].children[1]
 password.value = "password"
