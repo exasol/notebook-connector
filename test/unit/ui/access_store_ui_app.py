@@ -12,6 +12,7 @@ password = ui.children[0].children[2].children[1]
 password.value = "password"
 
 open_button = ui.children[1]
+sb_store_file = None
 open_button.click()
 
 #def read_from_store():
