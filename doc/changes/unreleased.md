@@ -15,3 +15,4 @@
 
 * #319: Add restore_package_file method to class ScriptLanguagesContainer
 * #318: Added method to generate and store language_definition
+* #317: Implemented reuse of workspace directory

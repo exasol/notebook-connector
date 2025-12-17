@@ -28,3 +28,8 @@ SLC_GITHUB_REPO = "https://github.com/exasol/script-languages-release"
 """
 GitHub URL which is used as base for the Script-Languages-Container.
 """
+
+SLC_WORKSPACE_KEY_PREFIX = "slc_workspace_"
+"""
+Key prefix of the key in secret store to save the workspace directory. 
+"""

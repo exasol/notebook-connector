@@ -6,6 +6,7 @@ import os
 import shutil
 from pathlib import Path
 
+from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.git_access import GitAccess
 
@@ -32,8 +33,14 @@ class Workspace:
         self.root_dir = root_dir
 
     @classmethod
-    def for_slc(cls, name: str) -> Workspace:
-        return cls(Path.cwd() / constants.WORKSPACE_DIR / name)
+    def for_slc(cls, name: str, secrets: Secrets) -> Workspace:
+        workspace_key = constants.SLC_WORKSPACE_KEY_PREFIX + name
+        path = Path.cwd()
+        if path_from_secret_store := secrets.get(workspace_key):
+            path = Path(path_from_secret_store)
+        else:
+            secrets.save(workspace_key, str(path))
+        return cls(path / constants.WORKSPACE_DIR / name)
 
     def clone_slc_repo(self):
         """
