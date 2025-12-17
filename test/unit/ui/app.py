@@ -1,11 +1,14 @@
 """
-A simple ipywidgets application demonstrating interactive widget behavior.
-This file is being called from test/unit/ui/test_solara.py
+A simple ipywidgets application demonstrating interactive
+widget behavior. This file is being called from
+'test/unit/ui/test_solara.py'
 
-This module defines a basic user interface with a text box and a button using ipywidgets.
-The text box is initially set to "init". When the button is clicked, the text box's value
-is updated to "click" via an event handler. The widgets are combined in a vertical box (VBox)
-layout and exposed as the variable `app` for integration with other systems or testing.
+This module defines a basic user interface with a text box
+and a button using ipywidgets.The text box is initially set
+to "init".When the button is clicked, the text box's value
+is updated to "click" via an event handler.The widgets are
+combined in a vertical box (VBox) layout and exposed as the
+variable `app` for integration with other systems or testing.
 
 Widgets:
 - Text: Displays a string, initially "init".
@@ -19,6 +22,9 @@ button = ipywidgets.Button(description="Click me")
 
 
 def on_button_clicked(b):
+    """
+    This function is called when the button was clicked.
+    """
     text.value = "click"
 
 
