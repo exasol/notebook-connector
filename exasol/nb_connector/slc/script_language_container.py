@@ -11,6 +11,9 @@ from typing import (
 
 import requests
 from exasol.slc import api as exaslct_api
+from exasol.slc.api.get_language_definition_builder import (
+    get_language_definition_builder,
+)
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import (
     ContextDockerClient,
@@ -228,11 +231,7 @@ class ScriptLanguageContainer:
                 compression_strategy=self.compression_strategy,
             )
 
-    def deploy(self):
-        """
-        Deploys the current script-languages-container to the database and
-        stores the activation string in the Secure Configuration Storage.
-        """
+    def _generate_bfs_params_from_secret_store(self):
         bfs_params: dict[str, Any] = {
             k: self.secrets.get(v)
             for k, v in [
@@ -244,6 +243,7 @@ class ScriptLanguageContainer:
                 ("bucket", CKey.bfs_bucket),
             ]
         }
+
         bucketfs_use_https = optional_str_to_bool(self.secrets.get(CKey.bfs_encryption))
         if bucketfs_use_https is not None:
             bfs_params["bucketfs_use_https"] = bucketfs_use_https
@@ -253,6 +253,14 @@ class ScriptLanguageContainer:
         ssl_cert_path = self.secrets.get(CKey.trusted_ca)
         if ssl_cert_path is not None:
             bfs_params["ssl_cert_path"] = ssl_cert_path
+        return bfs_params
+
+    def deploy(self):
+        """
+        Deploys the current script-languages-container to the database and
+        stores the activation string in the Secure Configuration Storage.
+        """
+        bfs_params = self._generate_bfs_params_from_secret_store()
 
         with current_directory(self.checkout_dir):
             result = exaslct_api.deploy(
@@ -287,6 +295,32 @@ class ScriptLanguageContainer:
             raise SlcError(
                 "Secure Configuration Storage does not contains an activation key."
             ) from ex
+
+    def generate_activation_key(self, add_to_secret_store: bool) -> str:
+        """
+        Generates the language activation string for the uploaded script-language-container.
+        Can be used in `ALTER SESSION` or `ALTER_SYSTEM` SQL commands to activate
+        the language of the uploaded script-language-container, for example, if you want to use the SLC in your SQL Editor.
+        Furthermore, this method can be used as fallback if the deploy-function failed for some reason,
+        but the script-language-container was uploaded to the BucketFS.
+        Then it will register the Language activation for this SLC in the Secure Configuration Store.
+        """
+        bfs_params = self._generate_bfs_params_from_secret_store()
+
+        with current_directory(self.checkout_dir):
+            builder = get_language_definition_builder(
+                flavor_path=str(self._flavor_path_rel),
+                bucketfs_name=bfs_params["bucketfs_name"],
+                bucket_name=bfs_params["bucket"],
+                path_in_bucket=constants.PATH_IN_BUCKET,
+                container_name=f"{self.flavor}-release-{self.language_alias}",  # Currently this can't be retrieved from exaslct. Need to use a hard coded value here.
+            )
+            components = builder.generate_definition_components()
+            builder.add_custom_alias(components[0].alias, self.language_alias)
+            lang_def = builder.generate_definition()
+            if add_to_secret_store:
+                self.secrets.save(self._alias_key, lang_def)
+            return lang_def
 
     def append_custom_pip_packages(self, pip_packages: list[PipPackageDefinition]):
         """

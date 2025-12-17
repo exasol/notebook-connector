@@ -14,3 +14,4 @@
 ## Features
 
 * #319: Add restore_package_file method to class ScriptLanguagesContainer
+* #318: Added method to generate and store language_definition
