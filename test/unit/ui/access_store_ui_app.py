@@ -16,6 +16,7 @@ open_button.click()
 
 def read_from_store():
     global sb_store_file
+    sb_store_file = None
     ipython = get_ipython()
     ipython.run_line_magic("store", "-r")
 
