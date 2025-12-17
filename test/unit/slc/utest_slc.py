@@ -10,6 +10,7 @@ from test.unit.slc.util import (
 from typing import (
     Callable,
 )
+from unittest import mock
 from unittest.mock import (
     Mock,
     create_autospec,
@@ -60,6 +61,7 @@ def git_access_mock(monkeypatch: MonkeyPatch):
 
         mock = create_autospec(GitAccess)
         monkeypatch.setattr(workspace, "GitAccess", mock)
+        monkeypatch.setattr(script_language_container, "GitAccess", mock)
         mock.clone_from_recursively.side_effect = create_dir
         yield mock
 
@@ -640,3 +642,39 @@ def test_generate_activation_key(
             assert slc.secrets.get(slc._alias_key) == language_activation
         else:
             assert slc.secrets.get(slc._alias_key) is None
+
+
+def test_restore_pip_package_file(sample_slc_name, slc_factory_create, git_access_mock):
+    flavor = "Strawberry"
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        with git_access_mock(flavor) as git_access:
+            slc.restore_custom_pip_file()
+            assert git_access.checkout_file.mock_calls == [
+                mock.call(
+                    slc.workspace.git_clone_path / "script-languages",
+                    Path("flavors")
+                    / flavor
+                    / "flavor_customization"
+                    / "packages"
+                    / "python3_pip_packages",
+                )
+            ]
+
+
+def test_restore_conda_package_file(
+    sample_slc_name, slc_factory_create, git_access_mock
+):
+    flavor = "Strawberry"
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        with git_access_mock(flavor) as git_access:
+            slc.restore_custom_conda_file()
+            assert git_access.checkout_file.mock_calls == [
+                mock.call(
+                    slc.workspace.git_clone_path / "script-languages",
+                    Path("flavors")
+                    / flavor
+                    / "flavor_customization"
+                    / "packages"
+                    / "conda_packages",
+                )
+            ]

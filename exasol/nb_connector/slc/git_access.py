@@ -25,3 +25,8 @@ class GitAccess:
     def checkout_recursively(path: Path) -> None:
         repo = Repo(path)
         repo.git.checkout("--recurse-submodules", ".")
+
+    @staticmethod
+    def checkout_file(repo_path: Path, file: Path) -> None:
+        repo = Repo(repo_path)
+        repo.git.checkout("HEAD", "--", str(file))
