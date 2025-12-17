@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import re
-from collections import namedtuple
 from pathlib import (
     Path,
 )
@@ -20,6 +19,12 @@ from exasol_integration_test_docker_environment.lib.docker import (
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
+from exasol.nb_connector.slc.git_access import GitAccess
+from exasol.nb_connector.slc.package_file_editor import append_packages
+from exasol.nb_connector.slc.package_types import (
+    CondaPackageDefinition,
+    PipPackageDefinition,
+)
 from exasol.nb_connector.slc.slc_compression_strategy import SlcCompressionStrategy
 from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
@@ -31,9 +36,6 @@ from exasol.nb_connector.slc.workspace import (
 )
 from exasol.nb_connector.utils import optional_str_to_bool
 
-PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
-CondaPackageDefinition = namedtuple("CondaPackageDefinition", ["pkg", "version"])
-
 NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$", flags=re.IGNORECASE)
 
 
@@ -43,65 +45,6 @@ def _verify_name(slc_name: str) -> None:
             f'SLC name "{slc_name}" doesn\'t match'
             f' regular expression "{NAME_PATTERN}".'
         )
-
-
-def _read_packages(file_path: Path, package_definition: type) -> list:
-    packages = []
-    with file_path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue  # skip empty or commented lines
-            # Take everything before the '|' as package name
-            package, version = line.split("|", 1)
-            packages.append(package_definition(package, version))
-    return packages
-
-
-def _ends_with_newline(file_path: Path) -> bool:
-    content = file_path.read_text()
-    return content.endswith("\n")
-
-
-def _filter_packages(
-    original_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-    new_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-) -> list[PipPackageDefinition | CondaPackageDefinition]:
-    filtered_packages = []
-    for package in new_packages:
-        add_package = True
-        for original_package in original_packages:
-            if package.pkg == original_package.pkg:
-                add_package = False
-                if package.version == original_package.version:
-                    logging.warning("Package already exists: %s", original_package)
-                else:
-                    raise SlcError(
-                        "Package already exists: %s but with different version",
-                        original_package,
-                    )
-        if add_package:
-            filtered_packages.append(package)
-    return filtered_packages
-
-
-def _append_packages(
-    file_path: Path,
-    package_definition: type,
-    packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-):
-    """
-    Appends packages to the custom packages file.
-    """
-    original_packages = _read_packages(file_path, package_definition)
-    filtered_packages = _filter_packages(original_packages, packages)
-    ends_with_newline = _ends_with_newline(file_path)
-    if filtered_packages:
-        with open(file_path, "a") as f:
-            if not ends_with_newline:
-                f.write("\n")
-            for p in filtered_packages:
-                print(f"{p.pkg}|{p.version}", file=f)
 
 
 class ScriptLanguageContainer:
@@ -242,6 +185,24 @@ class ScriptLanguageContainer:
         """
         return self.custom_packages_dir / "conda_packages"
 
+    def restore_custom_pip_file(self):
+        """
+        Restores the custom pip packages file from Git. All changes will be overwritten.
+        """
+        GitAccess.checkout_file(
+            self.checkout_dir / "script-languages",
+            self.custom_pip_file.relative_to(self.checkout_dir),
+        )
+
+    def restore_custom_conda_file(self):
+        """
+        Restores the custom conda packages file from Git. All changes will be overwritten.
+        """
+        GitAccess.checkout_file(
+            self.checkout_dir / "script-languages",
+            self.custom_conda_file.relative_to(self.checkout_dir),
+        )
+
     def export(self) -> None:
         """
         Exports the current SLC to the export directory.
@@ -333,7 +294,7 @@ class ScriptLanguageContainer:
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
-        _append_packages(self.custom_pip_file, PipPackageDefinition, pip_packages)
+        append_packages(self.custom_pip_file, PipPackageDefinition, pip_packages)
 
     def append_custom_conda_packages(
         self, conda_packages: list[CondaPackageDefinition]
@@ -343,7 +304,7 @@ class ScriptLanguageContainer:
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
-        _append_packages(self.custom_conda_file, CondaPackageDefinition, conda_packages)
+        append_packages(self.custom_conda_file, CondaPackageDefinition, conda_packages)
 
     @property
     def docker_image_tags(self) -> list[str]:
