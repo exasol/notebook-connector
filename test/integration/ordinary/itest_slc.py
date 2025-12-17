@@ -187,9 +187,9 @@ def test_deploy_cert_fails(
 def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
-    assert sample_slc.generate_activation_key(False) == sample_slc.secrets.get(
-        sample_slc._alias_key
-    )
+    act_key_from_deploy = sample_slc.secrets.get(sample_slc._alias_key)
+    act_key_from_generate = sample_slc.generate_activation_key(False)
+    assert act_key_from_deploy == act_key_from_generate
 
 
 @pytest.mark.dependency(name="append_custom_pip_packages", depends=["deploy_slc"])

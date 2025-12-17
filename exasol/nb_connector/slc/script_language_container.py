@@ -302,7 +302,8 @@ class ScriptLanguageContainer:
         Can be used in `ALTER SESSION` or `ALTER_SYSTEM` SQL commands to activate
         the language of the uploaded script-language-container, for example, if you want to use the SLC in your SQL Editor.
         Furthermore, this method can be used as fallback if the deploy-function failed for some reason,
-        but the script-language-container was uploaded to the BucketFS. Then it will register the Language activation for this SLC in the Secure Configuration Store.
+        but the script-language-container was uploaded to the BucketFS.
+        Then it will register the Language activation for this SLC in the Secure Configuration Store.
         """
         bfs_params = self._generate_bfs_params_from_secret_store()
 
