@@ -25,6 +25,8 @@ def test_store_magic_write(tmp_path, monkeypatch):
 
     try:
         # Run the command
+        import os
+        os.makedirs(os.path.expanduser("~/.ipython/profile_default"), exist_ok=True)
         result = subprocess.run(
             command,
             capture_output=True,  # Captures stdout and stderr
