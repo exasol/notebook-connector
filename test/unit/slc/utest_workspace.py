@@ -36,12 +36,16 @@ from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
     SlcFlavor,
 )
-from exasol.nb_connector.slc.workspace import current_directory, Workspace
+from exasol.nb_connector.slc.workspace import (
+    Workspace,
+    current_directory,
+)
 
 
 @pytest.fixture
 def sample_slc_name() -> str:
     return "CUDA"
+
 
 def test_workspace_reuses_directory(sample_slc_name, tmp_path):
     secrets = SlcSecretsMock(sample_slc_name)
@@ -56,5 +60,6 @@ def test_workspace_reuses_directory(sample_slc_name, tmp_path):
 
     with current_directory(workspace_dir2) as _:
         ws2 = Workspace.for_slc(sample_slc_name, secrets)
-        assert ws2.root_dir == workspace_dir1 / constants.WORKSPACE_DIR / sample_slc_name
-
+        assert (
+            ws2.root_dir == workspace_dir1 / constants.WORKSPACE_DIR / sample_slc_name
+        )
