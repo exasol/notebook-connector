@@ -29,6 +29,7 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
         ipython.run_line_magic(
             "store", "-r"
         )  # reloads variables in the IPython user namespace persistence mechanism.
+        print("read", globals().get("sb_store_file"))
 
     if "sb_store_file" in globals():
         # pylint: disable=undefined-variable
@@ -75,9 +76,8 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
             open_btn.icon = "check"
         finally:
             # Save the file in the shared store.
-            # Added this if condition just to enable testing
-            if ipython and hasattr(ipython, "run_line_magic"):
-                ipython.run_line_magic("store", "sb_store_file")
+            print("store sb_store_file", sb_store_file)
+            ipython.run_line_magic("store", "sb_store_file")
             del sb_store_file
 
     def on_value_change(change):
