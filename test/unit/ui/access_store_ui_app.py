@@ -6,7 +6,7 @@ from IPython import get_ipython
 
 from exasol.nb_connector.ui import access_store_ui
 
-sb_store_file = "ai_lab_secure_configuration_storage.sqlite"
+sb_store_file = access_store_ui.DEFAULT_FILE_NAME
 
 ui = access_store_ui.get_access_store_ui()
 
