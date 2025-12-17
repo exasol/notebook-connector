@@ -78,7 +78,7 @@ class ScriptLanguageContainer:
         _verify_name(name)
         self.flavor = SlcFlavor(name).verify(secrets)
         self.compression_strategy = SlcCompressionStrategy(name).verify(secrets)
-        self.workspace = Workspace.for_slc(name)
+        self.workspace = Workspace.for_slc(name, secrets)
         if not self.checkout_dir.is_dir():
             raise SlcError(
                 f"SLC Git repository not checked out to {self.checkout_dir}."
@@ -113,7 +113,7 @@ class ScriptLanguageContainer:
             )
         slc_flavor.save(secrets, flavor)
         slc_compression_strategy.save(secrets, compression_strategy)
-        workspace = Workspace.for_slc(name)
+        workspace = Workspace.for_slc(name, secrets)
         workspace.clone_slc_repo()
         return cls(secrets=secrets, name=name)
 
@@ -144,7 +144,7 @@ class ScriptLanguageContainer:
             )
         else:
             slc_compression_strategy.save(secrets, compression_strategy)
-        workspace = Workspace.for_slc(name)
+        workspace = Workspace.for_slc(name, secrets)
         workspace.clone_slc_repo()
         return cls(secrets=secrets, name=name)
 
