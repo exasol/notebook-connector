@@ -14,12 +14,12 @@ password.value = "password"
 open_button = ui.children[1]
 open_button.click()
 
-def read_from_store():
-    global sb_store_file
-    sb_store_file = None
-    ipython = get_ipython()
-    ipython.run_line_magic("store", "-r")
+#def read_from_store():
+#    global sb_store_file
+#    sb_store_file = None
+#    ipython = get_ipython()
+#    ipython.run_line_magic("store", "-r")
 
-read_from_store()
+#read_from_store()
 assert "sb_store_file" in globals(), "sb_store_file was not set by test code!"
 assert globals()["sb_store_file"] == access_store_ui.DEFAULT_FILE_NAME
