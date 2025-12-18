@@ -187,6 +187,9 @@ def test_deploy_cert_fails(
 def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
     sample_slc.deploy()
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
+    act_key_from_deploy = sample_slc.secrets.get(sample_slc._alias_key)
+    act_key_from_generate = sample_slc.generate_activation_key(False)
+    assert act_key_from_deploy == act_key_from_generate
 
 
 @pytest.mark.dependency(name="append_custom_pip_packages", depends=["deploy_slc"])
@@ -356,3 +359,39 @@ def test_fresh_clone_if_repo_is_corrupt(
     assert not marker_file.exists()
     expected_error = f"Git repository is inconsistent: {temp_cwd_func}/slc_workspace/{slc_name}/git-clone. Doing a fresh clone..."
     assert expected_error in caplog.text
+
+
+def test_restore_pip_custom_file(
+    temp_cwd_func,
+    secrets_module: Secrets,
+    default_flavor: str,
+    compression_strategy: CompressionStrategy,
+):
+    slc_name = "slc_restore_pip_custom_file"
+    slc = create_slc(secrets_module, slc_name, default_flavor, compression_strategy)
+
+    slc.append_custom_pip_packages([PipPackageDefinition("my_test_package", "1.2.3")])
+    custom_pip_file_content = slc.custom_pip_file.read_text()
+    assert "my_test_package" in custom_pip_file_content
+    slc.restore_custom_pip_file()
+    custom_pip_file_content = slc.custom_pip_file.read_text()
+    assert "my_test_package" not in custom_pip_file_content
+
+
+def test_restore_conda_custom_file(
+    temp_cwd_func,
+    secrets_module: Secrets,
+    compression_strategy: CompressionStrategy,
+):
+    slc_name = "slc_restore_conda_custom_file"
+    flavor = DEFAULT_FLAVORS[PackageManager.CONDA]
+    slc = create_slc(secrets_module, slc_name, flavor, compression_strategy)
+
+    slc.append_custom_conda_packages(
+        [CondaPackageDefinition("my_test_package", "1.2.3")]
+    )
+    custom_conda_file_content = slc.custom_conda_file.read_text()
+    assert "my_test_package" in custom_conda_file_content
+    slc.restore_custom_conda_file()
+    custom_conda_file_content = slc.custom_conda_file.read_text()
+    assert "my_test_package" not in custom_conda_file_content

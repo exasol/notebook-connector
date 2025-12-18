@@ -1,6 +1,5 @@
 import contextlib
 import logging
-import shutil
 import textwrap
 from collections.abc import Generator
 from pathlib import Path
@@ -11,6 +10,7 @@ from test.unit.slc.util import (
 from typing import (
     Callable,
 )
+from unittest import mock
 from unittest.mock import (
     Mock,
     create_autospec,
@@ -21,6 +21,7 @@ import requests
 from _pytest.monkeypatch import MonkeyPatch
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.slc import (
     constants,
     script_language_container,
@@ -48,11 +49,19 @@ def git_access_mock(monkeypatch: MonkeyPatch):
     @contextlib.contextmanager
     def context(flavor: str):
         def create_dir(url: str, dir: Path, branch: str):
-            (dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor).mkdir(parents=True)
+            flavor_base_path = (
+                dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor / "flavor_base"
+            )
+            flavor_base_path.mkdir(parents=True)
+            language_definition = flavor_base_path / "language_definition"
+            language_definition.write_text(
+                "PYTHON3=localzmq+protobuf:///{{ bucketfs_name }}/{{ bucket_name }}/{{ path_in_bucket }}{{ release_name }}?lang=python#buckets/{{ bucketfs_name }}/{{ bucket_name }}/{{ path_in_bucket }}{{ release_name }}/exaudf/exaudfclient"
+            )
             return Mock()
 
         mock = create_autospec(GitAccess)
         monkeypatch.setattr(workspace, "GitAccess", mock)
+        monkeypatch.setattr(script_language_container, "GitAccess", mock)
         mock.clone_from_recursively.side_effect = create_dir
         yield mock
 
@@ -613,3 +622,59 @@ def test_make_fresh_clone_if_repo_is_corrupt(
             f"Git repository is inconsistent: something went wrong. Doing a fresh clone..."
             in caplog.text
         )
+
+
+@pytest.mark.parametrize("add_to_secret_store", [True, False])
+def test_generate_activation_key(
+    add_to_secret_store, sample_slc_name, slc_factory_create
+):
+    flavor = "Strawberry"
+
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        slc.secrets.save(CKey.bfs_service, "test_bfs")
+        slc.secrets.save(CKey.bfs_bucket, "test_bucket")
+        language_activation = slc.generate_activation_key(add_to_secret_store)
+        assert (
+            language_activation
+            == "custom_slc_CUDA=localzmq+protobuf:///test_bfs/test_bucket/container/Strawberry-release-custom_slc_CUDA?lang=python#buckets/test_bfs/test_bucket/container/Strawberry-release-custom_slc_CUDA/exaudf/exaudfclient"
+        )
+        if add_to_secret_store:
+            assert slc.secrets.get(slc._alias_key) == language_activation
+        else:
+            assert slc.secrets.get(slc._alias_key) is None
+
+
+def test_restore_pip_package_file(sample_slc_name, slc_factory_create, git_access_mock):
+    flavor = "Strawberry"
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        with git_access_mock(flavor) as git_access:
+            slc.restore_custom_pip_file()
+            assert git_access.checkout_file.mock_calls == [
+                mock.call(
+                    slc.workspace.git_clone_path / "script-languages",
+                    Path("flavors")
+                    / flavor
+                    / "flavor_customization"
+                    / "packages"
+                    / "python3_pip_packages",
+                )
+            ]
+
+
+def test_restore_conda_package_file(
+    sample_slc_name, slc_factory_create, git_access_mock
+):
+    flavor = "Strawberry"
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        with git_access_mock(flavor) as git_access:
+            slc.restore_custom_conda_file()
+            assert git_access.checkout_file.mock_calls == [
+                mock.call(
+                    slc.workspace.git_clone_path / "script-languages",
+                    Path("flavors")
+                    / flavor
+                    / "flavor_customization"
+                    / "packages"
+                    / "conda_packages",
+                )
+            ]

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import re
-from collections import namedtuple
 from pathlib import (
     Path,
 )
@@ -12,6 +11,9 @@ from typing import (
 
 import requests
 from exasol.slc import api as exaslct_api
+from exasol.slc.api.get_language_definition_builder import (
+    get_language_definition_builder,
+)
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import (
     ContextDockerClient,
@@ -20,6 +22,12 @@ from exasol_integration_test_docker_environment.lib.docker import (
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
+from exasol.nb_connector.slc.git_access import GitAccess
+from exasol.nb_connector.slc.package_file_editor import append_packages
+from exasol.nb_connector.slc.package_types import (
+    CondaPackageDefinition,
+    PipPackageDefinition,
+)
 from exasol.nb_connector.slc.slc_compression_strategy import SlcCompressionStrategy
 from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
@@ -31,9 +39,6 @@ from exasol.nb_connector.slc.workspace import (
 )
 from exasol.nb_connector.utils import optional_str_to_bool
 
-PipPackageDefinition = namedtuple("PipPackageDefinition", ["pkg", "version"])
-CondaPackageDefinition = namedtuple("CondaPackageDefinition", ["pkg", "version"])
-
 NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$", flags=re.IGNORECASE)
 
 
@@ -43,65 +48,6 @@ def _verify_name(slc_name: str) -> None:
             f'SLC name "{slc_name}" doesn\'t match'
             f' regular expression "{NAME_PATTERN}".'
         )
-
-
-def _read_packages(file_path: Path, package_definition: type) -> list:
-    packages = []
-    with file_path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue  # skip empty or commented lines
-            # Take everything before the '|' as package name
-            package, version = line.split("|", 1)
-            packages.append(package_definition(package, version))
-    return packages
-
-
-def _ends_with_newline(file_path: Path) -> bool:
-    content = file_path.read_text()
-    return content.endswith("\n")
-
-
-def _filter_packages(
-    original_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-    new_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-) -> list[PipPackageDefinition | CondaPackageDefinition]:
-    filtered_packages = []
-    for package in new_packages:
-        add_package = True
-        for original_package in original_packages:
-            if package.pkg == original_package.pkg:
-                add_package = False
-                if package.version == original_package.version:
-                    logging.warning("Package already exists: %s", original_package)
-                else:
-                    raise SlcError(
-                        "Package already exists: %s but with different version",
-                        original_package,
-                    )
-        if add_package:
-            filtered_packages.append(package)
-    return filtered_packages
-
-
-def _append_packages(
-    file_path: Path,
-    package_definition: type,
-    packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-):
-    """
-    Appends packages to the custom packages file.
-    """
-    original_packages = _read_packages(file_path, package_definition)
-    filtered_packages = _filter_packages(original_packages, packages)
-    ends_with_newline = _ends_with_newline(file_path)
-    if filtered_packages:
-        with open(file_path, "a") as f:
-            if not ends_with_newline:
-                f.write("\n")
-            for p in filtered_packages:
-                print(f"{p.pkg}|{p.version}", file=f)
 
 
 class ScriptLanguageContainer:
@@ -132,7 +78,7 @@ class ScriptLanguageContainer:
         _verify_name(name)
         self.flavor = SlcFlavor(name).verify(secrets)
         self.compression_strategy = SlcCompressionStrategy(name).verify(secrets)
-        self.workspace = Workspace.for_slc(name)
+        self.workspace = Workspace.for_slc(name, secrets)
         if not self.checkout_dir.is_dir():
             raise SlcError(
                 f"SLC Git repository not checked out to {self.checkout_dir}."
@@ -167,7 +113,7 @@ class ScriptLanguageContainer:
             )
         slc_flavor.save(secrets, flavor)
         slc_compression_strategy.save(secrets, compression_strategy)
-        workspace = Workspace.for_slc(name)
+        workspace = Workspace.for_slc(name, secrets)
         workspace.clone_slc_repo()
         return cls(secrets=secrets, name=name)
 
@@ -198,7 +144,7 @@ class ScriptLanguageContainer:
             )
         else:
             slc_compression_strategy.save(secrets, compression_strategy)
-        workspace = Workspace.for_slc(name)
+        workspace = Workspace.for_slc(name, secrets)
         workspace.clone_slc_repo()
         return cls(secrets=secrets, name=name)
 
@@ -242,6 +188,24 @@ class ScriptLanguageContainer:
         """
         return self.custom_packages_dir / "conda_packages"
 
+    def restore_custom_pip_file(self):
+        """
+        Restores the custom pip packages file from Git. All changes will be overwritten.
+        """
+        GitAccess.checkout_file(
+            self.checkout_dir / "script-languages",
+            self.custom_pip_file.relative_to(self.checkout_dir),
+        )
+
+    def restore_custom_conda_file(self):
+        """
+        Restores the custom conda packages file from Git. All changes will be overwritten.
+        """
+        GitAccess.checkout_file(
+            self.checkout_dir / "script-languages",
+            self.custom_conda_file.relative_to(self.checkout_dir),
+        )
+
     def export(self) -> None:
         """
         Exports the current SLC to the export directory.
@@ -267,11 +231,7 @@ class ScriptLanguageContainer:
                 compression_strategy=self.compression_strategy,
             )
 
-    def deploy(self):
-        """
-        Deploys the current script-languages-container to the database and
-        stores the activation string in the Secure Configuration Storage.
-        """
+    def _generate_bfs_params_from_secret_store(self):
         bfs_params: dict[str, Any] = {
             k: self.secrets.get(v)
             for k, v in [
@@ -283,6 +243,7 @@ class ScriptLanguageContainer:
                 ("bucket", CKey.bfs_bucket),
             ]
         }
+
         bucketfs_use_https = optional_str_to_bool(self.secrets.get(CKey.bfs_encryption))
         if bucketfs_use_https is not None:
             bfs_params["bucketfs_use_https"] = bucketfs_use_https
@@ -292,6 +253,14 @@ class ScriptLanguageContainer:
         ssl_cert_path = self.secrets.get(CKey.trusted_ca)
         if ssl_cert_path is not None:
             bfs_params["ssl_cert_path"] = ssl_cert_path
+        return bfs_params
+
+    def deploy(self):
+        """
+        Deploys the current script-languages-container to the database and
+        stores the activation string in the Secure Configuration Storage.
+        """
+        bfs_params = self._generate_bfs_params_from_secret_store()
 
         with current_directory(self.checkout_dir):
             result = exaslct_api.deploy(
@@ -327,13 +296,39 @@ class ScriptLanguageContainer:
                 "Secure Configuration Storage does not contains an activation key."
             ) from ex
 
+    def generate_activation_key(self, add_to_secret_store: bool) -> str:
+        """
+        Generates the language activation string for the uploaded script-language-container.
+        Can be used in `ALTER SESSION` or `ALTER_SYSTEM` SQL commands to activate
+        the language of the uploaded script-language-container, for example, if you want to use the SLC in your SQL Editor.
+        Furthermore, this method can be used as fallback if the deploy-function failed for some reason,
+        but the script-language-container was uploaded to the BucketFS.
+        Then it will register the Language activation for this SLC in the Secure Configuration Store.
+        """
+        bfs_params = self._generate_bfs_params_from_secret_store()
+
+        with current_directory(self.checkout_dir):
+            builder = get_language_definition_builder(
+                flavor_path=str(self._flavor_path_rel),
+                bucketfs_name=bfs_params["bucketfs_name"],
+                bucket_name=bfs_params["bucket"],
+                path_in_bucket=constants.PATH_IN_BUCKET,
+                container_name=f"{self.flavor}-release-{self.language_alias}",  # Currently this can't be retrieved from exaslct. Need to use a hard coded value here.
+            )
+            components = builder.generate_definition_components()
+            builder.add_custom_alias(components[0].alias, self.language_alias)
+            lang_def = builder.generate_definition()
+            if add_to_secret_store:
+                self.secrets.save(self._alias_key, lang_def)
+            return lang_def
+
     def append_custom_pip_packages(self, pip_packages: list[PipPackageDefinition]):
         """
         Appends packages to the custom pip packages file.
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
-        _append_packages(self.custom_pip_file, PipPackageDefinition, pip_packages)
+        append_packages(self.custom_pip_file, PipPackageDefinition, pip_packages)
 
     def append_custom_conda_packages(
         self, conda_packages: list[CondaPackageDefinition]
@@ -343,7 +338,7 @@ class ScriptLanguageContainer:
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
-        _append_packages(self.custom_conda_file, CondaPackageDefinition, conda_packages)
+        append_packages(self.custom_conda_file, CondaPackageDefinition, conda_packages)
 
     @property
     def docker_image_tags(self) -> list[str]:
