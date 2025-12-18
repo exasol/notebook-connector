@@ -1,3 +1,7 @@
+"""
+Working examples for solara kernel tests
+"""
+
 import importlib.resources
 import logging
 from contextlib import contextmanager
@@ -34,8 +38,8 @@ def app_box_and_rc(app_name, kernel_context):
 
 def test_notebook_widget(kernel_context, no_kernel_context):
     """
-    The fixture no_kernel_context is not used directly in this test but is required, though, to
-    make the test pass.
+    The fixture no_kernel_context is not used directly in this test but is required,
+    though, to make the test pass.
     """
     with app_box_and_rc(APP_SRC, kernel_context) as (box, rc):
         button = rc.find(ipywidgets.Button).widget
