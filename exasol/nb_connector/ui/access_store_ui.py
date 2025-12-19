@@ -10,19 +10,25 @@ from exasol.nb_connector.ui.popup_message_ui import popup_message
 from exasol.nb_connector.ui.ui_styles import get_config_styles
 
 DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
-SCS_FILE = Path.home() / ".cache" / "notebook-connector" / "scs_file"
-SCS_FILE.parent.mkdir(parents=True, exist_ok=True)
 
+def get_scs_location_file_path() -> Path:
+    '''
+    Returns the path to the file where the path of the SCS sqlite database file is stored
+    '''
+    return Path.home() / ".cache" / "notebook-connector" / "scs_file"
+
+
+get_scs_location_file_path().parent.mkdir(parents=True, exist_ok=True)
 
 def get_sb_store_file():
     try:
-        return SCS_FILE.read_text().strip()
+        return get_scs_location_file_path().read_text().strip()
     except FileNotFoundError:
         return DEFAULT_FILE_NAME
 
 
 def set_sb_store_file(value):
-    SCS_FILE.write_text(value)
+    get_scs_location_file_path().write_text(value)
 
 
 def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
