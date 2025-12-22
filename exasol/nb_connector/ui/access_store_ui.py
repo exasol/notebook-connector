@@ -11,14 +11,16 @@ from exasol.nb_connector.ui.ui_styles import get_config_styles
 
 DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
 
+
 def get_scs_location_file_path() -> Path:
-    '''
+    """
     Returns the path to the file where the path of the SCS sqlite database file is stored
-    '''
+    """
     return Path.home() / ".cache" / "notebook-connector" / "scs_file"
 
 
 get_scs_location_file_path().parent.mkdir(parents=True, exist_ok=True)
+
 
 def get_sb_store_file():
     try:

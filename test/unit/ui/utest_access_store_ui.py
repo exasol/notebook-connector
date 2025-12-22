@@ -10,11 +10,7 @@ def test_access_store_ui_store_read_and_write_2(tmp_path, monkeypatch):
     Test access store UI reading and writing SCS file path via widgets and helper functions.
     """
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(
-        access_ui,
-        "get_scs_location_file_path",
-        lambda: test_scs_file
-    )
+    monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
 
     test_scs_file = tmp_path / "scs_file"
 
