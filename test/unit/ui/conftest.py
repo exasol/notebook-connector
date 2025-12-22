@@ -1,3 +1,7 @@
+"""
+conftest for UI testing
+"""
+
 import pytest
 import solara.server.app
 import solara.server.kernel_context
@@ -7,6 +11,9 @@ from solara.server.kernel_context import VirtualKernelContext
 
 @pytest.fixture(autouse=True)
 def kernel_context():
+    """
+    method for setting up a kernel context
+    """
     kernel_shared = kernel.Kernel()
     context = VirtualKernelContext(id="1", kernel=kernel_shared, session_id="session-1")
     try:
@@ -18,7 +25,10 @@ def kernel_context():
 
 
 @pytest.fixture()
-def no_kernel_context(kernel_context):
+def no_kernel_context(kernel_context):  # pylint: disable=unused-argument
+    """
+    method for setting up a no kernel context
+    """
     context = solara.server.kernel_context.get_current_context()
     solara.server.kernel_context.set_current_context(None)
     try:

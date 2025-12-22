@@ -7,12 +7,12 @@ import exasol.nb_connector.ui.access_store_ui as access_ui
 
 def test_access_store_ui_store_read_and_write_2(tmp_path, monkeypatch):
     """
-    Test access store UI reading and writing SCS file path via widgets and helper functions.
+    Test access store UI reading and writing SCS file path via widgets
+    and helper functions.
     """
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
-
     test_scs_file = tmp_path / "scs_file"
+    monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
 
     if test_scs_file.exists():
         test_scs_file.unlink()
