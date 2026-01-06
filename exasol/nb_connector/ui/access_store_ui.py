@@ -19,7 +19,7 @@ def get_scs_location_file_path() -> Path:
     return Path.home() / ".cache" / "notebook-connector" / "scs_file"
 
 
-get_scs_location_file_path().parent.mkdir(parents=True, exist_ok=True)
+
 
 
 def get_sb_store_file():
@@ -30,6 +30,7 @@ def get_sb_store_file():
 
 
 def set_sb_store_file(value):
+    get_scs_location_file_path().parent.mkdir(parents=True, exist_ok=True)
     get_scs_location_file_path().write_text(value)
 
 
@@ -70,7 +71,7 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
             )
         else:
             open_btn.icon = "check"
-            set_sb_store_file(sb_store_file)
+        set_sb_store_file(sb_store_file)
 
     def on_value_change(change):
         open_btn.icon = "pen"
