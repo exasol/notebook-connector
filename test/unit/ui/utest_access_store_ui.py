@@ -32,3 +32,7 @@ def test_access_store_ui_store_read_and_write_2(tmp_path, monkeypatch):
     # assert the file name
     assert test_scs_file.read_text().strip() == "test_config.sqlite"
     assert access_ui.get_sb_store_file() == "test_config.sqlite"
+
+    ui2 = access_ui.get_access_store_ui(str(tmp_path))
+    file_name2 = ui2.children[0].children[1].children[1]
+    assert file_name2.value == "test_config.sqlite"

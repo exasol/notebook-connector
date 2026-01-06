@@ -7,7 +7,7 @@ using ipywidgets.The text box is initially set to "init".
 When the button is clicked, the text box's value is updated to "click"
 via an event handler.
 The widgets are combined in a vertical box (VBox) layout and exposed as
- the variable `app` for integration with other systems or testing.
+the variable `app` for integration with other systems or testing.
 
 Widgets:
 - Text: Displays a string, initially "init".
