@@ -7,7 +7,7 @@ import exasol.nb_connector.ui.access_store_ui as access_ui
 TEST_CONFIG_SQLITE = "test_config.sqlite"
 
 
-def test_access_store_ui_store_read_and_write_2(tmp_path, monkeypatch):
+def test_access_store_ui_store_read_and_write(tmp_path, monkeypatch):
     """
     Test access store UI reading and writing SCS file path via widgets
     and helper functions.

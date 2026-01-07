@@ -68,7 +68,8 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
             )
         else:
             open_btn.icon = "check"
-        set_sb_store_file(sb_store_file)
+        finally:
+            set_sb_store_file(sb_store_file)
 
     def on_value_change(change):
         open_btn.icon = "pen"
