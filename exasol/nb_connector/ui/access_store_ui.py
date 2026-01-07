@@ -19,9 +19,6 @@ def get_scs_location_file_path() -> Path:
     return Path.home() / ".cache" / "notebook-connector" / "scs_file"
 
 
-
-
-
 def get_sb_store_file():
     try:
         return get_scs_location_file_path().read_text().strip()
