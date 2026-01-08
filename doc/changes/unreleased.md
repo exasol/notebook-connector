@@ -1,5 +1,5 @@
 # Unreleased
-  * #305: Added Integration test store magic read and write
+  * #305: Replacing store magic with normal file access
 
 
 ## Bugs
