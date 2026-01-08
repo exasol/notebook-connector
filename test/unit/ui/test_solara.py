@@ -1,7 +1,10 @@
+"""
+Working examples for solara kernel tests
+"""
+
 import importlib.resources
 import logging
 from contextlib import contextmanager
-from pathlib import Path
 
 import ipywidgets
 import solara
@@ -15,7 +18,13 @@ reload.reloader.start()
 
 
 @contextmanager
-def app_box_and_rc(app_name, kernel_context):
+def app_box_and_rc(app_name, kernel_context):  # pylint: disable=unused-argument
+    """
+    Runs and renders a Solara app, yielding `box` (rendered widget tree)
+    and `rc` (render context) within a kernel context.
+    Ensures app resources are properly closed after execution.
+    """
+
     app = AppScript(str(app_name))
     app.init()
     try:
@@ -32,10 +41,12 @@ def app_box_and_rc(app_name, kernel_context):
         app.close()
 
 
-def test_notebook_widget(kernel_context, no_kernel_context):
+def test_notebook_widget(
+    kernel_context, no_kernel_context
+):  # pylint: disable=unused-argument
     """
-    The fixture no_kernel_context is not used directly in this test but is required, though, to
-    make the test pass.
+    The fixture no_kernel_context is not used directly in this test but is required,
+    though, to make the test pass.
     """
     with app_box_and_rc(APP_SRC, kernel_context) as (box, rc):
         button = rc.find(ipywidgets.Button).widget
@@ -56,11 +67,9 @@ def test_ipywidgets_update_global_state():
     confirms that the global state does not update before the button is clicked,
     and then checks that clicking the button updates the global state as expected.
     """
-    import ipywidgets as widgets
-
     global_state = {"username": ""}
-    textbox = widgets.Text()
-    button = widgets.Button(description="Submit")
+    textbox = ipywidgets.Text()
+    button = ipywidgets.Button(description="Submit")
 
     def on_click(b):
         global_state["username"] = textbox.value
