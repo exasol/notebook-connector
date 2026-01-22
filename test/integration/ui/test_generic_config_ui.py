@@ -1,4 +1,5 @@
 from test.integration.ui.ui_utils import assert_ui_screenshot
+from typing import Optional
 
 import ipywidgets as widgets
 import pytest
@@ -58,7 +59,11 @@ def row_by_label(page_session, label: str):
 
 
 def set_text_input(
-    row, *, value: str = None, clear: bool = False, text_to_type: str = None
+    row,
+    *,
+    value: Optional[str] = None,
+    clear: bool = False,
+    text_to_type: Optional[str] = None,
 ):
     """
     Update a text input located inside a given row.
