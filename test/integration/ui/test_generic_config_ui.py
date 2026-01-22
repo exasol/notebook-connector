@@ -1,3 +1,5 @@
+from test.integration.ui.ui_utils import assert_ui_screenshot
+
 import ipywidgets as widgets
 import pytest
 from IPython.display import display
@@ -56,7 +58,7 @@ def row_by_label(page_session, label: str):
 
 
 def set_text_input(
-    row, *, value: str = None, clear: bool = False, type_text: str = None
+    row, *, value: str = None, clear: bool = False, text_to_type: str = None
 ):
     """
     Update a text input located inside a given row.
@@ -66,8 +68,8 @@ def set_text_input(
         inp.clear()
     if value is not None:
         inp.fill(value)
-    if type_text is not None:
-        inp.type(type_text)
+    if text_to_type is not None:
+        inp.type(text_to_type)
 
 
 def checkbox(page_session):
@@ -91,6 +93,13 @@ def save_button(page_session):
     return page_session.locator("button:text('Save')")
 
 
+def expect_check_icon(page_session, count: int = 1):
+    """
+    Assert the presence/absence count of the 'pen' icon inside the Save button.
+    """
+    expect(save_button(page_session).locator("i.fa-check")).to_have_count(count)
+
+
 def expect_pen_icon(page_session, count: int = 1):
     """
     Assert the presence/absence count of the 'pen' icon inside the Save button.
@@ -99,27 +108,20 @@ def expect_pen_icon(page_session, count: int = 1):
 
 
 def assert_screenshot(assert_solara_snapshot, page_session):
-    """
-    Capture and snapshot-test the UI
-    """
-    page_session.wait_for_timeout(2000)
-    box_element = page_session.locator("button:text('Save')").locator("..")
-    assert_solara_snapshot(box_element.screenshot())
+    assert_ui_screenshot(
+        assert_solara_snapshot,
+        page_session,
+        anchor_selector="button:text('Save')",
+        parent_levels=1,  # button -> parent
+    )
 
 
 def change_host_and_user(page_session):
     """
-    Fill the minimum required fields to allow saving a config.
+    Fill the  fields for saving a config.
     """
-    set_text_input(row_by_label(page_session, "Host"), type_text="name")
+    set_text_input(row_by_label(page_session, "Host"), text_to_type="name")
     set_text_input(row_by_label(page_session, "User"), value="user")
-
-
-def save_and_expect_clean(page_session):
-    click_save(page_session)
-    page_session.wait_for_timeout(1000)
-    # TODO change to expect_check_icon
-    expect_pen_icon(page_session, 1)
 
 
 def test_generic_config_ui_load(
@@ -131,7 +133,7 @@ def test_generic_config_ui_load(
     assert_screenshot(assert_solara_snapshot, page_session)
 
 
-def test_generic_config_empty_checkbox_save(
+def test_icon_on_value_change_by_textfield(
     solara_test, page_session, assert_solara_snapshot, tmp_path, inputs_and_groups
 ):
     conf = create_conf(tmp_path)
@@ -139,12 +141,36 @@ def test_generic_config_empty_checkbox_save(
     render_ui(page_session, conf, inputs, group_names)
 
     change_host_and_user(page_session)
-    save_and_expect_clean(page_session)
+    expect_pen_icon(page_session, 1)
 
     assert_screenshot(assert_solara_snapshot, page_session)
 
 
-def test_generic_config_empty_textfield_save(
+def test_icon_on_value_change_by_checkbox(
+    solara_test, page_session, assert_solara_snapshot, tmp_path, inputs_and_groups
+):
+    conf = create_conf(tmp_path)
+    inputs, group_names = inputs_and_groups
+    render_ui(page_session, conf, inputs, group_names)
+
+    checkbox(page_session).set_checked(True)
+    expect_pen_icon(page_session, 1)
+
+    assert_screenshot(assert_solara_snapshot, page_session)
+
+
+def test_empty_checkbox_save(
+    solara_test, page_session, assert_solara_snapshot, tmp_path, inputs_and_groups
+):
+    conf = create_conf(tmp_path)
+    inputs, group_names = inputs_and_groups
+    render_ui(page_session, conf, inputs, group_names)
+    click_save(page_session)
+
+    assert_screenshot(assert_solara_snapshot, page_session)
+
+
+def test_empty_textfield_save(
     solara_test, page_session, assert_solara_snapshot, tmp_path, inputs_and_groups
 ):
     conf = create_conf(tmp_path)
@@ -152,22 +178,25 @@ def test_generic_config_empty_textfield_save(
     render_ui(page_session, conf, inputs, group_names)
 
     set_text_input(row_by_label(page_session, "Host"), clear=True)
-    page_session.wait_for_timeout(1000)
-    expect_pen_icon(page_session, 1)
-
+    set_text_input(row_by_label(page_session, "User"), clear=True)
     checkbox(page_session).set_checked(True)
+    expect_pen_icon(page_session, 1)
+    click_save(page_session)
     assert_screenshot(assert_solara_snapshot, page_session)
 
 
-def test_generic_config_ui_on_value_change(
+def test_for_scs_read_after_save(
     solara_test, page_session, assert_solara_snapshot, tmp_path, inputs_and_groups
 ):
     conf = create_conf(tmp_path)
     inputs, group_names = inputs_and_groups
     render_ui(page_session, conf, inputs, group_names)
-
-    change_host_and_user(page_session)
-    save_and_expect_clean(page_session)
-
     checkbox(page_session).set_checked(True)
+    expect_pen_icon(page_session, 1)
     assert_screenshot(assert_solara_snapshot, page_session)
+    click_save(page_session)
+    print(list(tmp_path.iterdir()))
+    print("#" * 100)
+    scs_file = tmp_path / "sample_scs_file.sqlite"
+    assert scs_file.exists()
+    assert not list(Secrets(scs_file, "password").keys())
