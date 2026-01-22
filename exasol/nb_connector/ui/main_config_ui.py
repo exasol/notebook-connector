@@ -329,7 +329,7 @@ def _itde_error_message(header: str, e: Exception) -> str:
 
 
 def _get_docker_db_action_buttons(
-        conf: Secrets, itde_exists: bool, itde_ready: bool, display_status: widgets.Widget
+    conf: Secrets, itde_exists: bool, itde_ready: bool, display_status: widgets.Widget
 ) -> list[widgets.Button]:
     """
     Creates one or two action buttons with the correspondent on_click functions for managing the
@@ -392,7 +392,7 @@ def _get_docker_db_action_buttons(
 def _create_warning(warning_text: str) -> widgets.Widget:
     return widgets.HTML(
         value="<style>p.itde_warning{word-wrap: break-word; color: red;}</style>"
-              '<p class="itde_warning">' + warning_text + " </p>"
+        '<p class="itde_warning">' + warning_text + " </p>"
     )
 
 
