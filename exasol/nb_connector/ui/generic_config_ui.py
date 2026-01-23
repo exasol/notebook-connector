@@ -8,7 +8,7 @@ from exasol.nb_connector.ui.ui_styles import get_config_styles
 
 
 def get_generic_config_ui(
-    conf: Secrets,
+    secrets: Secrets,
     inputs: list[list[tuple[str, widgets.Widget, CKey]]],
     group_names: list[str],
 ) -> widgets.Widget:
@@ -36,7 +36,9 @@ def get_generic_config_ui(
     def save_configuration(btn):
         for row in chain(*inputs):
             _, widget, key = row
-            conf.save(key, str(widget.value))
+            print("before save---------------------------------------")
+            secrets.save(key, str(widget.value))
+            print("saved------------------------------------------", key)
         btn.icon = "check"
 
     def on_value_change(change):

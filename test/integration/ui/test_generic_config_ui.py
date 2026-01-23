@@ -44,7 +44,7 @@ def render_ui(page_session, conf, inputs, group_names):
     """
     Render the generic config UI
     """
-    ui = get_generic_config_ui(conf=conf, inputs=inputs, group_names=group_names)
+    ui = get_generic_config_ui(secrets=conf, inputs=inputs, group_names=group_names)
     display(ui)
     page_session.wait_for_timeout(1000)
     return ui
@@ -200,8 +200,5 @@ def test_for_scs_read_after_save(
     expect_pen_icon(page_session, 1)
     assert_screenshot(assert_solara_snapshot, page_session)
     click_save(page_session)
-    print(list(tmp_path.iterdir()))
-    print("#" * 100)
-    scs_file = tmp_path / "sample_scs_file.sqlite"
-    assert scs_file.exists()
-    assert not list(Secrets(scs_file, "password").keys())
+    scs_file = str(tmp_path / "sample_scs_file.sqlite")
+    assert list(Secrets(scs_file, "password").keys())
