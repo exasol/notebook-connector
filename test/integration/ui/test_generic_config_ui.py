@@ -1,3 +1,4 @@
+from pathlib import Path
 from test.integration.ui.ui_utils import assert_ui_screenshot
 from typing import Optional
 
@@ -37,7 +38,7 @@ def create_conf(tmp_path):
     Create a Secret configuration store using a temporary SQLite file.
     """
     scs_file = str(tmp_path / "sample_scs_file.sqlite")
-    return Secrets(db_file=scs_file, master_password="password")
+    return Secrets(db_file=Path(scs_file), master_password="password")
 
 
 def render_ui(page_session, conf, inputs, group_names):
@@ -198,7 +199,15 @@ def test_for_scs_read_after_save(
     render_ui(page_session, conf, inputs, group_names)
     checkbox(page_session).set_checked(True)
     expect_pen_icon(page_session, 1)
-    assert_screenshot(assert_solara_snapshot, page_session)
     click_save(page_session)
-    scs_file = str(tmp_path / "sample_scs_file.sqlite")
-    assert list(Secrets(scs_file, "password").keys())
+    assert_screenshot(assert_solara_snapshot, page_session)
+    scs_file = Path(tmp_path / "sample_scs_file.sqlite")
+    secrets = Secrets(db_file=scs_file, master_password="password")
+    expected_key_values = {
+        "db_host_name": "localhost",
+        "db_port": "8563",
+        "db_user": "sys",
+        "db_encryption": "True",
+    }
+    actual_key_values = dict(secrets.items())
+    assert expected_key_values == actual_key_values

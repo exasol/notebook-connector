@@ -36,9 +36,7 @@ def get_generic_config_ui(
     def save_configuration(btn):
         for row in chain(*inputs):
             _, widget, key = row
-            print("before save---------------------------------------")
             secrets.save(key, str(widget.value))
-            print("saved------------------------------------------", key)
         btn.icon = "check"
 
     def on_value_change(change):
