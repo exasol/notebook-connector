@@ -1,4 +1,5 @@
 from pathlib import Path
+from test.integration.ui.ui_utils import assert_ui_screenshot
 
 from IPython.display import display
 
@@ -10,23 +11,12 @@ from exasol.nb_connector.ui.access_store_ui import (
 
 
 def assert_screenshot(assert_solara_snapshot, page_session):
-    """
-    Creates an actual screenshot and asserts if the screenshot is identical to the
-    expectation. The expected screenshots are located in folder ui_screenshots.
-    If the actual screenshot differs from the expected, then solara save the
-    actual to folder test-results for comparison. You can also decide to copy
-    the actual as expected to make the test succeed next time,
-    see the developer guide for details.
-    """
-    # wait for the page to load before finding the element in UI followed
-    # by screenshot assertion.
-    # As of now, we didn't find another way to wait for the action.
-    page_session.wait_for_timeout(1000)
-    box_element = (
-        page_session.locator(":text('Configuration Store')").locator("..").locator("..")
+    assert_ui_screenshot(
+        assert_solara_snapshot,
+        page_session,
+        anchor_selector=":text('Configuration Store')",
+        parent_levels=2,  # text -> parent -> parent
     )
-    box_element.wait_for()
-    assert_solara_snapshot(box_element.screenshot())
 
 
 def fill_scs_password(password: str, page_session):
