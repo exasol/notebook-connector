@@ -101,7 +101,7 @@ def expect_pen_icon(page_session, count: int = 1):
     """
     Assert the presence/absence count of the 'pen' icon inside the Save button.
     """
-    expect(save_button(page_session).locator("i.fa-pen")).to_have_count(count)
+    expect(save_button(page_session).locator("i.fa-pencil")).to_have_count(count)
 
 
 def expect_check_icon(page_session, count: int = 1):
@@ -198,7 +198,7 @@ def test_saas_ui_pen_on_change(
     `expect_pen_icon(page_session, 1)`
     need to find a solution for that and enable screenshot asserion
     """
-    # assert_config_ui_screenshot(assert_solara_snapshot, page_session)
+    assert_config_ui_screenshot(assert_solara_snapshot, page_session)
 
 
 def test_saas_ui_check_on_save(
