@@ -94,7 +94,6 @@ def click_save(page_session):
     """
     page_session.locator("button:text('Save')").click()
     print("clicked Save button")
-    page_session.wait_for_timeout(2000)
 
 
 def expect_pen_icon(page_session, count: int = 1):
@@ -126,6 +125,7 @@ def test_default_main_config_load_default_on_clear(
     render_main_config_ui(page_session, conf)
     set_text_input(row_by_label(page_session, "Memory Size (GiB)"), clear=True)
     set_text_input(row_by_label(page_session, "Disk Size (GiB)"), clear=True)
+    save_button(page_session).focus()
     assert_config_ui_screenshot(assert_solara_snapshot, page_session)
 
 
@@ -135,9 +135,10 @@ def test_default_main_config_pen_icon_on_change(
     conf = create_conf(tmp_path)
     render_main_config_ui(page_session, conf)
     set_text_input(row_by_label(page_session, "Memory Size (GiB)"), text_to_type="4")
-    page_session.wait_for_timeout(1000)
-    page_session.keyboard.press("Tab")
+    page_session.locator("button:text('Save')").focus()
     expect_pen_icon(page_session, 1)
+    page_session.get_by_role("button", name="Please Save").focus()
+    page_session.locator("button:text('Please Save')").focus()
     # TODO: cannot see pen icon in the screenshot, need to find a solution for that
     page_session.wait_for_timeout(3000)
     assert_config_ui_screenshot(assert_solara_snapshot, page_session)
@@ -210,14 +211,9 @@ def test_saas_ui_check_on_save(
     set_text_input(row_by_label(page_session, "Account ID"), value="account_id")
     set_text_input(row_by_label(page_session, "Database ID"), value="database_id")
     expect_pen_icon(page_session, 1)
-    """
-    TODO: cannot see pen icon in the screenshot, 
-    but playwright is able detect the icon in the above line of code 
-    `expect_pen_icon(page_session, 1)`
-    need to find a solution for that and enable screenshot asserion
-    """
     click_save(page_session)
-    # expect_check_icon(page_session, 1)
+    # expect(page_session.get_by_role("button", name="Saved")).to_be_visible()
+
     assert_config_ui_screenshot(assert_solara_snapshot, page_session)
 
 
