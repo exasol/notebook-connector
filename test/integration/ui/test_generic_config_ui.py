@@ -1,4 +1,5 @@
 from pathlib import Path
+from test.conftest import secrets
 from test.integration.ui.ui_utils import assert_ui_screenshot
 from typing import Optional
 
@@ -131,20 +132,28 @@ def change_host_and_user(page_session):
 
 
 def test_generic_config_ui_load(
-    solara_test, page_session, assert_solara_snapshot, tmp_path, inputs_and_groups
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
-    conf = create_conf(tmp_path)
     inputs, group_names = inputs_and_groups
-    render_ui(page_session, conf, inputs, group_names)
+    render_ui(page_session, secrets, inputs, group_names)
     assert_screenshot(assert_solara_snapshot, page_session)
 
 
 def test_icon_on_value_change_by_textfield(
-    solara_test, page_session, assert_solara_snapshot, tmp_path, inputs_and_groups
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
-    conf = create_conf(tmp_path)
     inputs, group_names = inputs_and_groups
-    render_ui(page_session, conf, inputs, group_names)
+    render_ui(page_session, secrets, inputs, group_names)
 
     change_host_and_user(page_session)
     expect_pen_icon(page_session, 1)
@@ -153,11 +162,15 @@ def test_icon_on_value_change_by_textfield(
 
 
 def test_icon_on_value_change_by_checkbox(
-    solara_test, page_session, assert_solara_snapshot, tmp_path, inputs_and_groups
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
-    conf = create_conf(tmp_path)
     inputs, group_names = inputs_and_groups
-    render_ui(page_session, conf, inputs, group_names)
+    render_ui(page_session, secrets, inputs, group_names)
 
     checkbox(page_session).set_checked(True)
     expect_pen_icon(page_session, 1)
@@ -166,22 +179,30 @@ def test_icon_on_value_change_by_checkbox(
 
 
 def test_empty_checkbox_save(
-    solara_test, page_session, assert_solara_snapshot, tmp_path, inputs_and_groups
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
-    conf = create_conf(tmp_path)
     inputs, group_names = inputs_and_groups
-    render_ui(page_session, conf, inputs, group_names)
+    render_ui(page_session, secrets, inputs, group_names)
     click_save(page_session)
 
     assert_screenshot(assert_solara_snapshot, page_session)
 
 
 def test_empty_textfield_save(
-    solara_test, page_session, assert_solara_snapshot, tmp_path, inputs_and_groups
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
-    conf = create_conf(tmp_path)
     inputs, group_names = inputs_and_groups
-    render_ui(page_session, conf, inputs, group_names)
+    render_ui(page_session, secrets, inputs, group_names)
 
     set_text_input(row_by_label(page_session, "Host"), clear=True)
     set_text_input(row_by_label(page_session, "User"), clear=True)
