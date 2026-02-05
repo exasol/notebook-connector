@@ -217,7 +217,7 @@ def test_saas_ui_check_on_save(
     need to find a solution for that and enable screenshot asserion
     """
     click_save(page_session)
-    # expect_check_icon(page_session, 1)
+    expect_check_icon(page_session, 1)
     assert_config_ui_screenshot(assert_solara_snapshot, page_session)
 
 
