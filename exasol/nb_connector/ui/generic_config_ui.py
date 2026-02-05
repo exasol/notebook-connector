@@ -40,7 +40,7 @@ def get_generic_config_ui(
         btn.icon = "check"
 
     def on_value_change(change):
-        save_btn.icon = "pen"
+        save_btn.icon = "pencil"
 
     save_btn.on_click(save_configuration)
 
