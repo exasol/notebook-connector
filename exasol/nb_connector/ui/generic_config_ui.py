@@ -42,7 +42,6 @@ def get_generic_config_ui(
             print("after saving----------------------------------------------------")
         btn.icon = "check"
         btn.text = "Saved"
-        # btn.on_click(save_configuration)
 
     def on_value_change(change):
         save_btn.icon = "pen"
