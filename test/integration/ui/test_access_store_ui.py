@@ -1,5 +1,8 @@
 from pathlib import Path
-from test.integration.ui.ui_utils import assert_ui_screenshot
+from test.integration.ui.utils.ui_utils import (
+    CONF_STORE,
+    assert_ui_screenshot,
+)
 
 from IPython.display import display
 
@@ -8,15 +11,6 @@ from exasol.nb_connector.ui.access_store_ui import (
     DEFAULT_FILE_NAME,
     get_access_store_ui,
 )
-
-
-def assert_screenshot(assert_solara_snapshot, page_session):
-    assert_ui_screenshot(
-        assert_solara_snapshot,
-        page_session,
-        anchor_selector=":text('Configuration Store')",
-        parent_levels=2,  # text -> parent -> parent
-    )
 
 
 def fill_scs_password(password: str, page_session):
@@ -47,7 +41,12 @@ def test_access_store_ui_screenshot(
     test to check if the get_access_store_ui function displays the UI elements
     """
     display(get_access_store_ui(str(tmp_path)))
-    assert_screenshot(assert_solara_snapshot, page_session)
+    assert_ui_screenshot(
+        assert_solara_snapshot,
+        page_session,
+        anchor_selector=CONF_STORE,
+        parent_levels=2,
+    )
 
 
 def test_enter_password_and_click_open(
@@ -60,7 +59,12 @@ def test_enter_password_and_click_open(
     display(get_access_store_ui(str(tmp_path)))
     fill_scs_password(password, page_session)
     click_open_db(page_session)
-    assert_screenshot(assert_solara_snapshot, page_session)
+    assert_ui_screenshot(
+        assert_solara_snapshot,
+        page_session,
+        anchor_selector=CONF_STORE,
+        parent_levels=2,
+    )
     generated_scs_file = tmp_path / DEFAULT_FILE_NAME
     assert generated_scs_file.exists()
     assert not list(Secrets(generated_scs_file, password).keys())
@@ -78,7 +82,12 @@ def test_non_default_store_file(
     fill_scs_file_name(scs_file, page_session)
     fill_scs_password(password, page_session)
     click_open_db(page_session)
-    assert_screenshot(assert_solara_snapshot, page_session)
+    assert_ui_screenshot(
+        assert_solara_snapshot,
+        page_session,
+        anchor_selector=CONF_STORE,
+        parent_levels=2,
+    )
     generated_scs_file = tmp_path / scs_file
     assert generated_scs_file.exists()
     assert not list(Secrets(generated_scs_file, password).keys())
@@ -96,4 +105,9 @@ def test_invalid_password(solara_test, page_session, assert_solara_snapshot, tmp
     fill_scs_password("wrong_password", page_session)
     click_open_db(page_session)
     # take screenshot
-    assert_screenshot(assert_solara_snapshot, page_session)
+    assert_ui_screenshot(
+        assert_solara_snapshot,
+        page_session,
+        anchor_selector=CONF_STORE,
+        parent_levels=2,
+    )

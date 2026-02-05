@@ -77,7 +77,7 @@ def get_db_selection_ui(conf: Secrets) -> widgets.Widget:
         btn.icon = "check"
 
     def on_value_change(change):
-        select_btn.icon = "pen"
+        select_btn.icon = "pencil"
 
     select_btn.on_click(select_database)
     db_selector.observe(on_value_change, names=["value"])
@@ -102,7 +102,7 @@ def get_onprem_db_config_ui(conf: Secrets) -> widgets.Widget:
             ),
             (
                 "Port",
-                widgets.IntText(value=int(conf.get(CKey.db_port, "8563"))),
+                widgets.IntText(value=int(conf.get(CKey.db_port) or 8563)),
                 CKey.db_port,
             ),
             ("User Name", widgets.Text(value=conf.get(CKey.db_user)), CKey.db_user),
@@ -137,12 +137,12 @@ def get_onprem_db_config_ui(conf: Secrets) -> widgets.Widget:
             ),
             (
                 "External Port",
-                widgets.IntText(value=int(conf.get(CKey.bfs_port, "2580"))),
+                widgets.IntText(value=int(conf.get(CKey.bfs_port) or 2580)),
                 CKey.bfs_port,
             ),
             (
                 "Internal Port",
-                widgets.IntText(value=int(conf.get(CKey.bfs_port, "2580"))),
+                widgets.IntText(value=int(conf.get(CKey.bfs_port) or 2580)),
                 CKey.bfs_internal_port,
             ),
             ("User Name", widgets.Text(value=conf.get(CKey.bfs_user)), CKey.bfs_user),
@@ -272,12 +272,12 @@ def get_docker_db_config_ui(conf: Secrets) -> widgets.Widget:
         [
             (
                 "Memory Size (GiB)",
-                widgets.IntText(value=int(conf.get(CKey.mem_size, "2"))),
+                widgets.IntText(value=int(conf.get(CKey.mem_size) or 2)),
                 CKey.mem_size,
             ),
             (
                 "Disk Size (GiB)",
-                widgets.IntText(value=int(conf.get(CKey.disk_size, "2"))),
+                widgets.IntText(value=int(conf.get(CKey.disk_size) or 2)),
                 CKey.disk_size,
             ),
             (
