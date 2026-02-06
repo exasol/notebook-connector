@@ -15,6 +15,8 @@ def sample_file(tmp_path: Path) -> Path:
     return tmp_path / "sample_database.db"
 
 
+@pytest.mark.skip("""This test case is no longer valid.  The constructur will
+always create the file on the fly if it doesn't exist.""")
 def test_no_database_file(secrets):
     assert not secrets.db_file.exists()
 
@@ -60,10 +62,8 @@ def test_update(secrets):
 def test_wrong_password(sample_file):
     secrets = Secrets(sample_file, "correct password")
     secrets.save("key", "my value").close()
-    invalid = Secrets(sample_file, "wrong password")
-    with pytest.raises(InvalidPassword) as ex:
-        invalid.get("key")
-    assert "master password is incorrect" in str(ex.value)
+    with pytest.raises(InvalidPassword, match="master password is incorrect"):
+        Secrets(sample_file, "wrong password")
 
 
 def test_plain_access_fails(sample_file):
