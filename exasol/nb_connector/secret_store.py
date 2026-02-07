@@ -54,7 +54,7 @@ class Secrets:
         # fmt: on
         return self._con
 
-    def _use_master_password(self, cur) -> None:
+    def _use_master_password(self, cur: sqlcipher.Cursor) -> None:
         """
         If database is unencrypted then this method encrypts it.
         If database is already encrypted then this method enables to access the data.
@@ -64,8 +64,8 @@ class Secrets:
             cur.execute(f"PRAGMA key = '{sanitized}'")
 
     def _execute(
-        self, stmt: str, args: list[Any] | None = None, cur=None
-    ) -> Iterable[tuple[str]]:
+        self, stmt: str, args: list[Any] | None = None, cur: sqlcipher.Cursor = None
+    ) -> sqlcipher.Cursor:
         try:
             with contextlib.ExitStack() as stack:
                 cur = cur or stack.enter_context(self._cursor())
@@ -109,18 +109,18 @@ class Secrets:
         """key represents a system, service, or application"""
         key = key.name if isinstance(key, CKey) else key
 
-        def entry_exists(cur) -> bool:
+        def entry_exists(cur: sqlcipher.Cursor) -> bool:
             res = self._execute(
                 f"SELECT * FROM {TABLE_NAME} WHERE key=?", [key], cur=cur
             )
             return res and res.fetchone()
 
-        def update(cur) -> None:
+        def update(cur: sqlcipher.Cursor) -> None:
             self._execute(
                 f"UPDATE {TABLE_NAME} SET value=? WHERE key=?", [value, key], cur=cur
             )
 
-        def insert(cur) -> None:
+        def insert(cur: sqlcipher.Cursor) -> None:
             self._execute(
                 f"INSERT INTO {TABLE_NAME} (key,value) VALUES (?, ?)",
                 [key, value],
