@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import contextlib
 import logging
+import sys
 from collections.abc import Iterable
 from inspect import cleandoc
 from pathlib import Path
 from typing import (
+    Any,
     Optional,
     Union,
 )
@@ -12,7 +16,7 @@ from sqlcipher3 import dbapi2 as sqlcipher  # type: ignore
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
-_logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 TABLE_NAME = "secrets"
 
 
@@ -25,6 +29,15 @@ class Secrets:
         self.db_file = db_file
         self._master_password = master_password
         self._con = None
+        self._initialize()
+
+    def _initialize(self) -> None:
+        if self.db_file.exists():
+            # May raise InvalidPassword
+            self._execute("SELECT * FROM sqlite_master")
+            return
+        LOG.info('Creating file %s and table "%s"', self.db_file, TABLE_NAME)
+        self._execute(f"CREATE TABLE {TABLE_NAME} (key TEXT PRIMARY KEY, value TEXT)")
 
     def close(self) -> None:
         if self._con is not None:
@@ -36,43 +49,31 @@ class Secrets:
     def connection(
         self,
     ) -> sqlcipher.Connection:  # pylint: disable=E1101
-        if self._con is None:
-            db_file_found = self.db_file.exists()
-            if not db_file_found:
-                _logger.info("Creating file %s", self.db_file)
-            # fmt: off
-            self._con = sqlcipher.connect(self.db_file)  # pylint: disable=E1101
-            # fmt: on
-            self._use_master_password()
-            self._initialize(db_file_found)
+        # fmt: off
+        self._con = sqlcipher.connect(self.db_file)  # pylint: disable=E1101
+        # fmt: on
         return self._con
 
-    def _initialize(self, db_file_found: bool) -> None:
-        if db_file_found:
-            self._verify_access()
-            return
-        _logger.info('Creating table "%s".', TABLE_NAME)
-        with self._cursor() as cur:
-            cur.execute(f"CREATE TABLE {TABLE_NAME} (key TEXT PRIMARY KEY, value TEXT)")
-
-    def _use_master_password(self) -> None:
+    def _use_master_password(self, cur) -> None:
         """
         If database is unencrypted then this method encrypts it.
         If database is already encrypted then this method enables to access the data.
         """
         if self._master_password is not None:
             sanitized = self._master_password.replace("'", "\\'")
-            with self._cursor() as cur:
-                cur.execute(f"PRAGMA key = '{sanitized}'")
+            cur.execute(f"PRAGMA key = '{sanitized}'")
 
-    def _verify_access(self):
+    def _execute(
+        self, stmt: str, args: list[Any] | None = None, cur=None
+    ) -> Iterable[tuple[str]]:
         try:
-            with self._cursor() as cur:
-                cur.execute("SELECT * FROM sqlite_master")
+            with contextlib.ExitStack() as stack:
+                cur = cur or stack.enter_context(self._cursor())
+                return cur.execute(stmt, args or [])
         # fmt: off
         except (sqlcipher.DatabaseError) as ex:  # pylint: disable=E1101
             # fmt: on
-            print(f"exception {ex}")
+            LOG.error(f"exception %s", ex)
             if str(ex) == "file is not a database":
                 raise InvalidPassword(
                     cleandoc(
@@ -83,36 +84,47 @@ class Secrets:
                     """
                     )
                 ) from ex
-            raise ex
+            raise
 
     @contextlib.contextmanager
     def _cursor(
         self,
     ) -> sqlcipher.Cursor:  # pylint: disable=E1101
-        cur = self.connection().cursor()
+        con = self.connection()
         try:
-            yield cur
-            self.connection().commit()
-        except:
-            self.connection().rollback()
-            raise
+            cur = con.cursor()
+            try:
+                self._use_master_password(cur)
+                yield cur
+                con.commit()
+            except:
+                con.rollback()
+                raise
+            finally:
+                cur.close()
         finally:
-            cur.close()
+            con.close()
 
-    def save(self, key: Union[str, CKey], value: str) -> "Secrets":
+    def save(self, key: Union[str, CKey], value: str) -> Secrets:
         """key represents a system, service, or application"""
         key = key.name if isinstance(key, CKey) else key
 
         def entry_exists(cur) -> bool:
-            res = cur.execute(f"SELECT * FROM {TABLE_NAME} WHERE key=?", [key])
+            res = self._execute(
+                f"SELECT * FROM {TABLE_NAME} WHERE key=?", [key], cur=cur
+            )
             return res and res.fetchone()
 
         def update(cur) -> None:
-            cur.execute(f"UPDATE {TABLE_NAME} SET value=? WHERE key=?", [value, key])
+            self._execute(
+                f"UPDATE {TABLE_NAME} SET value=? WHERE key=?", [value, key], cur=cur
+            )
 
         def insert(cur) -> None:
-            cur.execute(
-                f"INSERT INTO {TABLE_NAME} (key,value) VALUES (?, ?)", [key, value]
+            self._execute(
+                f"INSERT INTO {TABLE_NAME} (key,value) VALUES (?, ?)",
+                [key, value],
+                cur=cur,
             )
 
         with self._cursor() as cur:
@@ -127,9 +139,10 @@ class Secrets:
     ) -> Optional[str]:
 
         key = key.name if isinstance(key, CKey) else key
-
         with self._cursor() as cur:
-            res = cur.execute(f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key])
+            res = self._execute(
+                f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key], cur=cur
+            )
             row = res.fetchone() if res else None
         return row[0] if row else default_value
 
@@ -148,30 +161,25 @@ class Secrets:
     def keys(self) -> Iterable[str]:
         """Iterator over keys akin to dict.keys()"""
         with self._cursor() as cur:
-            res = cur.execute(f"SELECT key FROM {TABLE_NAME}")
-            for row in res:
-                yield row[0]
+            res = self._execute(f"SELECT key FROM {TABLE_NAME}", cur=cur)
+            yield from (row[0] for row in res)
 
     def values(self) -> Iterable[str]:
         """Iterator over values akin to dict.values()"""
         with self._cursor() as cur:
-            res = cur.execute(f"SELECT value FROM {TABLE_NAME}")
-            for row in res:
-                yield row[0]
+            res = self._execute(f"SELECT value FROM {TABLE_NAME}", cur=cur)
+            yield from (row[0] for row in res)
 
     def items(self) -> Iterable[tuple[str, str]]:
         """Iterator over keys and values akin to dict.items()"""
         with self._cursor() as cur:
-            res = cur.execute(f"SELECT key, value FROM {TABLE_NAME}")
-            for row in res:
-                yield row[0], row[1]
+            res = self._execute(f"SELECT key, value FROM {TABLE_NAME}", cur=cur)
+            yield from ((row[0], row[1]) for row in res)
 
     def remove(self, key: Union[str, CKey]) -> None:
         """
-        Deletes entry with the specified key if it exists.
-        Doesn't raise any exception if the key doesn't exist.
+        Deletes the entry with the specified key if it exists.  Doesn't
+        raise any exception if the key doesn't exist.
         """
         key = key.name if isinstance(key, CKey) else key
-
-        with self._cursor() as cur:
-            cur.execute(f"DELETE FROM {TABLE_NAME} WHERE key=?", [key])
+        self._execute(f"DELETE FROM {TABLE_NAME} WHERE key=?", [key])
