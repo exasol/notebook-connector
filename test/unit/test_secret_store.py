@@ -130,3 +130,14 @@ def test_remove_db_schema(secrets):
     secrets.save(CKey.db_schema, "the_schema")
     secrets.remove(CKey.db_schema)
     assert secrets.get(CKey.db_schema) is None
+
+
+def test_performance(secrets):
+    """
+    old implementation: range(0.20), 0.24 seconds
+    """
+    for i in range(0, 20):
+        key = f'key-{i}'
+        value = f'value {i}'
+        secrets.save(key, value)
+        assert value == secrets.get(key)
