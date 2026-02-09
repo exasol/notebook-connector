@@ -136,9 +136,9 @@ def test_remove_db_schema(secrets):
 
 def test_performance(secrets):
     """
-    range(0.20):
-    new implementation 7.9 seconds
-    old implementation: 0.24 seconds, 3% duration
+    range(0, 20):
+    old implementation: 0.24 seconds
+    new implementation 7.9 seconds (3% speed)
     """
     for i in range(0, 20):
         key = f"key-{i}"
