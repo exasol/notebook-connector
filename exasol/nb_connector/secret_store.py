@@ -134,9 +134,7 @@ class Secrets:
                 insert(cur)
         return self
 
-    def get(
-        self, key: str | CKey, default_value: str | None = None
-    ) -> str | None:
+    def get(self, key: str | CKey, default_value: str | None = None) -> str | None:
 
         key = key.name if isinstance(key, CKey) else key
         with self._cursor() as cur:

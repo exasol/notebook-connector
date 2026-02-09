@@ -15,8 +15,10 @@ def sample_file(tmp_path: Path) -> Path:
     return tmp_path / "sample_database.db"
 
 
-@pytest.mark.skip("""This test case is no longer valid.  The constructur will
-always create the file on the fly if it doesn't exist.""")
+@pytest.mark.skip(
+    """This test case is no longer valid.  The constructur will
+always create the file on the fly if it doesn't exist."""
+)
 def test_no_database_file(secrets):
     assert not secrets.db_file.exists()
 
@@ -139,7 +141,7 @@ def test_performance(secrets):
     old implementation: 0.24 seconds, 3% duration
     """
     for i in range(0, 20):
-        key = f'key-{i}'
-        value = f'value {i}'
+        key = f"key-{i}"
+        value = f"value {i}"
         secrets.save(key, value)
         assert value == secrets.get(key)
