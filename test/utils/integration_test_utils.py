@@ -43,26 +43,6 @@ def _setup_itde_impl(secrets: Secrets) -> Iterator[None]:
         take_itde_down(secrets)
 
 
-@pytest.fixture
-def setup_itde(secrets) -> Iterator[None]:
-    """
-    Brings up the ITDE and takes it down when the tests are completed or failed.
-    Creates a schema and saves its name in the secret store.
-    The scope is per test function.
-    """
-    yield from _setup_itde_impl(secrets)
-
-
-@pytest.fixture(scope="module")
-def setup_itde_module(secrets_module) -> Iterator[None]:
-    """
-    Brings up the ITDE and takes it down when the tests are completed or failed.
-    Creates a schema and saves its name in the secret store.
-    The scope is per test module.
-    """
-    yield from _setup_itde_impl(secrets_module)
-
-
 def activate_languages(pyexasol_connection: ExaConnection, secrets: Secrets) -> None:
     """
     Activates languages at the current session level.
