@@ -1,0 +1,30 @@
+name: Slow-Checks
+
+on:
+  workflow_call:
+
+jobs:
+
+  ordinary-itests:
+    name: Ordinary iTests
+    uses: ./.github/workflows/tests-ordinary-integration.yml
+    permissions:
+      contents: read
+
+  large-runner-tests:
+    name: Large Runner
+    uses: ./.github/workflows/tests-large-runner.yml
+    permissions:
+      contents: read
+
+  gpu-tests:
+    name: GPU
+    uses: ./.github/workflows/tests-gpu.yml
+    permissions:
+      contents: read
+
+  ui-tests:
+    name: UI
+    uses: ./.github/workflows/tests-ui.yml
+    permissions:
+      contents: read

@@ -4,7 +4,6 @@
 exasol.nb_connector
 *******************
 
-.. autofunction:: exasol.nb_connector.bfs_utils.put_file
 .. autofunction:: exasol.nb_connector.cloud_storage.setup_scripts
 .. autofunction:: exasol.nb_connector.github.retrieve_jar
 

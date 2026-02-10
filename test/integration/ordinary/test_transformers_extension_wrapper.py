@@ -4,11 +4,7 @@ from test.utils.integration_test_utils import (
     assert_run_empty_udf,
     get_script_counts,
     language_definition_context,
-    setup_itde,
 )
-
-import pytest
-from _pytest.fixtures import FixtureRequest
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.connections import open_pyexasol_connection
@@ -17,7 +13,7 @@ from exasol.nb_connector.transformers_extension_wrapper import initialize_te_ext
 
 
 def test_initialize_te_extension(secrets: Secrets, setup_itde):
-    language_alias = f"PYTHON3_TE_TEST"
+    language_alias = "PYTHON3_TE_TEST"
     secrets.save(CKey.huggingface_token, "abc")
 
     with open_pyexasol_connection(secrets) as pyexasol_connection:

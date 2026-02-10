@@ -13,7 +13,7 @@ jobs:
 
   run-slow-tests:
     name: Run Slow Tests?
-    runs-on: ubuntu-24.04
+    runs-on: "ubuntu-24.04"
     permissions:
       contents: read
 
@@ -25,55 +25,36 @@ jobs:
       - name: Tests
         run: echo "Slow tests approved"
 
-
-  ordinary-itests:
-    name: Ordinary iTests
-    needs: [ run-slow-tests ]
-    uses: ./.github/workflows/tests-ordinary-integration.yml
-    permissions:
-      contents: read
-
-  saas-tests:
-    name: SaaS
-    needs: [ run-slow-tests ]
-    uses: ./.github/workflows/tests-saas.yml
+  slow-checks:
+    name: Slow
+    needs:
+      - run-slow-tests
+    uses: ./.github/workflows/slow-checks.yml
     secrets: inherit
     permissions:
       contents: read
 
-  large-runner-tests:
-    name: Large Runner
-    needs: [ run-slow-tests ]
-    uses: ./.github/workflows/tests-large-runner.yml
-    permissions:
-      contents: read
-
-  gpu-tests:
-    name: GPU
-    needs: [ run-slow-tests ]
-    uses: ./.github/workflows/tests-gpu.yml
-    permissions:
-      contents: read
-
-  ui-tests:
-    name: UI
-    needs: [ run-slow-tests ]
-    uses: ./.github/workflows/tests-ui.yml
+  optional-slow-checks:
+    name: Optional Slow
+    needs:
+      - run-slow-tests
+    uses: ./.github/workflows/tests-saas.yml
+    secrets: inherit
     permissions:
       contents: read
 
   # This job ensures inputs have been executed successfully.
   approve-merge:
     name: Allow Merge
-    runs-on: ubuntu-24.04
+    runs-on: "ubuntu-24.04"
     permissions:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
-    # Removed saas-tests from being required
-    needs: [ fast-checks, large-runner-tests, ordinary-itests, gpu-tests, ui-tests ]
+    needs:
+      - fast-checks
+      - slow-checks
 
     # Each job requires a step, so we added this dummy step.
     steps:
       - name: Approve
-        run: |
-          echo "Merge Approved"
+        run: echo "Merge Approved"

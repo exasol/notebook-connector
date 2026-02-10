@@ -1,25 +1,12 @@
-from collections.abc import Iterable
-from dataclasses import dataclass
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).parent
+from exasol.toolbox.config import BaseConfig
 
-
-@dataclass(frozen=True)
-class Config:
-    root: Path = ROOT_DIR
-    doc: Path = ROOT_DIR / "doc"
-    version_file: Path = ROOT_DIR / "version.py"
-    path_filters: Iterable[str] = (
-        "dist",
-        ".eggs",
-        "venv",
-        ".workspace",
-        "test-results",
-        "ui_snapshots",
-    )
-    python_versions = ["3.10"]
-    source: Path = Path("exasol/nb_connector")
-
-
-PROJECT_CONFIG = Config()
+PROJECT_CONFIG = BaseConfig(
+    root_path=Path(__file__).parent,
+    project_name="nb_connector",
+    # currently only python 3.10 is supported due to
+    # dependencies on binary provision such as TXAIE
+    python_versions=("3.10",),
+    add_to_excluded_python_paths=("ui_snapshots",),
+)

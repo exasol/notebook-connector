@@ -6,7 +6,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from test.bucketfs_protocol import BucketFSProtocol
 from test.package_manager import PackageManager
-from test.utils.integration_test_utils import setup_itde_module
 
 import pytest
 from docker.models.images import Image as DockerImage

@@ -2,12 +2,6 @@
 # Importing cython packages causes import errors in pylint, we need to investigate this later
 # see https://github.com/exasol/notebook-connector/issues/206
 
-from test.utils.integration_test_utils import (
-    activate_languages,
-    assert_connection_exists,
-    assert_run_empty_udf,
-    setup_itde,
-)
 
 from exasol.ai.text.extraction.abstract_extraction import (
     Defaults,
@@ -32,7 +26,6 @@ from exasol.analytics.schema import (
     TableNameImpl,
 )
 
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.text_ai_extension_wrapper import (

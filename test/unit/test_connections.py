@@ -4,11 +4,9 @@ import ssl
 import tempfile
 import types
 import unittest.mock
-import warnings
 from contextlib import ExitStack
 from typing import (
     Any,
-    Optional,
 )
 from unittest.mock import create_autospec
 
@@ -17,7 +15,6 @@ import pytest
 from sqlalchemy.engine import make_url
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.connections import (
     get_external_host,
     open_bucketfs_bucket,

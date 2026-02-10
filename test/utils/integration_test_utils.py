@@ -10,7 +10,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import pytest
 from pyexasol import ExaConnection
 
 from exasol.nb_connector.ai_lab_config import AILabConfig
@@ -43,26 +42,6 @@ def _setup_itde_impl(secrets: Secrets) -> Iterator[None]:
         take_itde_down(secrets)
 
 
-@pytest.fixture
-def setup_itde(secrets) -> Iterator[None]:
-    """
-    Brings up the ITDE and takes it down when the tests are completed or failed.
-    Creates a schema and saves its name in the secret store.
-    The scope is per test function.
-    """
-    yield from _setup_itde_impl(secrets)
-
-
-@pytest.fixture(scope="module")
-def setup_itde_module(secrets_module) -> Iterator[None]:
-    """
-    Brings up the ITDE and takes it down when the tests are completed or failed.
-    Creates a schema and saves its name in the secret store.
-    The scope is per test module.
-    """
-    yield from _setup_itde_impl(secrets_module)
-
-
 def activate_languages(pyexasol_connection: ExaConnection, secrets: Secrets) -> None:
     """
     Activates languages at the current session level.
@@ -84,12 +63,12 @@ def assert_run_empty_udf(
     pyexasol_connection.execute(
         textwrap.dedent(
             f"""
-        CREATE OR REPLACE {language_alias} SCALAR SCRIPT {secrets.get(AILabConfig.db_schema)}."TEST_UDF"()
-        RETURNS BOOLEAN AS
-        def run(ctx):
-            return True
-        /
-        """
+            CREATE OR REPLACE {language_alias} SCALAR SCRIPT {secrets.get(AILabConfig.db_schema)}."TEST_UDF"()
+            RETURNS BOOLEAN AS
+            def run(ctx):
+                return True
+            /
+            """
         )
     )
     result = pyexasol_connection.execute(
@@ -107,9 +86,9 @@ def get_script_counts(
 
     result = pyexasol_connection.execute(
         f"""
-            SELECT SCRIPT_TYPE, COUNT(*) FROM SYS.EXA_ALL_SCRIPTS
-            WHERE SCRIPT_SCHEMA='{secrets[AILabConfig.db_schema].upper()}'
-            GROUP BY SCRIPT_TYPE;
+        SELECT SCRIPT_TYPE, COUNT(*) FROM SYS.EXA_ALL_SCRIPTS
+        WHERE SCRIPT_SCHEMA='{secrets[AILabConfig.db_schema].upper()}'
+        GROUP BY SCRIPT_TYPE;
         """
     ).fetchall()
     return dict(result)
@@ -124,8 +103,8 @@ def assert_connection_exists(
 
     result = pyexasol_connection.execute(
         f"""
-            SELECT 1 FROM SYS.EXA_ALL_CONNECTIONS
-            WHERE CONNECTION_NAME='{connection_name.upper()}';
+        SELECT 1 FROM SYS.EXA_ALL_CONNECTIONS
+        WHERE CONNECTION_NAME='{connection_name.upper()}';
         """
     ).fetchall()
     assert result
