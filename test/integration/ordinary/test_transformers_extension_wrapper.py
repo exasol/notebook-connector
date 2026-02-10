@@ -1,3 +1,4 @@
+from test.utils.integration_test_utils import setup_itde
 from test.utils.integration_test_utils import (
     activate_languages,
     assert_connection_exists,
