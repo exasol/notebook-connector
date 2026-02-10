@@ -23,10 +23,10 @@ def test_itde_with_gpu(secrets):
         bring_itde_up(secrets)
         query_accelerator_parameters = cleandoc(
             """
-                SELECT PARAM_VALUE, PARAM_NAME FROM EXA_METADATA 
-                WHERE PARAM_NAME IN ('acceleratorDeviceDetected', 'acceleratorDeviceGpuNvidiaDetected')
-                ORDER BY PARAM_NAME;
-                """
+            SELECT PARAM_VALUE, PARAM_NAME FROM EXA_METADATA 
+            WHERE PARAM_NAME IN ('acceleratorDeviceDetected', 'acceleratorDeviceGpuNvidiaDetected')
+            ORDER BY PARAM_NAME;
+            """
         )
         from exasol.nb_connector.connections import open_pyexasol_connection
 
