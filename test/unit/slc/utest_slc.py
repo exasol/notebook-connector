@@ -1,14 +1,14 @@
 import contextlib
 import logging
 import textwrap
-from collections.abc import Generator
+from collections.abc import (
+    Callable,
+    Generator,
+)
 from pathlib import Path
 from test.unit.slc.util import (
     SlcSecretsMock,
     not_raises,
-)
-from typing import (
-    Callable,
 )
 from unittest import mock
 from unittest.mock import (
@@ -619,7 +619,7 @@ def test_make_fresh_clone_if_repo_is_corrupt(
         )
         assert not marker.exists()
         assert (
-            f"Git repository is inconsistent: something went wrong. Doing a fresh clone..."
+            "Git repository is inconsistent: something went wrong. Doing a fresh clone..."
             in caplog.text
         )
 

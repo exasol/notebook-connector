@@ -3,10 +3,6 @@ import logging
 from collections.abc import Iterable
 from inspect import cleandoc
 from pathlib import Path
-from typing import (
-    Optional,
-    Union,
-)
 
 from sqlcipher3 import dbapi2 as sqlcipher  # type: ignore
 
@@ -99,7 +95,7 @@ class Secrets:
         finally:
             cur.close()
 
-    def save(self, key: Union[str, CKey], value: str) -> "Secrets":
+    def save(self, key: str | CKey, value: str) -> "Secrets":
         """key represents a system, service, or application"""
         key = key.name if isinstance(key, CKey) else key
 
@@ -122,9 +118,7 @@ class Secrets:
                 insert(cur)
         return self
 
-    def get(
-        self, key: Union[str, CKey], default_value: Optional[str] = None
-    ) -> Optional[str]:
+    def get(self, key: str | CKey, default_value: str | None = None) -> str | None:
 
         key = key.name if isinstance(key, CKey) else key
 
@@ -166,7 +160,7 @@ class Secrets:
             for row in res:
                 yield row[0], row[1]
 
-    def remove(self, key: Union[str, CKey]) -> None:
+    def remove(self, key: str | CKey) -> None:
         """
         Deletes entry with the specified key if it exists.
         Doesn't raise any exception if the key doesn't exist.

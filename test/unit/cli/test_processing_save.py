@@ -74,7 +74,7 @@ def test_change_value(scs_patcher):
 
 def test_save_enum_value(scs_patcher):
     scs_mock = scs_patcher.patch()
-    actual = processing.save(
+    processing.save(
         scs_file=Path("/fictional/scs"),
         backend=StorageBackend.onprem,
         use_itde=True,
@@ -86,7 +86,7 @@ def test_save_enum_value(scs_patcher):
 def test_save_secret_option(scs_patcher, monkeypatch, capsys):
     scs_mock = scs_patcher.patch()
     monkeypatch.setitem(os.environ, "SCS_EXASOL_SAAS_TOKEN", "patty-pat")
-    actual = processing.save(
+    processing.save(
         scs_file=Path("/fictional/scs"),
         backend=StorageBackend.saas,
         use_itde=False,

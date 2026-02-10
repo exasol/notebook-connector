@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 
 def upward_file_search(file_name: str) -> str:
@@ -20,7 +19,7 @@ def upward_file_search(file_name: str) -> str:
     raise ValueError(f"Cannot find {file_name}")
 
 
-def optional_str_to_bool(value: Optional[str]) -> Optional[bool]:
+def optional_str_to_bool(value: str | None) -> bool | None:
     """
     Converts an optional string value to an optional boolean.
     None, '' => None.

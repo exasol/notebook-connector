@@ -8,4 +8,5 @@ PROJECT_CONFIG = BaseConfig(
     # currently only python 3.10 is supported due to
     # dependencies on binary provision such as TXAIE
     python_versions=("3.10",),
+    add_to_excluded_python_paths=("ui_snapshots",),
 )

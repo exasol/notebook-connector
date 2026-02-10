@@ -2,7 +2,6 @@ import textwrap
 from collections.abc import Iterator
 from test.utils.integration_test_utils import (
     sample_db_file,
-    setup_itde_module,
 )
 
 import pytest

@@ -1,8 +1,6 @@
 from inspect import cleandoc
 from test.integration.ordinary.test_itde_manager import remove_itde
 
-import pytest
-
 from exasol.nb_connector.ai_lab_config import (
     Accelerator,
     AILabConfig,
@@ -24,7 +22,7 @@ def test_itde_with_gpu(secrets):
         secrets.save(AILabConfig.accelerator, Accelerator.nvidia.value)
         bring_itde_up(secrets)
         query_accelerator_parameters = cleandoc(
-            f"""
+            """
                 SELECT PARAM_VALUE, PARAM_NAME FROM EXA_METADATA 
                 WHERE PARAM_NAME IN ('acceleratorDeviceDetected', 'acceleratorDeviceGpuNvidiaDetected')
                 ORDER BY PARAM_NAME;
