@@ -2,7 +2,7 @@
 
 ## Summary
 
-This releasese fixes vulnerabilities by updating dependencies.
+This release fixes vulnerabilities by updating dependencies.
 
 ## Security Issues
 
