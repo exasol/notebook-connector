@@ -10,7 +10,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import pytest
 from pyexasol import ExaConnection
 
 from exasol.nb_connector.ai_lab_config import AILabConfig

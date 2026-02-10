@@ -1,6 +1,5 @@
 from collections.abc import Iterator
 from test.utils.integration_test_utils import _setup_itde_impl
-from typing import Iterator
 
 import pytest
 
