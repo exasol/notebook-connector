@@ -65,11 +65,17 @@ class Secrets:
 
     def _execute(
         self, stmt: str, args: list[Any] | None = None, cur: sqlcipher.Cursor = None
-    ) -> sqlcipher.Cursor:
+    ) -> None:
+        """
+        cur.execute() returns the same object on which execute() was
+        called. To avoid lifetime issues of the cursor object, we dont't
+        return it. This forces the caller to inject the cursor with the correct
+        lifetime into this method.
+        """
         try:
             with contextlib.ExitStack() as stack:
                 cur = cur or stack.enter_context(self._cursor())
-                return cur.execute(stmt, args or [])
+                cur.execute(stmt, args or [])
         # fmt: off
         except (sqlcipher.DatabaseError) as ex:  # pylint: disable=E1101
             # fmt: on
@@ -110,10 +116,8 @@ class Secrets:
         key = key.name if isinstance(key, CKey) else key
 
         def entry_exists(cur: sqlcipher.Cursor) -> bool:
-            res = self._execute(
-                f"SELECT * FROM {TABLE_NAME} WHERE key=?", [key], cur=cur
-            )
-            return res and res.fetchone()
+            self._execute(f"SELECT * FROM {TABLE_NAME} WHERE key=?", [key], cur=cur)
+            return bool(cur.fetchone())
 
         def update(cur: sqlcipher.Cursor) -> None:
             self._execute(
@@ -138,10 +142,8 @@ class Secrets:
 
         key = key.name if isinstance(key, CKey) else key
         with self._cursor() as cur:
-            res = self._execute(
-                f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key], cur=cur
-            )
-            row = res.fetchone() if res else None
+            self._execute(f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key], cur=cur)
+            row = cur.fetchone()
         return row[0] if row else default_value
 
     def __getattr__(self, key) -> str:
@@ -159,20 +161,20 @@ class Secrets:
     def keys(self) -> Iterable[str]:
         """Iterator over keys akin to dict.keys()"""
         with self._cursor() as cur:
-            res = self._execute(f"SELECT key FROM {TABLE_NAME}", cur=cur)
-            yield from (row[0] for row in res)
+            self._execute(f"SELECT key FROM {TABLE_NAME}", cur=cur)
+            yield from (row[0] for row in cur)
 
     def values(self) -> Iterable[str]:
         """Iterator over values akin to dict.values()"""
         with self._cursor() as cur:
-            res = self._execute(f"SELECT value FROM {TABLE_NAME}", cur=cur)
-            yield from (row[0] for row in res)
+            self._execute(f"SELECT value FROM {TABLE_NAME}", cur=cur)
+            yield from (row[0] for row in cur)
 
     def items(self) -> Iterable[tuple[str, str]]:
         """Iterator over keys and values akin to dict.items()"""
         with self._cursor() as cur:
-            res = self._execute(f"SELECT key, value FROM {TABLE_NAME}", cur=cur)
-            yield from ((row[0], row[1]) for row in res)
+            self._execute(f"SELECT key, value FROM {TABLE_NAME}", cur=cur)
+            yield from ((row[0], row[1]) for row in cur)
 
     def remove(self, key: str | CKey) -> None:
         """
