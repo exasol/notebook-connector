@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import contextlib
+import functools
 import logging
 import sys
+import threading
 from collections.abc import Iterable
 from inspect import cleandoc
 from pathlib import Path
@@ -28,7 +30,8 @@ class Secrets:
     def __init__(self, db_file: Path, master_password: str) -> None:
         self.db_file = db_file
         self._master_password = master_password
-        self._con = None
+        self._lock = threading.Lock()
+        self._cache: dict[int, sqlcipher.Connection] = {}
         self._initialize()
 
     def _initialize(self) -> None:
@@ -40,19 +43,32 @@ class Secrets:
         self._execute(f"CREATE TABLE {TABLE_NAME} (key TEXT PRIMARY KEY, value TEXT)")
 
     def close(self) -> None:
-        if self._con is not None:
-            self._con.close()
-            self._con = None
+        thread_id = threading.get_ident()
+        with self._lock:
+            con = self._cache.pop(thread_id, None)
+        if con:
+            con.close()
+        # if self._con is not None:
+        #     self._con.close()
+        #     self._con = None
 
     # disable error messages about unresolved types in type hints as
     # sqlcipher is a c library and does not provide this information.
-    def connection(
-        self,
-    ) -> sqlcipher.Connection:  # pylint: disable=E1101
-        # fmt: off
-        self._con = sqlcipher.connect(self.db_file)  # pylint: disable=E1101
-        # fmt: on
-        return self._con
+    def connection(self) -> sqlcipher.Connection:  # pylint: disable=E1101
+        thread_id = threading.get_ident()
+        return self._connection(thread_id)
+        # # fmt: off
+        # self._con = sqlcipher.connect(self.db_file)  # pylint: disable=E1101
+        # # fmt: on
+        # return self._con
+
+    def _connection(self, thread_id: int) -> sqlcipher.Connection:  # pylint: disable=E1101
+        if con := self._cache.get(thread_id):
+            return con
+        con = sqlcipher.connect(self.db_file)  # pylint: disable=E1101
+        with self._lock:
+            self._cache[thread_id] = con
+        return con
 
     def _use_master_password(self, cur: sqlcipher.Cursor) -> None:
         """
@@ -109,7 +125,7 @@ class Secrets:
             finally:
                 cur.close()
         finally:
-            con.close()
+            self.close()
 
     def save(self, key: str | CKey, value: str) -> Secrets:
         """key represents a system, service, or application"""
