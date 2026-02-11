@@ -1,9 +1,4 @@
 from test.utils.mock_cast import mock_cast
-from typing import (
-    Dict,
-    Tuple,
-    Union,
-)
 from unittest.mock import (
     MagicMock,
     PropertyMock,
@@ -20,10 +15,8 @@ from exasol.nb_connector.container_by_ip import ContainerByIp
 
 def create_docker_client_mock(
     containers: dict[str, dict[str, str]],
-) -> tuple[
-    Union[docker.DockerClient, MagicMock], dict[str, Union[MagicMock, Container]]
-]:
-    docker_client_mock: Union[MagicMock, docker.DockerClient] = create_autospec(
+) -> tuple[docker.DockerClient | MagicMock, dict[str, MagicMock | Container]]:
+    docker_client_mock: MagicMock | docker.DockerClient = create_autospec(
         docker.DockerClient
     )
     container_mocks = {
@@ -36,8 +29,8 @@ def create_docker_client_mock(
     return docker_client_mock, container_mocks
 
 
-def create_container_mock(networks: dict[str, str]) -> Union[MagicMock, Container]:
-    container_mock: Union[MagicMock, Container] = create_autospec(Container)
+def create_container_mock(networks: dict[str, str]) -> MagicMock | Container:
+    container_mock: MagicMock | Container = create_autospec(Container)
     type(container_mock).attrs = PropertyMock(
         return_value={
             "NetworkSettings": {
@@ -89,7 +82,7 @@ def test_no_matching_container():
     result = test_setup.container_by_ip.find(ip_addresses)
 
     assert test_setup.docker_client_mock.mock_calls == [call.containers.list()]
-    assert result == None
+    assert result is None
 
 
 def test_multiple_containers_matching():

@@ -1,9 +1,6 @@
 from test.utils.integration_test_utils import (
     get_script_counts,
-    setup_itde,
 )
-
-import pytest
 
 from exasol.nb_connector.bfs_utils import put_file
 from exasol.nb_connector.cloud_storage import setup_scripts

@@ -4,7 +4,6 @@ from test.utils.integration_test_utils import (
     assert_run_empty_udf,
     get_script_counts,
     language_definition_context,
-    setup_itde,
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey

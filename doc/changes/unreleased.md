@@ -1,5 +1,7 @@
 # Unreleased
 
+## Summary
+
 ## Refactoring
 
 * #305: Replacing store magic with normal file access

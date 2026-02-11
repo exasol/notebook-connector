@@ -70,7 +70,7 @@ def test_bfs_exception(bfs_mock, method, side_effect, expected_message):
     """
     file_mock = mock_bfs_file(bfs_mock, method, side_effect)
     scs = ScsMock()
-    with pytest.raises(ScsCliError, match=expected_message) as ex:
+    with pytest.raises(ScsCliError, match=expected_message):
         bfs_access.verify_bucketfs_access(scs)
     assert file_mock.rm.called
 
