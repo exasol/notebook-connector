@@ -1,17 +1,13 @@
 from __future__ import annotations
 
 import contextlib
-import functools
 import logging
-import sys
 import threading
 from collections.abc import Iterable
 from inspect import cleandoc
 from pathlib import Path
 from typing import (
     Any,
-    Optional,
-    Union,
 )
 
 from sqlcipher3 import dbapi2 as sqlcipher  # type: ignore
@@ -36,8 +32,7 @@ class Secrets:
 
     def _initialize(self) -> None:
         if self.db_file.exists():
-            # May raise InvalidPassword
-            self._execute("SELECT * FROM sqlite_master")
+            self._verify_access()
             return
         LOG.info('Creating file %s and table "%s"', self.db_file, TABLE_NAME)
         self._execute(f"CREATE TABLE {TABLE_NAME} (key TEXT PRIMARY KEY, value TEXT)")
@@ -48,26 +43,16 @@ class Secrets:
             con = self._cache.pop(thread_id, None)
         if con:
             con.close()
-        # if self._con is not None:
-        #     self._con.close()
-        #     self._con = None
 
-    # disable error messages about unresolved types in type hints as
-    # sqlcipher is a c library and does not provide this information.
-    def connection(self) -> sqlcipher.Connection:  # pylint: disable=E1101
+    def connection(self) -> sqlcipher.Connection:
         thread_id = threading.get_ident()
-        return self._connection(thread_id)
-        # # fmt: off
-        # self._con = sqlcipher.connect(self.db_file)  # pylint: disable=E1101
-        # # fmt: on
-        # return self._con
-
-    def _connection(self, thread_id: int) -> sqlcipher.Connection:  # pylint: disable=E1101
         if con := self._cache.get(thread_id):
             return con
         con = sqlcipher.connect(self.db_file)  # pylint: disable=E1101
         with self._lock:
             self._cache[thread_id] = con
+        with self._cursor(con) as cur:
+            self._use_master_password(cur)
         return con
 
     def _use_master_password(self, cur: sqlcipher.Cursor) -> None:
@@ -79,23 +64,13 @@ class Secrets:
             sanitized = self._master_password.replace("'", "\\'")
             cur.execute(f"PRAGMA key = '{sanitized}'")
 
-    def _execute(
-        self, stmt: str, args: list[Any] | None = None, cur: sqlcipher.Cursor = None
-    ) -> None:
-        """
-        cur.execute() returns the same object on which execute() was
-        called. To avoid lifetime issues of the cursor object, we dont't
-        return it. This forces the caller to inject the cursor with the correct
-        lifetime into this method.
-        """
+    def _verify_access(self) -> None:
         try:
-            with contextlib.ExitStack() as stack:
-                cur = cur or stack.enter_context(self._cursor())
-                cur.execute(stmt, args or [])
+            self._execute("SELECT * FROM sqlite_master")
         # fmt: off
         except (sqlcipher.DatabaseError) as ex:  # pylint: disable=E1101
             # fmt: on
-            LOG.error(f"exception %s", ex)
+            LOG.error("Exception %s", ex)
             if str(ex) == "file is not a database":
                 raise InvalidPassword(
                     cleandoc(
@@ -108,24 +83,34 @@ class Secrets:
                 ) from ex
             raise
 
+    def _execute(
+        self, stmt: str, args: list[Any] | None = None, cur: sqlcipher.Cursor = None
+    ) -> None:
+        """
+        cur.execute() returns the same object on which execute() was
+        called. To avoid lifetime issues of the cursor object, we dont't
+        return it. This forces the caller to inject the cursor with the correct
+        lifetime into this method.
+        """
+        with contextlib.ExitStack() as stack:
+            cur = cur or stack.enter_context(self._cursor())
+            cur.execute(stmt, args or [])
+
     @contextlib.contextmanager
     def _cursor(
         self,
-    ) -> sqlcipher.Cursor:  # pylint: disable=E1101
-        con = self.connection()
+        con: sqlcipher.Connection | None = None,
+    ) -> sqlcipher.Cursor:
+        con = con or self.connection()
+        cur = con.cursor()
         try:
-            cur = con.cursor()
-            try:
-                self._use_master_password(cur)
-                yield cur
-                con.commit()
-            except:
-                con.rollback()
-                raise
-            finally:
-                cur.close()
+            yield cur
+            con.commit()
+        except:
+            con.rollback()
+            raise
         finally:
-            self.close()
+            cur.close()
 
     def save(self, key: str | CKey, value: str) -> Secrets:
         """key represents a system, service, or application"""
