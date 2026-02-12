@@ -158,9 +158,9 @@ class Secrets:
             " ON CONFLICT(key) DO UPDATE SET value=?"
         )
         self._execute(stmt, [key, value, value])
+        return self
 
     def get(self, key: str | CKey, default_value: str | None = None) -> str | None:
-
         key = key.name if isinstance(key, CKey) else key
         with self._cursor() as cur:
             self._execute(f"SELECT value FROM {TABLE_NAME} WHERE key=?", [key], cur=cur)
