@@ -1,10 +1,7 @@
 import contextlib
 import logging
-import random
 import sqlite3
 import threading
-import time
-from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
@@ -161,7 +158,7 @@ def test_performance(secrets):
 class AccessThread(threading.Thread):
     def __init__(self, id: int, secrets: Secrets):
         super().__init__(target=self.access_scs)
-        self.id = f'T{id}'
+        self.id = f"T{id}"
         self._secrets = secrets
 
     def access_scs(self):
