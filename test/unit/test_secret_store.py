@@ -175,6 +175,7 @@ def not_raises(exception):
         raise pytest.fail(f"Did raise {exception}")
 
 
+@pytest.mark.slow
 def test_multithreads(secrets):
     """
     Verify multiple threads concurrently accessing the same secret store.
