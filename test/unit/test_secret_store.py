@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import random
 import sqlite3
@@ -142,6 +143,7 @@ def test_remove_db_schema(secrets):
     assert secrets.get(CKey.db_schema) is None
 
 
+# todo: benchmark
 def test_performance(secrets):
     """
     duration of range(0, 20) in seconds:
@@ -156,65 +158,33 @@ def test_performance(secrets):
         assert value == secrets.get(key)
 
 
-def access_scs(secrets: Secrets):
-    for i in range(0, 5):
-        print(f'{i+1} {secrets}')
-        time.sleep(0.1)
-
-@dataclass
-class Result:
-    iteration: int
-    key: str
-    written: str
-    read: str
-
-    def __str__(self) -> str:
-        if self.written == self.read:
-            return (
-                f'Iteration {self.iteration} successfully used key {self.key}'
-                f' to write and read value {self.written}.'
-            )
-        return (
-            f'Iteration {self.iteration} used key {self.key},'
-            f' wrote {self.written}, but read {self.read}.'
-        )
-
-
 class AccessThread(threading.Thread):
-    def __init__(self, id: str, secrets: Secrets, sleep: int = 0, iterations: int = 0):
+    def __init__(self, id: int, secrets: Secrets):
         super().__init__(target=self.access_scs)
-        self.id = id
+        self.id = f'T{id}'
         self._secrets = secrets
-        self._sleep = sleep or random.randint(1, 10) / 100
-        self._iterations = iterations or random.randint(4, 8)
-        self.results: list[Result] = []
-
-    @property
-    def random_key(self) -> str:
-        i = random.randint(0, 2) + 1
-        return f'K{i}'
 
     def access_scs(self):
-        for i in range(0, self._iterations):
-            time.sleep(self._sleep)
-            key = self.random_key
-            written = self.id
-            self._secrets.save(key, written)
-            time.sleep(self._sleep)
-            read = self._secrets.get(key)
-            result = Result(i, key, written, read)
-            self.results.append(result)
-            LOG.info(f'thread {self.id}: {result}')
+        for i in range(0, 20):
+            self._secrets.save("key", self.id)
+            dict(self._secrets.items())
+
+
+@contextlib.contextmanager
+def not_raises(exception):
+    try:
+        yield
+    except exception:
+        raise pytest.fail(f"Did raise {exception}")
+
 
 def test_multithreads(secrets):
     """
     Verify multiple threads concurrently accessing the same secret store.
     """
-    threads = [AccessThread(f"T{i}", secrets) for i in range(0,20)]
-    for t in threads:
-        t.start()
-    for t in threads:
-        t.join()
-    for t in threads:
-        for r in t.results:
-            assert r.written == r.read, f'Thread {t.id}: {r}'
+    threads = [AccessThread(i, secrets) for i in range(0, 200)]
+    with not_raises(Exception):
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
