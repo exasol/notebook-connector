@@ -10,7 +10,14 @@ from typing import (
     Any,
 )
 
+import tenacity
 from sqlcipher3 import dbapi2 as sqlcipher  # type: ignore
+from tenacity import (
+    retry_if_exception_message,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
@@ -37,6 +44,26 @@ class Secrets:
         LOG.info('Creating file %s and table "%s"', self.db_file, TABLE_NAME)
         self._execute(f"CREATE TABLE {TABLE_NAME} (key TEXT PRIMARY KEY, value TEXT)")
 
+    def connection(self) -> sqlcipher.Connection:
+        """
+        SQLite allows a connection to be used only by a single thread.  In
+        multi-threaded scenarios we therefore need to maintain a connection
+        pool, containing a separate connection for each thread.
+
+        Potential exceptions:
+        sqlcipher3.dbapi2.IntegrityError: UNIQUE constraint failed: secrets.key
+        sqlcipher3.dbapi2.OperationalError: database is locked
+        """
+        thread_id = threading.get_ident()
+        with self._lock:
+            if con := self._cache.get(thread_id):
+                return con
+            con = sqlcipher.connect(self.db_file)  # pylint: disable=E1101
+            self._cache[thread_id] = con
+        with self._cursor(con) as cur:
+            self._use_master_password(cur)
+        return con
+
     def close(self) -> None:
         thread_id = threading.get_ident()
         with self._lock:
@@ -44,16 +71,17 @@ class Secrets:
         if con:
             con.close()
 
-    def connection(self) -> sqlcipher.Connection:
-        thread_id = threading.get_ident()
-        if con := self._cache.get(thread_id):
-            return con
-        con = sqlcipher.connect(self.db_file)  # pylint: disable=E1101
+    def close_all(self) -> None:
+        """
+        Close all connections in cache and empty cache.
+        """
         with self._lock:
-            self._cache[thread_id] = con
-        with self._cursor(con) as cur:
-            self._use_master_password(cur)
-        return con
+            for con in self._cache.values():
+                con.close()
+            self._cache = {}
+
+    def __del__(self) -> None:
+        self.close()
 
     def _use_master_password(self, cur: sqlcipher.Cursor) -> None:
         """
@@ -83,6 +111,16 @@ class Secrets:
                 ) from ex
             raise
 
+    # If the database is locked, wait exponentially min. 0.1 seconds, max. 5
+    # seconds (50 * 0.1) and retry executing the current SQL statement.
+    @tenacity.retry(
+        retry=(
+            retry_if_exception_type(sqlcipher.OperationalError)
+            | retry_if_exception_message("database is locked")
+        ),
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=0.1, min=0.1, max=50),
+    )
     def _execute(
         self, stmt: str, args: list[Any] | None = None, cur: sqlcipher.Cursor = None
     ) -> None:
@@ -115,29 +153,11 @@ class Secrets:
     def save(self, key: str | CKey, value: str) -> Secrets:
         """key represents a system, service, or application"""
         key = key.name if isinstance(key, CKey) else key
-
-        def entry_exists(cur: sqlcipher.Cursor) -> bool:
-            self._execute(f"SELECT * FROM {TABLE_NAME} WHERE key=?", [key], cur=cur)
-            return bool(cur.fetchone())
-
-        def update(cur: sqlcipher.Cursor) -> None:
-            self._execute(
-                f"UPDATE {TABLE_NAME} SET value=? WHERE key=?", [value, key], cur=cur
-            )
-
-        def insert(cur: sqlcipher.Cursor) -> None:
-            self._execute(
-                f"INSERT INTO {TABLE_NAME} (key,value) VALUES (?, ?)",
-                [key, value],
-                cur=cur,
-            )
-
-        with self._cursor() as cur:
-            if entry_exists(cur):
-                update(cur)
-            else:
-                insert(cur)
-        return self
+        stmt = (
+            f"INSERT INTO {TABLE_NAME} (key,value) VALUES (?, ?)"
+            " ON CONFLICT(key) DO UPDATE SET value=?"
+        )
+        self._execute(stmt, [key, value, value])
 
     def get(self, key: str | CKey, default_value: str | None = None) -> str | None:
 

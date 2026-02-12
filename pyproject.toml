@@ -21,6 +21,7 @@ dependencies = [
   "exasol-saas-api (>=0.9.0, <3)", # needed to get database id for database name
   "pydantic (==2.11.5)", # See https://github.com/exasol/ai-lab/issues/428
   "pickleshare(>=0.7.5)", # See https://github.com/exasol/ai-lab/issues/291 for details.
+  "tenacity (>=8.5.0)",
 ]
 
 [project.optional-dependencies]
