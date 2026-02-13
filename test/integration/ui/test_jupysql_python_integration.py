@@ -8,8 +8,6 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.jupysql_init import init_jupysql
 
-LOG = logging.getLogger(__name__)
-
 
 def test_jupysql_python_execution(tmp_path):
     config_path = tmp_path / "dummy_config_store.sqlite"
