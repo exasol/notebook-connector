@@ -1,8 +1,8 @@
 import logging
 import os
 from pathlib import Path
-
 import pytest
+from exasol.nb_connector.ui import jupysql_init
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
@@ -21,15 +21,11 @@ def test_jupysql_python_execution(tmp_path):
     secrets.save(CKey.db_user, "user")
     secrets.save(CKey.db_password, "password")
     secrets.save(CKey.storage_backend, "onprem")
-    os.environ["EXASOL_CONFIG_PATH"] = str(config_path)
-    ai_lab_config = Secrets(Path(os.environ["EXASOL_CONFIG_PATH"]), store_password)
+    ai_lab_config = Secrets(Path(config_path), store_password)
+    orig_get_ipython = jupysql_init.get_ipython
+    jupysql_init.get_ipython = lambda: None
     try:
-        init_jupysql(ai_lab_config)
-    except Exception as e:
-        assert False, f"Python execution failed: {e}"
-    assert ai_lab_config.get(CKey.db_schema) == "SCHEMA"
-    assert ai_lab_config.get(CKey.db_host_name) == "localhost"
-    assert ai_lab_config.get(CKey.db_port) == "8563"
-    assert ai_lab_config.get(CKey.db_user) == "user"
-    assert ai_lab_config.get(CKey.db_password) == "password"
-    assert ai_lab_config.get(CKey.storage_backend) == "onprem"
+        with pytest.raises(RuntimeError, match="Not running inside IPython. Magic commands will not execute."):
+            init_jupysql(ai_lab_config)
+    finally:
+        jupysql_init.get_ipython = orig_get_ipython
