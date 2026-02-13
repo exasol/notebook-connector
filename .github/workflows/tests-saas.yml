@@ -34,6 +34,7 @@ jobs:
 
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v5
+        with:
           poetry-version: "2.3.0"
           extras: all
 
