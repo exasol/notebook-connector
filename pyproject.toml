@@ -60,10 +60,10 @@ all = [
     "ifaddr (>=0.2.0, <0.3)",
     "exasol-script-languages-container-tool (>=3, <4)",
     "GitPython (>=2.1.0)",
-    "ibis-framework [exasol (>=11, <12)" ,
+    "ibis-framework [exasol] (>=11, <12)",
     "exasol-transformers-extension (>=3.0.0, <4)",
     "yaspin (>=3.1.0, <4)",
-    "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ,
+    "exasol-text-ai-extension (>=0.1.0, <2.0.0)",
     "exasol-sagemaker-extension (>=0.11.5)",
 ]
 performance = ["pytest-benchmark[histogram]>=5.1.0,<6"]
