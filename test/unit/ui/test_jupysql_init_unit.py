@@ -1,0 +1,25 @@
+import pytest
+from unittest.mock import MagicMock, patch
+from exasol.nb_connector.ui import jupysql_init
+
+def test_init_jupysql_ipython_none():
+    """This test is checking if proper error is coming when IPython is not there, like in normal python only."""
+    with patch('exasol.nb_connector.ui.jupysql_init.get_ipython', return_value=None), \
+         patch('exasol.nb_connector.ui.jupysql_init.open_sqlalchemy_connection'):
+        with pytest.raises(RuntimeError, match="Not running inside IPython. Magic commands will not execute."):
+            jupysql_init.init_jupysql(MagicMock())
+
+def test_init_jupysql_ipython_magics():
+    """This test is checking if all magic commands are running properly when IPython is there, like in notebook."""
+    mock_ipy = MagicMock()
+    with patch('exasol.nb_connector.ui.jupysql_init.get_ipython', return_value=mock_ipy):
+        with patch('exasol.nb_connector.ui.jupysql_init.open_sqlalchemy_connection'), \
+             patch('exasol.nb_connector.ui.jupysql_init.get_activation_sql', return_value='MOCK_SQL'):
+            mock_config = MagicMock()
+            mock_config.db_schema = 'MOCK_SCHEMA'
+            jupysql_init.init_jupysql(mock_config)
+            mock_ipy.run_line_magic.assert_any_call('load_ext', 'sql')
+            mock_ipy.run_line_magic.assert_any_call('sql', 'engine')
+            mock_ipy.run_line_magic.assert_any_call('config', 'SqlMagic.short_errors = False')
+            mock_ipy.run_line_magic.assert_any_call('sql', 'OPEN SCHEMA MOCK_SCHEMA')
+            mock_ipy.run_line_magic.assert_any_call('sql', 'MOCK_SQL')
