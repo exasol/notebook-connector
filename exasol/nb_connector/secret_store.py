@@ -118,8 +118,7 @@ class Secrets:
             retry_if_exception_type(sqlcipher.OperationalError)
             | retry_if_exception_message("database is locked")
         ),
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=0.1, min=0.1, max=50),
+        wait=wait_exponential(multiplier=0.1, min=0.1, max=30),
     )
     def _execute(
         self, stmt: str, args: list[Any] | None = None, cur: sqlcipher.Cursor = None
