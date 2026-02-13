@@ -26,6 +26,10 @@ def test_jupysql_python_execution(tmp_path):
     try:
         init_jupysql(ai_lab_config)
     except Exception as e:
-        LOG.error(f"Python execution error: {e}")
         assert False, f"Python execution failed: {e}"
-    assert True
+    assert ai_lab_config.get(CKey.db_schema) == "SCHEMA"
+    assert ai_lab_config.get(CKey.db_host_name) == "localhost"
+    assert ai_lab_config.get(CKey.db_port) == "8563"
+    assert ai_lab_config.get(CKey.db_user) == "user"
+    assert ai_lab_config.get(CKey.db_password) == "password"
+    assert ai_lab_config.get(CKey.storage_backend) == "onprem"
