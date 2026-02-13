@@ -3,8 +3,11 @@ import logging
 import sqlite3
 import threading
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
+import sqlcipher3.dbapi2 as sqlcipher
+import tenacity
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import (
@@ -188,6 +191,33 @@ def test_multithreads(secrets):
             t.join()
 
 
-## TODO
-def test_retry_execute():
-    pass
+def cursor_mock(side_effect):
+    mock = Mock()
+    mock.execute.side_effect = side_effect
+    return mock
+
+
+@pytest.mark.parametrize("side_effect, expected", [
+    (Exception("message"), Exception),
+    (sqlcipher.OperationalError("any"), sqlcipher.OperationalError),
+])
+def test_execute_no_retry(secrets, side_effect, expected):
+    cursor = cursor_mock(side_effect)
+    with pytest.raises(expected):
+        secrets._execute("statement", cur=cursor)
+
+
+DATABASE_LOCKED = sqlcipher.OperationalError("database is locked")
+
+
+def test_execute_retry_once(secrets):
+    cursor = cursor_mock([DATABASE_LOCKED, None])
+    secrets._execute("statement", cur=cursor)
+    assert cursor.execute.call_count == 2
+
+
+def test_execute_retry_timeout(secrets):
+    cursor = cursor_mock(DATABASE_LOCKED)
+    with pytest.raises(tenacity.RetryError):
+        secrets._execute("statement", cur=cursor)
+    assert cursor.execute.call_count == 5

@@ -52,6 +52,7 @@ transformers = [
 text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
 sagemaker = [ "exasol-sagemaker-extension (>=0.11.5)" ]
 
+# performance = ["pytest-benchmark[histogram]>=5.1.0,<6"]
 
 [project.urls]
 Homepage = "https://github.io/exasol/notebook-connector"

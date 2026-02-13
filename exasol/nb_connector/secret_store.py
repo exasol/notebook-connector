@@ -116,8 +116,9 @@ class Secrets:
     @tenacity.retry(
         retry=(
             retry_if_exception_type(sqlcipher.OperationalError)
-            | retry_if_exception_message("database is locked")
+            & retry_if_exception_message("database is locked")
         ),
+        stop=stop_after_attempt(5),
         wait=wait_exponential(multiplier=0.1, min=0.1, max=30),
     )
     def _execute(
