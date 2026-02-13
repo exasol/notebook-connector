@@ -197,10 +197,13 @@ def cursor_mock(side_effect):
     return mock
 
 
-@pytest.mark.parametrize("side_effect, expected", [
-    (Exception("message"), Exception),
-    (sqlcipher.OperationalError("any"), sqlcipher.OperationalError),
-])
+@pytest.mark.parametrize(
+    "side_effect, expected",
+    [
+        (Exception("message"), Exception),
+        (sqlcipher.OperationalError("any"), sqlcipher.OperationalError),
+    ],
+)
 def test_execute_no_retry(secrets, side_effect, expected):
     cursor = cursor_mock(side_effect)
     with pytest.raises(expected):
