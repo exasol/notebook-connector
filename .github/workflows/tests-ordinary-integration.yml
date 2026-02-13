@@ -63,10 +63,9 @@ jobs:
           sudo rm -rf /usr/local/lib/node_modules
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v1
-
-      - name: Install All Optional Dependencies (aka. "extras")
-        run: poetry install --all-extras
+        uses: exasol/python-toolbox/.github/actions/python-environment@v5
+          poetry-version: "2.3.0"
+          extras: all
 
       - name: Allow unprivileged user namespaces
         run: |
