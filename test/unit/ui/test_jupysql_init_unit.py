@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
 from exasol.nb_connector.ui import jupysql_init
 
 
@@ -20,8 +20,10 @@ def test_init_jupysql_ipython_magics():
             mock_config = MagicMock()
             mock_config.db_schema = 'MOCK_SCHEMA'
             jupysql_init.init_jupysql(mock_config)
-            mock_ipy.run_line_magic.assert_any_call('load_ext', 'sql')
-            mock_ipy.run_line_magic.assert_any_call('sql', 'engine')
-            mock_ipy.run_line_magic.assert_any_call('config', 'SqlMagic.short_errors = False')
-            mock_ipy.run_line_magic.assert_any_call('sql', 'OPEN SCHEMA MOCK_SCHEMA')
-            mock_ipy.run_line_magic.assert_any_call('sql', 'MOCK_SQL')
+            assert mock_ipy.mock_calls == [
+                call.run_line_magic('load_ext', 'sql'),
+                call.run_line_magic('sql', 'engine'),
+                call.run_line_magic('config', 'SqlMagic.short_errors = False'),
+                call.run_line_magic('sql', 'OPEN SCHEMA MOCK_SCHEMA'),
+                call.run_line_magic('sql', 'MOCK_SQL'),
+            ]
