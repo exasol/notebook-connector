@@ -45,7 +45,7 @@ jobs:
 
 
   performance-checks:
-    needs: [ run-slow-tests ]
+    # needs: [ run-slow-tests ]
     uses: ./.github/workflows/performance-checks.yml
     permissions:
       contents: read
