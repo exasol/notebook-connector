@@ -24,7 +24,7 @@ jobs:
         run: poetry install --with performance
 
       - name: Run performance test
-        run: poetry run -- nox -s performance:test -- test/performance/benchmark.py
+        run: poetry run -- nox -s test:performance -- test/performance/benchmark.py
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v6
