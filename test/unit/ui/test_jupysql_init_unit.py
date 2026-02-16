@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import MagicMock, patch, call
+
+import pytest
+
 from exasol.nb_connector.ui import jupysql_init
 
 
