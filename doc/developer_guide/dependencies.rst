@@ -38,6 +38,8 @@ In file ``pyproject.toml`` these are in group
 ``[tool.poetry.group.dev.dependencies]``.
 
 
+.. _benchmark_dependency:
+
 Optional Dev Dependencies
 =========================
 

@@ -8,3 +8,4 @@
    release
    slc_versions
    ui_tests
+   performance_tests
