@@ -20,10 +20,10 @@ jobs:
           python-version: "3.10"
           poetry-version: "2.3.0"
 
-      - name: Install performance dependency
+      - name: Install Performance Dependency
         run: poetry install --with performance
 
-      - name: Run performance test
+      - name: Run Performance Test
         run: poetry run -- nox -s test:performance -- test/performance/benchmark.py
 
       - name: Upload Artifacts
