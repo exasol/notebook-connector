@@ -30,14 +30,14 @@ def start_database(session):
     )
 
 
-def rename(file: Path, prefix: str="", suffix: str=""):
-    name = file.with_suffix('').name
+def rename(file: Path, prefix: str = "", suffix: str = ""):
+    name = file.with_suffix("").name
     return file.parent / f"{prefix}{name}{suffix}"
 
 
 @nox.session(name="test:performance", python=False)
 def performance_test(session: nox.Session) -> None:
-    """ Execute one or more performance tests. """
+    """Execute one or more performance tests."""
     if not session.posargs:
         session.error(f"Usage: nox -s {session.name} pytest_file.py")
     pytest_file = PROJECT_CONFIG.root_path / session.posargs[0]
