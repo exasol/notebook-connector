@@ -3,7 +3,7 @@ from pathlib import Path
 import nox
 
 # imports all nox task provided by the toolbox
-# noqa: disables ruff error
+# no-qa: disables ruff error
 from exasol.toolbox.nox.tasks import *  # noqa: F403
 
 from noxconfig import PROJECT_CONFIG
@@ -44,7 +44,7 @@ def performance_test(session: nox.Session) -> None:
     output = rename(pytest_file, "_", "-results.json")
     command = [
         "pytest",
-        pytest_file,
+        str(pytest_file),
         "--benchmark-sort=name",
         f"--benchmark-json={output}",
     ]
