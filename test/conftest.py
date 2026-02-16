@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from test.bucketfs_protocol import BucketFSProtocol
 from test.package_manager import PackageManager
-from test.utils.integration_test_utils import sample_db_file
+from test.utils.secrets import sample_db_file
 
 import pytest
 from exasol.slc.models.compression_strategy import CompressionStrategy
