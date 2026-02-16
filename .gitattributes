@@ -1,3 +1,4 @@
-poetry.lock              linguist-generated
-doc/changes/changelog.md linguist-generated
-version.py               linguist-generated
+poetry.lock                              linguist-generated
+doc/changes/changelog.md                 linguist-generated
+exasol/nb_connector/version.py           linguist-generated
+test/performance/_benchmark-results.json linguist-generated
