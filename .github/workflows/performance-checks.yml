@@ -6,7 +6,7 @@ on:
 jobs:
 
   performance-tests:
-    name: Performace Test
+    name: Performance Test
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read

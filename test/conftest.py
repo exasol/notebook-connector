@@ -33,7 +33,7 @@ def pytest_addoption(parser):
     parser.addoption(
         "--compression-strategy",
         action="store",
-        choices=["none","gzip"],
+        choices=["none", "gzip"],
         default="gzip",
         help="Compression strategy to use for SLCs",
     )
