@@ -7,6 +7,8 @@
 
    scs-cli
 
+.. _install_nc:
+
 Installing the Notebook Connector (NC)
 **************************************
 
