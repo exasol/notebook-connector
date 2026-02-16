@@ -1,0 +1,33 @@
+name: Performance-Checks
+
+on:
+  workflow_call:
+
+jobs:
+
+  performance-tests:
+    name: Performace Test
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v6
+
+      - name: Set up Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v5
+        with:
+          python-version: "3.10"
+          poetry-version: "2.3.0"
+
+      - name: Install performance dependency
+        run: poetry install --with performance
+
+      - name: Run performance test
+        run: poetry run -- nox -s performance:test -- test/performance/benchmark.py
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: performance_benchmark-results.json
+          path: test/performance/_benchmark-results.json
