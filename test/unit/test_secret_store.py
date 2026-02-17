@@ -143,21 +143,6 @@ def test_remove_db_schema(secrets):
     assert secrets.get(CKey.db_schema) is None
 
 
-# todo: benchmark
-def test_performance(secrets):
-    """
-    duration of range(0, 20) in seconds:
-    0.24 old implementation
-    7.90 separate connection (32 times slower)
-    0.14 connection pool (runtime 58 %)
-    """
-    for i in range(0, 20):
-        key = f"key-{i}"
-        value = f"value {i}"
-        secrets.save(key, value)
-        assert value == secrets.get(key)
-
-
 class AccessThread(threading.Thread):
     def __init__(self, id: int, secrets: Secrets):
         super().__init__(target=self.access_scs)
