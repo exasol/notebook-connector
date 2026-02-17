@@ -76,7 +76,7 @@ files = [
     {file = "annotated_doc-0.0.4-py3-none-any.whl", hash = "sha256:571ac1dc6991c450b25a9c2d84a3705e2ae7a53467b5d111c24fa8baabbed320"},
     {file = "annotated_doc-0.0.4.tar.gz", hash = "sha256:fbcda96e87e9c92ad167c2e53839e57503ecfda18804ea28102353485033faa4"},
 ]
-markers = {main = "extra == \"text-ai\" or extra == \"sagemaker\""}
+markers = {main = "extra == \"sagemaker\""}
 
 [[package]]
 name = "annotated-types"
@@ -689,19 +689,19 @@ testing = ["pytest (>=6,!=7.0.0)", "pytest-xdist (>=2)"]
 
 [[package]]
 name = "boto3"
-version = "1.42.49"
+version = "1.42.45"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "extra == \"sagemaker\""
 files = [
-    {file = "boto3-1.42.49-py3-none-any.whl", hash = "sha256:99e1df4361c3f6ff6ade65803c043ea96314826134962dd3b385433b309eb819"},
-    {file = "boto3-1.42.49.tar.gz", hash = "sha256:9cd252f640567b86e92b0a8ffdd4ade9a3018ee357c724bff6a21b8c8a41be0c"},
+    {file = "boto3-1.42.45-py3-none-any.whl", hash = "sha256:5074e074a718a6f3c2b519cbb9ceab258f17b331a143d23351d487984f2a412f"},
+    {file = "boto3-1.42.45.tar.gz", hash = "sha256:4db50b8b39321fab87ff7f40ab407887d436d004c1f2b0dfdf56e42b4884709b"},
 ]
 
 [package.dependencies]
-botocore = ">=1.42.49,<1.43.0"
+botocore = ">=1.42.45,<1.43.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.16.0,<0.17.0"
 
@@ -710,15 +710,15 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.42.49"
+version = "1.42.45"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "extra == \"sagemaker\""
 files = [
-    {file = "botocore-1.42.49-py3-none-any.whl", hash = "sha256:1c33544f72101eed4ccf903ebb667a803e14e25b2af4e0836e4b871da1c0af37"},
-    {file = "botocore-1.42.49.tar.gz", hash = "sha256:333115a64a507697b0c450ade7e2d82bc8b4e21c0051542514532b455712bdcc"},
+    {file = "botocore-1.42.45-py3-none-any.whl", hash = "sha256:a5ea5d1b7c46c2d5d113879e45b21eaf7d60dc865f4bcb46dfcf0703fe3429f4"},
+    {file = "botocore-1.42.45.tar.gz", hash = "sha256:40b577d07b91a0ed26879da9e4658d82d3a400382446af1014d6ad3957497545"},
 ]
 
 [package.dependencies]
@@ -727,7 +727,7 @@ python-dateutil = ">=2.1,<3.0.0"
 urllib3 = {version = ">=1.25.4,<2.2.0 || >2.2.0,<3", markers = "python_version >= \"3.10\""}
 
 [package.extras]
-crt = ["awscrt (==0.31.2)"]
+crt = ["awscrt (==0.29.2)"]
 
 [[package]]
 name = "cachecontrol"
@@ -1367,14 +1367,14 @@ test = ["cython (>=3.1,<3.2)", "numpy (>=1.21.1)", "pyglet (>=2.1.9)", "pytest (
 
 [[package]]
 name = "cuda-pathfinder"
-version = "1.3.4"
+version = "1.3.3"
 description = "Pathfinder for CUDA components"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
-    {file = "cuda_pathfinder-1.3.4-py3-none-any.whl", hash = "sha256:fb983f6e0d43af27ef486e14d5989b5f904ef45cedf40538bfdcbffa6bb01fb2"},
+    {file = "cuda_pathfinder-1.3.3-py3-none-any.whl", hash = "sha256:9984b664e404f7c134954a771be8775dfd6180ea1e1aef4a5a37d4be05d9bbb1"},
 ]
 
 [[package]]
@@ -1641,6 +1641,7 @@ files = [
 markers = {main = "(extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\") and (sys_platform != \"win32\" or extra == \"sagemaker\")", dev = "sys_platform != \"win32\""}
 
 [package.dependencies]
+pywin32 = {version = ">=304", markers = "sys_platform == \"win32\""}
 requests = ">=2.26.0"
 urllib3 = ">=1.26.0"
 
@@ -1885,15 +1886,15 @@ sagemaker = ">=2.214.3,<3.0.0"
 
 [[package]]
 name = "exasol-script-languages-container-tool"
-version = "3.6.1"
+version = "3.6.0"
 description = "Script Languages Container Tool"
 optional = true
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
 markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
-    {file = "exasol_script_languages_container_tool-3.6.1-py3-none-any.whl", hash = "sha256:92a154e41d4d24ede20043fd15baf279236085ab4c54663360f0d912de9da593"},
-    {file = "exasol_script_languages_container_tool-3.6.1.tar.gz", hash = "sha256:dc36dfb90f0e4611e8e255583b6392a1446817194e24b64c144c9cbcce311923"},
+    {file = "exasol_script_languages_container_tool-3.6.0-py3-none-any.whl", hash = "sha256:f6baec0f14ae8619a042eca3cd98961385af0e70aad81915191bb4397c2be229"},
+    {file = "exasol_script_languages_container_tool-3.6.0.tar.gz", hash = "sha256:86561a7f07ab9165059b997cfe56690f9161e7c2157f6cca6108da20118083c1"},
 ]
 
 [package.dependencies]
@@ -6777,7 +6778,7 @@ files = [
     {file = "pywin32-311-cp39-cp39-win_amd64.whl", hash = "sha256:e0c4cfb0621281fe40387df582097fd796e80430597cb9944f0ae70447bacd91"},
     {file = "pywin32-311-cp39-cp39-win_arm64.whl", hash = "sha256:62ea666235135fee79bb154e695f3ff67370afefd71bd7fea7512fc70ef31e3d"},
 ]
-markers = {main = "(extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\") and platform_system == \"Windows\"", dev = "platform_system == \"Windows\""}
+markers = {main = "(platform_system == \"Windows\" or extra == \"sagemaker\") and (platform_system == \"Windows\" or sys_platform == \"win32\") and (extra == \"sagemaker\" or extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\")", dev = "platform_system == \"Windows\""}
 
 [[package]]
 name = "pywin32-ctypes"
@@ -10040,20 +10041,20 @@ typing-extensions = ">=3.7.4.3"
 
 [[package]]
 name = "typer-slim"
-version = "0.21.2"
+version = "0.21.1"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "extra == \"text-ai\""
 files = [
-    {file = "typer_slim-0.21.2-py3-none-any.whl", hash = "sha256:4705082bb6c66c090f60e47c8be09a93158c139ce0aa98df7c6c47e723395e5f"},
-    {file = "typer_slim-0.21.2.tar.gz", hash = "sha256:78f20d793036a62aaf9c3798306142b08261d4b2a941c6e463081239f062a2f9"},
+    {file = "typer_slim-0.21.1-py3-none-any.whl", hash = "sha256:6e6c31047f171ac93cc5a973c9e617dbc5ab2bddc4d0a3135dc161b4e2020e0d"},
+    {file = "typer_slim-0.21.1.tar.gz", hash = "sha256:73495dd08c2d0940d611c5a8c04e91c2a0a98600cbd4ee19192255a233b6dbfd"},
 ]
 
 [package.dependencies]
-annotated-doc = ">=0.0.2"
 click = ">=8.0.0"
+typing-extensions = ">=3.7.4.3"
 
 [package.extras]
 standard = ["rich (>=10.11.0)", "shellingham (>=1.3.0)"]
@@ -10521,4 +10522,4 @@ transformers = ["exasol-transformers-extension", "yaspin"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "56b4ab2160d39e00d2080ad36bd46ad2f2c39ea9063abd766c29b1969033756c"
+content-hash = "242c00873f6911b4a8455d721f8a465e26d56a0253b04ead0b62688eff4dba3a"
