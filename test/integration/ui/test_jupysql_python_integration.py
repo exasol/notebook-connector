@@ -33,8 +33,8 @@ def test_jupysql_no_ipython(tmp_path):
     jupysql_init.get_ipython = lambda: None
     try:
         with pytest.raises(
-                RuntimeError,
-                match="Not running inside IPython. Magic commands will not execute.",
+            RuntimeError,
+            match="Not running inside IPython. Magic commands will not execute.",
         ):
             init_jupysql(ai_lab_config)
     finally:
