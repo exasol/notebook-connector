@@ -11,13 +11,14 @@ from exasol.nb_connector.language_container_activation import get_activation_sql
 
 
 def init_jupysql(ai_lab_config):
-    open_sqlalchemy_connection(ai_lab_config)
+    engine = open_sqlalchemy_connection(ai_lab_config)
     ipy = get_ipython()
     if ipy is None:
         raise RuntimeError(
             "Not running inside IPython. Magic commands will not execute."
         )
     ipy.run_line_magic("load_ext", "sql")
+    ipy.push({"engine": engine})
     ipy.run_line_magic("sql", "engine")
     ipy.run_line_magic("config", "SqlMagic.short_errors = False")
     ipy.run_line_magic("sql", f"OPEN SCHEMA {ai_lab_config.db_schema}")
