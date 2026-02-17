@@ -14,3 +14,7 @@ file:
 
     poetry run -- nox -s test:performance -- test/performance/benchmark.py
 
+The results based on the initial implementation of the SCS are committed as a
+baseline and for each pull request NC runs the performance tests via GitHub
+workflow ``performance-checks.yml`` to identify future performance
+degradation.
