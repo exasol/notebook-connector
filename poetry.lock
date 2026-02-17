@@ -76,7 +76,7 @@ files = [
     {file = "annotated_doc-0.0.4-py3-none-any.whl", hash = "sha256:571ac1dc6991c450b25a9c2d84a3705e2ae7a53467b5d111c24fa8baabbed320"},
     {file = "annotated_doc-0.0.4.tar.gz", hash = "sha256:fbcda96e87e9c92ad167c2e53839e57503ecfda18804ea28102353485033faa4"},
 ]
-markers = {main = "extra == \"sagemaker\""}
+markers = {main = "extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "annotated-types"
@@ -689,19 +689,19 @@ testing = ["pytest (>=6,!=7.0.0)", "pytest-xdist (>=2)"]
 
 [[package]]
 name = "boto3"
-version = "1.42.45"
+version = "1.42.49"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "extra == \"sagemaker\""
 files = [
-    {file = "boto3-1.42.45-py3-none-any.whl", hash = "sha256:5074e074a718a6f3c2b519cbb9ceab258f17b331a143d23351d487984f2a412f"},
-    {file = "boto3-1.42.45.tar.gz", hash = "sha256:4db50b8b39321fab87ff7f40ab407887d436d004c1f2b0dfdf56e42b4884709b"},
+    {file = "boto3-1.42.49-py3-none-any.whl", hash = "sha256:99e1df4361c3f6ff6ade65803c043ea96314826134962dd3b385433b309eb819"},
+    {file = "boto3-1.42.49.tar.gz", hash = "sha256:9cd252f640567b86e92b0a8ffdd4ade9a3018ee357c724bff6a21b8c8a41be0c"},
 ]
 
 [package.dependencies]
-botocore = ">=1.42.45,<1.43.0"
+botocore = ">=1.42.49,<1.43.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.16.0,<0.17.0"
 
@@ -710,15 +710,15 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.42.45"
+version = "1.42.49"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "extra == \"sagemaker\""
 files = [
-    {file = "botocore-1.42.45-py3-none-any.whl", hash = "sha256:a5ea5d1b7c46c2d5d113879e45b21eaf7d60dc865f4bcb46dfcf0703fe3429f4"},
-    {file = "botocore-1.42.45.tar.gz", hash = "sha256:40b577d07b91a0ed26879da9e4658d82d3a400382446af1014d6ad3957497545"},
+    {file = "botocore-1.42.49-py3-none-any.whl", hash = "sha256:1c33544f72101eed4ccf903ebb667a803e14e25b2af4e0836e4b871da1c0af37"},
+    {file = "botocore-1.42.49.tar.gz", hash = "sha256:333115a64a507697b0c450ade7e2d82bc8b4e21c0051542514532b455712bdcc"},
 ]
 
 [package.dependencies]
@@ -727,7 +727,7 @@ python-dateutil = ">=2.1,<3.0.0"
 urllib3 = {version = ">=1.25.4,<2.2.0 || >2.2.0,<3", markers = "python_version >= \"3.10\""}
 
 [package.extras]
-crt = ["awscrt (==0.29.2)"]
+crt = ["awscrt (==0.31.2)"]
 
 [[package]]
 name = "cachecontrol"
@@ -1066,12 +1066,12 @@ version = "0.4.6"
 description = "Cross-platform colored terminal text."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
-groups = ["main", "dev"]
+groups = ["main", "dev", "performance"]
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
-markers = {main = "(platform_system == \"Windows\" or extra == \"text-ai\") and (platform_system == \"Windows\" or sys_platform == \"win32\") and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "platform_system == \"Windows\" or sys_platform == \"win32\""}
+markers = {main = "(platform_system == \"Windows\" or extra == \"text-ai\") and (platform_system == \"Windows\" or sys_platform == \"win32\") and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "platform_system == \"Windows\" or sys_platform == \"win32\"", performance = "sys_platform == \"win32\""}
 
 [[package]]
 name = "colorlog"
@@ -1367,14 +1367,14 @@ test = ["cython (>=3.1,<3.2)", "numpy (>=1.21.1)", "pyglet (>=2.1.9)", "pytest (
 
 [[package]]
 name = "cuda-pathfinder"
-version = "1.3.3"
+version = "1.3.4"
 description = "Pathfinder for CUDA components"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"transformers\" or extra == \"text-ai\")"
 files = [
-    {file = "cuda_pathfinder-1.3.3-py3-none-any.whl", hash = "sha256:9984b664e404f7c134954a771be8775dfd6180ea1e1aef4a5a37d4be05d9bbb1"},
+    {file = "cuda_pathfinder-1.3.4-py3-none-any.whl", hash = "sha256:fb983f6e0d43af27ef486e14d5989b5f904ef45cedf40538bfdcbffa6bb01fb2"},
 ]
 
 [[package]]
@@ -1641,7 +1641,6 @@ files = [
 markers = {main = "(extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\") and (sys_platform != \"win32\" or extra == \"sagemaker\")", dev = "sys_platform != \"win32\""}
 
 [package.dependencies]
-pywin32 = {version = ">=304", markers = "sys_platform == \"win32\""}
 requests = ">=2.26.0"
 urllib3 = ">=1.26.0"
 
@@ -1886,15 +1885,15 @@ sagemaker = ">=2.214.3,<3.0.0"
 
 [[package]]
 name = "exasol-script-languages-container-tool"
-version = "3.6.0"
+version = "3.6.1"
 description = "Script Languages Container Tool"
 optional = true
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
 markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
-    {file = "exasol_script_languages_container_tool-3.6.0-py3-none-any.whl", hash = "sha256:f6baec0f14ae8619a042eca3cd98961385af0e70aad81915191bb4397c2be229"},
-    {file = "exasol_script_languages_container_tool-3.6.0.tar.gz", hash = "sha256:86561a7f07ab9165059b997cfe56690f9161e7c2157f6cca6108da20118083c1"},
+    {file = "exasol_script_languages_container_tool-3.6.1-py3-none-any.whl", hash = "sha256:92a154e41d4d24ede20043fd15baf279236085ab4c54663360f0d912de9da593"},
+    {file = "exasol_script_languages_container_tool-3.6.1.tar.gz", hash = "sha256:dc36dfb90f0e4611e8e255583b6392a1446817194e24b64c144c9cbcce311923"},
 ]
 
 [package.dependencies]
@@ -2010,7 +2009,7 @@ version = "1.3.1"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
-groups = ["main", "dev"]
+groups = ["main", "dev", "performance"]
 markers = "python_version == \"3.10\""
 files = [
     {file = "exceptiongroup-1.3.1-py3-none-any.whl", hash = "sha256:a7a39a3bd276781e98394987d3a5701d0c4edffb633bb7a5144577f82c773598"},
@@ -2821,7 +2820,7 @@ version = "6.11.0"
 description = "Read metadata from Python packages"
 optional = false
 python-versions = ">=3.8"
-groups = ["main", "dev"]
+groups = ["main", "dev", "performance"]
 files = [
     {file = "importlib_metadata-6.11.0-py3-none-any.whl", hash = "sha256:f0afba6205ad8f8947c7d338b5342d5db2afbfd82f9cbef7879a9539cc12eb9b"},
     {file = "importlib_metadata-6.11.0.tar.gz", hash = "sha256:1231cf92d825c9e03cfc4da076a16de6422c863558229ea0b22b675657463443"},
@@ -2863,7 +2862,7 @@ version = "2.3.0"
 description = "brain-dead simple config-ini parsing"
 optional = false
 python-versions = ">=3.10"
-groups = ["dev"]
+groups = ["dev", "performance"]
 files = [
     {file = "iniconfig-2.3.0-py3-none-any.whl", hash = "sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12"},
     {file = "iniconfig-2.3.0.tar.gz", hash = "sha256:c76315c77db068650d49c5b56314774a7804df16fee4402c1f19d6d15d8c4730"},
@@ -3193,7 +3192,7 @@ description = "Low-level, pure Python DBus protocol wrapper."
 optional = false
 python-versions = ">=3.7"
 groups = ["dev"]
-markers = "platform_machine != \"ppc64le\" and platform_machine != \"s390x\" and sys_platform == \"linux\""
+markers = "sys_platform == \"linux\" and platform_machine != \"ppc64le\" and platform_machine != \"s390x\""
 files = [
     {file = "jeepney-0.9.0-py3-none-any.whl", hash = "sha256:97e5714520c16fc0a45695e5365a2e11b81ea79bba796e26f9f1d178cb182683"},
     {file = "jeepney-0.9.0.tar.gz", hash = "sha256:cf0e9e845622b81e4a28df94c40345400256ec608d0e55bb8a3feaa9163f5732"},
@@ -5010,7 +5009,7 @@ version = "24.2"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
-groups = ["main", "dev"]
+groups = ["main", "dev", "performance"]
 files = [
     {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
     {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
@@ -5510,7 +5509,7 @@ version = "1.6.0"
 description = "plugin and hook calling mechanisms for python"
 optional = false
 python-versions = ">=3.9"
-groups = ["dev"]
+groups = ["dev", "performance"]
 files = [
     {file = "pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746"},
     {file = "pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3"},
@@ -5841,7 +5840,7 @@ description = "Run a subprocess in a pseudo terminal"
 optional = false
 python-versions = "*"
 groups = ["dev"]
-markers = "sys_platform != \"win32\" and sys_platform != \"emscripten\" or os_name != \"nt\""
+markers = "os_name != \"nt\" or sys_platform != \"win32\" and sys_platform != \"emscripten\""
 files = [
     {file = "ptyprocess-0.7.0-py2.py3-none-any.whl", hash = "sha256:4b41f3967fce3af57cc7e94b888626c18bf37a083e3651ca8feeb66d492fef35"},
     {file = "ptyprocess-0.7.0.tar.gz", hash = "sha256:5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220"},
@@ -5861,6 +5860,18 @@ files = [
 
 [package.extras]
 tests = ["pytest"]
+
+[[package]]
+name = "py-cpuinfo"
+version = "9.0.0"
+description = "Get CPU info with pure Python"
+optional = false
+python-versions = "*"
+groups = ["performance"]
+files = [
+    {file = "py-cpuinfo-9.0.0.tar.gz", hash = "sha256:3cdbbf3fac90dc6f118bfd64384f309edeadd902d7c8fb17f02ffa1fc3f49690"},
+    {file = "py_cpuinfo-9.0.0-py3-none-any.whl", hash = "sha256:859625bc251f64e21f077d099d4162689c762b5d6a4c3c97553d56241c9674d5"},
+]
 
 [[package]]
 name = "py-serializable"
@@ -5971,7 +5982,7 @@ files = [
     {file = "pycparser-3.0-py3-none-any.whl", hash = "sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"},
     {file = "pycparser-3.0.tar.gz", hash = "sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29"},
 ]
-markers = {main = "(platform_python_implementation != \"PyPy\" or extra == \"text-ai\") and (platform_python_implementation != \"PyPy\" or implementation_name == \"pypy\") and implementation_name != \"PyPy\" and (extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"docker-db\" or extra == \"slc\")", dev = "implementation_name != \"PyPy\""}
+markers = {main = "platform_python_implementation != \"PyPy\" and implementation_name != \"PyPy\" and (extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"docker-db\" or extra == \"slc\") or extra == \"text-ai\" and implementation_name == \"pypy\"", dev = "implementation_name != \"PyPy\""}
 
 [[package]]
 name = "pydantic"
@@ -6190,12 +6201,46 @@ files = [
 ]
 
 [[package]]
+name = "pygal"
+version = "3.1.0"
+description = "A Python svg graph plotting library"
+optional = false
+python-versions = ">=3.8"
+groups = ["performance"]
+files = [
+    {file = "pygal-3.1.0-py3-none-any.whl", hash = "sha256:4e923490f3490c90c481f4535fa3adcda20ff374257ab9d8ae897f91b632c0bb"},
+    {file = "pygal-3.1.0.tar.gz", hash = "sha256:fbdee7351a7423e7907fb8a9c3b77305f6b5678cb2e6fd0db36a8825e42955ec"},
+]
+
+[package.dependencies]
+importlib-metadata = "*"
+
+[package.extras]
+docs = ["pygal-sphinx-directives", "sphinx", "sphinx-rtd-theme"]
+lxml = ["lxml"]
+moulinrouge = ["flask", "pygal-maps-ch", "pygal-maps-fr", "pygal-maps-world"]
+png = ["cairosvg"]
+test = ["cairosvg", "coveralls", "lxml", "pyquery", "pytest", "pytest-cov", "ruff (>=0.5.6)"]
+
+[[package]]
+name = "pygaljs"
+version = "1.0.2"
+description = "Python package providing assets from https://github.com/Kozea/pygal.js"
+optional = false
+python-versions = "*"
+groups = ["performance"]
+files = [
+    {file = "pygaljs-1.0.2-py2.py3-none-any.whl", hash = "sha256:d75e18cb21cc2cda40c45c3ee690771e5e3d4652bf57206f20137cf475c0dbe8"},
+    {file = "pygaljs-1.0.2.tar.gz", hash = "sha256:0b71ee32495dcba5fbb4a0476ddbba07658ad65f5675e4ad409baf154dec5111"},
+]
+
+[[package]]
 name = "pygments"
 version = "2.19.2"
 description = "Pygments is a syntax highlighting package written in Python."
 optional = false
 python-versions = ">=3.8"
-groups = ["main", "dev"]
+groups = ["main", "dev", "performance"]
 files = [
     {file = "pygments-2.19.2-py3-none-any.whl", hash = "sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b"},
     {file = "pygments-2.19.2.tar.gz", hash = "sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887"},
@@ -6343,7 +6388,7 @@ files = [
     {file = "pyreadline3-3.5.4-py3-none-any.whl", hash = "sha256:eaf8e6cc3c49bcccf145fc6067ba8643d1df34d604a1ec0eccbf7a18e6d3fae6"},
     {file = "pyreadline3-3.5.4.tar.gz", hash = "sha256:8d57d53039a1c75adba8e50dd3d992b28143480816187ea5efbd5c78e6c885b7"},
 ]
-markers = {main = "sys_platform == \"win32\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "sys_platform == \"win32\""}
+markers = {main = "(extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\") and sys_platform == \"win32\"", dev = "sys_platform == \"win32\""}
 
 [package.extras]
 dev = ["build", "flake8", "mypy", "pytest", "twine"]
@@ -6369,26 +6414,27 @@ tomli = "2.2.1"
 
 [[package]]
 name = "pytest"
-version = "7.4.4"
+version = "8.4.2"
 description = "pytest: simple powerful testing with Python"
 optional = false
-python-versions = ">=3.7"
-groups = ["dev"]
+python-versions = ">=3.9"
+groups = ["dev", "performance"]
 files = [
-    {file = "pytest-7.4.4-py3-none-any.whl", hash = "sha256:b090cdf5ed60bf4c45261be03239c2c1c22df034fbffe691abe93cd80cea01d8"},
-    {file = "pytest-7.4.4.tar.gz", hash = "sha256:2cf0005922c6ace4a3e2ec8b4080eb0d9753fdc93107415332f50ce9e7994280"},
+    {file = "pytest-8.4.2-py3-none-any.whl", hash = "sha256:872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79"},
+    {file = "pytest-8.4.2.tar.gz", hash = "sha256:86c0d0b93306b961d58d62a4db4879f27fe25513d4b969df351abdddb3c30e01"},
 ]
 
 [package.dependencies]
-colorama = {version = "*", markers = "sys_platform == \"win32\""}
-exceptiongroup = {version = ">=1.0.0rc8", markers = "python_version < \"3.11\""}
-iniconfig = "*"
-packaging = "*"
-pluggy = ">=0.12,<2.0"
-tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
+colorama = {version = ">=0.4", markers = "sys_platform == \"win32\""}
+exceptiongroup = {version = ">=1", markers = "python_version < \"3.11\""}
+iniconfig = ">=1"
+packaging = ">=20"
+pluggy = ">=1.5,<2"
+pygments = ">=2.7.2"
+tomli = {version = ">=1", markers = "python_version < \"3.11\""}
 
 [package.extras]
-testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
+dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "requests", "setuptools", "xmlschema"]
 
 [[package]]
 name = "pytest-base-url"
@@ -6408,6 +6454,30 @@ requests = ">=2.9"
 
 [package.extras]
 test = ["black (>=22.1.0)", "flake8 (>=4.0.1)", "pre-commit (>=2.17.0)", "pytest-localserver (>=0.7.1)", "tox (>=3.24.5)"]
+
+[[package]]
+name = "pytest-benchmark"
+version = "5.2.3"
+description = "A ``pytest`` fixture for benchmarking code. It will group the tests into rounds that are calibrated to the chosen timer."
+optional = false
+python-versions = ">=3.9"
+groups = ["performance"]
+files = [
+    {file = "pytest_benchmark-5.2.3-py3-none-any.whl", hash = "sha256:bc839726ad20e99aaa0d11a127445457b4219bdb9e80a1afc4b51da7f96b0803"},
+    {file = "pytest_benchmark-5.2.3.tar.gz", hash = "sha256:deb7317998a23c650fd4ff76e1230066a76cb45dcece0aca5607143c619e7779"},
+]
+
+[package.dependencies]
+py-cpuinfo = "*"
+pygal = {version = "*", optional = true, markers = "extra == \"histogram\""}
+pygaljs = {version = "*", optional = true, markers = "extra == \"histogram\""}
+pytest = ">=8.1"
+setuptools = {version = "*", optional = true, markers = "extra == \"histogram\""}
+
+[package.extras]
+aspect = ["aspectlib"]
+elasticsearch = ["elasticsearch"]
+histogram = ["pygal", "pygaljs", "setuptools"]
 
 [[package]]
 name = "pytest-dependency"
@@ -6517,7 +6587,7 @@ files = [
     {file = "python-daemon-2.1.2.tar.gz", hash = "sha256:261c859be5c12ae7d4286dc6951e87e9e1a70a882a8b41fd926efc1ec4214f73"},
     {file = "python_daemon-2.1.2-py2.py3-none-any.whl", hash = "sha256:53da55aec3bb67b576e13a8091a2181f99b395c2eec32a5a0d91d347a5c420a7"},
 ]
-markers = {main = "sys_platform == \"win32\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "sys_platform == \"win32\""}
+markers = {main = "(extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\") and sys_platform == \"win32\"", dev = "sys_platform == \"win32\""}
 
 [package.dependencies]
 docutils = "*"
@@ -6535,7 +6605,7 @@ files = [
     {file = "python_daemon-3.1.2-py3-none-any.whl", hash = "sha256:b906833cef63502994ad48e2eab213259ed9bb18d54fa8774dcba2ff7864cec6"},
     {file = "python_daemon-3.1.2.tar.gz", hash = "sha256:f7b04335adc473de877f5117e26d5f1142f4c9f7cd765408f0877757be5afbf4"},
 ]
-markers = {main = "sys_platform != \"win32\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "sys_platform != \"win32\""}
+markers = {main = "(extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\") and sys_platform != \"win32\"", dev = "sys_platform != \"win32\""}
 
 [package.dependencies]
 lockfile = ">=0.10"
@@ -6707,7 +6777,7 @@ files = [
     {file = "pywin32-311-cp39-cp39-win_amd64.whl", hash = "sha256:e0c4cfb0621281fe40387df582097fd796e80430597cb9944f0ae70447bacd91"},
     {file = "pywin32-311-cp39-cp39-win_arm64.whl", hash = "sha256:62ea666235135fee79bb154e695f3ff67370afefd71bd7fea7512fc70ef31e3d"},
 ]
-markers = {main = "(platform_system == \"Windows\" or extra == \"sagemaker\") and (platform_system == \"Windows\" or sys_platform == \"win32\") and (extra == \"sagemaker\" or extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\")", dev = "platform_system == \"Windows\""}
+markers = {main = "(extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\") and platform_system == \"Windows\"", dev = "platform_system == \"Windows\""}
 
 [[package]]
 name = "pywin32-ctypes"
@@ -8020,7 +8090,7 @@ description = "Python bindings to FreeDesktop.org Secret Service API"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
-markers = "platform_machine != \"ppc64le\" and platform_machine != \"s390x\" and sys_platform == \"linux\""
+markers = "sys_platform == \"linux\" and platform_machine != \"ppc64le\" and platform_machine != \"s390x\""
 files = [
     {file = "secretstorage-3.5.0-py3-none-any.whl", hash = "sha256:0ce65888c0725fcb2c5bc0fdb8e5438eece02c523557ea40ce0703c266248137"},
     {file = "secretstorage-3.5.0.tar.gz", hash = "sha256:f04b8e4689cbce351744d5537bf6b1329c6fc68f91fa666f60a380edddcd11be"},
@@ -8083,12 +8153,12 @@ version = "82.0.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 optional = false
 python-versions = ">=3.9"
-groups = ["main", "dev"]
+groups = ["main", "dev", "performance"]
 files = [
     {file = "setuptools-82.0.0-py3-none-any.whl", hash = "sha256:70b18734b607bd1da571d097d236cfcfacaf01de45717d59e6e04b96877532e0"},
     {file = "setuptools-82.0.0.tar.gz", hash = "sha256:22e0a2d69474c6ae4feb01951cb69d515ed23728cf96d05513d36e42b62b37cb"},
 ]
-markers = {main = "(extra == \"text-ai\" or extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"sagemaker\") and (extra == \"text-ai\" or sys_platform == \"win32\" or python_version == \"3.12\") and (extra == \"transformers\" or extra == \"text-ai\" or extra == \"docker-db\" or extra == \"slc\" or extra == \"sagemaker\" or python_version == \"3.10\") and (sys_platform == \"win32\" or extra == \"transformers\" or extra == \"text-ai\")"}
+markers = {main = "extra == \"text-ai\" or python_version == \"3.12\" and (extra == \"text-ai\" or extra == \"transformers\") or sys_platform == \"win32\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")"}
 
 [package.extras]
 check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\"", "ruff (>=0.13.0) ; sys_platform != \"cygwin\""]
@@ -9589,7 +9659,7 @@ version = "2.2.1"
 description = "A lil' TOML parser"
 optional = false
 python-versions = ">=3.8"
-groups = ["main", "dev"]
+groups = ["main", "dev", "performance"]
 files = [
     {file = "tomli-2.2.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:678e4fa69e4575eb77d103de3df8a895e1591b48e740211bd1067378c69e8249"},
     {file = "tomli-2.2.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:023aa114dd824ade0100497eb2318602af309e5a55595f76b626d6d9f3b7b0a6"},
@@ -9624,7 +9694,7 @@ files = [
     {file = "tomli-2.2.1-py3-none-any.whl", hash = "sha256:cb55c73c5f4408779d0cf3eef9f762b9c9f147a77de7b258bef0a5628adc85cc"},
     {file = "tomli-2.2.1.tar.gz", hash = "sha256:cd45e1dc79c835ce60f7404ec8119f2eb06d38b1deba146f07ced3bbc44505ff"},
 ]
-markers = {main = "python_version == \"3.10\" and extra == \"text-ai\""}
+markers = {main = "python_version == \"3.10\" and extra == \"text-ai\"", performance = "python_version == \"3.10\""}
 
 [[package]]
 name = "tomli-w"
@@ -9672,10 +9742,10 @@ python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
-    {file = "torch-2.10.0-1-cp310-none-macosx_11_0_arm64.whl", hash = "sha256:c37fc46eedd9175f9c81814cc47308f1b42cfe4987e532d4b423d23852f2bf63"},
-    {file = "torch-2.10.0-1-cp311-none-macosx_11_0_arm64.whl", hash = "sha256:f699f31a236a677b3118bc0a3ef3d89c0c29b5ec0b20f4c4bf0b110378487464"},
-    {file = "torch-2.10.0-1-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:6abb224c2b6e9e27b592a1c0015c33a504b00a0e0938f1499f7f514e9b7bfb5c"},
-    {file = "torch-2.10.0-1-cp313-none-macosx_11_0_arm64.whl", hash = "sha256:7350f6652dfd761f11f9ecb590bfe95b573e2961f7a242eccb3c8e78348d26fe"},
+    {file = "torch-2.10.0-2-cp310-none-macosx_11_0_arm64.whl", hash = "sha256:2b980edd8d7c0a68c4e951ee1856334a43193f98730d97408fbd148c1a933313"},
+    {file = "torch-2.10.0-2-cp311-none-macosx_11_0_arm64.whl", hash = "sha256:418997cb02d0a0f1497cf6a09f63166f9f5df9f3e16c8a716ab76a72127c714f"},
+    {file = "torch-2.10.0-2-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:13ec4add8c3faaed8d13e0574f5cd4a323c11655546f91fbe6afa77b57423574"},
+    {file = "torch-2.10.0-2-cp313-none-macosx_11_0_arm64.whl", hash = "sha256:e521c9f030a3774ed770a9c011751fb47c4d12029a3d6522116e48431f2ff89e"},
     {file = "torch-2.10.0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:5276fa790a666ee8becaffff8acb711922252521b28fbce5db7db5cf9cb2026d"},
     {file = "torch-2.10.0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:aaf663927bcd490ae971469a624c322202a2a1e68936eb952535ca4cd3b90444"},
     {file = "torch-2.10.0-cp310-cp310-win_amd64.whl", hash = "sha256:a4be6a2a190b32ff5c8002a0977a25ea60e64f7ba46b1be37093c141d9c49aeb"},
@@ -9970,20 +10040,20 @@ typing-extensions = ">=3.7.4.3"
 
 [[package]]
 name = "typer-slim"
-version = "0.21.1"
+version = "0.21.2"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "extra == \"text-ai\""
 files = [
-    {file = "typer_slim-0.21.1-py3-none-any.whl", hash = "sha256:6e6c31047f171ac93cc5a973c9e617dbc5ab2bddc4d0a3135dc161b4e2020e0d"},
-    {file = "typer_slim-0.21.1.tar.gz", hash = "sha256:73495dd08c2d0940d611c5a8c04e91c2a0a98600cbd4ee19192255a233b6dbfd"},
+    {file = "typer_slim-0.21.2-py3-none-any.whl", hash = "sha256:4705082bb6c66c090f60e47c8be09a93158c139ce0aa98df7c6c47e723395e5f"},
+    {file = "typer_slim-0.21.2.tar.gz", hash = "sha256:78f20d793036a62aaf9c3798306142b08261d4b2a941c6e463081239f062a2f9"},
 ]
 
 [package.dependencies]
+annotated-doc = ">=0.0.2"
 click = ">=8.0.0"
-typing-extensions = ">=3.7.4.3"
 
 [package.extras]
 standard = ["rich (>=10.11.0)", "shellingham (>=1.3.0)"]
@@ -10009,11 +10079,12 @@ version = "4.15.0"
 description = "Backported and Experimental Type Hints for Python 3.9+"
 optional = false
 python-versions = ">=3.9"
-groups = ["main", "dev"]
+groups = ["main", "dev", "performance"]
 files = [
     {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
     {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
 ]
+markers = {performance = "python_version == \"3.10\""}
 
 [[package]]
 name = "typing-inspection"
@@ -10420,7 +10491,7 @@ version = "3.23.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 optional = false
 python-versions = ">=3.9"
-groups = ["main", "dev"]
+groups = ["main", "dev", "performance"]
 files = [
     {file = "zipp-3.23.0-py3-none-any.whl", hash = "sha256:071652d6115ed432f5ce1d34c336c0adfd6a884660d1e9712a256d3d3bd4b14e"},
     {file = "zipp-3.23.0.tar.gz", hash = "sha256:a07157588a12518c9d4034df3fbbee09c814741a33ff63c05fa29d26a2404166"},
@@ -10450,4 +10521,4 @@ transformers = ["exasol-transformers-extension", "yaspin"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "93486b8eefac801b1971bceedc9f5c1c8984950ada6883a1e9d2c33a92665a3b"
+content-hash = "56b4ab2160d39e00d2080ad36bd46ad2f2c39ea9063abd766c29b1969033756c"

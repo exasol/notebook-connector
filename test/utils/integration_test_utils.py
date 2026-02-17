@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-import contextlib
 import textwrap
 from collections.abc import (
     Generator,
     Iterator,
 )
 from contextlib import contextmanager
-from pathlib import Path
-from tempfile import TemporaryDirectory
 
 from pyexasol import ExaConnection
 
@@ -20,12 +17,6 @@ from exasol.nb_connector.itde_manager import (
 )
 from exasol.nb_connector.language_container_activation import get_activation_sql
 from exasol.nb_connector.secret_store import Secrets
-
-
-@contextlib.contextmanager
-def sample_db_file() -> Iterator[Path]:
-    with TemporaryDirectory() as d:
-        yield Path(d) / "sample_database.db"
 
 
 def _setup_itde_impl(secrets: Secrets) -> Iterator[None]:
