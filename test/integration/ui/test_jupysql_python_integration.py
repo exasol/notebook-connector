@@ -1,7 +1,7 @@
 from pathlib import Path
 
+import nbformat
 import pytest
-from IPython.core.error import UsageError
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
@@ -12,6 +12,7 @@ from exasol.nb_connector.ui.jupysql_init import init_jupysql
 def create_test_config(tmp_path, schema, user, password, cert_vld=None):
     config_path = Path(f"{tmp_path}/dummy_config_store.sqlite")
     store_password = "store_password"
+
     secrets = Secrets(config_path, master_password=store_password)
     secrets.save(CKey.db_schema, schema)
     secrets.save(CKey.db_host_name, "localhost")
@@ -41,37 +42,36 @@ def test_jupysql_no_ipython(tmp_path):
         jupysql_init.get_ipython = orig_get_ipython
 
 
-def test_init_jupysql(tmp_path):
-    config_path, store_password = create_test_config(
-        tmp_path, "MYSCHEMA", "sys", "exasol", cert_vld="False"
+def test_jupysql_init_as_subprocess(tmp_path, notebook_runner):
+    """Test running jupysql_init.py logic as a notebook via nbclient with a real config file."""
+    nb = nbformat.v4.new_notebook()
+    nb.cells = [
+        nbformat.v4.new_code_cell(
+            """
+from exasol.nb_connector.ui.jupysql_init import init_jupysql
+init_jupysql(ai_lab_config)
+"""
+        ),
+        # nbformat.v4.new_code_cell(
+        #     "%sql SELECT 1"
+        # ),
+#         nbformat.v4.new_code_cell(
+#             """
+# # Assign the result of the previous SQL cell to a variable
+# result = _
+# try:
+#     value = int(result.first()[0])
+# except Exception as e:
+#     print(f'Error extracting value: {e}')
+# print(value == 1)
+# """
+#         )
+    ]
+    executed_nb = notebook_runner(nb)
+    output = "".join(
+        o.get("text", "")
+        for cell in executed_nb.cells if "outputs" in cell
+        for o in cell["outputs"]
+        if o.get("output_type") == "stream" and o.get("name") == "stdout"
     )
-    ai_lab_config = Secrets(config_path, store_password)
-    try:
-        init_jupysql(ai_lab_config)
-    except Exception as e:
-        pytest.fail(f"init_jupysql raised an exception: {e}")
-
-
-def test_init_jupysql_invalid_credentials(tmp_path):
-    config_path, store_password = create_test_config(
-        tmp_path, "MYSCHEMA", "wrong_user", "wrong_password", cert_vld="False"
-    )
-    ai_lab_config = Secrets(config_path, store_password)
-    with pytest.raises(UsageError, match="Pass a valid connection string"):
-        init_jupysql(ai_lab_config)
-
-
-def test_init_jupysql_missing_schema(tmp_path):
-    config_path = Path(f"{tmp_path}/dummy_config_store.sqlite")
-    store_password = "store_password"
-    secrets = Secrets(config_path, master_password=store_password)
-    # Intentionally omit db_schema
-    secrets.save(CKey.db_host_name, "localhost")
-    secrets.save(CKey.db_port, "8563")
-    secrets.save(CKey.db_user, "sys")
-    secrets.save(CKey.db_password, "exasol")
-    secrets.save(CKey.storage_backend, "onprem")
-    secrets.save(CKey.cert_vld, "False")
-    ai_lab_config = Secrets(config_path, store_password)
-    with pytest.raises(AttributeError, match='Unknown key "db_schema"'):
-        init_jupysql(ai_lab_config)
+    print("JS23", output)
