@@ -1,4 +1,13 @@
 from pathlib import Path
+from typing import Optional
+
+import ipywidgets as widgets
+import pytest
+from IPython.display import display
+
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.ui.generic_config_ui import get_generic_config_ui
 from test.conftest import secrets
 from test.integration.ui.utils.ui_utils import (
     SAVE_BUTTON,
@@ -9,15 +18,6 @@ from test.integration.ui.utils.ui_utils import (
     save_button,
     set_checkbox,
 )
-from typing import Optional
-
-import ipywidgets as widgets
-import pytest
-from IPython.display import display
-
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ui.generic_config_ui import get_generic_config_ui
 
 
 @pytest.fixture
@@ -70,9 +70,9 @@ def row_by_label(page_session, label: str):
 def set_text_input(
     row,
     *,
-    value: Optional[str] = None,
+    value: str | None = None,
     clear: bool = False,
-    text_to_type: Optional[str] = None,
+    text_to_type: str | None = None,
 ):
     """
     Update a text input located inside a given row.

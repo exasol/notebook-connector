@@ -1,8 +1,4 @@
 from pathlib import Path
-from test.integration.ui.utils.ui_utils import (
-    CONF_STORE,
-    assert_ui_screenshot,
-)
 
 from IPython.display import display
 
@@ -10,6 +6,10 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.access_store_ui import (
     DEFAULT_FILE_NAME,
     get_access_store_ui,
+)
+from test.integration.ui.utils.ui_utils import (
+    CONF_STORE,
+    assert_ui_screenshot,
 )
 
 
@@ -55,9 +55,9 @@ def test_enter_password_and_click_open(
     """
     test to validate if the open button is pressed and file is created
     """
-    password = "dummy123"
+    code_word = "dummy123"
     display(get_access_store_ui(str(tmp_path)))
-    fill_scs_password(password, page_session)
+    fill_scs_password(code_word, page_session)
     click_open_db(page_session)
     assert_ui_screenshot(
         assert_solara_snapshot,
@@ -67,7 +67,7 @@ def test_enter_password_and_click_open(
     )
     generated_scs_file = tmp_path / DEFAULT_FILE_NAME
     assert generated_scs_file.exists()
-    assert not list(Secrets(generated_scs_file, password).keys())
+    assert not list(Secrets(generated_scs_file, code_word).keys())
 
 
 def test_non_default_store_file(
@@ -76,11 +76,11 @@ def test_non_default_store_file(
     """
     test to validate if the file accepts the correct password
     """
-    password = "dummy123"
+    code_word = "dummy123"
     scs_file = "ai_lab_secure_dummy.sqlite"
     display(get_access_store_ui(str(tmp_path)))
     fill_scs_file_name(scs_file, page_session)
-    fill_scs_password(password, page_session)
+    fill_scs_password(code_word, page_session)
     click_open_db(page_session)
     assert_ui_screenshot(
         assert_solara_snapshot,
@@ -90,7 +90,7 @@ def test_non_default_store_file(
     )
     generated_scs_file = tmp_path / scs_file
     assert generated_scs_file.exists()
-    assert not list(Secrets(generated_scs_file, password).keys())
+    assert not list(Secrets(generated_scs_file, code_word).keys())
 
 
 def test_invalid_password(solara_test, page_session, assert_solara_snapshot, tmp_path):
