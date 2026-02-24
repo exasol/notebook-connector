@@ -1,9 +1,3 @@
-import ipywidgets as widgets
-import pytest
-from IPython.display import display
-
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.ui.generic_config_ui import get_generic_config_ui
 from test.integration.ui.utils.ui_utils import (
     SAVE_BUTTON,
     assert_ui_screenshot,
@@ -13,6 +7,13 @@ from test.integration.ui.utils.ui_utils import (
     save_button,
     set_checkbox,
 )
+
+import ipywidgets as widgets
+import pytest
+from IPython.display import display
+
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ui.generic_config_ui import get_generic_config_ui
 
 
 @pytest.fixture
@@ -55,11 +56,11 @@ def row_by_label(page_session, label: str):
 
 
 def set_text_input(
-        row,
-        *,
-        value: str | None = None,
-        clear: bool = False,
-        text_to_type: str | None = None,
+    row,
+    *,
+    value: str | None = None,
+    clear: bool = False,
+    text_to_type: str | None = None,
 ):
     """
     Update a text input located inside a given row.
@@ -74,12 +75,12 @@ def set_text_input(
 
 
 def test_generic_config_ui_load(
-        solara_test,
-        page_session,
-        assert_solara_snapshot,
-        tmp_path,
-        inputs_and_groups,
-        secrets,
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
     inputs, group_names = inputs_and_groups
     render_ui(page_session, secrets, inputs, group_names)
@@ -92,12 +93,12 @@ def test_generic_config_ui_load(
 
 
 def test_icon_on_value_change_by_textfield(
-        solara_test,
-        page_session,
-        assert_solara_snapshot,
-        tmp_path,
-        inputs_and_groups,
-        secrets,
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
     inputs, group_names = inputs_and_groups
     render_ui(page_session, secrets, inputs, group_names)
@@ -114,12 +115,12 @@ def test_icon_on_value_change_by_textfield(
 
 
 def test_icon_on_value_change_by_checkbox(
-        solara_test,
-        page_session,
-        assert_solara_snapshot,
-        tmp_path,
-        inputs_and_groups,
-        secrets,
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
     inputs, group_names = inputs_and_groups
     render_ui(page_session, secrets, inputs, group_names)
@@ -135,12 +136,12 @@ def test_icon_on_value_change_by_checkbox(
 
 
 def test_empty_checkbox_save(
-        solara_test,
-        page_session,
-        assert_solara_snapshot,
-        tmp_path,
-        inputs_and_groups,
-        secrets,
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
     inputs, group_names = inputs_and_groups
     render_ui(page_session, secrets, inputs, group_names)
@@ -155,12 +156,12 @@ def test_empty_checkbox_save(
 
 
 def test_empty_textfield_save(
-        solara_test,
-        page_session,
-        assert_solara_snapshot,
-        tmp_path,
-        inputs_and_groups,
-        secrets,
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
     inputs, group_names = inputs_and_groups
     render_ui(page_session, secrets, inputs, group_names)
@@ -178,12 +179,12 @@ def test_empty_textfield_save(
 
 
 def test_for_scs_read_after_save(
-        solara_test,
-        page_session,
-        assert_solara_snapshot,
-        tmp_path,
-        inputs_and_groups,
-        secrets,
+    solara_test,
+    page_session,
+    assert_solara_snapshot,
+    tmp_path,
+    inputs_and_groups,
+    secrets,
 ):
     inputs, group_names = inputs_and_groups
     render_ui(page_session, secrets, inputs, group_names)
