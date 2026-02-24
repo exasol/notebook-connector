@@ -1,5 +1,4 @@
 from test.integration.ui.utils.main_config_ui_utils import (
-    assert_main_config_ui_screenshot,
     render_main_config_ui,
 )
 from test.integration.ui.utils.ui_utils import (
