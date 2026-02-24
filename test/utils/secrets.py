@@ -1,7 +1,18 @@
 from __future__ import annotations
 
+import contextlib
+from collections.abc import Iterator
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
+
+
+@contextlib.contextmanager
+def sample_db_file() -> Iterator[Path]:
+    with TemporaryDirectory() as d:
+        yield Path(d) / "sample_database.db"
 
 
 def _ensure_str(key: str | CKey) -> str:

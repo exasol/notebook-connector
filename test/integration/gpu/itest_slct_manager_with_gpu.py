@@ -1,8 +1,6 @@
 import textwrap
 from collections.abc import Iterator
-from test.utils.integration_test_utils import (
-    sample_db_file,
-)
+from test.utils.secrets import sample_db_file
 
 import pytest
 from exasol.slc.models.compression_strategy import CompressionStrategy

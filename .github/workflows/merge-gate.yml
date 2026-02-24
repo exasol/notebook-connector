@@ -43,6 +43,14 @@ jobs:
     permissions:
       contents: read
 
+
+  performance-checks:
+    name: Performance
+    # needs: [ run-slow-tests ]
+    uses: ./.github/workflows/performance-checks.yml
+    permissions:
+      contents: read
+
   # This job ensures inputs have been executed successfully.
   approve-merge:
     name: Allow Merge

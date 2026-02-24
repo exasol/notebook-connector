@@ -21,9 +21,7 @@ jobs:
         with:
           python-version: "3.10"
           poetry-version: "2.3.0"
-
-      - name: Install All Optional Dependencies (aka. "extras")
-        run: poetry install --all-extras
+          extras: "all"
 
       - name: Build Documentation
         run: |

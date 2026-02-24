@@ -1,9 +1,16 @@
 # Unreleased
-  * #305: Replacing store magic with normal file access
-  * #334: Convert ipynb to python for generic_config_ui and automate tests
+  * #354: converted utils/jupysql_init from ipynb to py
   * #343: Convert ipynb to python for main_config_ui and automate tests
 
+## Summary
 
-## Bugs
+## Bugfixes
 
 * #327: Fixed Multiple CD workflows
+* #344: Enabled SCS to be used by multiple threads
+
+## Refactoring
+
+* #305: Replacing store magic with normal file access
+* #356: Added pytest-benchmark Plugin and measured performance of SCS access
+
