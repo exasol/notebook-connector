@@ -4,7 +4,6 @@ from IPython.display import display
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ui.generic_config_ui import get_generic_config_ui
-from test.conftest import secrets
 from test.integration.ui.utils.ui_utils import (
     SAVE_BUTTON,
     assert_ui_screenshot,
