@@ -1,4 +1,8 @@
 from pathlib import Path
+from test.integration.ui.utils.ui_utils import (
+    CONF_STORE,
+    assert_ui_screenshot,
+)
 
 from IPython.display import display
 
@@ -6,10 +10,6 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.access_store_ui import (
     DEFAULT_FILE_NAME,
     get_access_store_ui,
-)
-from test.integration.ui.utils.ui_utils import (
-    CONF_STORE,
-    assert_ui_screenshot,
 )
 
 
