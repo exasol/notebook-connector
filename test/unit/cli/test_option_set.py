@@ -7,7 +7,6 @@ from test.unit.cli.scs_mock import (
 
 import pytest
 
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.cli.options import (
     DOCKER_DB_OPTIONS,

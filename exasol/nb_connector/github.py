@@ -6,10 +6,6 @@ project, retrieval of artefacts, etc.
 import enum
 import logging
 import pathlib
-from typing import (
-    Optional,
-    Tuple,
-)
 
 import requests
 
@@ -59,7 +55,7 @@ def get_latest_version_and_jar_url(project: Project) -> tuple[str, str]:
 def retrieve_jar(
     project: Project,
     use_local_cache: bool = True,
-    storage_path: Optional[pathlib.Path] = None,
+    storage_path: pathlib.Path | None = None,
 ) -> pathlib.Path:
     """
     Returns latest jar file for the project, possibly using local cache.

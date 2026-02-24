@@ -1,9 +1,6 @@
 import logging
 import os
 from enum import IntFlag
-from typing import (
-    Optional,
-)
 
 import docker
 from docker.models.networks import Network
@@ -50,7 +47,7 @@ class ItdeContainerStatus(IntFlag):
     READY = RUNNING | VISIBLE
 
 
-def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> None:
+def bring_itde_up(conf: Secrets, env_info: EnvironmentInfo | None = None) -> None:
     """
     Launches the ITDE environment using its API. Sets hardcoded environment name,
     and Google name server address. Additionally, can set the following
@@ -82,7 +79,6 @@ def bring_itde_up(conf: Secrets, env_info: Optional[EnvironmentInfo] = None) -> 
         db_version = os.getenv(TEST_DB_VERSION_ENV_VAR, LATEST_DB_VERSION)
         accelerator = conf.get(AILabConfig.accelerator, Accelerator.none.value)
 
-        docker_runtime = None
         docker_environment_variable: tuple[str, ...] = ()
         additional_db_parameter: tuple[str, ...] = ("-etlCheckCertsDefault=0",)
         itde_accelerator: tuple[str, ...] = ()
@@ -172,7 +168,7 @@ def _is_current_container_visible(network_name: str) -> bool:
 
 def _get_docker_network(
     docker_client: docker.DockerClient, network_name: str
-) -> Optional[Network]:
+) -> Network | None:
     networks = docker_client.networks.list(names=[network_name])
     if len(networks) == 1:
         network = networks[0]

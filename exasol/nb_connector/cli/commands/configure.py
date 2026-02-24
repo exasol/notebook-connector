@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 
 from exasol.nb_connector.ai_lab_config import (

@@ -1,6 +1,6 @@
 [project]
 name = "exasol-notebook-connector"
-version = "2.3.0"
+version = "2.4.0"
 requires-python = ">=3.10,<3.13"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [{ include = "exasol" }, ]
@@ -81,7 +81,7 @@ build-backend = "poetry.core.masonry.api"
 pytest = "^7.1.1"
 pytest-mock = "^3.7.0"
 pytest_dependency = ">=0.6.0"
-exasol-toolbox = "^1.9.0"
+exasol-toolbox = "^5"
 pytest-exasol-backend = ">=1.1.0,<2"
 pytest-ipywidgets = ">=1.52.0,<2.0.0"
 notebook = ">=7.4,<8"

@@ -4,9 +4,6 @@
 
 import importlib.metadata
 from pathlib import Path
-from typing import (
-    Optional,
-)
 
 from exasol.ai.text.deployment import license_deployment as txai_licenses
 from exasol.ai.text.deployment.script_deployer import create_scripts
@@ -85,8 +82,8 @@ credentials.
 
 def deploy_license(
     conf: Secrets,
-    license_content: Optional[str] = None,
-    license_file: Optional[Path] = None,
+    license_content: str | None = None,
+    license_file: Path | None = None,
 ) -> None:
     """
     Deploys the given license and saves its identifier to the secret store. The licence can either be
@@ -111,8 +108,8 @@ def deploy_license(
 
 def initialize_text_ai_extension(
     conf: Secrets,
-    container_file: Optional[Path] = None,
-    version: Optional[str] = None,
+    container_file: Path | None = None,
+    version: str | None = None,
     install_slc: bool = True,
     install_scripts: bool = True,
     install_models: bool = True,
@@ -176,10 +173,10 @@ def initialize_text_ai_extension(
             allow_override=allow_override_language_alias,
         )
 
-    print(f"Text AI: Updating Secure Configuration Storage")
+    print("Text AI: Updating Secure Configuration Storage")
     conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
 
-    print(f"Text AI: Ensuring BFS model connection")
+    print("Text AI: Ensuring BFS model connection")
     ensure_bfs_connection(conf)
     ensure_model_subdir_config_value(conf)
 
@@ -225,7 +222,7 @@ def initialize_text_ai_extension(
         )
         create_scripts(pyexasol_connection)
 
-    print(f"Text AI: Installation finished.")
+    print("Text AI: Installation finished.")
 
 
 class Extraction(AbstractExtraction):

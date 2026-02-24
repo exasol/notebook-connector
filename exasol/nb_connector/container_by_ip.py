@@ -1,6 +1,5 @@
 from typing import (
     Any,
-    Optional,
 )
 
 import docker
@@ -34,7 +33,7 @@ class ContainerByIp:
     def __init__(self, docker_client: docker.DockerClient):
         self._docker_client = docker_client
 
-    def find(self, ip_addresses: list[str]) -> Optional[Container]:
+    def find(self, ip_addresses: list[str]) -> Container | None:
         candidates = {
             container
             for container in self._docker_client.containers.list()

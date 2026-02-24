@@ -175,7 +175,7 @@ def test_round_trip(
     assert result.exit_code == 0
 
     result = CliRunner().invoke(commands.check, [scs_file, "--connect"])
-    assert_success(result, f"Configuration is complete")
+    assert_success(result, "Configuration is complete")
     if command == "docker-db":
         assert not pyexasol_connection_mock.called
         assert not verify_bucketfs_access_mock.called
