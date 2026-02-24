@@ -1,5 +1,3 @@
-from typing import Optional
-
 from playwright.sync_api import expect
 
 SAVE_BUTTON = "button:text('Save')"
