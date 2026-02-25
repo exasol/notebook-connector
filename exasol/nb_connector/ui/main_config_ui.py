@@ -6,7 +6,6 @@ from exasol_integration_test_docker_environment.lib.models.api_errors import (
     TaskFailures,
     TaskRuntimeError,
 )
-from useful_urls import UsefulUrls
 
 from exasol.nb_connector.ai_lab_config import Accelerator
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
@@ -23,6 +22,7 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.generic_config_ui import get_generic_config_ui
 from exasol.nb_connector.ui.popup_message_ui import popup_message
 from exasol.nb_connector.ui.ui_styles import get_config_styles
+from exasol.nb_connector.ui.useful_urls import UsefulUrls
 
 DEFAULT_SCHEMA = "Default Schema"
 
