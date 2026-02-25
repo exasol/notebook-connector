@@ -6,6 +6,7 @@ from exasol_integration_test_docker_environment.lib.models.api_errors import (
     TaskFailures,
     TaskRuntimeError,
 )
+from useful_urls import UsefulUrls
 
 from exasol.nb_connector.ai_lab_config import Accelerator
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
@@ -26,7 +27,7 @@ from exasol.nb_connector.ui.ui_styles import get_config_styles
 DEFAULT_SCHEMA = "Default Schema"
 
 
-class ITDEStatus(Enum):
+class ItdeStatus(Enum):
     """
     Display status of the Exasol Docker-DB
     """
@@ -350,7 +351,7 @@ def _get_docker_db_action_buttons(
                 else:
                     restart_itde(conf)
             # Indicate the successful completion.
-            display_status.value = ITDEStatus.ready.value
+            display_status.value = ItdeStatus.ready.value
             btn.icon = "check"
         except Exception as e:
             popup_message(
@@ -366,7 +367,7 @@ def _get_docker_db_action_buttons(
                 take_itde_down(conf)
             bring_itde_up(conf)
             # Indicate the successful completion.
-            display_status.value = ITDEStatus.ready.value
+            display_status.value = ItdeStatus.ready.value
             btn.icon = "check"
         except Exception as e:
             popup_message(
@@ -418,13 +419,13 @@ def get_start_docker_db_ui(conf: Secrets) -> widgets.Widget:
         # Get and display the current status of the Exasol Docker-DB.
         itde_status = get_itde_status(conf)
         if itde_status == ItdeContainerStatus.READY:
-            header_lbl.value = ITDEStatus.ready.value
+            header_lbl.value = ItdeStatus.ready.value
         elif itde_status == ItdeContainerStatus.RUNNING:
-            header_lbl.value = ITDEStatus.disconnected.value
+            header_lbl.value = ItdeStatus.disconnected.value
         elif itde_status == ItdeContainerStatus.STOPPED:
-            header_lbl.value = ITDEStatus.stopped.value
+            header_lbl.value = ItdeStatus.stopped.value
         else:
-            header_lbl.value = ITDEStatus.missing.value
+            header_lbl.value = ItdeStatus.missing.value
 
         # Add a warning message about recreating an existing Exasol Docker-DB.
         itde_exists = itde_status != ItdeContainerStatus.ABSENT
@@ -445,12 +446,11 @@ def get_start_docker_db_ui(conf: Secrets) -> widgets.Widget:
             btn.style = ui_look.button_style
             btn.layout = ui_look.button_layout
     else:
-        from useful_urls import UsefulURLs
 
-        header_lbl.value = ITDEStatus.inaccessible.value
+        header_lbl.value = ItdeStatus.inaccessible.value
         warning_text = (
             f"The docker socket is not mounted. Please consult the "
-            f'<a href="{UsefulURLs.user_manual_docker_db.value}" target="_blank">documentation</a> '
+            f'<a href="{UsefulUrls.user_manual_docker_db.value}" target="_blank">documentation</a> '
             "on how to start the AI-Lab that will use the Integrated Exasol Docker-DB."
         )
         warning_html = _create_warning(warning_text)

@@ -14,7 +14,6 @@ def assert_ui_screenshot(
     wait_ms: int = 1000,
 ):
     """
-
     Takes a screenshot of a UI part and compares it to the saved one.
         anchor_selector: element to find
         parent_levels: go up .. this many times
@@ -88,28 +87,28 @@ def click_select(page_session):
 
 def expect_save_button_to_have_pencil_icon(page_session, count: int = 1):
     """
-    Assert the presence/absence count of the 'pen' icon inside the Save button.
+    Assert the presence/absence count of the 'pencil' icon inside the Save button.
     """
     expect(save_button(page_session).locator("i.fa-pencil")).to_have_count(count)
 
 
 def expect_select_button_to_have_pencil_icon(page_session, count: int = 1):
     """
-    Assert the presence/absence count of the 'pen' icon inside the Save button.
+    Assert the presence/absence count of the 'pencil' icon inside the Save button.
     """
     expect(select_button(page_session).locator("i.fa-pencil")).to_have_count(count)
 
 
 def expect_save_button_to_have_check_icon(page_session, count: int = 1):
     """
-    Assert the presence/absence count of the 'pen' icon inside the Save button.
+    Assert the presence/absence count of the 'check' icon inside the Save button.
     """
     expect(save_button(page_session).locator("i.fa-check")).to_have_count(count)
 
 
 def expect_select_button_to_have_check_icon(page_session, count: int = 1):
     """
-    Assert the presence/absence count of the 'pen' icon inside the Select button.
+    Assert the presence/absence count of the 'check' icon inside the Select button.
     """
     expect(select_button(page_session).locator("i.fa-check")).to_have_count(count)
 
