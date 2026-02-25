@@ -1,6 +1,9 @@
 # Unreleased
-  * #354: converted utils/jupysql_init from ipynb to py
-  * #343: Convert ipynb to python for main_config_ui and automate tests
+
+## Features
+
+* #354: Converted ipynb to python for `utils/jupysql_init`
+* #343: Converted ipynb to python for `main_config_ui` and automated tests
 
 ## Summary
 

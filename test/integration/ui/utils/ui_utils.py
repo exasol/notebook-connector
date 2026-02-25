@@ -52,7 +52,6 @@ def set_text_input(
 def row_by_label(page_session, label: str):
     """
     Locate the row/container element corresponding to a labeled field.
-
     """
     return page_session.locator(f"text={label}").locator("..")
 

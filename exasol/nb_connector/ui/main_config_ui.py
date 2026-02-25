@@ -27,16 +27,14 @@ from exasol.nb_connector.ui.useful_urls import UsefulUrls
 DEFAULT_SCHEMA = "Default Schema"
 
 
-class ItdeStatus(Enum):
-    """
-    Display status of the Exasol Docker-DB
-    """
+class DockerDbDisplayStatus(Enum):
+    """User-facing status messages for the Exasol Docker-DB."""
 
-    ready = "Exasol Docker-DB is READY"
-    stopped = "Exasol Docker-DB is STOPPED"
-    disconnected = "Exasol Docker-DB is NOT CONNECTED"
-    missing = "Exasol Docker-DB is NOT CREATED"
-    inaccessible = "Exasol Docker-DB is INACCESSIBLE"
+    READY = "Exasol Docker-DB is READY"
+    STOPPED = "Exasol Docker-DB is STOPPED"
+    DISCONNECTED = "Exasol Docker-DB is NOT CONNECTED"
+    MISSING = "Exasol Docker-DB is NOT CREATED"
+    INACCESSIBLE = "Exasol Docker-DB is INACCESSIBLE"
 
 
 def get_db_selection_ui(conf: Secrets) -> widgets.Widget:
@@ -343,7 +341,7 @@ def _get_docker_db_action_buttons(
     def start_docker_db(btn):
         try:
             # Need to check if the Exasol Docker-DB still exists and not running because
-            # the situation might have changed while the the widgets were hanging around.
+            # the situation might have changed while the widgets were hanging around.
             itde_status_now = get_itde_status(conf)
             if itde_status_now != ItdeContainerStatus.READY:
                 if itde_status_now == ItdeContainerStatus.ABSENT:
@@ -351,7 +349,7 @@ def _get_docker_db_action_buttons(
                 else:
                     restart_itde(conf)
             # Indicate the successful completion.
-            display_status.value = ItdeStatus.ready.value
+            display_status.value = DockerDbDisplayStatus.READY.value
             btn.icon = "check"
         except Exception as e:
             popup_message(
@@ -360,14 +358,13 @@ def _get_docker_db_action_buttons(
 
     def restart_docker_db(btn):
         try:
-            # Need to check again if the Exasol Docker-DB exists or not because
-            # the situation might have changed while the widgets were hanging around.
+            # Check if the Docker-DB state has changed since initial display of the UI widgets.
             itde_status_now = get_itde_status(conf)
             if itde_status_now != ItdeContainerStatus.ABSENT:
                 take_itde_down(conf)
             bring_itde_up(conf)
             # Indicate the successful completion.
-            display_status.value = ItdeStatus.ready.value
+            display_status.value = DockerDbDisplayStatus.READY.value
             btn.icon = "check"
         except Exception as e:
             popup_message(
@@ -419,13 +416,13 @@ def get_start_docker_db_ui(conf: Secrets) -> widgets.Widget:
         # Get and display the current status of the Exasol Docker-DB.
         itde_status = get_itde_status(conf)
         if itde_status == ItdeContainerStatus.READY:
-            header_lbl.value = ItdeStatus.ready.value
+            header_lbl.value = DockerDbDisplayStatus.READY.value
         elif itde_status == ItdeContainerStatus.RUNNING:
-            header_lbl.value = ItdeStatus.disconnected.value
+            header_lbl.value = DockerDbDisplayStatus.DISCONNECTED.value
         elif itde_status == ItdeContainerStatus.STOPPED:
-            header_lbl.value = ItdeStatus.stopped.value
+            header_lbl.value = DockerDbDisplayStatus.STOPPED.value
         else:
-            header_lbl.value = ItdeStatus.missing.value
+            header_lbl.value = DockerDbDisplayStatus.MISSING.value
 
         # Add a warning message about recreating an existing Exasol Docker-DB.
         itde_exists = itde_status != ItdeContainerStatus.ABSENT
@@ -447,7 +444,7 @@ def get_start_docker_db_ui(conf: Secrets) -> widgets.Widget:
             btn.layout = ui_look.button_layout
     else:
 
-        header_lbl.value = ItdeStatus.inaccessible.value
+        header_lbl.value = DockerDbDisplayStatus.INACCESSIBLE.value
         warning_text = (
             f"The docker socket is not mounted. Please consult the "
             f'<a href="{UsefulUrls.user_manual_docker_db.value}" target="_blank">documentation</a> '
