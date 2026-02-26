@@ -12,8 +12,10 @@ from exasol.nb_connector.ui.common import jupysql_init
 def test_init_jupysql_ipython_none():
     """This test is checking if proper error is coming when IPython is not there, like in normal python only."""
     with (
-        patch("exasol.nb_connector.ui.jupysql_init.get_ipython", return_value=None),
-        patch("exasol.nb_connector.ui.jupysql_init.open_sqlalchemy_connection"),
+        patch(
+            "exasol.nb_connector.ui.common.jupysql_init.get_ipython", return_value=None
+        ),
+        patch("exasol.nb_connector.ui.common.jupysql_init.open_sqlalchemy_connection"),
     ):
         with pytest.raises(
             RuntimeError,
@@ -26,12 +28,14 @@ def test_init_jupysql_ipython_magics():
     """This test is checking if all magic commands are running properly when IPython is there, like in notebook."""
     mock_ipy = MagicMock()
     with patch(
-        "exasol.nb_connector.ui.jupysql_init.get_ipython", return_value=mock_ipy
+        "exasol.nb_connector.ui.common.jupysql_init.get_ipython", return_value=mock_ipy
     ):
         with (
-            patch("exasol.nb_connector.ui.jupysql_init.open_sqlalchemy_connection"),
             patch(
-                "exasol.nb_connector.ui.jupysql_init.get_activation_sql",
+                "exasol.nb_connector.ui.common.jupysql_init.open_sqlalchemy_connection"
+            ),
+            patch(
+                "exasol.nb_connector.ui.common.jupysql_init.get_activation_sql",
                 return_value="MOCK_SQL",
             ),
         ):
