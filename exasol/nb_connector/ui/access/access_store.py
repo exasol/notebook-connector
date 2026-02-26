@@ -6,8 +6,8 @@ from exasol.nb_connector.secret_store import (
     InvalidPassword,
     Secrets,
 )
-from exasol.nb_connector.ui.popup_message_ui import popup_message
-from exasol.nb_connector.ui.ui_styles import get_config_styles
+from exasol.nb_connector.ui.common.popup_message import display_popup
+from exasol.nb_connector.ui.common.ui_styles import config_styles
 
 DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
 
@@ -31,9 +31,9 @@ def set_sb_store_file(value):
     get_scs_location_file_path().write_text(value)
 
 
-def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
+def get_access_store(root_dir: str = ".") -> widgets.Widget:
     sb_store_file_ = get_sb_store_file()
-    ui_look = get_config_styles()
+    ui_look = config_styles()
 
     header_lbl = widgets.Label(
         value="Configuration Store",
@@ -63,7 +63,7 @@ def get_access_store_ui(root_dir: str = ".") -> widgets.Widget:
             ai_lab_config = Secrets(Path(root_dir) / sb_store_file, password_txt.value)
             ai_lab_config.connection()
         except InvalidPassword:
-            popup_message(
+            display_popup(
                 "Failed to open the store. Please check that the password is correct"
             )
         else:

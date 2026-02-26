@@ -6,7 +6,7 @@ from unittest.mock import (
 
 import pytest
 
-from exasol.nb_connector.ui import jupysql_init
+from exasol.nb_connector.ui.common import jupysql_init
 
 
 def test_init_jupysql_ipython_none():

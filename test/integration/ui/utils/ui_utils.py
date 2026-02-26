@@ -1,8 +1,34 @@
+import pytest
 from playwright.sync_api import expect
 
 SAVE_BUTTON = "button:text('Save')"
 SELECT_BUTTON = "button:text('Select')"
 CONF_STORE = ":text('Configuration Store')"
+
+
+@pytest.fixture
+def ui_screenshot(page_session, assert_solara_snapshot):
+    """Fixture for asserting UI screenshots.
+
+    Returns a callable that forwards keyword arguments directly to
+    ``assert_ui_screenshot``. Tests must provide at least
+    ``anchor_selector`` (and typically ``parent_levels``) instead of
+    relying on hard-coded defaults here, e.g.::
+
+        ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
+    """
+
+    def _capture(**kwargs):
+        if "wait_ms" not in kwargs:
+            kwargs["wait_ms"] = 1000
+
+        assert_ui_screenshot(
+            assert_solara_snapshot,
+            page_session,
+            **kwargs,
+        )
+
+    return _capture
 
 
 def assert_ui_screenshot(
@@ -28,32 +54,6 @@ def assert_ui_screenshot(
 
     box.wait_for()
     assert_solara_snapshot(box.screenshot())
-
-
-def set_text_input(
-    row,
-    *,
-    value: str | None = None,
-    clear: bool = False,
-    text_to_type: str | None = None,
-):
-    """
-    Update a text input located inside a given row.
-    """
-    inp = row.locator("input")
-    if clear:
-        inp.clear()
-    if value is not None:
-        inp.fill(value)
-    if text_to_type is not None:
-        inp.type(text_to_type)
-
-
-def row_by_label(page_session, label: str):
-    """
-    Locate the row/container element corresponding to a labeled field.
-    """
-    return page_session.locator(f"text={label}").locator("..")
 
 
 def save_button(page_session):
