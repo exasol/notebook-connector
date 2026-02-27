@@ -17,10 +17,10 @@ def solara_snapshots_directory(request: Any) -> Path:
 def ui_screenshot(page_session, assert_solara_snapshot):
     """Fixture for asserting UI screenshots.
 
-    Returns a callable that forwards keyword arguments directly to
-    ``assert_ui_screenshot``. Tests must provide at least
-    ``anchor_selector`` (and typically ``parent_levels``) instead of
-    relying on hard-coded defaults here, e.g.::
+    Returns a callable that forwards keyword args to
+    ``assert_ui_screenshot``. Tests must pass at least
+    ``anchor_selector`` (and usually ``parent_levels``) instead of
+    relying on hard-coded defaults here, for example::
 
         ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
     """
