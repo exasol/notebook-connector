@@ -4,18 +4,16 @@ This subpackage exposes the main entry points for database-related
 configuration UIs.
 """
 
-from .db_selection import get_selection
+from .db_selection import select_db_backend
 from .generic import generic_configuration
-from .main import db_configuration
-from .onprem_or_saas_db import (
-    onprem_configuration,
-    saas_configuration,
-)
+from .main import configure_db
+from .onprem import get_onprem
+from .saas import get_saas
 
 __all__ = [
     "generic_configuration",
-    "db_configuration",
-    "get_selection",
-    "onprem_configuration",
-    "saas_configuration",
+    "configure_db",
+    "select_db_backend",
+    "get_onprem",
+    "get_saas",
 ]

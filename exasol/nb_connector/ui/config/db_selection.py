@@ -7,7 +7,7 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.common.ui_styles import config_styles
 
 
-def get_selection(conf: Secrets) -> widgets.Widget:
+def select_db_backend(conf: Secrets) -> widgets.Widget:
     """
     Creates a UI form for choosing between the Exasol Docker-DB and an external Exasol Database.
     """
