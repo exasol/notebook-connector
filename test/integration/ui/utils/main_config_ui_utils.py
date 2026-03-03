@@ -1,45 +1,25 @@
-from test.integration.ui.utils.ui_utils import assert_ui_screenshot
-
 from IPython.display import display
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ai_lab_config import StorageBackend
-from exasol.nb_connector.ui.main_config_ui import (
-    get_db_config_ui,
-    get_db_selection_ui,
+from exasol.nb_connector.ui.config.db_selection import select_db_backend
+from exasol.nb_connector.ui.config.main import (
+    configure_db,
 )
-
-
-def assert_main_config_ui_screenshot(assert_solara_snapshot, page_session):
-    assert_ui_screenshot(
-        assert_solara_snapshot,
-        page_session,
-        anchor_selector="button:text('Save')",
-        parent_levels=1,
-    )
-
-
-def assert_selection_ui_screenshot(assert_solara_snapshot, page_session):
-    assert_ui_screenshot(
-        assert_solara_snapshot,
-        page_session,
-        anchor_selector="button:text('Select')",
-        parent_levels=1,
-    )
 
 
 def render_main_config_ui(page_session, conf):
     """
     Render the main config UI
     """
-    ui = get_db_config_ui(conf=conf)
+    ui = configure_db(conf=conf)
     display(ui)
     page_session.wait_for_timeout(1000)
     return ui
 
 
 def render_db_selection_ui(page_session, conf):
-    ui = get_db_selection_ui(conf=conf)
+    ui = select_db_backend(conf=conf)
     display(ui)
     page_session.wait_for_timeout(1000)
     return ui

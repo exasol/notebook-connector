@@ -30,32 +30,6 @@ def assert_ui_screenshot(
     assert_solara_snapshot(box.screenshot())
 
 
-def set_text_input(
-    row,
-    *,
-    value: str | None = None,
-    clear: bool = False,
-    text_to_type: str | None = None,
-):
-    """
-    Update a text input located inside a given row.
-    """
-    inp = row.locator("input")
-    if clear:
-        inp.clear()
-    if value is not None:
-        inp.fill(value)
-    if text_to_type is not None:
-        inp.type(text_to_type)
-
-
-def row_by_label(page_session, label: str):
-    """
-    Locate the row/container element corresponding to a labeled field.
-    """
-    return page_session.locator(f"text={label}").locator("..")
-
-
 def save_button(page_session):
     """
     Locate the 'Save' button.

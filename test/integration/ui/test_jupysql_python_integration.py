@@ -4,8 +4,8 @@ import pytest
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ui import jupysql_init
-from exasol.nb_connector.ui.jupysql_init import init_jupysql
+from exasol.nb_connector.ui.common import jupysql_init
+from exasol.nb_connector.ui.common.jupysql_init import init_jupysql
 
 
 def test_jupysql_python_execution(tmp_path):

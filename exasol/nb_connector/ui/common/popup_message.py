@@ -11,7 +11,7 @@ display(notify_output)
 
 
 @notify_output.capture()
-def popup_message(message):
+def display_popup(message):
     clear_output()
     message = message.replace("'", '"')
     display(Javascript(f"alert('{message}')"))

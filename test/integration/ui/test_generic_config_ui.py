@@ -1,6 +1,5 @@
 from test.integration.ui.utils.ui_utils import (
     SAVE_BUTTON,
-    assert_ui_screenshot,
     click_save,
     expect_save_button_to_have_pencil_icon,
     fill_text,
@@ -13,7 +12,7 @@ import pytest
 from IPython.display import display
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.ui.generic_config_ui import get_generic_config_ui
+from exasol.nb_connector.ui.config.generic import generic_configuration
 
 
 @pytest.fixture
@@ -41,7 +40,7 @@ def render_ui(page_session, conf, inputs, group_names):
     """
     Render the generic config UI
     """
-    ui = get_generic_config_ui(secrets=conf, inputs=inputs, group_names=group_names)
+    ui = generic_configuration(secrets=conf, inputs=inputs, group_names=group_names)
     display(ui)
     page_session.wait_for_timeout(1000)
     return ui
@@ -77,25 +76,20 @@ def set_text_input(
 def test_generic_config_ui_load(
     solara_test,
     page_session,
-    assert_solara_snapshot,
+    ui_screenshot,
     tmp_path,
     inputs_and_groups,
     secrets,
 ):
     inputs, group_names = inputs_and_groups
     render_ui(page_session, secrets, inputs, group_names)
-    assert_ui_screenshot(
-        assert_solara_snapshot,
-        page_session,
-        anchor_selector=SAVE_BUTTON,
-        parent_levels=1,
-    )
+    ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
 
 
 def test_icon_on_value_change_by_textfield(
     solara_test,
     page_session,
-    assert_solara_snapshot,
+    ui_screenshot,
     tmp_path,
     inputs_and_groups,
     secrets,
@@ -106,18 +100,13 @@ def test_icon_on_value_change_by_textfield(
     fill_text(page_session, "Credentials", "User", "user")
     save_button(page_session).focus()
     expect_save_button_to_have_pencil_icon(page_session, 1)
-    assert_ui_screenshot(
-        assert_solara_snapshot,
-        page_session,
-        anchor_selector=SAVE_BUTTON,
-        parent_levels=1,
-    )
+    ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
 
 
 def test_icon_on_value_change_by_checkbox(
     solara_test,
     page_session,
-    assert_solara_snapshot,
+    ui_screenshot,
     tmp_path,
     inputs_and_groups,
     secrets,
@@ -127,18 +116,13 @@ def test_icon_on_value_change_by_checkbox(
     set_checkbox(page_session, "Encryption", "Encrypted Comm.", checked=True)
     expect_save_button_to_have_pencil_icon(page_session, 1)
 
-    assert_ui_screenshot(
-        assert_solara_snapshot,
-        page_session,
-        anchor_selector=SAVE_BUTTON,
-        parent_levels=1,
-    )
+    ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
 
 
 def test_empty_checkbox_save(
     solara_test,
     page_session,
-    assert_solara_snapshot,
+    ui_screenshot,
     tmp_path,
     inputs_and_groups,
     secrets,
@@ -147,18 +131,13 @@ def test_empty_checkbox_save(
     render_ui(page_session, secrets, inputs, group_names)
     click_save(page_session)
 
-    assert_ui_screenshot(
-        assert_solara_snapshot,
-        page_session,
-        anchor_selector=SAVE_BUTTON,
-        parent_levels=1,
-    )
+    ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
 
 
 def test_empty_textfield_save(
     solara_test,
     page_session,
-    assert_solara_snapshot,
+    ui_screenshot,
     tmp_path,
     inputs_and_groups,
     secrets,
@@ -170,18 +149,13 @@ def test_empty_textfield_save(
     set_checkbox(page_session, "Encryption", "Encrypted Comm.", checked=True)
     expect_save_button_to_have_pencil_icon(page_session, 1)
     click_save(page_session)
-    assert_ui_screenshot(
-        assert_solara_snapshot,
-        page_session,
-        anchor_selector=SAVE_BUTTON,
-        parent_levels=1,
-    )
+    ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
 
 
 def test_for_scs_read_after_save(
     solara_test,
     page_session,
-    assert_solara_snapshot,
+    ui_screenshot,
     tmp_path,
     inputs_and_groups,
     secrets,
@@ -191,12 +165,7 @@ def test_for_scs_read_after_save(
     set_checkbox(page_session, "Encryption", "Encrypted Comm.", checked=True)
     expect_save_button_to_have_pencil_icon(page_session, 1)
     click_save(page_session)
-    assert_ui_screenshot(
-        assert_solara_snapshot,
-        page_session,
-        anchor_selector=SAVE_BUTTON,
-        parent_levels=1,
-    )
+    ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
     expected_key_values = {
         "db_host_name": "localhost",
         "db_port": "8563",

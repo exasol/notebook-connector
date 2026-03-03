@@ -16,4 +16,5 @@
 
 * #305: Replacing store magic with normal file access
 * #356: Added pytest-benchmark Plugin and measured performance of SCS access
+* #345: Refactored `main_config_ui` and improved UI folder structure for better maintainability
 
