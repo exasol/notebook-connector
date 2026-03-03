@@ -22,6 +22,7 @@ dependencies = [
   "pydantic (==2.11.5)", # See https://github.com/exasol/ai-lab/issues/428
   "pickleshare(>=0.7.5)", # See https://github.com/exasol/ai-lab/issues/291 for details.
   "jupysql (>=0.11.1,<0.12.0)",
+  "tenacity (>=8.5.0)",
 ]
 
 [project.optional-dependencies]
@@ -106,6 +107,11 @@ python_files = [
     "itest_*.py",
     "test_*.py",
 ]
+
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
 
 [tool.coverage.run]
 relative_files = true
