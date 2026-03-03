@@ -8,6 +8,8 @@ import pytest
 from exasol.nb_connector.secret_store import Secrets
 
 
+pytest_plugins=["test.integration.ui.utils.notebook_test_utils"]
+
 @pytest.fixture
 def secrets() -> Iterator[Secrets]:
     with sample_db_file() as secret_db:

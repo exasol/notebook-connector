@@ -7,7 +7,7 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui import jupysql_init
 from exasol.nb_connector.ui.jupysql_init import init_jupysql
-
+from test.integration.ui.utils.notebook_test_utils import print_notebook_output
 
 def create_test_config(tmp_path, schema, user, password, cert_vld=None):
     config_path = Path(f"{tmp_path}/dummy_config_store.sqlite")
@@ -48,30 +48,23 @@ def test_jupysql_init_as_subprocess(tmp_path, notebook_runner):
     nb.cells = [
         nbformat.v4.new_code_cell(
             """
-from exasol.nb_connector.ui.jupysql_init import init_jupysql
-init_jupysql(ai_lab_config)
-"""
+            from exasol.nb_connector.connections import open_pyexasol_connection
+            sql = f'CREATE SCHEMA IF NOT EXISTS "{ai_lab_config.db_schema}"'
+            with open_pyexasol_connection(ai_lab_config, compression=True) as conn:
+                conn.execute(query=sql)
+            """
         ),
-        # nbformat.v4.new_code_cell(
-        #     "%sql SELECT 1"
-        # ),
-#         nbformat.v4.new_code_cell(
-#             """
-# # Assign the result of the previous SQL cell to a variable
-# result = _
-# try:
-#     value = int(result.first()[0])
-# except Exception as e:
-#     print(f'Error extracting value: {e}')
-# print(value == 1)
-# """
-#         )
+        nbformat.v4.new_code_cell(
+            """
+            from exasol.nb_connector.ui.jupysql_init import init_jupysql
+            init_jupysql(ai_lab_config)
+            """
+        ),
+        nbformat.v4.new_code_cell(
+            """
+            %sql SELECT 1
+            """
+        ),
     ]
     executed_nb = notebook_runner(nb)
-    output = "".join(
-        o.get("text", "")
-        for cell in executed_nb.cells if "outputs" in cell
-        for o in cell["outputs"]
-        if o.get("output_type") == "stream" and o.get("name") == "stdout"
-    )
-    print("JS23", output)
+    print_notebook_output(executed_nb)
