@@ -29,7 +29,10 @@ def test_init_jupysql_ipython_magics():
         "exasol.nb_connector.ui.jupysql_init.get_ipython", return_value=mock_ipy
     ):
         with (
-            patch("exasol.nb_connector.ui.jupysql_init.open_sqlalchemy_connection"),
+            patch(
+                "exasol.nb_connector.ui.jupysql_init.open_sqlalchemy_connection",
+                return_value="ENGINE_OBJ",
+            ),
             patch(
                 "exasol.nb_connector.ui.jupysql_init.get_activation_sql",
                 return_value="MOCK_SQL",
@@ -40,6 +43,7 @@ def test_init_jupysql_ipython_magics():
             jupysql_init.init_jupysql(mock_config)
             assert mock_ipy.mock_calls == [
                 call.run_line_magic("load_ext", "sql"),
+                call.push({"engine": "ENGINE_OBJ"}),
                 call.run_line_magic("sql", "engine"),
                 call.run_line_magic("config", "SqlMagic.short_errors = False"),
                 call.run_line_magic("sql", "OPEN SCHEMA MOCK_SCHEMA"),

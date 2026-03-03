@@ -1,11 +1,12 @@
 # Unreleased
 
+## Summary
+
 ## Features
 
 * #354: Converted ipynb to python for `utils/jupysql_init`
+* #358: Added integration tests for ui.jupysql_init
 * #343: Converted ipynb to python for `main_config_ui` and automated tests
-
-## Summary
 
 ## Bugfixes
 
