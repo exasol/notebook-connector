@@ -1,8 +1,15 @@
 from playwright.sync_api import expect
 
+from exasol.nb_connector.ui.docker.docker_db import DockerDbDisplayStatus
+
 SAVE_BUTTON = "button:text('Save')"
 SELECT_BUTTON = "button:text('Select')"
 CONF_STORE = ":text('Configuration Store')"
+DOCKER_DB_INACCESSIBLE = f":text('{DockerDbDisplayStatus.INACCESSIBLE.value}')"
+DOCKER_SOCKET_NOT_MOUNTED = ":text('The docker socket is not mounted')"
+DOCKER_DB_READY = f":text('{DockerDbDisplayStatus.READY.value}')"
+DOCKER_DB_STOPPED = f":text('{DockerDbDisplayStatus.STOPPED.value}')"
+DOCKER_DB_MISSING = f":text('{DockerDbDisplayStatus.MISSING.value}')"
 
 
 def assert_ui_screenshot(
