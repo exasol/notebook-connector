@@ -25,10 +25,12 @@ from exasol.nb_connector.ui.docker import docker_action_configuration
 
 
 def _configure_itde_secrets(secrets) -> None:
+    """Enable ITDE usage in the provided secrets store."""
     secrets.save(AILabConfig.use_itde, "True")
 
 
 def _stop_itde_container(container_name: str) -> None:
+    """Stop the ITDE Docker container by name, or fail the test if not possible."""
     try:
         client = docker.from_env()
         container = client.containers.get(container_name)
@@ -40,6 +42,7 @@ def _stop_itde_container(container_name: str) -> None:
 
 
 def _ensure_itde_ready(secrets, status: ItdeContainerStatus) -> None:
+    """Ensure the ITDE container is in READY state, otherwise fail."""
     if status == ItdeContainerStatus.STOPPED:
         restart_itde(secrets)
         status = get_itde_status(secrets)
@@ -48,6 +51,7 @@ def _ensure_itde_ready(secrets, status: ItdeContainerStatus) -> None:
 
 
 def _ensure_itde_stopped(secrets, status: ItdeContainerStatus) -> None:
+    """Ensure the ITDE container is STOPPED, stopping it if needed."""
     if status == ItdeContainerStatus.STOPPED:
         restart_itde(secrets)
         status = get_itde_status(secrets)
@@ -62,6 +66,7 @@ def _ensure_itde_stopped(secrets, status: ItdeContainerStatus) -> None:
 
 
 def _ensure_itde_state(secrets, expected_status: ItdeContainerStatus) -> None:
+    """Bring up ITDE if missing and ensure it reaches the expected status."""
     status = get_itde_status(secrets)
     if status == ItdeContainerStatus.ABSENT:
         bring_itde_up(secrets)
@@ -77,30 +82,35 @@ def _ensure_itde_state(secrets, expected_status: ItdeContainerStatus) -> None:
 
 @pytest.fixture
 def itde_secrets(secrets):
+    """Provide secrets configured to use ITDE."""
     _configure_itde_secrets(secrets)
     return secrets
 
 
 @pytest.fixture
 def itde_ready(itde_secrets):
+    """Provide secrets with ITDE in READY state."""
     _ensure_itde_state(itde_secrets, ItdeContainerStatus.READY)
     return itde_secrets
 
 
 @pytest.fixture
 def itde_stopped(itde_secrets):
+    """Provide secrets with ITDE in STOPPED state."""
     _ensure_itde_state(itde_secrets, ItdeContainerStatus.STOPPED)
     return itde_secrets
 
 
 @pytest.fixture(autouse=True)
 def _stop_itde_after_each_test(secrets):
+    """Always shut down ITDE after each test."""
     yield
     take_itde_down(secrets)
 
 
 @pytest.fixture
 def itde_missing(secrets):
+    """Provide secrets with ITDE configuration removed to simulate missing container."""
     secrets.save(AILabConfig.use_itde, "True")
     secrets.remove(AILabConfig.itde_container)
     secrets.remove(AILabConfig.itde_network)
@@ -114,6 +124,7 @@ def _click_button_and_wait_ready(
     ready_selector: str = DOCKER_DB_READY,
     timeout_ms: int = 60000,
 ) -> None:
+    """Click a UI button and wait until the ready selector appears."""
     button = page_session.locator(button_selector)
     button.wait_for()
     button.click()
@@ -121,6 +132,7 @@ def _click_button_and_wait_ready(
 
 
 def test_docker_db_inaccessible(solara_test, tmp_path, ui_screenshot, itde_secrets):
+    """Show UI state when Docker socket is not reachable."""
     ui = docker_action_configuration(itde_secrets, "/var/run/unavilable.sock")
     assert ui is not None
     display(ui)
@@ -128,12 +140,14 @@ def test_docker_db_inaccessible(solara_test, tmp_path, ui_screenshot, itde_secre
 
 
 def test_use_itde_false(solara_test, tmp_path, ui_screenshot, secrets):
+    """Ensure UI is hidden when ITDE use is disabled."""
     ui = docker_action_configuration(secrets)
     display(ui)
     assert ui is None
 
 
 def test_itde_and_docker_running(solara_test, tmp_path, ui_screenshot, itde_ready):
+    """Show UI state when ITDE is running and Docker is ready."""
     ui = docker_action_configuration(itde_ready)
     assert ui is not None
     display(ui)
@@ -141,6 +155,7 @@ def test_itde_and_docker_running(solara_test, tmp_path, ui_screenshot, itde_read
 
 
 def test_itde_and_docker_stopped(solara_test, tmp_path, ui_screenshot, itde_stopped):
+    """Show UI state when ITDE exists but is stopped."""
     ui = docker_action_configuration(itde_stopped)
     assert ui is not None
     display(ui)
@@ -148,6 +163,7 @@ def test_itde_and_docker_stopped(solara_test, tmp_path, ui_screenshot, itde_stop
 
 
 def test_itde_and_docker_missing(solara_test, tmp_path, ui_screenshot, itde_missing):
+    """Show UI state when ITDE is missing."""
     ui = docker_action_configuration(itde_missing)
     assert ui is not None
     display(ui)
@@ -157,6 +173,7 @@ def test_itde_and_docker_missing(solara_test, tmp_path, ui_screenshot, itde_miss
 def _start_docker_db_button_creates_itde(
     solara_test, page_session, itde_missing, ui_screenshot
 ):
+    """Click create/start and wait until ITDE becomes ready."""
     ui = docker_action_configuration(itde_missing)
     assert ui is not None
     display(ui)
@@ -167,6 +184,7 @@ def _start_docker_db_button_creates_itde(
 def test_restart_docker_db_button_recreates_itde(
     solara_test, page_session, itde_ready, ui_screenshot
 ):
+    """Click restart to recreate ITDE and verify readiness."""
     ui = docker_action_configuration(itde_ready)
     assert ui is not None
     display(ui)
@@ -177,6 +195,7 @@ def test_restart_docker_db_button_recreates_itde(
 def test_start_docker_db_button_starts_itde(
     solara_test, page_session, itde_stopped, ui_screenshot
 ):
+    """Click start to bring ITDE to ready state."""
     ui = docker_action_configuration(itde_stopped)
     assert ui is not None
     display(ui)
