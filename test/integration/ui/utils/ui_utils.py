@@ -12,7 +12,7 @@ DOCKER_DB_STOPPED = f":text('{DockerDbDisplayStatus.STOPPED.value}')"
 DOCKER_DB_MISSING = f":text('{DockerDbDisplayStatus.MISSING.value}')"
 DOCKER_DB_CREATE_START_BUTTON = "button:text('Create and Start')"
 DOCKER_DB_RECREATE_START_BUTTON = "button:text('Recreate and Start')"
-DOCKER_DB_START_BUTTON = "button:text('Start')"
+DOCKER_DB_START_BUTTON = "button:text-is('Start')"
 
 
 def assert_ui_screenshot(
