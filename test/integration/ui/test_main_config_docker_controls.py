@@ -154,7 +154,7 @@ def test_itde_and_docker_missing(solara_test, tmp_path, ui_screenshot, itde_miss
     ui_screenshot(anchor_selector=DOCKER_DB_MISSING, parent_levels=2)
 
 
-def test_start_docker_db_button_creates_itde(
+def _start_docker_db_button_creates_itde(
     solara_test, page_session, itde_missing, ui_screenshot
 ):
     ui = docker_action_configuration(itde_missing)
@@ -164,7 +164,7 @@ def test_start_docker_db_button_creates_itde(
     ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
 
 
-def _restart_docker_db_button_recreates_itde(
+def test_restart_docker_db_button_recreates_itde(
     solara_test, page_session, itde_ready, ui_screenshot
 ):
     ui = docker_action_configuration(itde_ready)
