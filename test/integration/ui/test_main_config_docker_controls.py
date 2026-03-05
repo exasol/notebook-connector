@@ -28,19 +28,6 @@ def _configure_itde_secrets(secrets) -> None:
     secrets.save(AILabConfig.use_itde, "True")
 
 
-def _render_and_capture(
-    ui, ui_screenshot, *, anchor_selector: str, parent_levels: int
-) -> None:
-    display(ui)
-    ui_screenshot(anchor_selector=anchor_selector, parent_levels=parent_levels)
-
-
-def _render_and_capture_status(ui, ui_screenshot, status_selector: str) -> None:
-    _render_and_capture(
-        ui, ui_screenshot, anchor_selector=status_selector, parent_levels=2
-    )
-
-
 def _stop_itde_container(container_name: str) -> None:
     try:
         client = docker.from_env()
@@ -52,19 +39,7 @@ def _stop_itde_container(container_name: str) -> None:
         pytest.fail(f"Failed to stop ITDE container: {exc}")
 
 
-def _ensure_itde_state(secrets, expected_status: ItdeContainerStatus) -> None:
-    status = get_itde_status(secrets)
-    if status == ItdeContainerStatus.ABSENT:
-        bring_itde_up(secrets)
-        status = get_itde_status(secrets)
-
-    if expected_status == ItdeContainerStatus.READY:
-        _ensure_itde_ready(secrets, status)
-    elif expected_status == ItdeContainerStatus.STOPPED:
-        _ensure_itde_stopped(secrets, status)
-
-
-def _ensure_itde_ready(secrets, status):
+def _ensure_itde_ready(secrets, status: ItdeContainerStatus) -> None:
     if status == ItdeContainerStatus.STOPPED:
         restart_itde(secrets)
         status = get_itde_status(secrets)
@@ -72,7 +47,7 @@ def _ensure_itde_ready(secrets, status):
         pytest.fail(f"ITDE status is {status.value}, expected READY")
 
 
-def _ensure_itde_stopped(secrets, status):
+def _ensure_itde_stopped(secrets, status: ItdeContainerStatus) -> None:
     if status == ItdeContainerStatus.STOPPED:
         restart_itde(secrets)
         status = get_itde_status(secrets)
@@ -84,6 +59,20 @@ def _ensure_itde_stopped(secrets, status):
         status = get_itde_status(secrets)
     if status != ItdeContainerStatus.STOPPED:
         pytest.fail(f"ITDE status is {status.value}, expected STOPPED")
+
+
+def _ensure_itde_state(secrets, expected_status: ItdeContainerStatus) -> None:
+    status = get_itde_status(secrets)
+    if status == ItdeContainerStatus.ABSENT:
+        bring_itde_up(secrets)
+        status = get_itde_status(secrets)
+
+    if expected_status == ItdeContainerStatus.READY:
+        _ensure_itde_ready(secrets, status)
+        return
+
+    if expected_status == ItdeContainerStatus.STOPPED:
+        _ensure_itde_stopped(secrets, status)
 
 
 @pytest.fixture
@@ -131,14 +120,11 @@ def _click_button_and_wait_ready(
     page_session.locator(ready_selector).wait_for(timeout=timeout_ms)
 
 
-def _render_docker_action_configuration(secrets, ui_screenshot, status_selector: str):
-    ui = docker_action_configuration(secrets)
-    _render_and_capture_status(ui, ui_screenshot, status_selector)
-
-
 def test_docker_db_inaccessible(solara_test, tmp_path, ui_screenshot, itde_secrets):
     ui = docker_action_configuration(itde_secrets, "/var/run/unavilable.sock")
-    _render_and_capture_status(ui, ui_screenshot, DOCKER_DB_INACCESSIBLE)
+    assert ui is not None
+    display(ui)
+    ui_screenshot(anchor_selector=DOCKER_DB_INACCESSIBLE, parent_levels=2)
 
 
 def test_use_itde_false(solara_test, tmp_path, ui_screenshot, secrets):
@@ -148,43 +134,51 @@ def test_use_itde_false(solara_test, tmp_path, ui_screenshot, secrets):
 
 
 def test_itde_and_docker_running(solara_test, tmp_path, ui_screenshot, itde_ready):
-    _render_docker_action_configuration(itde_ready, ui_screenshot, DOCKER_DB_READY)
+    ui = docker_action_configuration(itde_ready)
+    assert ui is not None
+    display(ui)
+    ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
 
 
 def test_itde_and_docker_stopped(solara_test, tmp_path, ui_screenshot, itde_stopped):
-    _render_docker_action_configuration(itde_stopped, ui_screenshot, DOCKER_DB_STOPPED)
+    ui = docker_action_configuration(itde_stopped)
+    assert ui is not None
+    display(ui)
+    ui_screenshot(anchor_selector=DOCKER_DB_STOPPED, parent_levels=2)
 
 
 def test_itde_and_docker_missing(solara_test, tmp_path, ui_screenshot, itde_missing):
-    _render_docker_action_configuration(itde_missing, ui_screenshot, DOCKER_DB_MISSING)
+    ui = docker_action_configuration(itde_missing)
+    assert ui is not None
+    display(ui)
+    ui_screenshot(anchor_selector=DOCKER_DB_MISSING, parent_levels=2)
 
 
 def test_start_docker_db_button_creates_itde(
     solara_test, page_session, itde_missing, ui_screenshot
 ):
     ui = docker_action_configuration(itde_missing)
+    assert ui is not None
     display(ui)
-
     _click_button_and_wait_ready(page_session, DOCKER_DB_CREATE_START_BUTTON)
-
-    _render_and_capture_status(ui, ui_screenshot, DOCKER_DB_READY)
+    ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
 
 
 def test_restart_docker_db_button_recreates_itde(
     solara_test, page_session, itde_ready, ui_screenshot
 ):
     ui = docker_action_configuration(itde_ready)
+    assert ui is not None
     display(ui)
-
     _click_button_and_wait_ready(page_session, DOCKER_DB_RECREATE_START_BUTTON)
-
-    _render_and_capture_status(ui, ui_screenshot, DOCKER_DB_READY)
+    ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
 
 
 def test_start_docker_db_button_starts_itde(
     solara_test, page_session, itde_stopped, ui_screenshot
 ):
     ui = docker_action_configuration(itde_stopped)
+    assert ui is not None
     display(ui)
     _click_button_and_wait_ready(page_session, DOCKER_DB_START_BUTTON)
-    _render_and_capture_status(ui, ui_screenshot, DOCKER_DB_READY)
+    ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
