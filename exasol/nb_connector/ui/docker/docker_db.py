@@ -154,7 +154,7 @@ def _create_warning(warning_text: str) -> widgets.Widget:
     )
 
 
-def docker_action_configuration(conf: Secrets) -> widgets.Widget:
+def manager_docker(conf: Secrets, socket="/var/run/docker.sock") -> widgets.Widget:
     """
     A UI for starting or restarting the Exasol Docker-DB.
     It checks if an instance of the Exasol Docker-DB is already running or if it exists.
@@ -167,7 +167,7 @@ def docker_action_configuration(conf: Secrets) -> widgets.Widget:
     ui_look = config_styles()
 
     # Check if the docker-socket has been mounted
-    socket_mounted = os.path.exists("/var/run/docker.sock")
+    socket_mounted = os.path.exists(socket)
 
     header_lbl = widgets.Label(style=ui_look.header_style, layout=ui_look.header_layout)
     group_items = [header_lbl]
