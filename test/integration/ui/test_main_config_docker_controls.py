@@ -1,5 +1,9 @@
+"""UI tests for the Docker-DB controls in the main config screen."""
+
+from test.integration.ui.utils.docker_itde_mock_util import apply_itde_docker_mocks
 from test.integration.ui.utils.ui_utils import (
     DOCKER_DB_CREATE_START_BUTTON,
+    DOCKER_DB_DISCONNECTED,
     DOCKER_DB_INACCESSIBLE,
     DOCKER_DB_MISSING,
     DOCKER_DB_READY,
@@ -8,113 +12,69 @@ from test.integration.ui.utils.ui_utils import (
     DOCKER_DB_STOPPED,
 )
 
-import docker
 import pytest
-from docker.errors import DockerException
 from solara import display
 
 from exasol.nb_connector.ai_lab_config import AILabConfig
-from exasol.nb_connector.itde_manager import (
-    ItdeContainerStatus,
-    bring_itde_up,
-    get_itde_status,
-    restart_itde,
-    take_itde_down,
-)
+from exasol.nb_connector.itde_manager import ItdeContainerStatus
 from exasol.nb_connector.ui.docker import docker_action_configuration
-
-
-def _configure_itde_secrets(secrets) -> None:
-    """Enable ITDE usage in the provided secrets store."""
-    secrets.save(AILabConfig.use_itde, "True")
-
-
-def _stop_itde_container(container_name: str) -> None:
-    """Stop the ITDE Docker container by name, or fail the test if not possible."""
-    try:
-        client = docker.from_env()
-        container = client.containers.get(container_name)
-        container.stop()
-    except docker.errors.NotFound:
-        pytest.fail(f"ITDE container not found: {container_name}")
-    except DockerException as exc:
-        pytest.fail(f"Failed to stop ITDE container: {exc}")
-
-
-def _ensure_itde_ready(secrets, status: ItdeContainerStatus) -> None:
-    """Ensure the ITDE container is in READY state, otherwise fail."""
-    if status == ItdeContainerStatus.STOPPED:
-        restart_itde(secrets)
-        status = get_itde_status(secrets)
-    if status != ItdeContainerStatus.READY:
-        pytest.fail(f"ITDE status is {status.value}, expected READY")
-
-
-def _ensure_itde_stopped(secrets, status: ItdeContainerStatus) -> None:
-    """Ensure the ITDE container is STOPPED, stopping it if needed."""
-    if status == ItdeContainerStatus.STOPPED:
-        restart_itde(secrets)
-        status = get_itde_status(secrets)
-    if ItdeContainerStatus.RUNNING in status:
-        container_name = secrets.get(AILabConfig.itde_container)
-        if not container_name:
-            pytest.fail("ITDE container name is not set")
-        _stop_itde_container(container_name)
-        status = get_itde_status(secrets)
-    if status != ItdeContainerStatus.STOPPED:
-        pytest.fail(f"ITDE status is {status.value}, expected STOPPED")
-
-
-def _ensure_itde_state(secrets, expected_status: ItdeContainerStatus) -> None:
-    """Bring up ITDE if missing and ensure it reaches the expected status."""
-    status = get_itde_status(secrets)
-    if status == ItdeContainerStatus.ABSENT:
-        bring_itde_up(secrets)
-        status = get_itde_status(secrets)
-
-    if expected_status == ItdeContainerStatus.READY:
-        _ensure_itde_ready(secrets, status)
-        return
-
-    if expected_status == ItdeContainerStatus.STOPPED:
-        _ensure_itde_stopped(secrets, status)
 
 
 @pytest.fixture
 def itde_secrets(secrets):
-    """Provide secrets configured to use ITDE."""
-    _configure_itde_secrets(secrets)
+    """Return secrets with ITDE enabled for this test."""
+    secrets.save(AILabConfig.use_itde, "True")
     return secrets
 
 
-@pytest.fixture
-def itde_ready(itde_secrets):
-    """Provide secrets with ITDE in READY state."""
-    _ensure_itde_state(itde_secrets, ItdeContainerStatus.READY)
-    return itde_secrets
-
-
-@pytest.fixture
-def itde_stopped(itde_secrets):
-    """Provide secrets with ITDE in STOPPED state."""
-    _ensure_itde_state(itde_secrets, ItdeContainerStatus.STOPPED)
-    return itde_secrets
-
-
 @pytest.fixture(autouse=True)
-def _stop_itde_after_each_test(secrets):
-    """Always shut down ITDE after each test."""
-    yield
-    take_itde_down(secrets)
+def _mock_itde_manager_and_docker(monkeypatch):
+    """Mock ITDE and Docker calls so tests do not use real services."""
+    return apply_itde_docker_mocks(monkeypatch)
+
+
+def _set_itde_container_and_network(secrets) -> None:
+    """Set standard ITDE container and network values for tests."""
+    secrets.save(AILabConfig.itde_container, "mock-itde")
+    secrets.save(AILabConfig.itde_network, "mock-net")
 
 
 @pytest.fixture
-def itde_missing(secrets):
-    """Provide secrets with ITDE configuration removed to simulate missing container."""
+def itde_ready(itde_secrets, _mock_itde_manager_and_docker):
+    """Return secrets set to a mocked READY ITDE state."""
+    state = _mock_itde_manager_and_docker
+    state.status = ItdeContainerStatus.READY
+    _set_itde_container_and_network(itde_secrets)
+    return itde_secrets
+
+
+@pytest.fixture
+def itde_stopped(itde_secrets, _mock_itde_manager_and_docker):
+    """Return secrets set to a mocked STOPPED ITDE state."""
+    state = _mock_itde_manager_and_docker
+    state.status = ItdeContainerStatus.STOPPED
+    _set_itde_container_and_network(itde_secrets)
+    return itde_secrets
+
+
+@pytest.fixture
+def itde_missing(secrets, _mock_itde_manager_and_docker):
+    """Return secrets with no ITDE container to simulate missing state."""
+    state = _mock_itde_manager_and_docker
+    state.status = ItdeContainerStatus.ABSENT
     secrets.save(AILabConfig.use_itde, "True")
     secrets.remove(AILabConfig.itde_container)
     secrets.remove(AILabConfig.itde_network)
     return secrets
+
+
+@pytest.fixture
+def itde_disconnected(itde_secrets, _mock_itde_manager_and_docker):
+    """Return secrets set to a mocked RUNNING ITDE state without visibility."""
+    state = _mock_itde_manager_and_docker
+    state.status = ItdeContainerStatus.RUNNING
+    _set_itde_container_and_network(itde_secrets)
+    return itde_secrets
 
 
 def _click_button_and_wait_ready(
@@ -124,11 +84,18 @@ def _click_button_and_wait_ready(
     ready_selector: str = DOCKER_DB_READY,
     timeout_ms: int = 60000,
 ) -> None:
-    """Click a UI button and wait until the ready selector appears."""
+    """Click a button and wait for the ready message to appear."""
     button = page_session.locator(button_selector)
     button.wait_for()
     button.click()
     page_session.locator(ready_selector).wait_for(timeout=timeout_ms)
+
+
+def _create_docker_socket(tmp_path) -> str:
+    """Create a temporary socket file to simulate a mounted Docker socket."""
+    socket_path = tmp_path / "docker.sock"
+    socket_path.touch()
+    return str(socket_path)
 
 
 def test_docker_db_inaccessible(solara_test, tmp_path, ui_screenshot, itde_secrets):
@@ -148,7 +115,8 @@ def test_use_itde_false(solara_test, tmp_path, ui_screenshot, secrets):
 
 def test_itde_and_docker_running(solara_test, tmp_path, ui_screenshot, itde_ready):
     """Show UI state when ITDE is running and Docker is ready."""
-    ui = docker_action_configuration(itde_ready)
+    socket_path = _create_docker_socket(tmp_path)
+    ui = docker_action_configuration(itde_ready, socket_path)
     assert ui is not None
     display(ui)
     ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
@@ -156,7 +124,8 @@ def test_itde_and_docker_running(solara_test, tmp_path, ui_screenshot, itde_read
 
 def test_itde_and_docker_stopped(solara_test, tmp_path, ui_screenshot, itde_stopped):
     """Show UI state when ITDE exists but is stopped."""
-    ui = docker_action_configuration(itde_stopped)
+    socket_path = _create_docker_socket(tmp_path)
+    ui = docker_action_configuration(itde_stopped, socket_path)
     assert ui is not None
     display(ui)
     ui_screenshot(anchor_selector=DOCKER_DB_STOPPED, parent_levels=2)
@@ -164,17 +133,19 @@ def test_itde_and_docker_stopped(solara_test, tmp_path, ui_screenshot, itde_stop
 
 def test_itde_and_docker_missing(solara_test, tmp_path, ui_screenshot, itde_missing):
     """Show UI state when ITDE is missing."""
-    ui = docker_action_configuration(itde_missing)
+    socket_path = _create_docker_socket(tmp_path)
+    ui = docker_action_configuration(itde_missing, socket_path)
     assert ui is not None
     display(ui)
     ui_screenshot(anchor_selector=DOCKER_DB_MISSING, parent_levels=2)
 
 
-def _start_docker_db_button_creates_itde(
-    solara_test, page_session, itde_missing, ui_screenshot
+def test_start_docker_db_button_creates_itde(
+    solara_test, page_session, itde_missing, ui_screenshot, tmp_path
 ):
     """Click create/start and wait until ITDE becomes ready."""
-    ui = docker_action_configuration(itde_missing)
+    socket_path = _create_docker_socket(tmp_path)
+    ui = docker_action_configuration(itde_missing, socket_path)
     assert ui is not None
     display(ui)
     _click_button_and_wait_ready(page_session, DOCKER_DB_CREATE_START_BUTTON)
@@ -182,10 +153,11 @@ def _start_docker_db_button_creates_itde(
 
 
 def test_restart_docker_db_button_recreates_itde(
-    solara_test, page_session, itde_ready, ui_screenshot
+    solara_test, page_session, itde_ready, ui_screenshot, tmp_path
 ):
     """Click restart to recreate ITDE and verify readiness."""
-    ui = docker_action_configuration(itde_ready)
+    socket_path = _create_docker_socket(tmp_path)
+    ui = docker_action_configuration(itde_ready, socket_path)
     assert ui is not None
     display(ui)
     _click_button_and_wait_ready(page_session, DOCKER_DB_RECREATE_START_BUTTON)
@@ -193,11 +165,23 @@ def test_restart_docker_db_button_recreates_itde(
 
 
 def test_start_docker_db_button_starts_itde(
-    solara_test, page_session, itde_stopped, ui_screenshot
+    solara_test, page_session, itde_stopped, ui_screenshot, tmp_path
 ):
     """Click start to bring ITDE to ready state."""
-    ui = docker_action_configuration(itde_stopped)
+    socket_path = _create_docker_socket(tmp_path)
+    ui = docker_action_configuration(itde_stopped, socket_path)
     assert ui is not None
     display(ui)
     _click_button_and_wait_ready(page_session, DOCKER_DB_START_BUTTON)
     ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
+
+
+def test_itde_and_docker_disconnected(
+    solara_test, tmp_path, ui_screenshot, itde_disconnected
+):
+    """Show UI state when ITDE runs but the container is not connected."""
+    socket_path = _create_docker_socket(tmp_path)
+    ui = docker_action_configuration(itde_disconnected, socket_path)
+    assert ui is not None
+    display(ui)
+    ui_screenshot(anchor_selector=DOCKER_DB_DISCONNECTED, parent_levels=2)
