@@ -1,5 +1,6 @@
 """UI tests for the Docker-DB controls in the main config screen."""
 
+from datetime import timedelta
 from test.integration.ui.utils.docker_itde_mock_util import apply_itde_docker_mocks
 from test.integration.ui.utils.ui_utils import (
     DOCKER_DB_CREATE_START_BUTTON,
@@ -13,11 +14,11 @@ from test.integration.ui.utils.ui_utils import (
 )
 
 import pytest
-from solara import display
+import solara
 
+import exasol.nb_connector.ui.docker as ui
 from exasol.nb_connector.ai_lab_config import AILabConfig
 from exasol.nb_connector.itde_manager import ItdeContainerStatus
-from exasol.nb_connector.ui.docker import docker_action_configuration
 
 
 @pytest.fixture
@@ -82,12 +83,13 @@ def _click_button_and_wait_ready(
     button_selector: str,
     *,
     ready_selector: str = DOCKER_DB_READY,
-    timeout_ms: int = 60000,
+    timeout: timedelta = timedelta(seconds=60),
 ) -> None:
     """Click a button and wait for the ready message to appear."""
     button = page_session.locator(button_selector)
     button.wait_for()
     button.click()
+    timeout_ms = int(timeout.total_seconds() * 1000)
     page_session.locator(ready_selector).wait_for(timeout=timeout_ms)
 
 
@@ -98,45 +100,45 @@ def _create_docker_socket(tmp_path) -> str:
     return str(socket_path)
 
 
-def test_docker_db_inaccessible(solara_test, tmp_path, ui_screenshot, itde_secrets):
+def test_docker_db_inaccessible(solara_test, ui_screenshot, itde_secrets):
     """Show UI state when Docker socket is not reachable."""
-    ui = docker_action_configuration(itde_secrets, "/var/run/unavilable.sock")
-    assert ui is not None
-    display(ui)
+    ui_widget = ui.manager_docker(itde_secrets, "/var/run/unavilable.sock")
+    assert ui_widget is not None
+    solara.display(ui_widget)
     ui_screenshot(anchor_selector=DOCKER_DB_INACCESSIBLE, parent_levels=2)
 
 
-def test_use_itde_false(solara_test, tmp_path, ui_screenshot, secrets):
+def test_use_itde_false(solara_test, ui_screenshot, secrets):
     """Ensure UI is hidden when ITDE use is disabled."""
-    ui = docker_action_configuration(secrets)
-    display(ui)
-    assert ui is None
+    ui_widget = ui.manager_docker(secrets)
+    solara.display(ui_widget)
+    assert ui_widget is None
 
 
 def test_itde_and_docker_running(solara_test, tmp_path, ui_screenshot, itde_ready):
     """Show UI state when ITDE is running and Docker is ready."""
     socket_path = _create_docker_socket(tmp_path)
-    ui = docker_action_configuration(itde_ready, socket_path)
-    assert ui is not None
-    display(ui)
+    ui_widget = ui.manager_docker(itde_ready, socket_path)
+    assert ui_widget is not None
+    solara.display(ui_widget)
     ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
 
 
 def test_itde_and_docker_stopped(solara_test, tmp_path, ui_screenshot, itde_stopped):
     """Show UI state when ITDE exists but is stopped."""
     socket_path = _create_docker_socket(tmp_path)
-    ui = docker_action_configuration(itde_stopped, socket_path)
-    assert ui is not None
-    display(ui)
+    ui_widget = ui.manager_docker(itde_stopped, socket_path)
+    assert ui_widget is not None
+    solara.display(ui_widget)
     ui_screenshot(anchor_selector=DOCKER_DB_STOPPED, parent_levels=2)
 
 
 def test_itde_and_docker_missing(solara_test, tmp_path, ui_screenshot, itde_missing):
     """Show UI state when ITDE is missing."""
     socket_path = _create_docker_socket(tmp_path)
-    ui = docker_action_configuration(itde_missing, socket_path)
-    assert ui is not None
-    display(ui)
+    ui_widget = ui.manager_docker(itde_missing, socket_path)
+    assert ui_widget is not None
+    solara.display(ui_widget)
     ui_screenshot(anchor_selector=DOCKER_DB_MISSING, parent_levels=2)
 
 
@@ -145,9 +147,9 @@ def test_start_docker_db_button_creates_itde(
 ):
     """Click create/start and wait until ITDE becomes ready."""
     socket_path = _create_docker_socket(tmp_path)
-    ui = docker_action_configuration(itde_missing, socket_path)
-    assert ui is not None
-    display(ui)
+    ui_widget = ui.manager_docker(itde_missing, socket_path)
+    assert ui_widget is not None
+    solara.display(ui_widget)
     _click_button_and_wait_ready(page_session, DOCKER_DB_CREATE_START_BUTTON)
     ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
 
@@ -157,9 +159,9 @@ def test_restart_docker_db_button_recreates_itde(
 ):
     """Click restart to recreate ITDE and verify readiness."""
     socket_path = _create_docker_socket(tmp_path)
-    ui = docker_action_configuration(itde_ready, socket_path)
-    assert ui is not None
-    display(ui)
+    ui_widget = ui.manager_docker(itde_ready, socket_path)
+    assert ui_widget is not None
+    solara.display(ui_widget)
     _click_button_and_wait_ready(page_session, DOCKER_DB_RECREATE_START_BUTTON)
     ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
 
@@ -169,9 +171,9 @@ def test_start_docker_db_button_starts_itde(
 ):
     """Click start to bring ITDE to ready state."""
     socket_path = _create_docker_socket(tmp_path)
-    ui = docker_action_configuration(itde_stopped, socket_path)
-    assert ui is not None
-    display(ui)
+    ui_widget = ui.manager_docker(itde_stopped, socket_path)
+    assert ui_widget is not None
+    solara.display(ui_widget)
     _click_button_and_wait_ready(page_session, DOCKER_DB_START_BUTTON)
     ui_screenshot(anchor_selector=DOCKER_DB_READY, parent_levels=2)
 
@@ -181,7 +183,7 @@ def test_itde_and_docker_disconnected(
 ):
     """Show UI state when ITDE runs but the container is not connected."""
     socket_path = _create_docker_socket(tmp_path)
-    ui = docker_action_configuration(itde_disconnected, socket_path)
-    assert ui is not None
-    display(ui)
+    ui_widget = ui.manager_docker(itde_disconnected, socket_path)
+    assert ui_widget is not None
+    solara.display(ui_widget)
     ui_screenshot(anchor_selector=DOCKER_DB_DISCONNECTED, parent_levels=2)
