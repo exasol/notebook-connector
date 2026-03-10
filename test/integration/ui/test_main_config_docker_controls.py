@@ -109,7 +109,7 @@ def test_docker_db_inaccessible(solara_test, ui_screenshot, itde_secrets):
     ui_screenshot(anchor_selector=DOCKER_DB_INACCESSIBLE, parent_levels=2)
 
 
-def test_use_itde_false(solara_test, ui_screenshot, secrets):
+def test_use_itde_false(solara_test, secrets):
     """Ensure UI is hidden when ITDE use is disabled."""
     widget = ui.manage_docker_db(secrets)
     solara.display(widget)
