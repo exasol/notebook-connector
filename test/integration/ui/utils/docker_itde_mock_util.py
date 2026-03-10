@@ -46,7 +46,6 @@ class ItdeManagerMock:
         self.state = ItdeContainerStatus.ABSENT
 
 
-
 def patch_itde_manager(monkeypatch) -> ItdeManagerMock:
     """Patch ITDE and Docker client to use mocks in UI tests."""
 
