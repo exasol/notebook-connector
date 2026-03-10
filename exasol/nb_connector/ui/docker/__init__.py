@@ -6,11 +6,11 @@ This package exposes the public Docker-DB UI helpers.
 from .docker_db import (
     DockerDbDisplayStatus,
     docker_db_configuration,
-    manager_docker,
+    manage_docker_db,
 )
 
 __all__ = [
     "DockerDbDisplayStatus",
     "docker_db_configuration",
-    "manager_docker",
+    "manage_docker_db",
 ]

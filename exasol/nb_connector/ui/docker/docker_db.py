@@ -154,7 +154,7 @@ def _create_warning(warning_text: str) -> widgets.Widget:
     )
 
 
-def manager_docker(conf: Secrets, socket="/var/run/docker.sock") -> widgets.Widget:
+def manage_docker_db(conf: Secrets, socket="/var/run/docker.sock") -> widgets.Widget:
     """
     A UI for starting or restarting the Exasol Docker-DB.
     It checks if an instance of the Exasol Docker-DB is already running or if it exists.
