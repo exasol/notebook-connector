@@ -53,5 +53,5 @@ def performance_test(session: nox.Session) -> None:
 
 @nox.session(name="install:playwright-browser", python=False)
 def install_playwright_browser(session: nox.Session) -> None:
-    """ Install browser "chromium" for UI tests with playwright. """
+    """Install browser "chromium" for UI tests with playwright."""
     session.run("playwright", "install", "chromium")

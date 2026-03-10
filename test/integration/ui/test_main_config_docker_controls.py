@@ -29,10 +29,12 @@ def itde_secrets(secrets):
     return secrets
 
 
-@pytest.fixture(autouse=True) # why autouse?
-# def _mock_itde_manager_and_docker(monkeypatch):
+@pytest.fixture(autouse=True)
 def itde_manager_mock(monkeypatch):
-    """Mock ITDE and Docker calls so tests do not use real services."""
+    """The autouse=True makes the fixture run automatically for every test in that module,
+    even if the test doesn’t list it as a parameter. Here that means all tests get
+    the ITDE/Docker mocking without having to repeat itde_manager_mock in each
+    test signature. It ensures no test accidentally hits real services."""
     return patch_itde_manager(monkeypatch)
 
 
