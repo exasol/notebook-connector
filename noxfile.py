@@ -49,3 +49,10 @@ def performance_test(session: nox.Session) -> None:
         f"--benchmark-json={output}",
     ]
     session.run(*command)
+
+
+@nox.session(name="install:playwright", python=False)
+def install_playwright(session: nox.Session) -> None:
+    """ Install dependencies for UI tests with playwright. """
+    session.run("poetry", "run", "playwright", "install", "chromium")
+    session.run("poetry", "run", "playwright", "install-deps")

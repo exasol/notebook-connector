@@ -1,7 +1,7 @@
 """UI tests for the Docker-DB controls in the main config screen."""
 
 from datetime import timedelta
-from test.integration.ui.utils.docker_itde_mock_util import apply_itde_docker_mocks
+from test.integration.ui.utils.docker_itde_mock_util import patch_itde_manager
 from test.integration.ui.utils.ui_utils import (
     DOCKER_DB_CREATE_START_BUTTON,
     DOCKER_DB_DISCONNECTED,
@@ -29,10 +29,11 @@ def itde_secrets(secrets):
     return secrets
 
 
-@pytest.fixture(autouse=True)
-def _mock_itde_manager_and_docker(monkeypatch):
+@pytest.fixture(autouse=True) # why autouse?
+# def _mock_itde_manager_and_docker(monkeypatch):
+def itde_manager_mock(monkeypatch):
     """Mock ITDE and Docker calls so tests do not use real services."""
-    return apply_itde_docker_mocks(monkeypatch)
+    return patch_itde_manager(monkeypatch)
 
 
 def _set_itde_container_and_network(secrets) -> None:
@@ -42,28 +43,25 @@ def _set_itde_container_and_network(secrets) -> None:
 
 
 @pytest.fixture
-def itde_ready(itde_secrets, _mock_itde_manager_and_docker):
+def itde_ready(itde_secrets, itde_manager_mock):
     """Return secrets set to a mocked READY ITDE state."""
-    state = _mock_itde_manager_and_docker
-    state.status = ItdeContainerStatus.READY
+    itde_manager_mock.state = ItdeContainerStatus.READY
     _set_itde_container_and_network(itde_secrets)
     return itde_secrets
 
 
 @pytest.fixture
-def itde_stopped(itde_secrets, _mock_itde_manager_and_docker):
+def itde_stopped(itde_secrets, itde_manager_mock):
     """Return secrets set to a mocked STOPPED ITDE state."""
-    state = _mock_itde_manager_and_docker
-    state.status = ItdeContainerStatus.STOPPED
+    itde_manager_mock.state = ItdeContainerStatus.STOPPED
     _set_itde_container_and_network(itde_secrets)
     return itde_secrets
 
 
 @pytest.fixture
-def itde_missing(secrets, _mock_itde_manager_and_docker):
+def itde_missing(secrets, itde_manager_mock):
     """Return secrets with no ITDE container to simulate missing state."""
-    state = _mock_itde_manager_and_docker
-    state.status = ItdeContainerStatus.ABSENT
+    itde_manager_mock.state = ItdeContainerStatus.ABSENT
     secrets.save(AILabConfig.use_itde, "True")
     secrets.remove(AILabConfig.itde_container)
     secrets.remove(AILabConfig.itde_network)
@@ -71,10 +69,9 @@ def itde_missing(secrets, _mock_itde_manager_and_docker):
 
 
 @pytest.fixture
-def itde_disconnected(itde_secrets, _mock_itde_manager_and_docker):
+def itde_disconnected(itde_secrets, itde_manager_mock):
     """Return secrets set to a mocked RUNNING ITDE state without visibility."""
-    state = _mock_itde_manager_and_docker
-    state.status = ItdeContainerStatus.RUNNING
+    itde_manager_mock.state = ItdeContainerStatus.RUNNING
     _set_itde_container_and_network(itde_secrets)
     return itde_secrets
 

@@ -1,6 +1,6 @@
-"""Utilities for mocking the ITDE and Docker behavior in UI tests."""
+"""Patch ITDE and Docker in UI tests."""
 
-from __future__ import annotations
+from unittest.mock import Mock
 
 import docker
 
@@ -10,68 +10,55 @@ from exasol.nb_connector.itde_manager import ItdeContainerStatus
 from exasol.nb_connector.ui.docker import docker_db
 
 
-class ItdeMockState:
-    """Track the mocked ITDE container status for a test run."""
+def mock_docker_client():
+    def container():
+        mock = Mock()
+        mock.stop.return_value = None
+        return mock
 
+    def container_manager():
+        mock = Mock()
+        mock.get.return_value = container()
+        return mock
+
+    client = Mock()
+    client.containers = container_manager()
+    client.close.return_value = None
+    return client
+
+
+class ItdeManagerMock:
     def __init__(self) -> None:
-        self.status = ItdeContainerStatus.ABSENT
+        self.state = ItdeContainerStatus.ABSENT
+
+    def get_state(self, secrets) -> ItdeContainerStatus:
+        return self.state
+
+    def bring_up(self, secrets) -> None:
+        secrets.save(AILabConfig.itde_container, "mock-itde")
+        secrets.save(AILabConfig.itde_network, "mock-net")
+        self.state = ItdeContainerStatus.READY
+
+    def restart(self, secrets) -> None:
+        self.state = ItdeContainerStatus.READY
+
+    def take_down(self, secrets) -> None:
+        self.state = ItdeContainerStatus.ABSENT
 
 
-class _FakeContainer:
-    """Minimal container stub used by the mocked Docker client."""
 
-    def stop(self) -> None:
-        return None
+def patch_itde_manager(monkeypatch) -> ItdeManagerMock:
+    """Patch ITDE and Docker client to use mocks in UI tests."""
 
+    mock = ItdeManagerMock()
+    # Patch modules itde_manager (used by UI code) and imports of docker_db
+    for module in (itde_manager, docker_db):
+        monkeypatch.setattr(module, "get_itde_status", mock.get_state)
+        monkeypatch.setattr(module, "bring_itde_up", mock.bring_up)
+        monkeypatch.setattr(module, "restart_itde", mock.restart)
+        monkeypatch.setattr(module, "take_itde_down", mock.take_down)
 
-class _FakeContainerManager:
-    """Container manager stub that returns a fake container."""
+    # Patch Docker client for usage in the test module.
+    monkeypatch.setattr(docker, "from_env", mock_docker_client)
 
-    def get(self, _name: str) -> _FakeContainer:
-        return _FakeContainer()
-
-
-class _FakeDockerClient:
-    """Minimal Docker client stub with a containers manager and close()."""
-
-    def __init__(self) -> None:
-        self.containers = _FakeContainerManager()
-
-    def close(self) -> None:
-        return None
-
-
-def apply_itde_docker_mocks(monkeypatch) -> ItdeMockState:
-    """Patch ITDE helpers and Docker client to use fakes for UI tests."""
-    state = ItdeMockState()
-
-    def _fake_get_itde_status(_secrets):
-        return state.status
-
-    def _fake_bring_itde_up(_secrets):
-        _secrets.save(AILabConfig.itde_container, "mock-itde")
-        _secrets.save(AILabConfig.itde_network, "mock-net")
-        state.status = ItdeContainerStatus.READY
-
-    def _fake_restart_itde(_secrets):
-        state.status = ItdeContainerStatus.READY
-
-    def _fake_take_itde_down(_secrets):
-        state.status = ItdeContainerStatus.ABSENT
-
-    # Patch itde_manager module (used by UI code).
-    monkeypatch.setattr(itde_manager, "get_itde_status", _fake_get_itde_status)
-    monkeypatch.setattr(itde_manager, "bring_itde_up", _fake_bring_itde_up)
-    monkeypatch.setattr(itde_manager, "restart_itde", _fake_restart_itde)
-    monkeypatch.setattr(itde_manager, "take_itde_down", _fake_take_itde_down)
-
-    # Patch UI module imports (docker_db imports these directly).
-    monkeypatch.setattr(docker_db, "get_itde_status", _fake_get_itde_status)
-    monkeypatch.setattr(docker_db, "bring_itde_up", _fake_bring_itde_up)
-    monkeypatch.setattr(docker_db, "restart_itde", _fake_restart_itde)
-    monkeypatch.setattr(docker_db, "take_itde_down", _fake_take_itde_down)
-
-    # Mock Docker client for usage in the test module.
-    monkeypatch.setattr(docker, "from_env", lambda: _FakeDockerClient())
-
-    return state
+    return mock
