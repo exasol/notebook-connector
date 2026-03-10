@@ -30,13 +30,21 @@ dependencies are installed and snapshots are updated correctly.
 
       playwright install chromium
 
-2. **Install system dependencies for Playwright**
-
-   This is necessary especially on Linux systems to ensure all required libraries are available:
+    Alternatively you can use the related nox session
 
    .. code-block:: bash
 
-      playwright install-deps
+      nox -s install:playwright-browser
+
+
+2. **Install system dependencies for Playwright**
+
+   On some systems you may need to install additional dependencies for
+   playwright:
+
+   .. code-block:: bash
+
+      sudo playwright install-deps
 
 3. **Run UI tests and update Solara snapshots**
 
