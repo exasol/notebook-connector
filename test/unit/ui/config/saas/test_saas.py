@@ -20,6 +20,7 @@ def _saas_values():
 
 def _capture_generic(monkeypatch, captured):
     """Patch generic_configuration to capture inputs and group names."""
+
     def fake_generic(conf, inputs, group_names):
         captured["conf"] = conf
         captured["inputs"] = inputs

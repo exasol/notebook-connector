@@ -24,7 +24,9 @@ def test_configure_db_saas(monkeypatch):
 
 def test_configure_db_docker_db(monkeypatch):
     """Use Docker DB when on-prem backend and flag is True."""
-    _assert_configure_db(monkeypatch, StorageBackend.onprem, "True", "docker_db_configuration")
+    _assert_configure_db(
+        monkeypatch, StorageBackend.onprem, "True", "docker_db_configuration"
+    )
 
 
 def test_configure_db_onprem(monkeypatch):

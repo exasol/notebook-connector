@@ -13,6 +13,7 @@ def _build_conf_with_values(values):
 
 def _capture_generic(monkeypatch, captured):
     """Patch generic_configuration to capture inputs and group names."""
+
     def fake_generic(conf, inputs, group_names):
         captured["inputs"] = inputs
         captured["group_names"] = group_names

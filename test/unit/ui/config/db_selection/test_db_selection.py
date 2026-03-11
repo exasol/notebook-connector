@@ -19,6 +19,7 @@ def config_store():
 @pytest.fixture
 def ui_styles():
     """Provide default UI styles for tests."""
+
     class UILook:
         input_layout = widgets.Layout()
         input_style = {}
