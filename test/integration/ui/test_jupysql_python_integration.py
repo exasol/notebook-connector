@@ -5,8 +5,7 @@ import pytest
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ui import jupysql_init
-from exasol.nb_connector.ui.jupysql_init import init_jupysql
+from exasol.nb_connector.ui.common import jupysql
 from test.integration.ui.utils.notebook_test_utils import print_notebook_output
 
 def create_test_config(tmp_path, schema, user, password, cert_vld=None):
@@ -30,20 +29,20 @@ def test_jupysql_no_ipython(tmp_path):
         tmp_path, "MYSCHEMA", "sys", "exasol"
     )
     ai_lab_config = Secrets(Path(config_path), store_password)
-    orig_get_ipython = jupysql_init.get_ipython
-    jupysql_init.get_ipython = lambda: None
+    orig_get_ipython = jupysql.get_ipython
+    jupysql.get_ipython = lambda: None
     try:
         with pytest.raises(
             RuntimeError,
             match="Not running inside IPython. Magic commands will not execute.",
         ):
-            init_jupysql(ai_lab_config)
+            jupysql.init(ai_lab_config)
     finally:
-        jupysql_init.get_ipython = orig_get_ipython
+        jupysql.get_ipython = orig_get_ipython
 
 
 def test_jupysql_init_as_subprocess(tmp_path, notebook_runner):
-    """Test running jupysql_init.py logic as a notebook via nbclient with a real config file."""
+    """Test running jupysql.py logic as a notebook via nbclient with a real config file."""
     nb = nbformat.v4.new_notebook()
     nb.cells = [
         nbformat.v4.new_code_cell(

@@ -6,7 +6,7 @@ from unittest.mock import (
 
 import pytest
 
-from exasol.nb_connector.ui import jupysql_init
+from exasol.nb_connector.ui.common import jupysql
 
 
 def test_init_jupysql_ipython_none():
@@ -19,7 +19,7 @@ def test_init_jupysql_ipython_none():
             RuntimeError,
             match="Not running inside IPython. Magic commands will not execute.",
         ):
-            jupysql_init.init_jupysql(MagicMock())
+            jupysql.init(MagicMock())
 
 
 def test_init_jupysql_ipython_magics():
@@ -40,7 +40,7 @@ def test_init_jupysql_ipython_magics():
         ):
             mock_config = MagicMock()
             mock_config.db_schema = "MOCK_SCHEMA"
-            jupysql_init.init_jupysql(mock_config)
+            jupysql.init(mock_config)
             assert mock_ipy.mock_calls == [
                 call.run_line_magic("load_ext", "sql"),
                 call.push({"engine": "ENGINE_OBJ"}),
