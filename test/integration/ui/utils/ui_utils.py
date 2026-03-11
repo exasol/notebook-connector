@@ -1,8 +1,19 @@
 from playwright.sync_api import expect
 
+from exasol.nb_connector.ui.docker.docker_db import DockerDbDisplayStatus
+
 SAVE_BUTTON = "button:text('Save')"
 SELECT_BUTTON = "button:text('Select')"
 CONF_STORE = ":text('Configuration Store')"
+DOCKER_DB_INACCESSIBLE = f":text('{DockerDbDisplayStatus.INACCESSIBLE.value}')"
+DOCKER_SOCKET_NOT_MOUNTED = ":text('The docker socket is not mounted')"
+DOCKER_DB_READY = f":text('{DockerDbDisplayStatus.READY.value}')"
+DOCKER_DB_STOPPED = f":text('{DockerDbDisplayStatus.STOPPED.value}')"
+DOCKER_DB_DISCONNECTED = f":text('{DockerDbDisplayStatus.DISCONNECTED.value}')"
+DOCKER_DB_MISSING = f":text('{DockerDbDisplayStatus.MISSING.value}')"
+DOCKER_DB_CREATE_START_BUTTON = "button:text('Create and Start')"
+DOCKER_DB_RECREATE_START_BUTTON = "button:text('Recreate and Start')"
+DOCKER_DB_START_BUTTON = "button:text-is('Start')"
 
 
 def assert_ui_screenshot(
@@ -28,32 +39,6 @@ def assert_ui_screenshot(
 
     box.wait_for()
     assert_solara_snapshot(box.screenshot())
-
-
-def set_text_input(
-    row,
-    *,
-    value: str | None = None,
-    clear: bool = False,
-    text_to_type: str | None = None,
-):
-    """
-    Update a text input located inside a given row.
-    """
-    inp = row.locator("input")
-    if clear:
-        inp.clear()
-    if value is not None:
-        inp.fill(value)
-    if text_to_type is not None:
-        inp.type(text_to_type)
-
-
-def row_by_label(page_session, label: str):
-    """
-    Locate the row/container element corresponding to a labeled field.
-    """
-    return page_session.locator(f"text={label}").locator("..")
 
 
 def save_button(page_session):

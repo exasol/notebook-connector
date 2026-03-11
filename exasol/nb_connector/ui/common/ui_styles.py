@@ -11,7 +11,7 @@ A user form may include one or more buttons. Their style and layout are defined 
 SOLID_BORDER: str = "solid 1px"
 
 
-def get_config_styles():
+def config_styles():
 
     from dataclasses import (
         dataclass,

@@ -4,10 +4,10 @@ import ipywidgets as widgets
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ui.ui_styles import get_config_styles
+from exasol.nb_connector.ui.common.ui_styles import config_styles
 
 
-def get_generic_config_ui(
+def generic_configuration(
     secrets: Secrets,
     inputs: list[list[tuple[str, widgets.Widget, CKey]]],
     group_names: list[str],
@@ -28,7 +28,7 @@ def get_generic_config_ui(
                      match the length of the inputs.
     """
 
-    ui_look = get_config_styles()
+    ui_look = config_styles()
     save_btn = widgets.Button(
         description="Save", style=ui_look.button_style, layout=ui_look.button_layout
     )
