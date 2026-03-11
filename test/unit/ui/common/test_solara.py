@@ -3,7 +3,6 @@ Working examples for solara kernel tests
 """
 
 import importlib.resources
-import logging
 from contextlib import contextmanager
 
 import ipywidgets
@@ -11,9 +10,7 @@ import solara
 from solara.server import reload
 from solara.server.app import AppScript
 
-logger = logging.getLogger("solara.server.app_test")
-
-APP_SRC = importlib.resources.files("test.unit.ui") / "app.py"
+APP_SRC = importlib.resources.files("test.unit.ui.common") / "app.py"
 reload.reloader.start()
 
 
@@ -67,15 +64,15 @@ def test_ipywidgets_update_global_state():
     confirms that the global state does not update before the button is clicked,
     and then checks that clicking the button updates the global state as expected.
     """
-    global_state = {"username": ""}
+    state = {"username": ""}
     textbox = ipywidgets.Text()
     button = ipywidgets.Button(description="Submit")
 
-    def on_click(b):
-        global_state["username"] = textbox.value
+    def on_click(_):
+        state["username"] = textbox.value
 
     button.on_click(on_click)
     textbox.value = "alice"  # Simulate user input
-    assert global_state["username"] == ""  # assert global state is unchanged
+    assert state["username"] == ""  # assert global state is unchanged
     button.click()  # Simulate button click
-    assert global_state["username"] == "alice"
+    assert state["username"] == "alice"

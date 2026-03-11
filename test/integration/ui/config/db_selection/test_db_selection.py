@@ -1,5 +1,5 @@
-from test.integration.ui.utils.main_config_ui_utils import render_db_selection_ui
-from test.integration.ui.utils.ui_utils import (
+from test.integration.ui.common.utils.main_config_ui_utils import render_db_selection_ui
+from test.integration.ui.common.utils.ui_utils import (
     SELECT_BUTTON,
     click_select,
     expect_select_button_to_have_check_icon,

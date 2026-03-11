@@ -1,8 +1,8 @@
 """UI tests for the Docker-DB controls in the main config screen."""
 
 from datetime import timedelta
-from test.integration.ui.utils.docker_itde_mock_util import patch_itde_manager
-from test.integration.ui.utils.ui_utils import (
+from test.integration.ui.common.utils.docker_itde_mock_util import patch_itde_manager
+from test.integration.ui.common.utils.ui_utils import (
     DOCKER_DB_CREATE_START_BUTTON,
     DOCKER_DB_DISCONNECTED,
     DOCKER_DB_INACCESSIBLE,

@@ -1,4 +1,4 @@
-from test.integration.ui.utils.ui_utils import (
+from test.integration.ui.common.utils.ui_utils import (
     SAVE_BUTTON,
     click_save,
     expect_save_button_to_have_pencil_icon,
