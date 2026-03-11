@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import ipywidgets as widgets
 from exasol_integration_test_docker_environment.lib.models.api_errors import (
@@ -12,7 +13,7 @@ from exasol.nb_connector.ui.docker import docker_db
 
 def create_secrets(tmp_path: os.PathLike) -> Secrets:
     """Create a secrets store for tests."""
-    return Secrets(tmp_path / "secrets.db", "test-password")
+    return Secrets(Path(tmp_path) / "secrets.db", "test-password")
 
 
 def header_label_from_ui(ui):
