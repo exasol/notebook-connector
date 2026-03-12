@@ -5,7 +5,6 @@
 ## Features
 
 * #354: Converted ipynb to python for `utils/jupysql_init`
-* #358: Added integration tests for ui.jupysql_init
 * #343: Converted ipynb to python for `main_config_ui` and automated tests
 
 ## Bugfixes
@@ -21,4 +20,5 @@
 * #346: Added integration tests for docker_db main configuration UI
 * #363: Simplified the UI test folder structure for better accessibility and maintainability
 * #364: Added unit tests for `main_config_ui`
+* #358: Added integration tests for ui.`jupysql_init`
 
