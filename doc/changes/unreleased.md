@@ -20,5 +20,5 @@
 * #346: Added integration tests for docker_db main configuration UI
 * #363: Simplified the UI test folder structure for better accessibility and maintainability
 * #364: Added unit tests for `main_config_ui`
-* #358: Added integration tests for ui.`jupysql_init`
+* #358: Added integration tests for `jupysql.py`
 
