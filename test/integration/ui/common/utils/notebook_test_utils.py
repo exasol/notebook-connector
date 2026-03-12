@@ -14,7 +14,6 @@ from pathlib import Path
 
 import nbformat
 import pytest
-import requests
 from exasol.pytest_backend import (
     BACKEND_ONPREM,
     BACKEND_SAAS,
@@ -36,14 +35,6 @@ LOG = logging.getLogger(__name__)
 def generate_password(pwd_length):
     pwd_characters = string.ascii_letters + string.digits
     return "".join(random.choice(pwd_characters) for _ in range(pwd_length))
-
-
-def url_exists(url):
-    try:
-        response = requests.head(url)
-        return response.status_code < 400
-    except requests.ConnectionError:
-        return False
 
 
 def _insert_hacks(nb: nbformat.NotebookNode, hacks: list[tuple[str, str]]):
@@ -109,7 +100,6 @@ def run_notebook(
     return result
 
 
-# ~/git/ai-lab/test/notebooks/notebook_test_utils.py
 def set_log_level_for_libraries(level=logging.WARNING):
     modules = cleandoc(
         """

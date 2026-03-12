@@ -10,7 +10,7 @@ from exasol.nb_connector.ui.common import jupysql
 
 
 def create_test_config(tmp_path, schema, user, password, cert_vld=None):
-    config_path = Path(f"{tmp_path}/dummy_config_store.sqlite")
+    config_path = tmp_path / "dummy_config_store.sqlite"
     store_password = "store_password"
 
     secrets = Secrets(config_path, master_password=store_password)
@@ -43,7 +43,13 @@ def test_jupysql_no_ipython(tmp_path):
 
 
 def test_jupysql_init_as_subprocess(tmp_path, notebook_runner):
-    """Test running jupysql.py logic as a notebook via nbclient with a real config file."""
+    """
+    Test running jupysql.py logic as a notebook via nbclient with a real config file.
+
+    ai_lab_config is provided by the notebook_runner fixture and injected into the
+    executed notebook's namespace. It represents an AILabConfig-like object that
+    simulates configuration coming from a separate notebook or external setup.
+    """
     nb = nbformat.v4.new_notebook()
     nb.cells = [
         nbformat.v4.new_code_cell(
