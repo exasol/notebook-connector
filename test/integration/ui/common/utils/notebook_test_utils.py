@@ -4,7 +4,10 @@ import pprint
 import random
 import string
 import textwrap
-from collections.abc import Callable
+from collections.abc import (
+    Callable,
+    Generator,
+)
 from functools import partial
 from inspect import cleandoc
 from pathlib import Path
@@ -138,7 +141,7 @@ def backend_setup(
     backend_aware_onprem_database,
     backend_aware_saas_database_id,
     tmp_path_factory,
-) -> tuple[Path, str]:
+) -> Generator[tuple[Path, str], None, None]:
     """
     Creates a temporary configuration store and initialises it according to the
     backend in use.
