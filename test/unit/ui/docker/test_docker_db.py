@@ -10,6 +10,9 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.docker import docker_db
 
+DEFAULT_DISK_VALUE = 2
+DEFAULT_MEM_VALUE = 2
+
 
 def create_secrets(tmp_path: os.PathLike) -> Secrets:
     """Create a secrets store for tests."""
@@ -39,8 +42,8 @@ def test_docker_db_configuration_defaults(tmp_path):
 
     assert isinstance(mem_widget, widgets.IntText)
     assert isinstance(disk_widget, widgets.IntText)
-    assert mem_widget.value == 2
-    assert disk_widget.value == 2
+    assert mem_widget.value == DEFAULT_MEM_VALUE
+    assert disk_widget.value == DEFAULT_DISK_VALUE
 
 
 def test_itde_error_message_non_task_runtime_error():
