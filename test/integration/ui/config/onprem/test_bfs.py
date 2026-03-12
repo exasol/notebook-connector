@@ -1,5 +1,7 @@
-from test.integration.ui.utils.main_config_ui_utils import render_onprem_non_itde_ui
-from test.integration.ui.utils.ui_utils import (
+from test.integration.ui.common.utils.main_config_ui_utils import (
+    render_onprem_non_itde_ui,
+)
+from test.integration.ui.common.utils.ui_utils import (
     SAVE_BUTTON,
     click_save,
     expect_save_button_to_have_check_icon,
@@ -10,16 +12,20 @@ from test.integration.ui.utils.ui_utils import (
 )
 
 
-def test_onprem_ui_load(solara_test, page_session, ui_screenshot, tmp_path, secrets):
-    render_onprem_non_itde_ui(page_session, secrets)
-    ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
-
-
-def test_clear_port_bring_original_value(
+def test_external_port_bring_original_value(
     solara_test, page_session, ui_screenshot, tmp_path, secrets
 ):
     render_onprem_non_itde_ui(page_session, secrets)
-    fill_text(page_session, "Database Connection", "Port", "")
+    fill_text(page_session, "BucketFS Connection", "External Port", "")
+    save_button(page_session).focus()
+    ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
+
+
+def test_internal_port_bring_original_value(
+    solara_test, page_session, ui_screenshot, tmp_path, secrets
+):
+    render_onprem_non_itde_ui(page_session, secrets)
+    fill_text(page_session, "BucketFS Connection", "Internal Port", "")
     save_button(page_session).focus()
     ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
 
@@ -28,7 +34,7 @@ def test_pencil_icon_on_textfield_change(
     solara_test, page_session, ui_screenshot, tmp_path, secrets
 ):
     render_onprem_non_itde_ui(page_session, secrets)
-    fill_text(page_session, "Database Connection", "User Name", "system")
+    fill_text(page_session, "BucketFS Connection", "User Name", "bfs_test_system")
     expect_save_button_to_have_pencil_icon(page_session, 1)
     ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
 
@@ -37,7 +43,7 @@ def test_pencil_icon_on_checkbox_change(
     solara_test, page_session, ui_screenshot, tmp_path, secrets
 ):
     render_onprem_non_itde_ui(page_session, secrets)
-    set_checkbox(page_session, "Database Connection", "Encrypted Comm.", checked=False)
+    set_checkbox(page_session, "BucketFS Connection", "Encrypted Comm.", checked=False)
     expect_save_button_to_have_pencil_icon(page_session, 1)
     ui_screenshot(anchor_selector=SAVE_BUTTON, parent_levels=1)
 
@@ -45,12 +51,9 @@ def test_pencil_icon_on_checkbox_change(
 def test_check_icon_on_save(
     solara_test, page_session, ui_screenshot, tmp_path, secrets
 ):
-    render_onprem_non_itde_ui(
-        page_session,
-        secrets,
-    )
-    fill_text(page_session, "Database Connection", "User Name", "system")
-    set_checkbox(page_session, "Database Connection", "Encrypted Comm.", checked=False)
+    render_onprem_non_itde_ui(page_session, secrets)
+    fill_text(page_session, "BucketFS Connection", "User Name", "bfs_test_system")
+    set_checkbox(page_session, "BucketFS Connection", "Encrypted Comm.", checked=False)
     expect_save_button_to_have_pencil_icon(page_session, 1)
     click_save(page_session)
     expect_save_button_to_have_check_icon(page_session, 1)

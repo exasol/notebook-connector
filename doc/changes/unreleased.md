@@ -19,4 +19,6 @@
 * #356: Added pytest-benchmark Plugin and measured performance of SCS access
 * #345: Refactored `main_config_ui` and improved UI folder structure for better maintainability
 * #346: Added integration tests for docker_db main configuration UI
+* #363: Simplified the UI test folder structure for better accessibility and maintainability
+* #364: Added unit tests for `main_config_ui`
 
