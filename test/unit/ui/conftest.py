@@ -3,7 +3,6 @@ conftest for UI testing
 """
 
 import pytest
-import solara.server.app
 import solara.server.kernel_context
 from solara.server import kernel
 from solara.server.kernel_context import VirtualKernelContext

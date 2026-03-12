@@ -2,7 +2,7 @@ import ipywidgets as widgets
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ui.config.generic import generic_configuration
+from exasol.nb_connector.ui.config.generic import get_config
 
 DEFAULT_SCHEMA = "Default Schema"
 
@@ -63,4 +63,4 @@ def get_saas(conf: Secrets) -> widgets.Widget:
 
     group_names = ["SaaS DB Configuration", "TLS/SSL Configuration"]
 
-    return generic_configuration(conf, inputs, group_names)
+    return get_config(conf, inputs, group_names)

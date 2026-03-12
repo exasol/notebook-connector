@@ -20,7 +20,7 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.common.popup_message import display_popup
 from exasol.nb_connector.ui.common.ui_styles import config_styles
 from exasol.nb_connector.ui.common.useful_urls import Urls
-from exasol.nb_connector.ui.config.generic import generic_configuration
+from exasol.nb_connector.ui.config.generic import get_config
 
 DEFAULT_SCHEMA = "Default Schema"
 
@@ -70,7 +70,7 @@ def docker_db_configuration(conf: Secrets) -> widgets.Widget:
 
     group_names = ["Database Configuration"]
 
-    return generic_configuration(conf, inputs, group_names)
+    return get_config(conf, inputs, group_names)
 
 
 def _itde_error_message(header: str, e: Exception) -> str:

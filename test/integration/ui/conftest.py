@@ -1,5 +1,5 @@
 from pathlib import Path
-from test.integration.ui.utils.ui_utils import assert_ui_screenshot
+from test.integration.ui.common.utils.ui_utils import assert_ui_screenshot
 from typing import Any
 
 import pytest

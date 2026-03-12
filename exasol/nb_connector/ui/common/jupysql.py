@@ -10,7 +10,7 @@ from exasol.nb_connector.connections import open_sqlalchemy_connection
 from exasol.nb_connector.language_container_activation import get_activation_sql
 
 
-def init_jupysql(ai_lab_config):
+def init(ai_lab_config):
     open_sqlalchemy_connection(ai_lab_config)
     ipy = get_ipython()
     if ipy is None:

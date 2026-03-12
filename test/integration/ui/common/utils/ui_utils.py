@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 from playwright.sync_api import expect
 
 from exasol.nb_connector.ui.docker.docker_db import DockerDbDisplayStatus
@@ -124,3 +126,10 @@ def set_checkbox(
     label = panel.get_by_text(label_text, exact=exact)
     cb = label.locator(checkbox_xpath)
     cb.check() if checked else cb.uncheck()
+
+
+def mock_conf(values):
+    """Create a mock config that returns values by key."""
+    conf = MagicMock()
+    conf.get.side_effect = lambda key, default=None: values.get(key, default)
+    return conf

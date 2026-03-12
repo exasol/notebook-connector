@@ -1,5 +1,5 @@
 from pathlib import Path
-from test.integration.ui.utils.ui_utils import CONF_STORE
+from test.integration.ui.common.utils.ui_utils import CONF_STORE
 
 from IPython.display import display
 
