@@ -9,7 +9,7 @@ from IPython.core.error import UsageError
 
 from exasol.nb_connector.connections import open_sqlalchemy_connection
 from exasol.nb_connector.language_container_activation import get_activation_sql
-import traceback
+
 
 def init(ai_lab_config):
     engine = open_sqlalchemy_connection(ai_lab_config)

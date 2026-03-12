@@ -1,4 +1,5 @@
 from pathlib import Path
+from test.integration.ui.common.utils.notebook_test_utils import print_notebook_output
 
 import nbformat
 import pytest
@@ -6,7 +7,7 @@ import pytest
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.common import jupysql
-from test.integration.ui.utils.notebook_test_utils import print_notebook_output
+
 
 def create_test_config(tmp_path, schema, user, password, cert_vld=None):
     config_path = Path(f"{tmp_path}/dummy_config_store.sqlite")
@@ -55,8 +56,8 @@ def test_jupysql_init_as_subprocess(tmp_path, notebook_runner):
         ),
         nbformat.v4.new_code_cell(
             """
-            from exasol.nb_connector.ui.jupysql_init import init_jupysql
-            init_jupysql(ai_lab_config)
+            from exasol.nb_connector.ui.common import jupysql
+            jupysql.init(ai_lab_config)
             """
         ),
         nbformat.v4.new_code_cell(

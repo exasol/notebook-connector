@@ -1,34 +1,38 @@
+import logging
 import os
-from typing import List, Tuple, Optional, Callable
-from pathlib import Path
-from functools import partial
+import pprint
 import random
 import string
 import textwrap
-import logging
+from collections.abc import Callable
+from functools import partial
 from inspect import cleandoc
-import pprint
+from pathlib import Path
 
-import pytest
 import nbformat
-from nbclient import NotebookClient
+import pytest
 import requests
+from exasol.pytest_backend import (
+    BACKEND_ONPREM,
+    BACKEND_SAAS,
+)
+from nbclient import NotebookClient
 
-from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend, Accelerator
+from exasol.nb_connector.ai_lab_config import Accelerator
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.itde_manager import (
     bring_itde_up,
-    take_itde_down
+    take_itde_down,
 )
-from exasol.pytest_backend import BACKEND_ONPREM, BACKEND_SAAS
-
+from exasol.nb_connector.secret_store import Secrets
 
 LOG = logging.getLogger(__name__)
 
 
 def generate_password(pwd_length):
     pwd_characters = string.ascii_letters + string.digits
-    return ''.join(random.choice(pwd_characters) for _ in range(pwd_length))
+    return "".join(random.choice(pwd_characters) for _ in range(pwd_length))
 
 
 def url_exists(url):
@@ -39,24 +43,32 @@ def url_exists(url):
         return False
 
 
-def _insert_hacks(nb: nbformat.NotebookNode, hacks: List[Tuple[str, str]]):
+def _insert_hacks(nb: nbformat.NotebookNode, hacks: list[tuple[str, str]]):
 
     def cell_match(nb_cell, ins_tag: str) -> bool:
-        return ('tags' in nb_cell.metadata) and (ins_tag in nb_cell.metadata['tags'])
+        return ("tags" in nb_cell.metadata) and (ins_tag in nb_cell.metadata["tags"])
 
     for hack in hacks:
         insertion_tag, hack_content = hack
         # Find the sequential numbers of the target cells.
-        location_cell_nums = [cell_no for cell_no, nb_cell in enumerate(nb.cells)
-                              if cell_match(nb_cell, insertion_tag)]
+        location_cell_nums = [
+            cell_no
+            for cell_no, nb_cell in enumerate(nb.cells)
+            if cell_match(nb_cell, insertion_tag)
+        ]
         # Insert the hack cell after each cell located at the previous step.
         for cell_no in location_cell_nums[::-1]:
             hack_cell = nbformat.v4.new_code_cell(hack_content)
             nb.cells.insert(cell_no + 1, hack_cell)
 
 
-def run_notebook(notebook_file: str | nbformat.NotebookNode, store_file: str, store_password: str,
-                 timeout: int = -1, hacks: Optional[List[Tuple[str, str]]] = None) -> nbformat.NotebookNode:
+def run_notebook(
+    notebook_file: str | nbformat.NotebookNode,
+    store_file: str,
+    store_password: str,
+    timeout: int = -1,
+    hacks: list[tuple[str, str]] | None = None,
+) -> nbformat.NotebookNode:
     """
     Executes notebook with added access to the configuration store.
 
@@ -78,18 +90,18 @@ def run_notebook(notebook_file: str | nbformat.NotebookNode, store_file: str, st
         _insert_hacks(nb, hacks)
 
     # Insert the following code at the beginning of the notebook
-    init_code = f'''
+    init_code = f"""
     def init_notebook_test():
         from pathlib import Path
         from exasol.nb_connector.secret_store import Secrets
         global ai_lab_config
         ai_lab_config = Secrets(Path("{store_file}"), "{store_password}")
     init_notebook_test()
-    '''
+    """
     nb.cells.insert(0, nbformat.v4.new_code_cell(init_code))
 
     # Execute the notebook object, expecting to get no exceptions.
-    nb_client = NotebookClient(nb, timeout=timeout, kernel_name='python3')
+    nb_client = NotebookClient(nb, timeout=timeout, kernel_name="python3")
     result = nb_client.execute()
     return result
 
@@ -116,28 +128,30 @@ def set_log_level_for_libraries(level=logging.WARNING):
         logging.getLogger(m).setLevel(level)
 
 
-@pytest.fixture(scope='session')
-def backend_setup(backend,
-                  saas_host,
-                  saas_pat,
-                  saas_account_id,
-                  database_name,
-                  backend_aware_onprem_database,
-                  backend_aware_saas_database_id,
-                  tmp_path_factory) -> Tuple[Path, str]:
+@pytest.fixture(scope="session")
+def backend_setup(
+    backend,
+    saas_host,
+    saas_pat,
+    saas_account_id,
+    database_name,
+    backend_aware_onprem_database,
+    backend_aware_saas_database_id,
+    tmp_path_factory,
+) -> tuple[Path, str]:
     """
     Creates a temporary configuration store and initialises it according to the
     backend in use.
     """
 
-    store_path = tmp_path_factory.mktemp('tmp_config_dir') / 'tmp_config_saas.sqlite'
+    store_path = tmp_path_factory.mktemp("tmp_config_dir") / "tmp_config_saas.sqlite"
     store_password = generate_password(12)
     secrets = Secrets(store_path, master_password=store_password)
-    secrets.save(CKey.db_schema, 'NOTEBOOK_TESTS')
+    secrets.save(CKey.db_schema, "NOTEBOOK_TESTS")
 
     if backend == BACKEND_ONPREM:
         secrets.save(CKey.storage_backend, StorageBackend.onprem.name)
-        secrets.save(CKey.use_itde, 'yes')
+        secrets.save(CKey.use_itde, "yes")
         if os.getenv("NBTEST_USE_GPU", "false") == "true":
             secrets.save(CKey.accelerator, Accelerator.nvidia.value)
         if db_mem_size := os.getenv("NBTEST_MEMSIZE"):
@@ -159,7 +173,7 @@ def backend_setup(backend,
         yield store_path, store_password
 
     else:
-        raise RuntimeError(f'Unknown backend {backend}')
+        raise RuntimeError(f"Unknown backend {backend}")
 
 
 @pytest.fixture
@@ -168,13 +182,13 @@ def notebook_runner(backend_setup) -> Callable:
     A fixture for running a notebook.
     """
     store_path, store_password = backend_setup
-    return partial(run_notebook,
-                   store_file=str(store_path),
-                   store_password=store_password)
+    return partial(
+        run_notebook, store_file=str(store_path), store_password=store_password
+    )
 
 
 @pytest.fixture
-def uploading_hack() -> Tuple[str, str]:
+def uploading_hack() -> tuple[str, str]:
     """
     This fixture is a hack that inserts a pause after uploading a big archive into the BucketFS.
     The BucketFS performs the decompression and file copying asynchronously. The files may still
@@ -182,15 +196,18 @@ def uploading_hack() -> Tuple[str, str]:
     operation is completed before resuming the notebook execution from the next cell.
     """
     return (
-        'uploading_model',
-        textwrap.dedent("""
+        "uploading_model",
+        textwrap.dedent(
+            """
         def pause_notebook_execution():
             import time
             time.sleep(20)
 
         pause_notebook_execution()
-        """)
+        """
+        ),
     )
+
 
 def print_notebook_output(notebook_result: nbformat.NotebookNode):
     """
