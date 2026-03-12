@@ -27,7 +27,7 @@ def _capture_generic(monkeypatch, captured):
         captured["group_names"] = group_names
         return "ui"
 
-    monkeypatch.setattr(saas, "generic_configuration", fake_generic)
+    monkeypatch.setattr(saas, "get_config", fake_generic)
 
 
 def test_get_saas_builds_expected_inputs(monkeypatch):

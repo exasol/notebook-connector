@@ -12,7 +12,7 @@ def _capture_generic(monkeypatch, captured):
         captured["group_names"] = group_names
         return "ui"
 
-    monkeypatch.setattr(onprem, "generic_configuration", fake_generic)
+    monkeypatch.setattr(onprem, "get_config", fake_generic)
 
 
 def test_get_onprem_builds_expected_inputs(monkeypatch):
