@@ -55,14 +55,14 @@ def test_notebook_widget(
         assert text.value == "click"
 
 
-def test_ipywidgets_update_global_state():
+def test_ipywidgets_update_state():
     """
-    Test that clicking an ipywidgets.Button correctly updates a global state dictionary
+    Test that clicking an ipywidgets.Button correctly updates a state dictionary
     with the current value of an ipywidgets.Text widget.
 
     This test simulates user input by setting the value of the Text widget,
-    confirms that the global state does not update before the button is clicked,
-    and then checks that clicking the button updates the global state as expected.
+    confirms that the state does not update before the button is clicked,
+    and then checks that clicking the button updates the state as expected.
     """
     state = {"username": ""}
     textbox = ipywidgets.Text()
@@ -73,6 +73,6 @@ def test_ipywidgets_update_global_state():
 
     button.on_click(on_click)
     textbox.value = "alice"  # Simulate user input
-    assert state["username"] == ""  # assert global state is unchanged
+    assert state["username"] == ""  # asserting state is unchanged
     button.click()  # Simulate button click
     assert state["username"] == "alice"

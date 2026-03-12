@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from test.integration.ui.common.utils.ui_utils import mock_conf
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ui.config import saas
@@ -30,19 +30,12 @@ def _capture_generic(monkeypatch, captured):
     monkeypatch.setattr(saas, "generic_configuration", fake_generic)
 
 
-def _mock_conf(values):
-    """Create a mock config that returns values by key."""
-    conf = MagicMock()
-    conf.get.side_effect = lambda key, default=None: values.get(key, default)
-    return conf
-
-
 def test_get_saas_builds_expected_inputs(monkeypatch):
     """Ensure SaaS UI inputs are built with expected defaults."""
     captured = {}
     _capture_generic(monkeypatch, captured)
 
-    conf = _mock_conf(_saas_values())
+    conf = mock_conf(_saas_values())
 
     assert saas.get_saas(conf) == "ui"
 

@@ -8,7 +8,7 @@ def _assert_configure_db(monkeypatch, backend, conf_get_value, target_attr):
     """Run configure_db and assert it returns the result object."""
     result = object()
     conf = MagicMock()
-    if conf_get_value is not None:
+    if conf_get_value:
         conf.get.return_value = conf_get_value
 
     monkeypatch.setattr(main, "get_backend", lambda _: backend)

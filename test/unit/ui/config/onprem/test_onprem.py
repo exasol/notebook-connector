@@ -1,14 +1,7 @@
-from unittest.mock import MagicMock
+from test.integration.ui.common.utils.ui_utils import mock_conf
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ui.config import onprem
-
-
-def _build_conf_with_values(values):
-    """Create a mock config that returns values by key."""
-    conf = MagicMock()
-    conf.get.side_effect = lambda key, default=None: values.get(key, default)
-    return conf
 
 
 def _capture_generic(monkeypatch, captured):
@@ -46,7 +39,7 @@ def test_get_onprem_builds_expected_inputs(monkeypatch):
         CKey.client_cert: "/client.pem",
         CKey.client_key: "/client.key",
     }
-    conf = _build_conf_with_values(values)
+    conf = mock_conf(values)
 
     assert onprem.get_onprem(conf) == "ui"
 

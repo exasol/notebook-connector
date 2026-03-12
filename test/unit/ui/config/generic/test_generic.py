@@ -57,7 +57,7 @@ def test_generic_configuration_builds_ui(
     assert isinstance(ui, widgets.Box)
     # Should have one save button at the end
     assert isinstance(ui.children[-1], widgets.Button)
-    # Should have as many groups as group_names
+    # Should have as many groups as group_labels
     assert len(ui.children) == len(group_labels) + 1
 
 

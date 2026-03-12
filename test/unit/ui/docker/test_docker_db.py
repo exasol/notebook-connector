@@ -45,23 +45,23 @@ def test_docker_db_configuration_defaults(tmp_path):
 
 def test_itde_error_message_non_task_runtime_error():
     """Format error message for a non-task runtime error."""
-    err = ValueError("boom")
+    err = ValueError("error")
     msg = docker_db._itde_error_message("Header", err)
-    assert msg == "Header: boom"
+    assert msg == "Header: error"
 
 
 def test_itde_error_message_task_runtime_error_inner():
     """Format error message for a task runtime error with inner list."""
-    err = TaskRuntimeError("oops", inner=["a", "b"])
+    err = TaskRuntimeError("Cause:", inner=["a", "b"])
     msg = docker_db._itde_error_message("Header", err)
-    assert msg == "Header: oops This was caused by\na\nb"
+    assert msg == "Header: Cause: This was caused by\na\nb"
 
 
 def test_create_warning_widget_contains_text():
     """Create a warning widget with the given text."""
-    warning = docker_db._create_warning("hello")
+    warning = docker_db._create_warning("warning")
     assert isinstance(warning, widgets.HTML)
-    assert "hello" in warning.value
+    assert "warning" in warning.value
 
 
 def test_docker_action_configuration_use_itde_false(tmp_path):
