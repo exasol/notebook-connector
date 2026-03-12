@@ -12,7 +12,7 @@ import pytest
 from IPython.display import display
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.ui.config.generic import generic_configuration
+from exasol.nb_connector.ui.config.generic import get_config
 
 
 @pytest.fixture
@@ -40,7 +40,7 @@ def render_ui(page_session, conf, inputs, group_names):
     """
     Render the generic config UI
     """
-    ui = generic_configuration(secrets=conf, inputs=inputs, group_names=group_names)
+    ui = get_config(secrets=conf, inputs=inputs, group_names=group_names)
     display(ui)
     page_session.wait_for_timeout(1000)
     return ui

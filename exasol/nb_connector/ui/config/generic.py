@@ -7,7 +7,7 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.common.ui_styles import config_styles
 
 
-def generic_configuration(
+def get_config(
     secrets: Secrets,
     inputs: list[list[tuple[str, widgets.Widget, CKey]]],
     group_names: list[str],
@@ -33,7 +33,7 @@ def generic_configuration(
         description="Save", style=ui_look.button_style, layout=ui_look.button_layout
     )
 
-    def save_configuration(btn):
+    def save(btn):
         for row in chain(*inputs):
             _, widget, key = row
             secrets.save(key, str(widget.value))
@@ -43,7 +43,7 @@ def generic_configuration(
         # Icon "pen" in font ... is not available on all systems
         save_btn.icon = "pencil"
 
-    save_btn.on_click(save_configuration)
+    save_btn.on_click(save)
 
     # Apply the styles and layouts to the input fields
     for row in chain(*inputs):

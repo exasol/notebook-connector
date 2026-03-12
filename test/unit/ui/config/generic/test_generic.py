@@ -53,7 +53,7 @@ def test_generic_configuration_builds_ui(
 ):
     """Check that the UI is built with groups and a save button."""
     monkeypatch.setattr(generic, "config_styles", lambda: ui_styles)
-    ui = generic.generic_configuration(secrets_store, input_definitions, group_labels)
+    ui = generic.get_config(secrets_store, input_definitions, group_labels)
     assert isinstance(ui, widgets.Box)
     # Should have one save button at the end
     assert isinstance(ui.children[-1], widgets.Button)
@@ -66,7 +66,7 @@ def test_save_button_saves_values(
 ):
     """Check that clicking save stores all input values."""
     monkeypatch.setattr(generic, "config_styles", lambda: ui_styles)
-    ui = generic.generic_configuration(secrets_store, input_definitions, group_labels)
+    ui = generic.get_config(secrets_store, input_definitions, group_labels)
     save_btn = ui.children[-1]
     # Simulate button click
     save_btn.click()
@@ -82,7 +82,7 @@ def test_on_value_change_sets_icon(
 ):
     """Check that changing a value sets the pencil icon."""
     monkeypatch.setattr(generic, "config_styles", lambda: ui_styles)
-    ui = generic.generic_configuration(secrets_store, input_definitions, group_labels)
+    ui = generic.get_config(secrets_store, input_definitions, group_labels)
     save_btn = ui.children[-1]
     # Simulate value change
     for group in input_definitions:
