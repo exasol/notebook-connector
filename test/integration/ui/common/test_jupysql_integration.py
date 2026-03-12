@@ -5,7 +5,6 @@ import pytest
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.common import jupysql
-from exasol.nb_connector.ui.common.jupysql import init
 
 
 def test_jupysql_python_execution(tmp_path):
@@ -26,6 +25,6 @@ def test_jupysql_python_execution(tmp_path):
             RuntimeError,
             match="Not running inside IPython. Magic commands will not execute.",
         ):
-            init(ai_lab_config)
+            jupysql.init(ai_lab_config)
     finally:
         jupysql.get_ipython = orig_get_ipython
