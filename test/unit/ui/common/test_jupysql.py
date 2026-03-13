@@ -29,13 +29,11 @@ def test_init_jupysql_ipython_magics(monkeypatch):
     mock_config.db_schema = "MOCK_SCHEMA"
     jupysql.init(mock_config)
     expected_calls = [
-        call.run_line_magic(*args)
-        for args in [
-            ("load_ext", "sql"),
-            ("sql", "engine"),
-            ("config", "SqlMagic.short_errors = False"),
-            ("sql", "OPEN SCHEMA MOCK_SCHEMA"),
-            ("sql", "MOCK_SQL"),
-        ]
+        call.run_line_magic("load_ext", "sql"),
+        call.run_line_magic("config", "SqlMagic.short_errors = False"),
+        call.push({"engine": None}, interactive=True),
+        call.run_line_magic("sql", "engine"),
+        call.run_line_magic("sql", "OPEN SCHEMA MOCK_SCHEMA"),
+        call.run_line_magic("sql", "MOCK_SQL"),
     ]
     assert mock_ipy.mock_calls == expected_calls
