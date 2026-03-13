@@ -46,9 +46,9 @@ def test_jupysql_init_as_subprocess(tmp_path, notebook_runner):
     """
     Test running jupysql.py logic as a notebook via nbclient with a real config file.
 
-    ai_lab_config is provided by the notebook_runner fixture and injected into the
-    executed notebook's namespace. It represents an AILabConfig-like object that
-    simulates configuration coming from a separate notebook or external setup.
+    ``ai_lab_config`` is a global variable set by fixture ``notebook_runner`` in ``notebook_test_utils.py``.
+    It represents an AILabConfig-like object simulating a configuration coming from a
+    separate notebook or external setup.
     """
     nb = nbformat.v4.new_notebook()
     nb.cells = [
