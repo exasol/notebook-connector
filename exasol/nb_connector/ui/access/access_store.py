@@ -8,6 +8,7 @@ from exasol.nb_connector.secret_store import (
 )
 from exasol.nb_connector.ui.common.popup_message import display_popup
 from exasol.nb_connector.ui.common.ui_styles import config_styles
+from IPython import get_ipython
 
 DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
 
@@ -59,9 +60,11 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
     def open_or_create_config_store(btn):
         global ai_lab_config
         sb_store_file = file_txt.value
+        ipython = get_ipython()
         try:
             ai_lab_config = Secrets(Path(root_dir) / sb_store_file, password_txt.value)
             ai_lab_config.connection()
+            ipython.push({"ai_lab_config": ai_lab_config}, interactive=True)
         except InvalidPassword:
             display_popup(
                 "Failed to open the store. Please check that the password is correct"
