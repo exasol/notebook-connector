@@ -58,7 +58,6 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
     )
 
     def open_or_create_config_store(btn):
-        global ai_lab_config
         sb_store_file = file_txt.value
         ipython = get_ipython()
         try:
