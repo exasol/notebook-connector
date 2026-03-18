@@ -80,6 +80,14 @@ def test_invalid_password(solara_test, page_session, ui_screenshot, tmp_path):
 
 
 def test_access_store_sets_ai_lab_config_in_ipython(tmp_path):
+    """
+    Test to check if get_access_store() creates ai_lab_config in the IPython namespace.
+
+    We do not use the `notebook_runner` fixture from `notebook_test_utils.py` ( as used in
+    `test_jupysql_integration.py`). `notebook_runner` fixture creates `ai_lab_config`, so the test
+    could pass even if `get_access_store()` does not put `ai_lab_config` into the
+    IPython namespace after Open is clicked from UI
+    """
     code_word = "dummy123"
     store_dir = str(tmp_path)
 
