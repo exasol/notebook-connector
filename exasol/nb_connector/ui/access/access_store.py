@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import ipywidgets as widgets
+from IPython import get_ipython
 
 from exasol.nb_connector.secret_store import (
     InvalidPassword,
@@ -8,7 +9,6 @@ from exasol.nb_connector.secret_store import (
 )
 from exasol.nb_connector.ui.common.popup_message import display_popup
 from exasol.nb_connector.ui.common.ui_styles import config_styles
-from IPython import get_ipython
 
 DEFAULT_FILE_NAME = "ai_lab_secure_configuration_storage.sqlite"
 
