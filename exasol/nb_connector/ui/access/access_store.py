@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import ipywidgets as widgets
+from IPython import get_ipython
 
 from exasol.nb_connector.secret_store import (
     InvalidPassword,
@@ -57,8 +58,8 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
     )
 
     def open_or_create_config_store(btn):
-        global ai_lab_config
         sb_store_file = file_txt.value
+        ipython = get_ipython()
         try:
             ai_lab_config = Secrets(Path(root_dir) / sb_store_file, password_txt.value)
             ai_lab_config.connection()
@@ -68,6 +69,7 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
             )
         else:
             open_btn.icon = "check"
+            ipython.push({"ai_lab_config": ai_lab_config}, interactive=True)
         finally:
             set_sb_store_file(sb_store_file)
 

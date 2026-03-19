@@ -1,7 +1,9 @@
 from pathlib import Path
 from test.integration.ui.common.utils.ui_utils import CONF_STORE
 
+import nbformat
 from IPython.display import display
+from nbclient import NotebookClient
 
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.access.access_store import (
@@ -75,3 +77,41 @@ def test_invalid_password(solara_test, page_session, ui_screenshot, tmp_path):
     fill_scs_password("wrong_password", page_session)
     click_open_db(page_session)
     ui_screenshot(anchor_selector=CONF_STORE, parent_levels=2)
+
+
+def test_access_store_sets_ai_lab_config_in_ipython(tmp_path):
+    """
+    Test to check if get_access_store() creates ai_lab_config in the IPython namespace.
+
+    We do not use the `notebook_runner` fixture from `notebook_test_utils.py` ( as used in
+    `test_jupysql_integration.py`). `notebook_runner` fixture creates `ai_lab_config`, so the test
+    could pass even if `get_access_store()` does not put `ai_lab_config` into the
+    IPython namespace after Open is clicked from UI
+    """
+    code_word = "dummy123"
+    store_dir = str(tmp_path)
+
+    nb = nbformat.v4.new_notebook()
+    nb.cells = [
+        nbformat.v4.new_code_cell(
+            f"""
+            from exasol.nb_connector.ui.access.access_store import get_access_store
+            
+            ui = get_access_store("{store_dir}")
+            display(ui)
+            
+            password_field = ui.children[0].children[2].children[1]
+            password_field.value = "{code_word}"
+            open_button = ui.children[1]
+            open_button.click()
+            
+            """
+        ),
+        nbformat.v4.new_code_cell(
+            """
+                ai_lab_config
+            """
+        ),
+    ]
+
+    NotebookClient(nb, timeout=60, kernel_name="python3").execute()
