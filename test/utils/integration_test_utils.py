@@ -51,17 +51,13 @@ def assert_run_empty_udf(
     must be activated.
     """
 
-    pyexasol_connection.execute(
-        textwrap.dedent(
-            f"""
+    pyexasol_connection.execute(textwrap.dedent(f"""
             CREATE OR REPLACE {language_alias} SCALAR SCRIPT {secrets.get(AILabConfig.db_schema)}."TEST_UDF"()
             RETURNS BOOLEAN AS
             def run(ctx):
                 return True
             /
-            """
-        )
-    )
+            """))
     result = pyexasol_connection.execute(
         f'SELECT {secrets.get(AILabConfig.db_schema)}."TEST_UDF"()'
     ).fetchall()
@@ -75,13 +71,11 @@ def get_script_counts(
     Returns numbers of installed scripts of different types.
     """
 
-    result = pyexasol_connection.execute(
-        f"""
+    result = pyexasol_connection.execute(f"""
         SELECT SCRIPT_TYPE, COUNT(*) FROM SYS.EXA_ALL_SCRIPTS
         WHERE SCRIPT_SCHEMA='{secrets[AILabConfig.db_schema].upper()}'
         GROUP BY SCRIPT_TYPE;
-        """
-    ).fetchall()
+        """).fetchall()
     return dict(result)
 
 
@@ -92,12 +86,10 @@ def assert_connection_exists(
     Checks that a connection object with the specified name exists.
     """
 
-    result = pyexasol_connection.execute(
-        f"""
+    result = pyexasol_connection.execute(f"""
         SELECT 1 FROM SYS.EXA_ALL_CONNECTIONS
         WHERE CONNECTION_NAME='{connection_name.upper()}';
-        """
-    ).fetchall()
+        """).fetchall()
     assert result
 
 

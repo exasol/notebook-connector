@@ -506,13 +506,11 @@ def test_slc_create_or_open_workspace_exists(
 
 
 def write_package_file(file_path: Path, trailing_newline: bool):
-    content = textwrap.dedent(
-        """
+    content = textwrap.dedent("""
     package_a|v1.2.3
     package_b|v4.5.6
     package_c|v5.6.7
-    """
-    ).lstrip("\n")
+    """).lstrip("\n")
     if not trailing_newline:
         content = content.rstrip("\n")
     file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -534,14 +532,12 @@ def test_add_new_pip_package(slc_with_packages):
     slc_with_packages.append_custom_pip_packages(
         [PipPackageDefinition("package_d", "v10.0")]
     )
-    expected_content = textwrap.dedent(
-        """
+    expected_content = textwrap.dedent("""
     package_a|v1.2.3
     package_b|v4.5.6
     package_c|v5.6.7
     package_d|v10.0
-    """
-    ).lstrip("\n")
+    """).lstrip("\n")
     assert slc_with_packages.custom_pip_file.read_text() == expected_content
 
 
@@ -550,13 +546,11 @@ def test_add_existing_pip_package_same_version(caplog, slc_with_packages):
         slc_with_packages.append_custom_pip_packages(
             [PipPackageDefinition("package_a", "v1.2.3")]
         )
-        expected_content = textwrap.dedent(
-            """
+        expected_content = textwrap.dedent("""
         package_a|v1.2.3
         package_b|v4.5.6
         package_c|v5.6.7
-        """
-        )
+        """)
         assert (
             slc_with_packages.custom_pip_file.read_text().strip()
             == expected_content.strip()

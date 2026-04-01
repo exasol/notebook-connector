@@ -1,0 +1,24 @@
+workflows:
+  - name: checks
+    step_customizations:
+      - action: INSERT_AFTER
+        job: build-documentation-and-check-links
+        step_id: set-up-python-and-poetry-environment
+        content:
+         - name: Install All Optional Dependencies (aka. "extras")
+           id: install-optional-dependencies
+           run: poetry install --all-extras
+      - action: INSERT_AFTER
+        job: lint-code
+        step_id: set-up-python-and-poetry-environment
+        content:
+         - name: Install All Optional Dependencies (aka. "extras")
+           id: install-optional-dependencies
+           run: poetry install --all-extras
+      - action: INSERT_AFTER
+        job: run-unit-tests
+        step_id: set-up-python-and-poetry-environment
+        content:
+         - name: Install All Optional Dependencies (aka. "extras")
+           id: install-optional-dependencies
+           run: poetry install --all-extras

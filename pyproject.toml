@@ -82,9 +82,10 @@ build-backend = "poetry.core.masonry.api"
 pytest = "^8.1"
 pytest-mock = "^3.7.0"
 pytest_dependency = ">=0.6.0"
-exasol-toolbox = "^5"
+exasol-toolbox = ">=6"
 pytest-exasol-backend = ">=1.1.0,<2"
 pytest-ipywidgets = ">=1.52.0,<2.0.0"
+starlette = "<1" # see https://github.com/exasol/notebook-connector/issues/378
 notebook = ">=7.4,<8"
 
 # See more details in the developer guide, section dependencies.
@@ -127,6 +128,7 @@ fail_under = 15
 line-length = 88
 verbose = false
 include = "\\.pyi?$"
+target-version = ["py310"]
 
 
 [tool.isort]
@@ -158,6 +160,18 @@ module = [
 ]
 ignore_errors = true
 follow_untyped_imports = true
+
+
+[tool.ruff.lint]
+extend-ignore = [
+    "E", # Syntax errors
+    "F", # Pyflakes rules (excluding F401)
+    "UP", # pyupgrade rules
+    "D", # Docstring rules
+]
+extend-select = ["F401"]
+unfixable = []
+
 
 [tool.pylint.format]
 max-line-length = 88
