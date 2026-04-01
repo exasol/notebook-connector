@@ -22,7 +22,7 @@ This release fixes vulnerabilities by updating dependencies:
 | tornado      | 6.5.4    | GHSA-78cv-mqj4-43f7 | 6.5.5         | 6.5.5      |
 | tornado      | 6.5.4    | CVE-2026-31958      | 6.5.5         | 6.5.5      |
 
-For the following vulnable packages there is not update avilable, yet:
+For the following vulnerable packages there is no update available, yet:
 
 | Dependency | Affected | Vulnerability       | Fixed in | Updated to |
 |------------|----------|---------------------|----------|------------|
