@@ -38,7 +38,6 @@ def test_te_init_ui_save_token(solara_test, page_session, secrets, tmp_path):
         ),
         nbformat.v4.new_code_cell(
             # Now ai_lab_config exists in this kernel session and can be used to save the token via the te_init UI
-
             """
             from exasol.nb_connector.ui.transformers.util import te_init
             te_init.ai_lab_config = ai_lab_config
