@@ -93,7 +93,8 @@ def test_access_store_sets_ai_lab_config_in_ipython(tmp_path):
 
     nb = nbformat.v4.new_notebook()
     nb.cells = [
-        nbformat.v4.new_code_cell(f"""
+        nbformat.v4.new_code_cell(
+            f"""
             from exasol.nb_connector.ui.access.access_store import get_access_store
             
             ui = get_access_store("{store_dir}")
@@ -104,10 +105,13 @@ def test_access_store_sets_ai_lab_config_in_ipython(tmp_path):
             open_button = ui.children[1]
             open_button.click()
             
-            """),
-        nbformat.v4.new_code_cell("""
+            """
+        ),
+        nbformat.v4.new_code_cell(
+            """
                 ai_lab_config
-            """),
+            """
+        ),
     ]
 
     NotebookClient(nb, timeout=60, kernel_name="python3").execute()

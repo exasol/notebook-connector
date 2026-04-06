@@ -52,19 +52,25 @@ def test_jupysql_init_as_subprocess(tmp_path, notebook_runner):
     """
     nb = nbformat.v4.new_notebook()
     nb.cells = [
-        nbformat.v4.new_code_cell("""
+        nbformat.v4.new_code_cell(
+            """
             from exasol.nb_connector.connections import open_pyexasol_connection
             sql = f'CREATE SCHEMA IF NOT EXISTS "{ai_lab_config.db_schema}"'
             with open_pyexasol_connection(ai_lab_config, compression=True) as conn:
                 conn.execute(query=sql)
-            """),
-        nbformat.v4.new_code_cell("""
+            """
+        ),
+        nbformat.v4.new_code_cell(
+            """
             from exasol.nb_connector.ui.common import jupysql
             jupysql.init(ai_lab_config)
-            """),
-        nbformat.v4.new_code_cell("""
+            """
+        ),
+        nbformat.v4.new_code_cell(
+            """
             %sql SELECT 1
-            """),
+            """
+        ),
     ]
     executed_nb = notebook_runner(nb)
     print_notebook_output(executed_nb)

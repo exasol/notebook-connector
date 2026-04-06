@@ -100,11 +100,15 @@ class Secrets:
             # fmt: on
             LOG.error("Exception %s", ex)
             if str(ex) == "file is not a database":
-                raise InvalidPassword(cleandoc(f"""
+                raise InvalidPassword(
+                    cleandoc(
+                        f"""
                     Cannot access
                     database file {self.db_file}.
                     This also happens if master password is incorrect.
-                    """)) from ex
+                    """
+                    )
+                ) from ex
             raise
 
     # If the database is locked, wait exponentially min. 0.1 seconds, max. 5

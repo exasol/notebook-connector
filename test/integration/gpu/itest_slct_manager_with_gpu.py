@@ -78,7 +78,8 @@ def test_numba(
     secrets_module: Secrets,
     sample_slc: ScriptLanguageContainer,
 ):
-    udf = textwrap.dedent(f"""
+    udf = textwrap.dedent(
+        f"""
         CREATE OR REPLACE {sample_slc.language_alias} SCALAR SCRIPT
         test_gpu_available()
         RETURNS VARCHAR(1000) AS
@@ -90,7 +91,8 @@ def test_numba(
             else:
                 return "GPU Not Found"
         /
-        """)
+        """
+    )
     con = open_pyexasol_connection_with_lang_definitions(secrets_module)
     try:
         con.execute("CREATE SCHEMA TEST")

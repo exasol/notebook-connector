@@ -251,7 +251,8 @@ def test_udf_with_custom_packages(
     import_statements = "\n    ".join(
         f"import {module}" for pkg, version, module in custom_packages
     )
-    udf = textwrap.dedent("""
+    udf = textwrap.dedent(
+        """
         CREATE OR REPLACE {language_alias}
         SET SCRIPT test_custom_packages(i integer)
         EMITS (o VARCHAR(2000000)) AS
@@ -260,7 +261,8 @@ def test_udf_with_custom_packages(
 
             ctx.emit("success")
         /
-        """).format(
+        """
+    ).format(
         language_alias=sample_slc.language_alias,
         import_statements=import_statements,
     )
