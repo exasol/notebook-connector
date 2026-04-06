@@ -101,8 +101,7 @@ def run_notebook(
 
 
 def set_log_level_for_libraries(level=logging.WARNING):
-    modules = cleandoc(
-        """
+    modules = cleandoc("""
         traitlets
         luigi-interface
         luigi-interface.PrepareDockerNetworkForTestEnvironment
@@ -110,8 +109,7 @@ def set_log_level_for_libraries(level=logging.WARNING):
         luigi-interface.SpawnTestEnvironmentWithDockerDB
         luigi-interface.WaitForTestDockerDatabase
         httpx
-        """
-    ).split()
+        """).split()
     LOG.info(
         "Setting log level to '%s' for modules\n  - %s",
         logging.getLevelName(level),
@@ -190,15 +188,13 @@ def uploading_hack() -> tuple[str, str]:
     """
     return (
         "uploading_model",
-        textwrap.dedent(
-            """
+        textwrap.dedent("""
         def pause_notebook_execution():
             import time
             time.sleep(20)
 
         pause_notebook_execution()
-        """
-        ),
+        """),
     )
 
 

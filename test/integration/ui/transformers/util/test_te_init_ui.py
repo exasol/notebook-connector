@@ -31,11 +31,9 @@ def test_te_init_ui_save_token(solara_test, page_session, secrets, tmp_path):
             open_button.click()
             """
         ),
-        nbformat.v4.new_code_cell(
-            """
+        nbformat.v4.new_code_cell("""
             assert ai_lab_config is not None
-            """
-        ),
+            """),
         nbformat.v4.new_code_cell(
             # Now ai_lab_config exists in this kernel session and can be used to save the token via the te_init UI
             """

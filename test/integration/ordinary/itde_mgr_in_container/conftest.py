@@ -43,15 +43,13 @@ def remove_itde():
 
 @pytest.fixture
 def dockerfile_content() -> str:
-    return cleandoc(
-        """
+    return cleandoc("""
         FROM ubuntu:22.04
 
         RUN apt-get update
         RUN apt-get install --yes --no-install-recommends python3 python3-pip git
         RUN python3 -m pip install --upgrade pip
-        """
-    )
+        """)
 
 
 @pytest.fixture
