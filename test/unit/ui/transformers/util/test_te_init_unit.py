@@ -19,6 +19,13 @@ def fake_get_config():
 
 
 def test_get_hf_config_builds_expected_inputs(monkeypatch, secrets, fake_get_config):
+    """
+    This test checks that the expected inputs are built.
+        - It mocks the get_config function to capture the inputs passed to it.
+        - It calls get_hf_config and verifies that the captured inputs match the expected values.
+        - It also checks that the token value is correctly retrieved from the secrets and passed to the widget.
+        - This test ensures that the get_hf_config function correctly builds the UI inputs based on the secrets and configuration.
+    """
     secrets.save(CKey.huggingface_token, "hf_token_123")
 
     fake_config, captured = fake_get_config
