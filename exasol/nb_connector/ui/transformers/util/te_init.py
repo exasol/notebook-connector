@@ -7,9 +7,8 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.config import generic
 
-global ai_lab_config
 
-def get_hf_config(secrets: Secrets) -> widgets.Widget:
+def get_hf_config(ai_lab_config: Secrets) -> widgets.Widget:
     input_rows = [
         (
             "Access token",
@@ -18,4 +17,6 @@ def get_hf_config(secrets: Secrets) -> widgets.Widget:
         )
     ]
 
-    return generic.get_config(secrets, [input_rows], ["Hugging Face Access Parameters"])
+    return generic.get_config(
+        ai_lab_config, [input_rows], ["Hugging Face Access Parameters"]
+    )
