@@ -7,6 +7,7 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.config import generic
 
+global ai_lab_config
 
 def get_hf_config(secrets: Secrets) -> widgets.Widget:
     input_rows = [
