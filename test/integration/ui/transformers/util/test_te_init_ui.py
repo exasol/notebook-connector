@@ -2,14 +2,14 @@ import nbformat
 from nbclient import NotebookClient
 
 
-def test_te_init_ui_save_token(solara_test, page_session, secrets, tmp_path):
+def test_te_init_ui_save_token(tmp_path):
     """
     This test validates that the te_init UI can save a token to the ai_lab_config after loading it via the access_store UI.
      - First, it loads the ai_lab_config via the access_store UI by entering a password and clicking open.
      - Then, it uses the te_init UI to save a token to the ai_lab_config and verifies that the token is correctly saved.
      - This test ensures that the ai_lab_config is properly shared between the access_store UI and the te_init UI
 
-     Why nbformat test isntead of normal python playwright test ?
+     Why nbformat test instead of normal python playwright test ?
      - because the access_store UI and te_init UI need to be run in the same kernel to enable the sharing of secrets
     """
     code_word = "dummy123"
@@ -53,5 +53,4 @@ def test_te_init_ui_save_token(solara_test, page_session, secrets, tmp_path):
             """
         ),
     ]
-    nb = nbformat.v4.new_notebook()
     NotebookClient(nb, timeout=60, kernel_name="python3").execute()

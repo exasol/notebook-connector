@@ -29,7 +29,6 @@ def test_get_hf_config_builds_expected_inputs(monkeypatch, secrets, fake_get_con
     secrets.save(CKey.huggingface_token, "hf_token_123")
 
     fake_config, captured = fake_get_config
-    monkeypatch.setattr(te_init, "ai_lab_config", secrets, raising=False)
     monkeypatch.setattr(te_init.generic, "get_config", fake_config)
 
     result = te_init.get_hf_config(secrets)

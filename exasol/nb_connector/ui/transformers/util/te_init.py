@@ -1,5 +1,7 @@
-# Hugging Face credentials UI
-# This is not supposed to be used on its own.
+"""
+Hugging Face credentials UI
+This is not supposed to be used on its own.
+"""
 
 import ipywidgets as widgets
 
