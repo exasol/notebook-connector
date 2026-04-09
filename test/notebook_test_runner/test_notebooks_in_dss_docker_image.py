@@ -39,7 +39,9 @@ def notebook_test_dockerfile_content(
 
 
 @pytest.fixture(scope="session")
-def notebook_test_build_context(notebook_test_dockerfile_content) -> Generator[io.BytesIO, None, None]:
+def notebook_test_build_context(
+    notebook_test_dockerfile_content,
+) -> Generator[io.BytesIO, None, None]:
     with InMemoryBuildContext() as context:
         context.add_string_to_file(
             name="Dockerfile", string=notebook_test_dockerfile_content
