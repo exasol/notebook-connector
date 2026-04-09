@@ -1,0 +1,6 @@
+nbclient
+nbformat
+pytest
+testbook
+pytest-check-links
+pytest-exasol-backend>=1.1.0
