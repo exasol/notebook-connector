@@ -1,67 +1,53 @@
 import logging
 from pathlib import Path
 
-from exasol.nb_connector.slc.package_types import (
-    CondaPackageDefinition,
-    PipPackageDefinition,
+import yaml
+from exasol.exaslpm.model.package_file_config import (
+    CondaPackage,
+    PackageFile,
+    PipPackage,
 )
+from exasol.exaslpm.model.serialization import to_yaml_str
+
 from exasol.nb_connector.slc.slc_error import SlcError
-
-
-def _read_packages(file_path: Path, package_definition: type) -> list:
-    packages = []
-    with file_path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue  # skip empty or commented lines
-            # Take everything before the '|' as package name
-            package, version = line.split("|", 1)
-            packages.append(package_definition(package, version))
-    return packages
-
-
-def _ends_with_newline(file_path: Path) -> bool:
-    content = file_path.read_text()
-    return content.endswith("\n")
-
-
-def _filter_packages(
-    original_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-    new_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-) -> list[PipPackageDefinition | CondaPackageDefinition]:
-    filtered_packages = []
-    for package in new_packages:
-        add_package = True
-        for original_package in original_packages:
-            if package.pkg == original_package.pkg:
-                add_package = False
-                if package.version == original_package.version:
-                    logging.warning("Package already exists: %s", original_package)
-                else:
-                    raise SlcError(
-                        "Package already exists: %s but with different version",
-                        original_package,
-                    )
-        if add_package:
-            filtered_packages.append(package)
-    return filtered_packages
 
 
 def append_packages(
     file_path: Path,
     package_definition: type,
-    packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-):
+    packages: list[PipPackage] | list[CondaPackage],
+    build_step: str,
+    phase: str,
+) -> None:
     """
     Appends packages to the custom packages file.
     """
-    original_packages = _read_packages(file_path, package_definition)
-    filtered_packages = _filter_packages(original_packages, packages)
-    ends_with_newline = _ends_with_newline(file_path)
-    if filtered_packages:
-        with open(file_path, "a") as f:
-            if not ends_with_newline:
-                f.write("\n")
-            for p in filtered_packages:
-                print(f"{p.pkg}|{p.version}", file=f)
+    with file_path.open("r", encoding="utf-8") as f:
+        package_file = PackageFile.model_validate(yaml.safe_load(f))
+
+    build_step = package_file.find_build_step(build_step)
+    phase = build_step.find_phase(phase)
+
+    if package_definition is PipPackage:
+        container = phase.pip
+    elif package_definition is CondaPackage:
+        container = phase.conda
+    else:
+        container = None
+
+    if container is not None:
+        for package in packages:
+            existing = container.find_package(
+                package.name, raise_if_not_found=False
+            )
+            if existing is not None:
+                if existing.version == package.version:
+                    logging.warning("Package already exists: %s", package)
+                else:
+                    raise SlcError(
+                        f"Package already exists: {package} but with different version"
+                    )
+            else:
+                container.add_package(package)
+
+    file_path.write_text(to_yaml_str(package_file))

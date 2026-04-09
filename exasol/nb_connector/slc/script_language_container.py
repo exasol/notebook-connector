@@ -10,11 +10,18 @@ from typing import (
 )
 
 import requests
+from exasol.exaslpm.model.package_file_config import (
+    CondaPackage,
+    PipPackage,
+)
 from exasol.slc import api as exaslct_api
 from exasol.slc.api.get_language_definition_builder import (
     get_language_definition_builder,
 )
 from exasol.slc.models.compression_strategy import CompressionStrategy
+from exasol.slc.models.package_file_location.package_file_location import (
+    PackageFileLocation,
+)
 from exasol_integration_test_docker_environment.lib.docker import (
     ContextDockerClient,
 )
@@ -24,10 +31,6 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.git_access import GitAccess
 from exasol.nb_connector.slc.package_file_editor import append_packages
-from exasol.nb_connector.slc.package_types import (
-    CondaPackageDefinition,
-    PipPackageDefinition,
-)
 from exasol.nb_connector.slc.slc_compression_strategy import SlcCompressionStrategy
 from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
@@ -182,11 +185,25 @@ class ScriptLanguageContainer:
         return self.custom_packages_dir / "python3_pip_packages"
 
     @property
+    def public_package_file(self) -> Path:
+        """
+        Returns the path to the public package file of the flavor
+        """
+        return PackageFileLocation.public_package_file()
+
+    @property
     def custom_conda_file(self) -> Path:
         """
         Returns the path to the custom conda packages file of the flavor
         """
         return self.custom_packages_dir / "conda_packages"
+
+    @property
+    def internal_package_file(self) -> Path:
+        """
+        Returns the path to the internal package file of the flavor
+        """
+        return PackageFileLocation.internal_package_file
 
     def restore_custom_pip_file(self):
         """
@@ -197,6 +214,15 @@ class ScriptLanguageContainer:
             self.custom_pip_file.relative_to(self.checkout_dir),
         )
 
+    def restore_public_package_file(self):
+        """
+        Restores the public package file from Git. All changes will be overwritten.
+        """
+        GitAccess.checkout_file(
+            self.checkout_dir / "script-languages",
+            self.public_package_file.relative_to(self.checkout_dir),
+        )
+
     def restore_custom_conda_file(self):
         """
         Restores the custom conda packages file from Git. All changes will be overwritten.
@@ -204,6 +230,15 @@ class ScriptLanguageContainer:
         GitAccess.checkout_file(
             self.checkout_dir / "script-languages",
             self.custom_conda_file.relative_to(self.checkout_dir),
+        )
+
+    def restore_internal_package_file(self):
+        """
+        Restores the internal package file from Git. All changes will be overwritten.
+        """
+        GitAccess.checkout_file(
+            self.checkout_dir / "script-languages",
+            self.internal_package_file.relative_to(self.checkout_dir),
         )
 
     def export(self) -> None:
@@ -322,23 +357,29 @@ class ScriptLanguageContainer:
                 self.secrets.save(self._alias_key, lang_def)
             return lang_def
 
-    def append_custom_pip_packages(self, pip_packages: list[PipPackageDefinition]):
+    def append_custom_pip_packages(
+        self, pip_packages: list[PipPackage], build_step: str, phase: str
+    ) -> None:
         """
         Appends packages to the custom pip packages file.
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
-        append_packages(self.custom_pip_file, PipPackageDefinition, pip_packages)
+        append_packages(
+            self.public_package_file, PipPackage, pip_packages, build_step, phase
+        )
 
     def append_custom_conda_packages(
-        self, conda_packages: list[CondaPackageDefinition]
-    ):
+        self, conda_packages: list[CondaPackage], build_step: str, phase: str
+    ) -> None:
         """
         Appends packages to the custom conda packages file.
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
-        append_packages(self.custom_conda_file, CondaPackageDefinition, conda_packages)
+        append_packages(
+            self.internal_package_file, CondaPackage, conda_packages, build_step, phase
+        )
 
     @property
     def docker_image_tags(self) -> list[str]:
