@@ -19,10 +19,12 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
+from exasol.exaslpm.model.package_file_config import (
+    CondaPackage,
+    PipPackage,
+)
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc.script_language_container import (
-    CondaPackageDefinition,
-    PipPackageDefinition,
     ScriptLanguageContainer,
     constants,
 )
@@ -200,12 +202,14 @@ def test_append_custom_pip_packages(
     # Cannot skip the test if it's not a Pip package manager, otherwise dependent tests below won't run
     if package_manager == PackageManager.PIP:
         sample_slc.append_custom_pip_packages(
-            [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
+            [PipPackage(name=pkg, version=f"=={version}") for pkg, version, _ in custom_packages],
+            build_step="flavor_customization",
+            phase="install_pip_packages",
         )
-        with open(sample_slc.custom_pip_file) as f:
-            pip_content = f.read()
-            for custom_package, version, _ in custom_packages:
-                assert f"{custom_package}|{version}" in pip_content
+        pip_content = sample_slc.public_package_file.read_text()
+        for custom_package, version, _ in custom_packages:
+            assert custom_package in pip_content
+            assert version in pip_content
 
 
 @pytest.mark.dependency(name="append_custom_conda_packages", depends=["deploy_slc"])
@@ -218,14 +222,16 @@ def test_append_custom_conda_packages(
     if package_manager == PackageManager.CONDA:
         sample_slc.append_custom_conda_packages(
             [
-                CondaPackageDefinition(pkg, version)
+                CondaPackage(name=pkg, version=f"={version}")
                 for pkg, version, _ in custom_packages
-            ]
+            ],
+            build_step="flavor_customization",
+            phase="install_conda_packages",
         )
-        with open(sample_slc.custom_conda_file) as f:
-            conda_content = f.read()
-            for custom_package, version, _ in custom_packages:
-                assert f"{custom_package}|{version}" in conda_content
+        conda_content = sample_slc.internal_package_file.read_text()
+        for custom_package, version, _ in custom_packages:
+            assert custom_package in conda_content
+            assert version in conda_content
 
 
 @pytest.mark.dependency(
@@ -367,12 +373,16 @@ def test_restore_pip_custom_file(
     slc_name = "slc_restore_pip_custom_file"
     slc = create_slc(secrets_module, slc_name, default_flavor, compression_strategy)
 
-    slc.append_custom_pip_packages([PipPackageDefinition("my_test_package", "1.2.3")])
-    custom_pip_file_content = slc.custom_pip_file.read_text()
-    assert "my_test_package" in custom_pip_file_content
-    slc.restore_custom_pip_file()
-    custom_pip_file_content = slc.custom_pip_file.read_text()
-    assert "my_test_package" not in custom_pip_file_content
+    slc.append_custom_pip_packages(
+        [PipPackage(name="my_test_package", version="1.2.3")],
+        build_step="flavor_customization",
+        phase="install_pip_packages",
+    )
+    public_package_file_content = slc.public_package_file.read_text()
+    assert "my_test_package" in public_package_file_content
+    slc.restore_public_package_file()
+    public_package_file_content = slc.public_package_file.read_text()
+    assert "my_test_package" not in public_package_file_content
 
 
 def test_restore_conda_custom_file(
@@ -385,10 +395,12 @@ def test_restore_conda_custom_file(
     slc = create_slc(secrets_module, slc_name, flavor, compression_strategy)
 
     slc.append_custom_conda_packages(
-        [CondaPackageDefinition("my_test_package", "1.2.3")]
+        [CondaPackage(name="my_test_package", version="1.2.3")],
+        build_step="flavor_customization",
+        phase="install_conda_packages",
     )
-    custom_conda_file_content = slc.custom_conda_file.read_text()
-    assert "my_test_package" in custom_conda_file_content
-    slc.restore_custom_conda_file()
-    custom_conda_file_content = slc.custom_conda_file.read_text()
-    assert "my_test_package" not in custom_conda_file_content
+    internal_package_file_content = slc.internal_package_file.read_text()
+    assert "my_test_package" in internal_package_file_content
+    slc.restore_internal_package_file()
+    internal_package_file_content = slc.internal_package_file.read_text()
+    assert "my_test_package" not in internal_package_file_content
