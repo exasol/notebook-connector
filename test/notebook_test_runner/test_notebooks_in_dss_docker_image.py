@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+from collections.abc import Generator
 from inspect import cleandoc
 from pathlib import Path
 from test.docker.container import (
@@ -20,7 +21,7 @@ _logger = logging.getLogger(__name__)
 @pytest.fixture(scope="session")
 def notebook_test_dockerfile_content(
     dss_docker_image, work_in_progress_notebooks
-) -> str:
+) -> Generator[str, None, None]:
     if not work_in_progress_notebooks:
         pytest.skip("Skip because work in progress notebooks are not enabled")
     yield cleandoc(f"""
@@ -38,7 +39,7 @@ def notebook_test_dockerfile_content(
 
 
 @pytest.fixture(scope="session")
-def notebook_test_build_context(notebook_test_dockerfile_content) -> io.BytesIO:
+def notebook_test_build_context(notebook_test_dockerfile_content) -> Generator[io.BytesIO, None, None]:
     with InMemoryBuildContext() as context:
         context.add_string_to_file(
             name="Dockerfile", string=notebook_test_dockerfile_content
