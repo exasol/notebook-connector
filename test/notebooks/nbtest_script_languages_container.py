@@ -7,19 +7,22 @@ from exasol.pytest_backend import BACKEND_ONPREM
 
 # We need to manually import all fixtures that we use, directly or indirectly,
 # since the pytest won't do this for us.
-from notebook_test_utils import run_notebook
+from test.integration.ui.common.utils.notebook_test_utils import (
+    backend_setup,
+    run_notebook,
+)
 
 
 @pytest.fixture()
-def cleanup_slc_repo_dir(backend):
+def cleanup_slc_repo_dir(backend, notebooks_root):
     yield
     if backend == BACKEND_ONPREM:
-        p = Path.cwd() / "script_languages_container" / "slc_workspace"
+        p = notebooks_root / "script_languages_container" / "slc_workspace"
         shutil.rmtree(p)
 
 
 def test_script_languages_container(
-    backend, backend_setup, cleanup_slc_repo_dir
+    backend, backend_setup, cleanup_slc_repo_dir, notebooks_root
 ) -> None:
     if backend != BACKEND_ONPREM:
         pytest.skip()
@@ -27,6 +30,7 @@ def test_script_languages_container(
     store_path, store_password = backend_setup
     store_file = str(store_path)
     try:
+        os.chdir(notebooks_root)
         run_notebook("main_config.ipynb", store_file, store_password)
         os.chdir("./script_languages_container")
         run_notebook("configure_slc_repository.ipynb", store_file, store_password)

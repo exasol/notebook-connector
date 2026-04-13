@@ -5,8 +5,11 @@ import pytest
 
 # We need to manually import all fixtures that we use, directly or indirectly,
 # since the pytest won't do this for us.
-from notebook_test_utils import (
+from test.integration.ui.common.utils.notebook_test_utils import (
+    backend_setup,
+    notebook_runner,
     set_log_level_for_libraries,
+    uploading_hack,
 )
 
 set_log_level_for_libraries()
@@ -64,10 +67,13 @@ running_pyexasol_hack = (
         ),
     ],
 )
-def test_transformers(notebook_runner, uploading_hack, notebook_file, hacks) -> None:
+def test_transformers(
+    notebook_runner, uploading_hack, notebook_file, hacks, notebooks_root
+) -> None:
 
     current_dir = os.getcwd()
     try:
+        os.chdir(notebooks_root)
         notebook_runner("main_config.ipynb")
         os.chdir("./transformers")
         notebook_runner(notebook_file="te_init.ipynb", hacks=[uploading_hack])

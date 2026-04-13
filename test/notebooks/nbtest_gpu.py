@@ -14,7 +14,11 @@ from exasol.slc.api import push as exaslct_push
 
 # We need to manually import all fixtures that we use, directly or indirectly,
 # since the pytest won't do this for us.
-from notebook_test_utils import run_notebook
+from test.integration.ui.common.utils.notebook_test_utils import (
+    backend_setup,
+    run_notebook,
+    uploading_hack,
+)
 
 from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
@@ -91,15 +95,15 @@ def docker_login():
 
 
 @pytest.fixture()
-def finish_slc_repo_dir(backend, backend_setup, check_if_gpu_is_active):
+def finish_slc_repo_dir(backend, backend_setup, check_if_gpu_is_active, notebooks_root):
     yield
     if backend == BACKEND_ONPREM:
-        p = Path.cwd() / "gpu_in_udf" / "slc_workspace"
+        p = notebooks_root / "gpu_in_udf" / "slc_workspace"
         shutil.rmtree(p)
 
 
 def test_gpu_notebooks(
-    backend, backend_setup, finish_slc_repo_dir, uploading_hack, docker_login
+    backend, backend_setup, finish_slc_repo_dir, uploading_hack, docker_login, notebooks_root
 ) -> None:
     if backend != BACKEND_ONPREM:
         pytest.skip()
@@ -107,6 +111,7 @@ def test_gpu_notebooks(
     store_path, store_password = backend_setup
     store_file = str(store_path)
     try:
+        os.chdir(notebooks_root)
         run_notebook("main_config.ipynb", store_file, store_password)
         os.chdir("./cloud")
         run_notebook("02_s3_vs_reuters.ipynb", store_file, store_password)

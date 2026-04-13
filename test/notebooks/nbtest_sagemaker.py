@@ -8,9 +8,11 @@ from botocore.exceptions import ClientError as BotoClientError
 
 # We need to manually import all fixtures that we use, directly or indirectly,
 # since the pytest won't do this for us.
-from notebook_test_utils import (
+from test.integration.ui.common.utils.notebook_test_utils import (
+    backend_setup,
     run_notebook,
     set_log_level_for_libraries,
+    uploading_hack,
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
@@ -321,7 +323,7 @@ def _remove_sagemaker_endpoint_and_config(endpoint_name: str) -> None:
             raise
 
 
-def test_sagemaker(backend_setup, uploading_hack):
+def test_sagemaker(backend_setup, uploading_hack, notebooks_root):
 
     store_path, store_password = backend_setup
     store_file = str(store_path)
@@ -333,6 +335,7 @@ def test_sagemaker(backend_setup, uploading_hack):
 
     current_dir = os.getcwd()
     try:
+        os.chdir(notebooks_root)
         run_notebook("main_config.ipynb", store_file, store_password)
         os.chdir("./data")
         run_notebook("data_telescope.ipynb", store_file, store_password)
