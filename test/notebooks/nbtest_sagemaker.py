@@ -3,15 +3,17 @@ import textwrap
 from inspect import cleandoc
 from pathlib import Path
 
+import boto3
+from botocore.exceptions import ClientError as BotoClientError
+
 # We need to manually import all fixtures that we use, directly or indirectly,
 # since the pytest won't do this for us.
 from test.integration.ui.common.utils.notebook_test_utils import (
+    backend_setup,
     run_notebook,
     set_log_level_for_libraries,
+    uploading_hack,
 )
-
-import boto3
-from botocore.exceptions import ClientError as BotoClientError
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
