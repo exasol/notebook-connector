@@ -12,7 +12,9 @@ from test.integration.ui.common.utils.notebook_test_utils import (
 set_log_level_for_libraries()
 
 
-def test_text_ai(notebook_runner, backend_setup, uploading_hack, notebooks_root) -> None:
+def test_text_ai(
+    notebook_runner, backend_setup, uploading_hack, notebooks_root
+) -> None:
     """
     This test currently requires some specific Jupyter notebooks which are work in progress
     and is only executed if the folder work_in_progress exists.

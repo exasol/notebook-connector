@@ -14,7 +14,9 @@ from exasol.nb_connector.secret_store import Secrets
 set_log_level_for_libraries()
 
 
-def test_quickstart(notebook_runner, monkeypatch, backend_setup, notebooks_root) -> None:
+def test_quickstart(
+    notebook_runner, monkeypatch, backend_setup, notebooks_root
+) -> None:
     store_path, store_password = backend_setup
     secrets = Secrets(store_path, master_password=store_password)
 
