@@ -37,9 +37,7 @@ def append_packages(
 
     if container is not None:
         for package in packages:
-            existing = container.find_package(
-                package.name, raise_if_not_found=False
-            )
+            existing = container.find_package(package.name, raise_if_not_found=False)
             if existing is not None:
                 if existing.version == package.version:
                     logging.warning("Package already exists: %s", package)

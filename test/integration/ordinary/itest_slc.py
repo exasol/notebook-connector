@@ -9,6 +9,10 @@ from test.package_manager import PackageManager
 
 import pytest
 from docker.models.images import Image as DockerImage
+from exasol.exaslpm.model.package_file_config import (
+    CondaPackage,
+    PipPackage,
+)
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.models.api_errors import (
@@ -18,10 +22,6 @@ from exasol_integration_test_docker_environment.lib.models.api_errors import (
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
-)
-from exasol.exaslpm.model.package_file_config import (
-    CondaPackage,
-    PipPackage,
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc.script_language_container import (
@@ -202,7 +202,10 @@ def test_append_custom_pip_packages(
     # Cannot skip the test if it's not a Pip package manager, otherwise dependent tests below won't run
     if package_manager == PackageManager.PIP:
         sample_slc.append_custom_pip_packages(
-            [PipPackage(name=pkg, version=f"=={version}") for pkg, version, _ in custom_packages],
+            [
+                PipPackage(name=pkg, version=f"=={version}")
+                for pkg, version, _ in custom_packages
+            ],
             build_step="flavor_customization",
             phase="install_pip_packages",
         )

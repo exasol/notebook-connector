@@ -19,6 +19,7 @@ from unittest.mock import (
 import pytest
 import requests
 from _pytest.monkeypatch import MonkeyPatch
+from exasol.exaslpm.model.package_file_config import PipPackage
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
@@ -27,7 +28,6 @@ from exasol.nb_connector.slc import (
     script_language_container,
     workspace,
 )
-from exasol.exaslpm.model.package_file_config import PipPackage
 from exasol.nb_connector.slc.git_access import GitAccess
 from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
