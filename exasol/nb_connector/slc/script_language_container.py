@@ -19,7 +19,7 @@ from exasol.slc.api.get_language_definition_builder import (
     get_language_definition_builder,
 )
 from exasol.slc.models.compression_strategy import CompressionStrategy
-from exasol.slc.models.package_file_location.package_file_location import (
+from exasol.slc.models.package_file_location import (
     PackageFileLocation,
 )
 from exasol_integration_test_docker_environment.lib.docker import (
@@ -189,7 +189,7 @@ class ScriptLanguageContainer:
         """
         Returns the path to the public package file of the flavor
         """
-        return PackageFileLocation.public_package_file()
+        return PackageFileLocation(self.flavor_path).public_package_file
 
     @property
     def custom_conda_file(self) -> Path:
@@ -203,7 +203,7 @@ class ScriptLanguageContainer:
         """
         Returns the path to the internal package file of the flavor
         """
-        return PackageFileLocation.internal_package_file
+        return PackageFileLocation(self.flavor_path).internal_package_file
 
     def restore_custom_pip_file(self):
         """
