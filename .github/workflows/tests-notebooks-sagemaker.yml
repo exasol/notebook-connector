@@ -1,28 +1,15 @@
-name: Notebook Tests
+name: Sagemaker Notebook Tests
 
 on:
   workflow_call:
 
 jobs:
 
-  notebook-tests:
-    name: Notebook Tests
+  notebook-sagemaker-tests:
+    name: Sagemaker Notebook Tests
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - file: nbtest_first_steps.py
-          - file: nbtest_sklearn.py
-          - file: nbtest_pyexasol.py
-          - file: nbtest_jupysql.py
-          - file: nbtest_ibis.py
-          - file: nbtest_script_languages_container.py
-          - file: nbtest_itde.py
-          - file: nbtest_useful_urls.py
-          - file: nbtest_cloud.py
 
     steps:
 
@@ -58,8 +45,12 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Pytest
+        env:
+          NBTEST_AWS_DEFAULT_REGION: ${{ secrets.NBTEST_AWS_DEFAULT_REGION }}
+          NBTEST_AWS_ACCESS_KEY_ID: ${{ secrets.NBTEST_AWS_ACCESS_KEY_ID }}
+          NBTEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.NBTEST_AWS_SECRET_ACCESS_KEY }}
         run: |
           poetry run -- pytest -rA --setup-show \
             -c test/notebooks/pytest.ini \
             --backend onprem \
-            test/notebooks/${{ matrix.file }}
+            test/notebooks/nbtest_sagemaker.py
