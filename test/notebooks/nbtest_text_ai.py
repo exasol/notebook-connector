@@ -3,16 +3,15 @@ import os
 # We need to manually import all fixtures that we use, directly or indirectly,
 # since the pytest won't do this for us.
 from test.integration.ui.common.utils.notebook_test_utils import (
-    backend_setup,
-    notebook_runner,
     set_log_level_for_libraries,
-    uploading_hack,
 )
 
 set_log_level_for_libraries()
 
 
-def test_text_ai(notebook_runner, backend_setup, uploading_hack, notebooks_root) -> None:
+def test_text_ai(
+    notebook_runner, backend_setup, uploading_hack, notebooks_root
+) -> None:
     """
     This test currently requires some specific Jupyter notebooks which are work in progress
     and is only executed if the folder work_in_progress exists.

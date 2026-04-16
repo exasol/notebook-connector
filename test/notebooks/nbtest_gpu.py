@@ -103,7 +103,12 @@ def finish_slc_repo_dir(backend, backend_setup, check_if_gpu_is_active, notebook
 
 
 def test_gpu_notebooks(
-    backend, backend_setup, finish_slc_repo_dir, uploading_hack, docker_login, notebooks_root
+    backend,
+    backend_setup,
+    finish_slc_repo_dir,
+    uploading_hack,
+    docker_login,
+    notebooks_root,
 ) -> None:
     if backend != BACKEND_ONPREM:
         pytest.skip()
