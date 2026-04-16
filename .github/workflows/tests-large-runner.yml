@@ -106,4 +106,5 @@ jobs:
           poetry run -- pytest -rA --setup-show \
             -c test/notebooks/pytest.ini \
             --backend onprem \
+            --itde-nameserver 8.8.8.8 \
             test/notebooks/${{ matrix.file }}
