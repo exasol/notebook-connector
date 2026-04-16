@@ -5,20 +5,18 @@ from datetime import (
 )
 from pathlib import Path
 
+# We need to manually import all fixtures that we use, directly or indirectly,
+# since the pytest won't do this for us.
+from test.integration.ui.common.utils.notebook_test_utils import (
+    run_notebook,
+)
+
 import docker
 import exasol.bucketfs as bfs
 import pytest
 from exasol.pytest_backend import BACKEND_ONPREM
 from exasol.python_extension_common.deployment.extract_validator import ExtractValidator
 from exasol.slc.api import push as exaslct_push
-
-# We need to manually import all fixtures that we use, directly or indirectly,
-# since the pytest won't do this for us.
-from test.integration.ui.common.utils.notebook_test_utils import (
-    backend_setup,
-    run_notebook,
-    uploading_hack,
-)
 
 from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
