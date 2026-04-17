@@ -1,4 +1,7 @@
-from test.integration.ui.common.utils.notebook_test_utils import set_log_level_for_libraries
+from test.integration.ui.common.utils.notebook_test_utils import (
+    set_log_level_for_libraries,
+)
+
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.itde_manager import (
     bring_itde_up,

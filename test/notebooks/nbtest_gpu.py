@@ -4,12 +4,12 @@ from datetime import (
     timedelta,
 )
 from pathlib import Path
+from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 
 import docker
 import exasol.bucketfs as bfs
 import pytest
 from exasol.pytest_backend import BACKEND_ONPREM
-from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 from exasol.python_extension_common.deployment.extract_validator import ExtractValidator
 from exasol.slc.api import push as exaslct_push
 
