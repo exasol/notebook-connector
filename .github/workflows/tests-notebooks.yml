@@ -6,7 +6,7 @@ on:
 jobs:
 
   notebook-tests:
-    name: Notebook Tests
+    name: Notebook Tests (${{ matrix.file }})
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -20,7 +20,6 @@ jobs:
           - file: nbtest_jupysql.py
           - file: nbtest_ibis.py
           - file: nbtest_script_languages_container.py
-          - file: nbtest_itde.py
           - file: nbtest_useful_urls.py
           - file: nbtest_cloud.py
 
@@ -58,6 +57,118 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
       - name: Pytest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          poetry run -- pytest -rA --setup-show \
+            -c test/notebooks/pytest.ini \
+            --backend onprem \
+            --itde-nameserver 8.8.8.8 \
+            test/notebooks/${{ matrix.file }}
+
+  notebook-tests-sagemaker:
+    name: Notebook Tests (Sagemaker)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          large-packages: false
+          haskell: true
+
+      - name: Free disk space by removing large directories
+        run: |
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/lib/node_modules
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v5
+        with:
+          poetry-version: "2.3.0"
+
+      - name: Install All Optional Dependencies (aka. "extras")
+        run: poetry install --all-extras
+
+      - name: Allow unprivileged user namespaces
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Pytest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NBTEST_AWS_DEFAULT_REGION: ${{ secrets.NBTEST_AWS_DEFAULT_REGION }}
+          NBTEST_AWS_ACCESS_KEY_ID: ${{ secrets.NBTEST_AWS_ACCESS_KEY_ID }}
+          NBTEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.NBTEST_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          poetry run -- pytest -rA --setup-show \
+            -c test/notebooks/pytest.ini \
+            --backend onprem \
+            --itde-nameserver 8.8.8.8 \
+            test/notebooks/nbtest_sagemaker.py
+
+  notebook-tests-large-runner:
+    name: Notebook Tests (${{ matrix.file }})
+    runs-on:
+      labels: int-linux-x64-4core-ubuntu24.04-1
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - file: nbtest_transformers.py
+          - file: nbtest_text_ai.py
+
+    steps:
+
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          large-packages: false
+
+      - name: Free disk space by removing large directories
+        run: |
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/.ghcup/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/lib/node_modules
+          sudo rm -rf /opt/ghc
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v5
+        with:
+          poetry-version: "2.3.0"
+
+      - name: Install All Optional Dependencies (aka. "extras")
+        run: poetry install --all-extras
+
+      - name: Allow unprivileged user namespaces
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Pytest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INTERACTIVE: False
         run: |
           poetry run -- pytest -rA --setup-show \
             -c test/notebooks/pytest.ini \
