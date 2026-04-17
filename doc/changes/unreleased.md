@@ -32,3 +32,8 @@ For the following vulnerable packages there is no update available, yet:
 ## Security Issues
 
 * #376: Fixed vulnerabilities by updating dependencies
+
+## Refactorings
+
+* #379: Converted `ai-lab/te_init_ui.ipynb` to `py` and added unit and integration tests
+* #382: Moved notebooks from ai-lab into notebook-connector including tests 

@@ -12,5 +12,6 @@ from . import access  # noqa: F401
 from . import common  # noqa: F401
 from . import config  # noqa: F401
 from . import docker  # noqa: F401
+from . import transformers  # noqa: F401
 
-__all__ = ["access", "common", "config", "docker"]
+__all__ = ["access", "common", "config", "docker", "transformers"]
