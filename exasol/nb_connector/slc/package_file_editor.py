@@ -1,11 +1,12 @@
-from pathlib import Path
 import logging
+from pathlib import Path
 
 from exasol.exaslpm.model.package_file_config import (
     CondaPackage,
     PipPackage,
 )
 from exasol.exaslpm.pkg_mgmt.package_file_session import PackageFileSession
+
 from exasol.nb_connector.slc.slc_error import SlcError
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,9 @@ def append_packages(
             try:
                 container.add_package(package)
             except ValueError:
-                existing = container.find_package(package.name, raise_if_not_found=False)
+                existing = container.find_package(
+                    package.name, raise_if_not_found=False
+                )
                 if existing is not None and existing.version == package.version:
                     logger.warning(
                         "Package already exists: %s==%s. Skipping.",
