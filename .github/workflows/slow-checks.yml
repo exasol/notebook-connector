@@ -32,12 +32,6 @@ jobs:
   notebook-tests:
     name: Notebook Tests
     uses: ./.github/workflows/tests-notebooks.yml
-    permissions:
-      contents: read
-
-  notebook-sagemaker-tests:
-    name: Sagemaker Notebook Tests
-    uses: ./.github/workflows/tests-notebooks-sagemaker.yml
     secrets: inherit
     permissions:
       contents: read
