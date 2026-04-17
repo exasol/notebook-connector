@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from exasol.pytest_backend import BACKEND_ONPREM
+from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 
 
 @pytest.fixture()
