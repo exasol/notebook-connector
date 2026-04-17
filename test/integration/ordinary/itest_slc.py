@@ -13,6 +13,7 @@ from exasol.exaslpm.model.package_file_config import (
     CondaPackage,
     PipPackage,
 )
+from exasol.exaslpm.pkg_mgmt.package_file_session import PackageFileSession
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.models.api_errors import (
@@ -209,10 +210,18 @@ def test_append_custom_pip_packages(
             build_step="flavor_customization",
             phase="install_pip_packages",
         )
-        pip_content = sample_slc.public_package_file.read_text()
+        package_file_session = PackageFileSession(sample_slc.public_package_file)
+        pip_packages = (
+            package_file_session.package_file_config.find_build_step(
+                "flavor_customization"
+            )
+            .find_phase("install_pip_packages")
+            .pip
+        )
         for custom_package, version, _ in custom_packages:
-            assert custom_package in pip_content
-            assert version in pip_content
+            # The find_package method raises an exception if the package is not found
+            found_package = pip_packages.find_package(custom_package)
+            assert found_package.version == f"=={version}"
 
 
 @pytest.mark.dependency(name="append_custom_conda_packages", depends=["deploy_slc"])
@@ -231,10 +240,18 @@ def test_append_custom_conda_packages(
             build_step="flavor_customization",
             phase="install_conda_packages",
         )
-        conda_content = sample_slc.internal_package_file.read_text()
+        package_file_session = PackageFileSession(sample_slc.internal_package_file)
+        conda_packages = (
+            package_file_session.package_file_config.find_build_step(
+                "flavor_customization"
+            )
+            .find_phase("install_conda_packages")
+            .conda
+        )
         for custom_package, version, _ in custom_packages:
-            assert custom_package in conda_content
-            assert version in conda_content
+            found_package = conda_packages.find_package(custom_package)
+            # The find_package method raises an exception if the package is not found
+            assert found_package.version == f"={version}"
 
 
 @pytest.mark.dependency(
@@ -381,11 +398,24 @@ def test_restore_pip_custom_file(
         build_step="flavor_customization",
         phase="install_pip_packages",
     )
-    public_package_file_content = slc.public_package_file.read_text()
-    assert "my_test_package" in public_package_file_content
+    session = PackageFileSession(slc.public_package_file)
+    pip_packages = (
+        session.package_file_config.find_build_step("flavor_customization")
+        .find_phase("install_pip_packages")
+        .pip
+    )
+    found_package = pip_packages.find_package("my_test_package")
+    assert found_package.version == "==1.2.3"
     slc.restore_public_package_file()
-    public_package_file_content = slc.public_package_file.read_text()
-    assert "my_test_package" not in public_package_file_content
+
+    session_after = PackageFileSession(slc.public_package_file)
+    pip_packages_after = (
+        session_after.package_file_config.find_build_step("flavor_customization")
+        .find_phase("install_pip_packages")
+        .pip
+    )
+    found_package_after = pip_packages_after.find_package("my_test_package")
+    assert found_package_after is None
 
 
 def test_restore_conda_custom_file(
@@ -402,8 +432,24 @@ def test_restore_conda_custom_file(
         build_step="flavor_customization",
         phase="install_conda_packages",
     )
-    internal_package_file_content = slc.internal_package_file.read_text()
-    assert "my_test_package" in internal_package_file_content
+    session = PackageFileSession(slc.internal_package_file)
+    conda_packages = (
+        session.package_file_config.find_build_step("flavor_customization")
+        .find_phase("install_conda_packages")
+        .conda
+    )
+    found_package = conda_packages.find_package("my_test_package")
+    assert found_package.version == "=1.2.3"
+
     slc.restore_internal_package_file()
-    internal_package_file_content = slc.internal_package_file.read_text()
-    assert "my_test_package" not in internal_package_file_content
+
+    session_after = PackageFileSession(slc.internal_package_file)
+    conda_packages_after = (
+        session_after.package_file_config.find_build_step("flavor_customization")
+        .find_phase("install_conda_packages")
+        .conda
+    )
+    found_package_after = conda_packages_after.find_package(
+        "my_test_package", raise_if_not_found=False
+    )
+    assert found_package_after is None

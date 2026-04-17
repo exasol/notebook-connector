@@ -113,10 +113,10 @@ def _validate_slc(flavor_name, sample_slc_name, slc, path):
         slc.flavor_path
         == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor_name
     )
-    assert slc.custom_pip_file.parts[-3:] == (
-        "flavor_customization",
-        "packages",
-        "python3_pip_packages",
+    assert slc.public_package_file.parts[-3:] == (
+        "flavors",
+        flavor_name,
+        "packages.yml",
     )
     assert slc.compression_strategy == CompressionStrategy.GZIP
 
@@ -538,8 +538,6 @@ def slc_with_packages(sample_slc_name, slc_factory_create):
 def test_add_new_pip_package(slc_with_packages):
     slc_with_packages.append_custom_pip_packages(
         [PipPackage(name="package_d", version="v10.0")],
-        build_step="flavor_customization",
-        phase="install_pip_packages",
     )
     content = slc_with_packages.public_package_file.read_text()
     assert "package_d" in content
@@ -550,8 +548,6 @@ def test_add_existing_pip_package_same_version(caplog, slc_with_packages):
     with caplog.at_level(logging.WARNING):
         slc_with_packages.append_custom_pip_packages(
             [PipPackage(name="package_a", version="v1.2.3")],
-            build_step="flavor_customization",
-            phase="install_pip_packages",
         )
         content = slc_with_packages.public_package_file.read_text()
         assert content.count("package_a") == 1
@@ -563,8 +559,6 @@ def test_add_existing_pip_package_different_version(slc_with_packages):
     with pytest.raises(SlcError, match=r"Package already exists"):
         slc_with_packages.append_custom_pip_packages(
             [PipPackage(name="package_a", version="v9.9.9")],
-            build_step="flavor_customization",
-            phase="install_pip_packages",
         )
 
 
@@ -638,19 +632,17 @@ def test_generate_activation_key(
             assert slc.secrets.get(slc._alias_key) is None
 
 
-def test_restore_pip_package_file(sample_slc_name, slc_factory_create, git_access_mock):
+def test_restore_public_package_file(
+    sample_slc_name, slc_factory_create, git_access_mock
+):
     flavor = "Strawberry"
     with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
         with git_access_mock(flavor) as git_access:
-            slc.restore_custom_pip_file()
+            slc.restore_public_package_file()
             assert git_access.checkout_file.mock_calls == [
                 mock.call(
                     slc.workspace.git_clone_path / "script-languages",
-                    Path("flavors")
-                    / flavor
-                    / "flavor_customization"
-                    / "packages"
-                    / "python3_pip_packages",
+                    Path("flavors") / flavor / "packages.yml",
                 )
             ]
 
@@ -661,14 +653,10 @@ def test_restore_conda_package_file(
     flavor = "Strawberry"
     with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
         with git_access_mock(flavor) as git_access:
-            slc.restore_custom_conda_file()
+            slc.restore_internal_package_file()
             assert git_access.checkout_file.mock_calls == [
                 mock.call(
                     slc.workspace.git_clone_path / "script-languages",
-                    Path("flavors")
-                    / flavor
-                    / "flavor_customization"
-                    / "packages"
-                    / "conda_packages",
+                    Path("flavors") / flavor / "flavor_base" / "packages.yml",
                 )
             ]

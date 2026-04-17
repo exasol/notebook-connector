@@ -178,25 +178,11 @@ class ScriptLanguageContainer:
         return self.flavor_path / "flavor_customization" / "packages"
 
     @property
-    def custom_pip_file(self) -> Path:
-        """
-        Returns the path to the custom pip packages file of the flavor
-        """
-        return self.custom_packages_dir / "python3_pip_packages"
-
-    @property
     def public_package_file(self) -> Path:
         """
         Returns the path to the public package file of the flavor
         """
         return PackageFileLocation(self.flavor_path).public_package_file
-
-    @property
-    def custom_conda_file(self) -> Path:
-        """
-        Returns the path to the custom conda packages file of the flavor
-        """
-        return self.custom_packages_dir / "conda_packages"
 
     @property
     def internal_package_file(self) -> Path:
@@ -205,15 +191,6 @@ class ScriptLanguageContainer:
         """
         return PackageFileLocation(self.flavor_path).internal_package_file
 
-    def restore_custom_pip_file(self):
-        """
-        Restores the custom pip packages file from Git. All changes will be overwritten.
-        """
-        GitAccess.checkout_file(
-            self.checkout_dir / "script-languages",
-            self.custom_pip_file.relative_to(self.checkout_dir),
-        )
-
     def restore_public_package_file(self):
         """
         Restores the public package file from Git. All changes will be overwritten.
@@ -221,15 +198,6 @@ class ScriptLanguageContainer:
         GitAccess.checkout_file(
             self.checkout_dir / "script-languages",
             self.public_package_file.relative_to(self.checkout_dir),
-        )
-
-    def restore_custom_conda_file(self):
-        """
-        Restores the custom conda packages file from Git. All changes will be overwritten.
-        """
-        GitAccess.checkout_file(
-            self.checkout_dir / "script-languages",
-            self.custom_conda_file.relative_to(self.checkout_dir),
         )
 
     def restore_internal_package_file(self):
@@ -357,28 +325,32 @@ class ScriptLanguageContainer:
                 self.secrets.save(self._alias_key, lang_def)
             return lang_def
 
-    def append_custom_pip_packages(
-        self, pip_packages: list[PipPackage], build_step: str, phase: str
-    ) -> None:
+    def append_custom_pip_packages(self, pip_packages: list[PipPackage]) -> None:
         """
         Appends packages to the custom pip packages file.
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
         append_packages(
-            self.public_package_file, PipPackage, pip_packages, build_step, phase
+            self.public_package_file,
+            PipPackage,
+            pip_packages,
+            "flavor_customization",
+            "install_pip_packages",
         )
 
-    def append_custom_conda_packages(
-        self, conda_packages: list[CondaPackage], build_step: str, phase: str
-    ) -> None:
+    def append_custom_conda_packages(self, conda_packages: list[CondaPackage]) -> None:
         """
         Appends packages to the custom conda packages file.
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
         append_packages(
-            self.internal_package_file, CondaPackage, conda_packages, build_step, phase
+            self.internal_package_file,
+            CondaPackage,
+            conda_packages,
+            "flavor_customization",
+            "install_conda_packages",
         )
 
     @property

@@ -1,15 +1,14 @@
-import logging
 from pathlib import Path
+import logging
 
-import yaml
 from exasol.exaslpm.model.package_file_config import (
     CondaPackage,
-    PackageFile,
     PipPackage,
 )
-from exasol.exaslpm.model.serialization import to_yaml_str
-
+from exasol.exaslpm.pkg_mgmt.package_file_session import PackageFileSession
 from exasol.nb_connector.slc.slc_error import SlcError
+
+logger = logging.getLogger(__name__)
 
 
 def append_packages(
@@ -22,10 +21,8 @@ def append_packages(
     """
     Appends packages to the custom packages file.
     """
-    with file_path.open("r", encoding="utf-8") as f:
-        package_file = PackageFile.model_validate(yaml.safe_load(f))
-
-    build_step = package_file.find_build_step(build_step)
+    session = PackageFileSession(file_path)
+    build_step = session.package_file_config.find_build_step(build_step)
     phase = build_step.find_phase(phase)
 
     if package_definition is PipPackage:
@@ -37,15 +34,21 @@ def append_packages(
 
     if container is not None:
         for package in packages:
-            existing = container.find_package(package.name, raise_if_not_found=False)
-            if existing is not None:
-                if existing.version == package.version:
-                    logging.warning("Package already exists: %s", package)
+            try:
+                container.add_package(package)
+            except ValueError:
+                existing = container.find_package(package.name, raise_if_not_found=False)
+                if existing is not None and existing.version == package.version:
+                    logger.warning(
+                        "Package already exists: %s==%s. Skipping.",
+                        package.name,
+                        package.version,
+                    )
                 else:
                     raise SlcError(
-                        f"Package already exists: {package} but with different version"
+                        f"Package already exists with a different version: "
+                        f"'{package.name}'. Existing: {existing.version if existing else 'unknown'}, "
+                        f"Requested: {package.version}"
                     )
-            else:
-                container.add_package(package)
 
-    file_path.write_text(to_yaml_str(package_file))
+    session.commit_changes()
