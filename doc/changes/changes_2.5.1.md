@@ -7,3 +7,7 @@ This release adds the `ai_lab_config` variable into the IPython variable namespa
 ## Bugfixes
 
 * #369: Added `ai_lab_config` variable into ipython variable namespace
+
+## Refactoring
+
+* #383: Adapted new SLC package management

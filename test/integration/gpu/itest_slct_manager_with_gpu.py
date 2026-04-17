@@ -13,8 +13,10 @@ from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
 from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.slc import ScriptLanguageContainer
-from exasol.nb_connector.slc.script_language_container import CondaPackageDefinition
+from exasol.exaslpm.model.package_file_config import (
+    CondaPackage,
+    PipPackage,
+)
 
 DEFAULT_GPU_FLAVOR = "template-Exasol-8-python-3.10-cuda-conda"
 """
@@ -52,7 +54,7 @@ def test_append_custom_packages(
     custom_packages: list[tuple[str, str]],
 ):
     sample_slc.append_custom_conda_packages(
-        [CondaPackageDefinition(pkg, version) for pkg, version in custom_packages]
+        [CondaPackage(name=pkg, version=f"={version}") for pkg, version in custom_packages]
     )
 
 
