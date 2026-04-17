@@ -23,13 +23,13 @@ def append_packages(
     Appends packages to the custom packages file.
     """
     session = PackageFileSession(file_path)
-    build_step = session.package_file_config.find_build_step(build_step)
-    phase = build_step.find_phase(phase)
+    build_step_obj = session.package_file_config.find_build_step(build_step)
+    phase_obj = build_step_obj.find_phase(phase)
 
     if package_definition is PipPackage:
-        container = phase.pip
+        container = phase_obj.pip
     elif package_definition is CondaPackage:
-        container = phase.conda
+        container = phase_obj.conda
     else:
         container = None
 

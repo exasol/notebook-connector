@@ -207,8 +207,6 @@ def test_append_custom_pip_packages(
                 PipPackage(name=pkg, version=f"=={version}")
                 for pkg, version, _ in custom_packages
             ],
-            build_step="flavor_customization",
-            phase="install_pip_packages",
         )
         package_file_session = PackageFileSession(sample_slc.public_package_file)
         pip_packages = (
@@ -237,8 +235,6 @@ def test_append_custom_conda_packages(
                 CondaPackage(name=pkg, version=f"={version}")
                 for pkg, version, _ in custom_packages
             ],
-            build_step="flavor_customization",
-            phase="install_conda_packages",
         )
         package_file_session = PackageFileSession(sample_slc.internal_package_file)
         conda_packages = (
@@ -395,8 +391,6 @@ def test_restore_pip_custom_file(
 
     slc.append_custom_pip_packages(
         [PipPackage(name="my_test_package", version="1.2.3")],
-        build_step="flavor_customization",
-        phase="install_pip_packages",
     )
     session = PackageFileSession(slc.public_package_file)
     pip_packages = (
@@ -429,8 +423,6 @@ def test_restore_conda_custom_file(
 
     slc.append_custom_conda_packages(
         [CondaPackage(name="my_test_package", version="1.2.3")],
-        build_step="flavor_customization",
-        phase="install_conda_packages",
     )
     session = PackageFileSession(slc.internal_package_file)
     conda_packages = (
