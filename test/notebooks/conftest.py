@@ -17,6 +17,10 @@ set_log_level_for_libraries()
 
 @pytest.fixture(scope="session")
 def notebooks_root() -> Path:
+    """
+    Returns the root of the notebooks directory
+    :return:
+    """
     notebooks_dir = (
         Path(__file__).resolve().parents[2]
         / "exasol"
