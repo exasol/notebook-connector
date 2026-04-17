@@ -1,15 +1,7 @@
 import os
 import textwrap
 
-# We need to manually import all fixtures that we use, directly or indirectly,
-# since the pytest won't do this for us.
-from test.integration.ui.common.utils.notebook_test_utils import (
-    set_log_level_for_libraries,
-)
-
 import pytest
-
-set_log_level_for_libraries()
 
 running_hack = (
     "running_model",

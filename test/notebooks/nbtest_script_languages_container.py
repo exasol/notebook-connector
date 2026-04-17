@@ -2,12 +2,6 @@ import os
 import shutil
 from pathlib import Path
 
-# We need to manually import all fixtures that we use, directly or indirectly,
-# since the pytest won't do this for us.
-from test.integration.ui.common.utils.notebook_test_utils import (
-    run_notebook,
-)
-
 import pytest
 from exasol.pytest_backend import BACKEND_ONPREM
 

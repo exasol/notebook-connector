@@ -5,12 +5,6 @@ from datetime import (
 )
 from pathlib import Path
 
-# We need to manually import all fixtures that we use, directly or indirectly,
-# since the pytest won't do this for us.
-from test.integration.ui.common.utils.notebook_test_utils import (
-    run_notebook,
-)
-
 import docker
 import exasol.bucketfs as bfs
 import pytest
