@@ -6,7 +6,6 @@ import pytest
 from exasol.exaslpm.model.package_file_config import (
     CondaPackage,
 )
-from exasol.nb_connector.slc import ScriptLanguageContainer
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.ai_lab_config import (
@@ -17,6 +16,7 @@ from exasol.nb_connector.language_container_activation import (
     open_pyexasol_connection_with_lang_definitions,
 )
 from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.slc import ScriptLanguageContainer
 
 DEFAULT_GPU_FLAVOR = "template-Exasol-8-python-3.10-cuda-conda"
 """
