@@ -335,7 +335,7 @@ class ScriptLanguageContainer:
             self.public_package_file,
             PipPackage,
             pip_packages,
-            "flavor_customization",
+            "build_deps",
             "install_pip_packages",
         )
 
@@ -349,7 +349,7 @@ class ScriptLanguageContainer:
             self.internal_package_file,
             CondaPackage,
             conda_packages,
-            "flavor_customization",
+            "build_deps",
             "install_conda_packages",
         )
 

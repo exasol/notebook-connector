@@ -211,7 +211,7 @@ def test_append_custom_pip_packages(
         package_file_session = PackageFileSession(sample_slc.public_package_file)
         pip_packages = (
             package_file_session.package_file_config.find_build_step(
-                "flavor_customization"
+                "build_deps"
             )
             .find_phase("install_pip_packages")
             .pip
@@ -239,7 +239,7 @@ def test_append_custom_conda_packages(
         package_file_session = PackageFileSession(sample_slc.internal_package_file)
         conda_packages = (
             package_file_session.package_file_config.find_build_step(
-                "flavor_customization"
+                "build_deps"
             )
             .find_phase("install_conda_packages")
             .conda
@@ -394,7 +394,7 @@ def test_restore_pip_custom_file(
     )
     session = PackageFileSession(slc.public_package_file)
     pip_packages = (
-        session.package_file_config.find_build_step("flavor_customization")
+        session.package_file_config.find_build_step("build_deps")
         .find_phase("install_pip_packages")
         .pip
     )
@@ -404,7 +404,7 @@ def test_restore_pip_custom_file(
 
     session_after = PackageFileSession(slc.public_package_file)
     pip_packages_after = (
-        session_after.package_file_config.find_build_step("flavor_customization")
+        session_after.package_file_config.find_build_step("build_deps")
         .find_phase("install_pip_packages")
         .pip
     )
@@ -426,7 +426,7 @@ def test_restore_conda_custom_file(
     )
     session = PackageFileSession(slc.internal_package_file)
     conda_packages = (
-        session.package_file_config.find_build_step("flavor_customization")
+        session.package_file_config.find_build_step("build_deps")
         .find_phase("install_conda_packages")
         .conda
     )
@@ -437,7 +437,7 @@ def test_restore_conda_custom_file(
 
     session_after = PackageFileSession(slc.internal_package_file)
     conda_packages_after = (
-        session_after.package_file_config.find_build_step("flavor_customization")
+        session_after.package_file_config.find_build_step("build_deps")
         .find_phase("install_conda_packages")
         .conda
     )
