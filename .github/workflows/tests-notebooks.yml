@@ -6,7 +6,7 @@ on:
 jobs:
 
   notebook-tests:
-    name: NB ${{ matrix.name }}
+    name: ${{ matrix.name }}
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -75,7 +75,7 @@ jobs:
             test/notebooks/${{ matrix.file }}
 
   notebook-tests-sagemaker:
-    name: Notebook Tests (Sagemaker)
+    name: Sagemaker
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -127,7 +127,7 @@ jobs:
             test/notebooks/nbtest_sagemaker.py
 
   notebook-tests-large-runner:
-    name: Notebook Tests (${{ matrix.file }})
+    name: ${{ matrix.name }} (large)
     runs-on:
       labels: int-linux-x64-4core-ubuntu24.04-1
     permissions:
@@ -137,7 +137,9 @@ jobs:
       matrix:
         include:
           - file: nbtest_transformers.py
+            name: TE
           - file: nbtest_text_ai.py
+            name: TXAIE
 
     steps:
 
