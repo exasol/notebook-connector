@@ -335,7 +335,7 @@ class ScriptLanguageContainer:
             self.public_package_file,
             PipPackage,
             pip_packages,
-            "build_deps",
+            "flavor_customization",
             "install_pip_packages",
         )
 

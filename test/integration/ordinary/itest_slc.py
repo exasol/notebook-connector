@@ -211,7 +211,7 @@ def test_append_custom_pip_packages(
         package_file_session = PackageFileSession(sample_slc.public_package_file)
         pip_packages = (
             package_file_session.package_file_config.find_build_step(
-                "build_deps"
+                "flavor_customization"
             )
             .find_phase("install_pip_packages")
             .pip
@@ -238,9 +238,7 @@ def test_append_custom_conda_packages(
         )
         package_file_session = PackageFileSession(sample_slc.internal_package_file)
         conda_packages = (
-            package_file_session.package_file_config.find_build_step(
-                "build_deps"
-            )
+            package_file_session.package_file_config.find_build_step("build_deps")
             .find_phase("install_conda_packages")
             .conda
         )
@@ -394,21 +392,23 @@ def test_restore_pip_custom_file(
     )
     session = PackageFileSession(slc.public_package_file)
     pip_packages = (
-        session.package_file_config.find_build_step("build_deps")
+        session.package_file_config.find_build_step("flavor_customization")
         .find_phase("install_pip_packages")
         .pip
     )
     found_package = pip_packages.find_package("my_test_package")
-    assert found_package.version == "==1.2.3"
+    assert found_package.version == "1.2.3"
     slc.restore_public_package_file()
 
     session_after = PackageFileSession(slc.public_package_file)
     pip_packages_after = (
-        session_after.package_file_config.find_build_step("build_deps")
+        session_after.package_file_config.find_build_step("flavor_customization")
         .find_phase("install_pip_packages")
         .pip
     )
-    found_package_after = pip_packages_after.find_package("my_test_package")
+    found_package_after = pip_packages_after.find_package(
+        "my_test_package", raise_if_not_found=False
+    )
     assert found_package_after is None
 
 
@@ -418,8 +418,12 @@ def test_restore_conda_custom_file(
     compression_strategy: CompressionStrategy,
 ):
     slc_name = "slc_restore_conda_custom_file"
-    flavor = DEFAULT_FLAVORS[PackageManager.CONDA]
-    slc = create_slc(secrets_module, slc_name, flavor, compression_strategy)
+    slc = create_slc(
+        secrets_module,
+        slc_name,
+        DEFAULT_FLAVORS[PackageManager.CONDA],
+        compression_strategy,
+    )
 
     slc.append_custom_conda_packages(
         [CondaPackage(name="my_test_package", version="1.2.3")],
@@ -431,7 +435,7 @@ def test_restore_conda_custom_file(
         .conda
     )
     found_package = conda_packages.find_package("my_test_package")
-    assert found_package.version == "=1.2.3"
+    assert found_package.version == "1.2.3"
 
     slc.restore_internal_package_file()
 

@@ -504,7 +504,7 @@ files = [
     {file = "bcrypt-5.0.0-pp311-pypy311_pp73-manylinux_2_34_x86_64.whl", hash = "sha256:6b8f520b61e8781efee73cba14e3e8c9556ccfb375623f4f97429544734545b4"},
     {file = "bcrypt-5.0.0.tar.gz", hash = "sha256:f748f7c2d6fd375cc93d3fba7ef4a9e3a092421b8dbf34d8d4dc06be9492dfdd"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 tests = ["pytest (>=3.2.1,!=3.3.0)"]
@@ -881,7 +881,7 @@ files = [
     {file = "cffi-2.0.0-cp39-cp39-win_amd64.whl", hash = "sha256:b882b3df248017dba09d6b16defe9b5c407fe32fc7c65a9c69798e6175601be9"},
     {file = "cffi-2.0.0.tar.gz", hash = "sha256:44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529"},
 ]
-markers = {main = "(platform_python_implementation != \"PyPy\" or extra == \"text-ai\") and (platform_python_implementation != \"PyPy\" or implementation_name == \"pypy\") and (extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\" or extra == \"docker-db\" or extra == \"slc\")"}
+markers = {main = "(platform_python_implementation != \"PyPy\" or extra == \"text-ai\") and (platform_python_implementation != \"PyPy\" or implementation_name == \"pypy\") and (extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"docker-db\" or extra == \"slc\")"}
 
 [package.dependencies]
 pycparser = {version = "*", markers = "implementation_name != \"PyPy\""}
@@ -1094,7 +1094,7 @@ files = [
     {file = "click-8.3.2-py3-none-any.whl", hash = "sha256:1924d2c27c5653561cd2cae4548d1406039cb79b858b747cfea24924bbc1616d"},
     {file = "click-8.3.2.tar.gz", hash = "sha256:14162b8b3b3550a7d479eafa77dfd3c38d9dc8951f6f69c78913a8f9a7540fd5"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
@@ -1145,7 +1145,7 @@ files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
-markers = {main = "(platform_system == \"Windows\" or extra == \"text-ai\") and (platform_system == \"Windows\" or sys_platform == \"win32\") and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\")", dev = "platform_system == \"Windows\" or sys_platform == \"win32\"", performance = "sys_platform == \"win32\""}
+markers = {main = "(platform_system == \"Windows\" or extra == \"text-ai\") and (platform_system == \"Windows\" or sys_platform == \"win32\") and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "platform_system == \"Windows\" or sys_platform == \"win32\"", performance = "sys_platform == \"win32\""}
 
 [[package]]
 name = "colorlog"
@@ -1375,7 +1375,7 @@ files = [
     {file = "cryptography-46.0.7-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:258514877e15963bd43b558917bc9f54cf7cf866c38aa576ebf47a77ddbc43a4"},
     {file = "cryptography-46.0.7.tar.gz", hash = "sha256:e4cfd68c5f3e0bfdad0d38e023239b96a2fe84146481852dffbcca442c245aa5"},
 ]
-markers = {main = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\" or extra == \"docker-db\" or extra == \"slc\""}
+markers = {main = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"docker-db\" or extra == \"slc\""}
 
 [package.dependencies]
 cffi = {version = ">=2.0.0", markers = "python_full_version >= \"3.9.0\" and platform_python_implementation != \"PyPy\""}
@@ -1666,7 +1666,7 @@ files = [
     {file = "decorator-5.2.1-py3-none-any.whl", hash = "sha256:d316bb415a2d9e2d2b3abcc4084c6502fc09240e292cd76a76afc106a1c8e04a"},
     {file = "decorator-5.2.1.tar.gz", hash = "sha256:65f266143752f734b0a7cc83c46f4618af75b8c5911b00ccb61d0ac9b6da0360"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "defusedxml"
@@ -1711,7 +1711,7 @@ files = [
     {file = "deprecated-1.3.1-py2.py3-none-any.whl", hash = "sha256:597bfef186b6f60181535a29fbe44865ce137a5079f295b479886c82729d5f3f"},
     {file = "deprecated-1.3.1.tar.gz", hash = "sha256:b1b50e0ff0c1fddaa5708a2c6b0a6588bb09b892825ab2b214ac9ea9d92a5223"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 wrapt = ">=1.10,<3"
@@ -1788,7 +1788,7 @@ files = [
     {file = "docker-7.1.0-py3-none-any.whl", hash = "sha256:c96b93b7f0a746f9e77d325bcfb87422a3d8bd4f03136ae8a85b37f1898d5fc0"},
     {file = "docker-7.1.0.tar.gz", hash = "sha256:ad8c70e6e3f8926cb8a92619b832b4ea5299e2831c14284663184e200546fa6c"},
 ]
-markers = {main = "(extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\") and (sys_platform != \"win32\" or extra == \"sagemaker\")", dev = "sys_platform != \"win32\""}
+markers = {main = "(extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\") and (sys_platform != \"win32\" or extra == \"sagemaker\")", dev = "sys_platform != \"win32\""}
 
 [package.dependencies]
 pywin32 = {version = ">=304", markers = "sys_platform == \"win32\""}
@@ -1812,7 +1812,7 @@ files = [
     {file = "docutils-0.21.2-py3-none-any.whl", hash = "sha256:dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2"},
     {file = "docutils-0.21.2.tar.gz", hash = "sha256:3a6b18732edf182daa3cd12775bbb338cf5691468f91eeeb109deff6ebfa986f"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "domdf-python-tools"
@@ -1884,7 +1884,7 @@ description = "BucketFS utilities for the Python programming language"
 optional = true
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
-markers = "extra == \"bucketfs\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""
+markers = "extra == \"bucketfs\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "exasol_bucketfs-2.2.0-py3-none-any.whl", hash = "sha256:cc1e1331467f64b951ee484fa0e51ba40d1e28bd7963cd09a021b793ba66531c"},
     {file = "exasol_bucketfs-2.2.0.tar.gz", hash = "sha256:a66fe0e80756e034adc665dc1bc7f9c2115ecbb4d83ffd214099c35c6c62e539"},
@@ -1905,7 +1905,7 @@ files = [
     {file = "exasol_error_reporting-1.1.0-py3-none-any.whl", hash = "sha256:1534d30aaf0fe9c66a5d5b49f28bb8ece909e660b616ba6df41384404fd936ad"},
     {file = "exasol_error_reporting-1.1.0.tar.gz", hash = "sha256:a1e3273fddfac11b91beb75be7c79aaa5143f0ceb522b489aac426fc207ee6a5"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "exasol-extension-license-protocol"
@@ -1937,7 +1937,7 @@ files = [
     {file = "exasol_integration_test_docker_environment-6.1.0-py3-none-any.whl", hash = "sha256:3da3e8d74c3c6ca947730587f0f22996b834a20363ef3d6d186564866cd97864"},
     {file = "exasol_integration_test_docker_environment-6.1.0.tar.gz", hash = "sha256:f0ecf2dd2db8af0688630543b76373fe154a8a147eaf6f76d8c5794a1bc04d00"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 click = ">=7.0"
@@ -1986,7 +1986,7 @@ description = "A collection of common utilities for Exasol extensions."
 optional = true
 python-versions = ">=3.10,<3.14"
 groups = ["main"]
-markers = "extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""
+markers = "extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = []
 develop = false
 
@@ -2058,7 +2058,7 @@ description = "Script Languages Container Tool"
 optional = true
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "exasol_script_languages_container_tool-4.0.3-py3-none-any.whl", hash = "sha256:0a9319203114743f1b80d7d74a0af4d8fb62461151c73ac6cc5f0b34b83544c6"},
     {file = "exasol_script_languages_container_tool-4.0.3.tar.gz", hash = "sha256:2e2916106d1ecb1fea7b0ea6e1ef746cb56a5d4f80eb5a93e22dcb2901e32e87"},
@@ -2082,7 +2082,7 @@ description = "This project provides a unified way of installing different packa
 optional = true
 python-versions = "<3.15,>=3.10"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "exasol_script_languages_package_management-1.2.0-py3-none-any.whl", hash = "sha256:e2c2d5f5b1a4515c0729127a4c65d82690e0224eb18a4744eb66ba974f16ca4a"},
     {file = "exasol_script_languages_package_management-1.2.0.tar.gz", hash = "sha256:4c4f4ffb34fc5099a508838402f3ce6048ba457b60bfad50d038497680009be4"},
@@ -2238,7 +2238,7 @@ files = [
     {file = "fabric-3.2.3-py3-none-any.whl", hash = "sha256:ce61917f4f398018337ce279b357650a3a74baecf3fdd53a5839013944af965e"},
     {file = "fabric-3.2.3.tar.gz", hash = "sha256:dcbd2c47ad87688facaef5cc11aab6d1ec9ed05645fed97a5de7204d5d17cc44"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 decorator = ">=5"
@@ -2385,7 +2385,7 @@ files = [
     {file = "gitdb-4.0.12-py3-none-any.whl", hash = "sha256:67073e15955400952c6565cc3e707c554a4eea2e428946f7a4c162fab9bd9bcf"},
     {file = "gitdb-4.0.12.tar.gz", hash = "sha256:5ef71f855d191a3326fcfbc0d5da835f26b13fbcba60c32c21091c349ffdb571"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 smmap = ">=3.0.1,<6"
@@ -2401,7 +2401,7 @@ files = [
     {file = "gitpython-3.1.46-py3-none-any.whl", hash = "sha256:79812ed143d9d25b6d176a10bb511de0f9c67b1fa641d82097b0ab90398a2058"},
     {file = "gitpython-3.1.46.tar.gz", hash = "sha256:400124c7d0ef4ea03f7310ac2fbf7151e09ff97f2a3288d64a440c584a29c37f"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 gitdb = ">=4.0.1,<5"
@@ -2842,7 +2842,7 @@ files = [
     {file = "humanfriendly-10.0-py2.py3-none-any.whl", hash = "sha256:1697e1a8a8f550fd43c2865cd84542fc175a61dcb779b6fee18cf6b6ccba1477"},
     {file = "humanfriendly-10.0.tar.gz", hash = "sha256:6b0b831ce8f15f7300721aa49829fc4e83921a9a301cc7f606be6686a2288ddc"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 pyreadline3 = {version = "*", markers = "sys_platform == \"win32\" and python_version >= \"3.8\""}
@@ -3079,7 +3079,7 @@ files = [
     {file = "invoke-2.2.1-py3-none-any.whl", hash = "sha256:2413bc441b376e5cd3f55bb5d364f973ad8bdd7bf87e53c79de3c11bf3feecc8"},
     {file = "invoke-2.2.1.tar.gz", hash = "sha256:515bf49b4a48932b79b024590348da22f39c4942dff991ad1fb8b8baea1be707"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "ipykernel"
@@ -3529,7 +3529,7 @@ files = [
     {file = "jsonpickle-4.1.1-py3-none-any.whl", hash = "sha256:bb141da6057898aa2438ff268362b126826c812a1721e31cf08a6e142910dc91"},
     {file = "jsonpickle-4.1.1.tar.gz", hash = "sha256:f86e18f13e2b96c1c1eede0b7b90095bbb61d99fedc14813c44dc2f361dbbae1"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 cov = ["pytest-cov"]
@@ -3561,7 +3561,7 @@ files = [
     {file = "jsonschema-4.26.0-py3-none-any.whl", hash = "sha256:d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce"},
     {file = "jsonschema-4.26.0.tar.gz", hash = "sha256:0c26707e2efad8aa1bfc5b7ce170f3fccc2e4918ff85989ba9ffa9facb2be326"},
 ]
-markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 attrs = ">=22.2.0"
@@ -3593,7 +3593,7 @@ files = [
     {file = "jsonschema_specifications-2025.9.1-py3-none-any.whl", hash = "sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe"},
     {file = "jsonschema_specifications-2025.9.1.tar.gz", hash = "sha256:b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d"},
 ]
-markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 referencing = ">=0.31.0"
@@ -4092,7 +4092,7 @@ files = [
     {file = "lockfile-0.12.2-py2.py3-none-any.whl", hash = "sha256:6c3cb24f344923d30b2785d5ad75182c8ea7ac1b6171b08657258ec7429d50fa"},
     {file = "lockfile-0.12.2.tar.gz", hash = "sha256:6aed02de03cba24efabcd600b30540140634fc06cfa603822d508d5361e9f799"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "luigi"
@@ -4104,7 +4104,7 @@ groups = ["main", "dev"]
 files = [
     {file = "luigi-3.6.0.tar.gz", hash = "sha256:41b14850223c619d9006b30acda733e756b883fc7e60814205576647190c96e3"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 python-daemon = "*"
@@ -4776,7 +4776,7 @@ files = [
     {file = "netaddr-1.3.0-py3-none-any.whl", hash = "sha256:c2c6a8ebe5554ce33b7d5b3a306b71bbb373e000bbbf2350dd5213cc56e3dbbe"},
     {file = "netaddr-1.3.0.tar.gz", hash = "sha256:5c3c3d9895b551b763779ba7db7a03487dc1f8e3b385af819af341ae9ef6e48a"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 nicer-shell = ["ipython"]
@@ -4792,7 +4792,7 @@ files = [
     {file = "networkx-3.4.2-py3-none-any.whl", hash = "sha256:df5d4365b724cf81b8c6a7312509d0c22386097011ad1abe274afd5e9d3bbc5f"},
     {file = "networkx-3.4.2.tar.gz", hash = "sha256:307c3669428c5362aab27c8a1260aa8f47c4e91d3891f48be0141738d8d053e1"},
 ]
-markers = {main = "python_version == \"3.10\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\")", dev = "python_version == \"3.10\""}
+markers = {main = "python_version == \"3.10\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "python_version == \"3.10\""}
 
 [package.extras]
 default = ["matplotlib (>=3.7)", "numpy (>=1.24)", "pandas (>=2.0)", "scipy (>=1.10,!=1.11.0,!=1.11.1)"]
@@ -4813,7 +4813,7 @@ files = [
     {file = "networkx-3.6.1-py3-none-any.whl", hash = "sha256:d47fbf302e7d9cbbb9e2555a0d267983d2aa476bac30e90dfbe5669bd57f3762"},
     {file = "networkx-3.6.1.tar.gz", hash = "sha256:26b7c357accc0c8cde558ad486283728b65b6a95d85ee1cd66bafab4c8168509"},
 ]
-markers = {main = "python_version >= \"3.11\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\")", dev = "python_version >= \"3.11\""}
+markers = {main = "python_version >= \"3.11\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "python_version >= \"3.11\""}
 
 [package.extras]
 benchmarking = ["asv", "virtualenv"]
@@ -4979,7 +4979,7 @@ description = "Fundamental package for array computing in Python"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"slc\" or extra == \"pec\" or python_version == \"3.10\" and (extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\" or extra == \"ibis\")"
+markers = "extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"slc\" or python_version == \"3.10\" and (extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"ibis\")"
 files = [
     {file = "numpy-1.26.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:9ff0f4f29c51e2803569d7a51c2304de5554655a60c5d776e35b4a41413830d0"},
     {file = "numpy-1.26.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:2e4ee3380d6de9c9ec04745830fd9e2eccb3e6cf790d39d7b98ffd19b0dd754a"},
@@ -5315,7 +5315,7 @@ files = [
     {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
     {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
 ]
-markers = {main = "extra == \"text-ai\" or extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"text-ai\" or extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "pandas"
@@ -5324,7 +5324,7 @@ description = "Powerful data structures for data analysis, time series, and stat
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\" or extra == \"ibis\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"ibis\""
 files = [
     {file = "pandas-2.3.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:376c6446ae31770764215a6c937f72d917f214b43560603cd60da6408f183b6c"},
     {file = "pandas-2.3.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:e19d192383eab2f4ceb30b412b22ea30690c9e618f78870357ae1d682912015a"},
@@ -5441,7 +5441,7 @@ files = [
     {file = "paramiko-4.0.0-py3-none-any.whl", hash = "sha256:0e20e00ac666503bf0b4eda3b6d833465a2b7aff2e2b3d79a8bba5ef144ee3b9"},
     {file = "paramiko-4.0.0.tar.gz", hash = "sha256:6a25f07b380cc9c9a88d2b920ad37167ac4667f8d9886ccebd8f90f654b5d69f"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 bcrypt = ">=3.2"
@@ -5910,7 +5910,7 @@ files = [
     {file = "portalocker-2.10.1-py3-none-any.whl", hash = "sha256:53a5984ebc86a025552264b459b46a2086e269b21823cb572f8f28ee759e45bf"},
     {file = "portalocker-2.10.1.tar.gz", hash = "sha256:ef1bf844e878ab08aee7e40184156e1151f228f103aa5c6bd0724cc330960f8f"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 pywin32 = {version = ">=226", markers = "platform_system == \"Windows\""}
@@ -6305,7 +6305,7 @@ description = "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs 
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""
+markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "pyasn1-0.6.3-py3-none-any.whl", hash = "sha256:a80184d120f0864a52a073acc6fc642847d0be408e7c7252f31390c0f4eadcde"},
     {file = "pyasn1-0.6.3.tar.gz", hash = "sha256:697a8ecd6d98891189184ca1fa05d1bb00e2f84b5977c481452050549c8a72cf"},
@@ -6322,7 +6322,7 @@ files = [
     {file = "pycparser-3.0-py3-none-any.whl", hash = "sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"},
     {file = "pycparser-3.0.tar.gz", hash = "sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29"},
 ]
-markers = {main = "(platform_python_implementation != \"PyPy\" or extra == \"text-ai\") and (platform_python_implementation != \"PyPy\" or implementation_name == \"pypy\") and implementation_name != \"PyPy\" and (extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\" or extra == \"docker-db\" or extra == \"slc\")", dev = "implementation_name != \"PyPy\""}
+markers = {main = "(platform_python_implementation != \"PyPy\" or extra == \"text-ai\") and (platform_python_implementation != \"PyPy\" or implementation_name == \"pypy\") and implementation_name != \"PyPy\" and (extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"docker-db\" or extra == \"slc\")", dev = "implementation_name != \"PyPy\""}
 
 [[package]]
 name = "pydantic"
@@ -6469,7 +6469,7 @@ files = [
     {file = "pydot-4.0.1-py3-none-any.whl", hash = "sha256:869c0efadd2708c0be1f916eb669f3d664ca684bc57ffb7ecc08e70d5e93fee6"},
     {file = "pydot-4.0.1.tar.gz", hash = "sha256:c2148f681c4a33e08bf0e26a9e5f8e4099a82e0e2a068098f32ce86577364ad5"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 pyparsing = ">=3.1.0"
@@ -6506,7 +6506,7 @@ description = "Exasol python driver with extra features"
 optional = true
 python-versions = "<4,>=3.9.2"
 groups = ["main"]
-markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""
+markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "pyexasol-1.3.0-py3-none-any.whl", hash = "sha256:0bb076346dcb33b36031a2633d6e7b9982f8411b95e770ad8017801ee438a689"},
     {file = "pyexasol-1.3.0.tar.gz", hash = "sha256:44e5be7245b92343634b0b66a81b62be2fb4b1ca485d4e0f86c0583d5a2cf6b5"},
@@ -6692,7 +6692,7 @@ files = [
     {file = "pynacl-1.6.2-cp38-abi3-win_arm64.whl", hash = "sha256:834a43af110f743a754448463e8fd61259cd4ab5bbedcf70f9dabad1d28a394c"},
     {file = "pynacl-1.6.2.tar.gz", hash = "sha256:018494d6d696ae03c7e656e5e74cdfd8ea1326962cc401bcf018f1ed8436811c"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 cffi = {version = ">=2.0.0", markers = "platform_python_implementation != \"PyPy\" and python_version >= \"3.9\""}
@@ -6712,7 +6712,7 @@ files = [
     {file = "pyparsing-3.3.2-py3-none-any.whl", hash = "sha256:850ba148bd908d7e2411587e247a1e4f0327839c40e2e5e6d05a007ecc69911d"},
     {file = "pyparsing-3.3.2.tar.gz", hash = "sha256:c777f4d763f140633dcb6d8a3eda953bf7a214dc4eff598413c070bcdc117cbc"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 diagrams = ["jinja2", "railroad-diagrams"]
@@ -6728,7 +6728,7 @@ files = [
     {file = "pyreadline3-3.5.4-py3-none-any.whl", hash = "sha256:eaf8e6cc3c49bcccf145fc6067ba8643d1df34d604a1ec0eccbf7a18e6d3fae6"},
     {file = "pyreadline3-3.5.4.tar.gz", hash = "sha256:8d57d53039a1c75adba8e50dd3d992b28143480816187ea5efbd5c78e6c885b7"},
 ]
-markers = {main = "sys_platform == \"win32\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\")", dev = "sys_platform == \"win32\""}
+markers = {main = "sys_platform == \"win32\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\")", dev = "sys_platform == \"win32\""}
 
 [package.extras]
 dev = ["build", "flake8", "mypy", "pytest", "twine"]
@@ -6927,7 +6927,7 @@ files = [
     {file = "python_daemon-3.1.2-py3-none-any.whl", hash = "sha256:b906833cef63502994ad48e2eab213259ed9bb18d54fa8774dcba2ff7864cec6"},
     {file = "python_daemon-3.1.2.tar.gz", hash = "sha256:f7b04335adc473de877f5117e26d5f1142f4c9f7cd765408f0877757be5afbf4"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 lockfile = ">=0.10"
@@ -7070,7 +7070,7 @@ description = "World timezone definitions, modern and historical"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\" or extra == \"ibis\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"ibis\""
 files = [
     {file = "pytz-2026.1.post1-py2.py3-none-any.whl", hash = "sha256:f2fd16142fda348286a75e1a524be810bb05d444e5a081f37f7affc635035f7a"},
     {file = "pytz-2026.1.post1.tar.gz", hash = "sha256:3378dde6a0c3d26719182142c56e60c7f9af7e968076f31aae569d72a0358ee1"},
@@ -7120,7 +7120,7 @@ files = [
     {file = "pywin32-311-cp39-cp39-win_amd64.whl", hash = "sha256:e0c4cfb0621281fe40387df582097fd796e80430597cb9944f0ae70447bacd91"},
     {file = "pywin32-311-cp39-cp39-win_arm64.whl", hash = "sha256:62ea666235135fee79bb154e695f3ff67370afefd71bd7fea7512fc70ef31e3d"},
 ]
-markers = {main = "(platform_system == \"Windows\" or extra == \"sagemaker\") and (platform_system == \"Windows\" or sys_platform == \"win32\") and (extra == \"sagemaker\" or extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"pec\")", dev = "platform_system == \"Windows\""}
+markers = {main = "(platform_system == \"Windows\" or extra == \"sagemaker\") and (platform_system == \"Windows\" or sys_platform == \"win32\") and (extra == \"sagemaker\" or extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\")", dev = "platform_system == \"Windows\""}
 
 [[package]]
 name = "pywin32-ctypes"
@@ -7403,7 +7403,7 @@ files = [
     {file = "referencing-0.37.0-py3-none-any.whl", hash = "sha256:381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231"},
     {file = "referencing-0.37.0.tar.gz", hash = "sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8"},
 ]
-markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.dependencies]
 attrs = ">=22.2.0"
@@ -7830,7 +7830,7 @@ files = [
     {file = "rpds_py-0.30.0-pp311-pypy311_pp73-musllinux_1_2_x86_64.whl", hash = "sha256:ac37f9f516c51e5753f27dfdef11a88330f04de2d564be3991384b2f3535d02e"},
     {file = "rpds_py-0.30.0.tar.gz", hash = "sha256:dd8ff7cf90014af0c0f787eea34794ebf6415242ee1d6fa91eaba725cc441e84"},
 ]
-markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "rsa"
@@ -7839,7 +7839,7 @@ description = "Pure-Python RSA implementation"
 optional = true
 python-versions = "<4,>=3.6"
 groups = ["main"]
-markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""
+markers = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "rsa-4.9.1-py3-none-any.whl", hash = "sha256:68635866661c6836b8d39430f97a996acbd61bfa49406748ea243539fe239762"},
     {file = "rsa-4.9.1.tar.gz", hash = "sha256:e7bdbfdb5497da4c07dfd35530e1a902659db6ff241e39d9953cad06ebd0ae75"},
@@ -8628,7 +8628,7 @@ files = [
     {file = "simplejson-4.0.1-py3-none-any.whl", hash = "sha256:dfa6e9923c0ec2880738d09e5ce045741eb6cd4551e261dcd6c3625d26666075"},
     {file = "simplejson-4.0.1.tar.gz", hash = "sha256:bc13170567a5c856a0e6c16620c0b0388722f7d6382acd8007857624c3dedf3e"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "six"
@@ -8693,7 +8693,7 @@ files = [
     {file = "smmap-5.0.3-py3-none-any.whl", hash = "sha256:c106e05d5a61449cf6ba9a1e650227ecfb141590d2a98412103ff35d89fc7b2f"},
     {file = "smmap-5.0.3.tar.gz", hash = "sha256:4d9debb8b99007ae47165abc08670bd74cb74b5227dda7f643eccc4e9eb5642c"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "snowballstemmer"
@@ -9677,7 +9677,7 @@ files = [
     {file = "stopwatch.py-2.0.1-py3-none-any.whl", hash = "sha256:5802a0178d766120c11dd5df8ae838e9beccb8c88329dbd5f0f7ac4b7fed9107"},
     {file = "stopwatch.py-2.0.1.tar.gz", hash = "sha256:8cc94ba0f6469d434eabd8b227166e595fd42350e7f66dbf1a1a80697f60cc79"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "structlog"
@@ -9725,7 +9725,7 @@ files = [
     {file = "tabulate-0.10.0-py3-none-any.whl", hash = "sha256:f0b0622e567335c8fabaaa659f1b33bcb6ddfe2e496071b743aa113f8774f2d3"},
     {file = "tabulate-0.10.0.tar.gz", hash = "sha256:e2cfde8f79420f6deeffdeda9aaec3b6bc5abce947655d17ac662b126e48a60d"},
 ]
-markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 widechars = ["wcwidth"]
@@ -10174,7 +10174,7 @@ files = [
     {file = "tornado-6.5.5-cp39-abi3-win_arm64.whl", hash = "sha256:2c9a876e094109333f888539ddb2de4361743e5d21eece20688e3e351e4990a6"},
     {file = "tornado-6.5.5.tar.gz", hash = "sha256:192b8f3ea91bd7f1f50c06955416ed76c6b72f96779b962f07f911b91e8d30e9"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [[package]]
 name = "tqdm"
@@ -10407,7 +10407,7 @@ description = "Typing stubs for PyYAML"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""
+markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""
 files = [
     {file = "types_pyyaml-6.0.12.20260408-py3-none-any.whl", hash = "sha256:fbc42037d12159d9c801ebfcc79ebd28335a7c13b08a4cfbc6916df78fee9384"},
     {file = "types_pyyaml-6.0.12.20260408.tar.gz", hash = "sha256:92a73f2b8d7f39ef392a38131f76b970f8c66e4c42b3125ae872b7c93b556307"},
@@ -10467,7 +10467,7 @@ files = [
     {file = "tzdata-2026.1-py2.py3-none-any.whl", hash = "sha256:4b1d2be7ac37ceafd7327b961aa3a54e467efbdb563a23655fbfe0d39cfc42a9"},
     {file = "tzdata-2026.1.tar.gz", hash = "sha256:67658a1903c75917309e753fdc349ac0efd8c27db7a0cb406a25be4840f87f98"},
 ]
-markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\" or extra == \"ibis\""}
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"ibis\""}
 
 [[package]]
 name = "uri-template"
@@ -10643,7 +10643,7 @@ files = [
     {file = "websocket_client-1.8.0-py3-none-any.whl", hash = "sha256:17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526"},
     {file = "websocket_client-1.8.0.tar.gz", hash = "sha256:3239df9f44da632f96012472805d40a23281a991027ce11d2f45a6f24ac4c3da"},
 ]
-markers = {main = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"sqlalchemy\" or extra == \"pyexasol\" or extra == \"ibis\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 docs = ["Sphinx (>=6.0)", "myst-parser (>=2.0.0)", "sphinx-rtd-theme (>=1.1.0)"]
@@ -10832,7 +10832,7 @@ files = [
     {file = "wrapt-2.1.2-py3-none-any.whl", hash = "sha256:b8fd6fa2b2c4e7621808f8c62e8317f4aae56e59721ad933bac5239d913cf0e8"},
     {file = "wrapt-2.1.2.tar.gz", hash = "sha256:3996a67eecc2c68fd47b4e3c564405a5777367adfd9b8abb58387b63ee83b21e"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\" or extra == \"pec\""}
+markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\" or extra == \"sagemaker\""}
 
 [package.extras]
 dev = ["pytest", "setuptools"]
@@ -10878,7 +10878,6 @@ type = ["pytest-mypy"]
 bucketfs = ["exasol-bucketfs"]
 docker-db = ["exasol-integration-test-docker-environment", "ifaddr"]
 ibis = ["ibis-framework"]
-pec = ["exasol-python-extension-common"]
 pyexasol = ["pyexasol"]
 pyexasol-extra = ["polars", "pyarrow"]
 sagemaker = ["exasol-sagemaker-extension"]
@@ -10890,4 +10889,4 @@ transformers = ["exasol-transformers-extension", "yaspin"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "6bc45816b62eea38f734b7a49ff0ca5c91a39db1b663cbcf823e82e973c5146b"
+content-hash = "787a057727e675b33525b379b665084c0e68414d822d1000379e848fc2e2acfb"
