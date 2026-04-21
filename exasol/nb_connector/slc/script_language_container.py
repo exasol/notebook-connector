@@ -346,10 +346,10 @@ class ScriptLanguageContainer:
         package definitions will result in duplicated entries.
         """
         append_packages(
-            self.internal_package_file,
+            self.public_package_file,
             CondaPackage,
             conda_packages,
-            "build_deps",
+            "flavor_customization",
             "install_conda_packages",
         )
 
