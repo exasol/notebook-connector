@@ -6,7 +6,7 @@ on:
 jobs:
 
   notebook-tests:
-    name: Notebook Tests (${{ matrix.file }})
+    name: NB ${{ matrix.file }}
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -15,13 +15,21 @@ jobs:
       matrix:
         include:
           - file: nbtest_first_steps.py
+            name: First Steps
           - file: nbtest_sklearn.py
+            name: SKlearn
           - file: nbtest_pyexasol.py
+            name: PyExasol
           - file: nbtest_jupysql.py
+            name: JupySql
           - file: nbtest_ibis.py
+            name: IBIS
           - file: nbtest_script_languages_container.py
+            name: SLC
           - file: nbtest_useful_urls.py
+            name: URLs
           - file: nbtest_cloud.py
+            name: Cloud
 
     steps:
 

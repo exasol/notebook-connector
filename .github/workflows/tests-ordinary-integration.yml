@@ -6,7 +6,7 @@ on:
 jobs:
 
   ordinary-itests:
-    name: iTests
+    name: iTests ${{ matrix.name }}
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -15,30 +15,43 @@ jobs:
       matrix:
         include:
           - file: test_itde_manager.py
+            name: ITDE Mgr
             extra_param: ""
           - file: test_sagemaker_extension_wrapper.py
+            name: SME
             extra_param: ""
           - file: test_transformers_extension_wrapper.py
+            name: TE
             extra_param: ""
           - file: itde_mgr_in_container/test_itde_connect.py
+            name: ITDE Connect
             extra_param: ""
           - file: itde_mgr_in_container/test_itde_external.py
+            name: ITDE External
             extra_param: ""
           - file: itde_mgr_in_container/test_itde_recreation_after_take_down.py
+            name: ITDE Recreate after take-down
             extra_param: ""
           - file: itde_mgr_in_container/test_itde_recreation_without_take_down.py
+            name: ITDE Recreate w/o take-down
             extra_param: ""
           - file: itde_mgr_in_container/test_itde_stop_and_restart.py
+            name: ITDE Stop / Restart
             extra_param: ""
           - file: itest_slc.py
+            name: SLC Pip Gzip
             extra_param: "--package-manager pip --compression-strategy gzip"
           - file: itest_slc.py
+            name: SLC Conda
             extra_param: "--package-manager conda --compression-strategy gzip"
           - file: itest_slc.py
+            name: SLC Pip uncompressed
             extra_param: "--package-manager pip --compression-strategy none"
           - file: itest_slc.py
+            name: SLC BFS TLS
             extra_param: "--package-manager pip --compression-strategy none --bucketfs-protocol https"
           - file: test_cloud_storage.py
+            name: CSE
             extra_param: ""
 
     steps:
