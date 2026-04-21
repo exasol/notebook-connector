@@ -108,9 +108,9 @@ jobs:
       - name: Pytest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NBTEST_AWS_DEFAULT_REGION: ${{ secrets.NBTEST_AWS_DEFAULT_REGION }}
-          NBTEST_AWS_ACCESS_KEY_ID: ${{ secrets.NBTEST_AWS_ACCESS_KEY_ID }}
-          NBTEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.NBTEST_AWS_SECRET_ACCESS_KEY }}
+          NBTEST_AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          NBTEST_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          NBTEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           poetry run -- pytest -rA --setup-show \
             -c test/notebooks/pytest.ini \
