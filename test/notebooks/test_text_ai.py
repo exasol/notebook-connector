@@ -18,7 +18,7 @@ def test_text_ai(
         notebook_runner(
             notebook_file="data_customer_support.ipynb", hacks=[uploading_hack]
         )
-        os.chdir(current_dir)
+        os.chdir(notebooks_root)
         os.chdir("text_ai")
         result = notebook_runner(
             notebook_file="txaie_init.ipynb", hacks=[uploading_hack]
