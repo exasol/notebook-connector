@@ -6,7 +6,7 @@ on:
 jobs:
 
   notebook-tests:
-    name: NB ${{ matrix.file }}
+    name: NB ${{ matrix.name }}
     runs-on: ubuntu-24.04
     permissions:
       contents: read
