@@ -2,6 +2,7 @@ import os
 import textwrap
 from inspect import cleandoc
 from pathlib import Path
+from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 
 import boto3
 from botocore.exceptions import ClientError as BotoClientError
