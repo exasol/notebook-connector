@@ -163,6 +163,9 @@ ignore_errors = true
 follow_untyped_imports = true
 
 
+[tool.ruff]
+exclude = [".venv", ".venv-1"]
+
 [tool.ruff.lint]
 extend-ignore = [
     "E", # Syntax errors
