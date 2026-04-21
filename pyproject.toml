@@ -23,6 +23,7 @@ dependencies = [
   "pickleshare(>=0.7.5)", # See https://github.com/exasol/ai-lab/issues/291 for details.
   "jupysql (>=0.11.1,<0.12.0)",
   "tenacity (>=8.5.0)",
+  "exasol-telemetry-client (>=0.1.2,<0.2.0)",
 ]
 
 [project.optional-dependencies]
