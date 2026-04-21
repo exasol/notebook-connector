@@ -1,8 +1,9 @@
 from pathlib import Path
+from test.integration.ui.common.utils.notebook_test_utils import (
+    set_log_level_for_libraries,
+)
 
 import pytest
-
-from test.integration.ui.common.utils.notebook_test_utils import set_log_level_for_libraries
 
 set_log_level_for_libraries()
 
