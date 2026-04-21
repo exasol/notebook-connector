@@ -1,16 +1,8 @@
 from pathlib import Path
 
-# Re-export fixtures so pytest discovers them when running test/notebooks/ directly.
-# pytest only auto-discovers fixtures defined in or imported into conftest.py files.
-from test.integration.ui.common.utils.notebook_test_utils import (  # noqa: F401
-    backend_setup,
-    notebook_runner,
-    run_notebook,
-    set_log_level_for_libraries,
-    uploading_hack,
-)
-
 import pytest
+
+from test.integration.ui.common.utils.notebook_test_utils import set_log_level_for_libraries
 
 set_log_level_for_libraries()
 

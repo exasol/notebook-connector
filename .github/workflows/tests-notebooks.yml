@@ -14,21 +14,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - file: nbtest_first_steps.py
+          - file: test_first_steps.py
             name: First Steps
-          - file: nbtest_sklearn.py
+          - file: test_sklearn.py
             name: SKlearn
-          - file: nbtest_pyexasol.py
+          - file: test_pyexasol.py
             name: PyExasol
-          - file: nbtest_jupysql.py
+          - file: test_jupysql.py
             name: JupySql
-          - file: nbtest_ibis.py
+          - file: test_ibis.py
             name: IBIS
-          - file: nbtest_script_languages_container.py
+          - file: test_script_languages_container.py
             name: SLC
-          - file: nbtest_useful_urls.py
+          - file: test_useful_urls.py
             name: URLs
-          - file: nbtest_cloud.py
+          - file: test_cloud.py
             name: Cloud
 
     steps:
@@ -69,7 +69,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           poetry run -- pytest -rA --setup-show \
-            -c test/notebooks/pytest.ini \
             --backend onprem \
             --itde-nameserver 8.8.8.8 \
             test/notebooks/${{ matrix.file }}
@@ -121,10 +120,9 @@ jobs:
           NBTEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           poetry run -- pytest -rA --setup-show \
-            -c test/notebooks/pytest.ini \
             --backend onprem \
             --itde-nameserver 8.8.8.8 \
-            test/notebooks/nbtest_sagemaker.py
+            test/notebooks/test_sagemaker.py
 
   notebook-tests-large-runner:
     name: ${{ matrix.name }} (large)
@@ -136,9 +134,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - file: nbtest_transformers.py
+          - file: test_transformers.py
             name: TE
-          - file: nbtest_text_ai.py
+          - file: test_text_ai.py
             name: TXAIE
 
     steps:
@@ -181,7 +179,6 @@ jobs:
           INTERACTIVE: False
         run: |
           poetry run -- pytest -rA --setup-show \
-            -c test/notebooks/pytest.ini \
             --backend onprem \
             --itde-nameserver 8.8.8.8 \
             test/notebooks/${{ matrix.file }}
