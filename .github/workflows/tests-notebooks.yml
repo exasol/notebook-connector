@@ -6,7 +6,7 @@ on:
 jobs:
 
   notebook-tests:
-    name: Notebook Tests (${{ matrix.file }})
+    name: ${{ matrix.name }}
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -15,13 +15,21 @@ jobs:
       matrix:
         include:
           - file: nbtest_first_steps.py
+            name: First Steps
           - file: nbtest_sklearn.py
+            name: SKlearn
           - file: nbtest_pyexasol.py
+            name: PyExasol
           - file: nbtest_jupysql.py
+            name: JupySql
           - file: nbtest_ibis.py
+            name: IBIS
           - file: nbtest_script_languages_container.py
+            name: SLC
           - file: nbtest_useful_urls.py
+            name: URLs
           - file: nbtest_cloud.py
+            name: Cloud
 
     steps:
 
@@ -67,7 +75,7 @@ jobs:
             test/notebooks/${{ matrix.file }}
 
   notebook-tests-sagemaker:
-    name: Notebook Tests (Sagemaker)
+    name: Sagemaker
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -119,7 +127,7 @@ jobs:
             test/notebooks/nbtest_sagemaker.py
 
   notebook-tests-large-runner:
-    name: Notebook Tests (${{ matrix.file }})
+    name: ${{ matrix.name }} (large)
     runs-on:
       labels: int-linux-x64-4core-ubuntu24.04-1
     permissions:
@@ -129,7 +137,9 @@ jobs:
       matrix:
         include:
           - file: nbtest_transformers.py
+            name: TE
           - file: nbtest_text_ai.py
+            name: TXAIE
 
     steps:
 
