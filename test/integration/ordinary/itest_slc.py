@@ -236,9 +236,9 @@ def test_append_custom_conda_packages(
                 for pkg, version, _ in custom_packages
             ],
         )
-        package_file_session = PackageFileSession(sample_slc.internal_package_file)
+        package_file_session = PackageFileSession(sample_slc.public_package_file)
         conda_packages = (
-            package_file_session.package_file_config.find_build_step("build_deps")
+            package_file_session.package_file_config.find_build_step("flavor_customization")
             .find_phase("install_conda_packages")
             .conda
         )
@@ -428,20 +428,20 @@ def test_restore_conda_custom_file(
     slc.append_custom_conda_packages(
         [CondaPackage(name="my_test_package", version="1.2.3")],
     )
-    session = PackageFileSession(slc.internal_package_file)
+    session = PackageFileSession(slc.public_package_file)
     conda_packages = (
-        session.package_file_config.find_build_step("build_deps")
+        session.package_file_config.find_build_step("flavor_customization")
         .find_phase("install_conda_packages")
         .conda
     )
     found_package = conda_packages.find_package("my_test_package")
     assert found_package.version == "1.2.3"
 
-    slc.restore_internal_package_file()
+    slc.restore_public_package_file()
 
-    session_after = PackageFileSession(slc.internal_package_file)
+    session_after = PackageFileSession(slc.public_package_file)
     conda_packages_after = (
-        session_after.package_file_config.find_build_step("build_deps")
+        session_after.package_file_config.find_build_step("flavor_customization")
         .find_phase("install_conda_packages")
         .conda
     )
