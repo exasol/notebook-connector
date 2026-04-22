@@ -238,7 +238,9 @@ def test_append_custom_conda_packages(
         )
         package_file_session = PackageFileSession(sample_slc.public_package_file)
         conda_packages = (
-            package_file_session.package_file_config.find_build_step("flavor_customization")
+            package_file_session.package_file_config.find_build_step(
+                "flavor_customization"
+            )
             .find_phase("install_conda_packages")
             .conda
         )
