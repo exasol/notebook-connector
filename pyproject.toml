@@ -53,21 +53,6 @@ transformers = [
 text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
 sagemaker = [ "exasol-sagemaker-extension (>=0.11.5)" ]
 
-# These packages are needed to run notebooks interactively (JupyterLab server).
-# Created this file based on ai-lab jupyter_requirements.txt and notebook_requirements.txt.
-jupyter = [
-    "jupyterlab (>=4.2.5, <5)",
-    "pexpect (>=4.8.0, <5)",
-]
-notebook-dependencies = [
-    "scikit-learn (>=1.7.0, <2)",
-    "matplotlib (>=3.10.0, <4)",
-    "wordcloud (>=1.9.4, <2)",
-    "ipyfilechooser (>=0.6.0, <1)",
-    "ipywidgets (>=8.1.0, <9)",
-    "stopwatch.py (>=2.0.1)",
-]
-
 [project.urls]
 Homepage = "https://github.io/exasol/notebook-connector"
 Documentation = "https://github.io/exasol/notebook-connector"
@@ -102,8 +87,6 @@ pytest-exasol-backend = ">=1.1.0,<2"
 pytest-ipywidgets = ">=1.52.0,<2.0.0"
 starlette = "<1" # see https://github.com/exasol/notebook-connector/issues/378
 notebook = ">=7.4,<8"
-# the below are the dependencies that added to replicate test_dependencies.txt
-# because we deleted the test_dependencies.txt
 nbclient = ">=0.10.0"
 nbformat = ">=5.10.0"
 testbook = ">=0.4.2"
@@ -206,4 +189,3 @@ exclusions = "exasol/nb_connector/resources/notebooks/**"
 
 [tool.poetry.plugins."console_scripts"]
 scs = 'exasol.nb_connector.cli.main:main'
-ai-lab = 'exasol.nb_connector.cli.main:main' # added this to enable new cli for ai-lab
