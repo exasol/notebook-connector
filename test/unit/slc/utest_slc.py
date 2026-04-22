@@ -509,7 +509,7 @@ def write_pip_package_file(file_path: Path) -> None:
     content = textwrap.dedent("""
         version: '1.0.0'
         build_steps:
-        - name: build_deps
+        - name: flavor_customization
           phases:
           - name: install_pip_packages
             pip:
