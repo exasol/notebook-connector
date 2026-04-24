@@ -18,7 +18,7 @@ FLAVORS_PATH_IN_SLC_REPO = Path("flavors")
 
 SLC_RELEASE_TAG = "11.1.1"
 """"
-Using the SLC_RELEASE 10.1.0 because we are limited to slc-tool 4.*. (see pyproject.toml)
+Using the SLC_RELEASE 11.1.1 because we are limited to slc-tool 4.*. (see pyproject.toml)
 Check the developer guide (./doc/developer-guide.md) for more information.
 """
 
