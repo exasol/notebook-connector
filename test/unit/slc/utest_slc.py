@@ -19,7 +19,10 @@ from unittest.mock import (
 import pytest
 import requests
 from _pytest.monkeypatch import MonkeyPatch
-from exasol.exaslpm.model.package_file_config import PipPackage
+from exasol.exaslpm.model.package_file_config import (
+    CondaPackage,
+    PipPackage,
+)
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
@@ -559,6 +562,63 @@ def test_add_existing_pip_package_different_version(slc_with_packages):
     with pytest.raises(SlcError, match=r"Package already exists"):
         slc_with_packages.append_custom_pip_packages(
             [PipPackage(name="package_a", version="v9.9.9")],
+        )
+
+
+def write_conda_package_file(file_path: Path) -> None:
+    content = textwrap.dedent("""
+        version: '1.0.0'
+        build_steps:
+        - name: flavor_customization
+          phases:
+          - name: install_conda_packages
+            conda:
+              packages:
+              - name: package_a
+                version: v1.2.3
+              - name: package_b
+                version: v4.5.6
+              - name: package_c
+                version: v5.6.7
+          validation_cfg:
+            version_mandatory: false
+        """).lstrip("\n")
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    file_path.write_text(content)
+
+
+@pytest.fixture
+def slc_with_conda_packages(sample_slc_name, slc_factory_create):
+    flavor = "Strawberry"
+    with slc_factory_create.context(sample_slc_name, flavor) as testee:
+        write_conda_package_file(testee.public_package_file)
+        yield testee
+
+
+def test_add_new_conda_package(slc_with_conda_packages):
+    slc_with_conda_packages.append_custom_conda_packages(
+        [CondaPackage(name="package_d", version="v10.0")],
+    )
+    content = slc_with_conda_packages.public_package_file.read_text()
+    assert "package_d" in content
+    assert "v10.0" in content
+
+
+def test_add_existing_conda_package_same_version(caplog, slc_with_conda_packages):
+    with caplog.at_level(logging.WARNING):
+        slc_with_conda_packages.append_custom_conda_packages(
+            [CondaPackage(name="package_a", version="v1.2.3")],
+        )
+        content = slc_with_conda_packages.public_package_file.read_text()
+        assert content.count("package_a") == 1
+        assert "Package already exists" in caplog.text
+        assert "package_a" in caplog.text
+
+
+def test_add_existing_conda_package_different_version(slc_with_conda_packages):
+    with pytest.raises(SlcError, match=r"Package already exists"):
+        slc_with_conda_packages.append_custom_conda_packages(
+            [CondaPackage(name="package_a", version="v9.9.9")],
         )
 
 

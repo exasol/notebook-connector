@@ -16,7 +16,11 @@ Configuration Storage with this key.
 FLAVORS_PATH_IN_SLC_REPO = Path("flavors")
 """Path to flavors within the script-languages-release repository"""
 
-SLC_RELEASE_TAG = "11.1.0"
+SLC_RELEASE_TAG = "11.1.1"
+""""
+Using the SLC_RELEASE 10.1.0 because we are limited to slc-tool 4.*. (see pyproject.toml)
+Check the developer guide (./doc/developer-guide.md) for more information.
+"""
 
 
 WORKSPACE_DIR = "slc_workspace"

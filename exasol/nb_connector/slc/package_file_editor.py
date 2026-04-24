@@ -31,7 +31,7 @@ def append_packages(
     elif package_definition is CondaPackage:
         container = phase_obj.conda
     else:
-        container = None
+        raise SlcError(f"Package type not supported: {package_definition}")
 
     if container is not None:
         for package in packages:
