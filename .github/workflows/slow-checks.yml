@@ -28,3 +28,10 @@ jobs:
     uses: ./.github/workflows/tests-ui.yml
     permissions:
       contents: read
+
+  notebook-tests:
+    name: Notebook Tests
+    uses: ./.github/workflows/tests-notebooks.yml
+    secrets: inherit
+    permissions:
+      contents: read

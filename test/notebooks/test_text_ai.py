@@ -1,13 +1,5 @@
 import os
 
-# We need to manually import all fixtures that we use, directly or indirectly,
-# since the pytest won't do this for us.
-from test.integration.ui.common.utils.notebook_test_utils import (
-    set_log_level_for_libraries,
-)
-
-set_log_level_for_libraries()
-
 
 def test_text_ai(
     notebook_runner, backend_setup, uploading_hack, notebooks_root
@@ -26,7 +18,7 @@ def test_text_ai(
         notebook_runner(
             notebook_file="data_customer_support.ipynb", hacks=[uploading_hack]
         )
-        os.chdir(current_dir)
+        os.chdir(notebooks_root)
         os.chdir("text_ai")
         result = notebook_runner(
             notebook_file="txaie_init.ipynb", hacks=[uploading_hack]

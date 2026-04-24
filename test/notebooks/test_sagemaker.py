@@ -2,21 +2,13 @@ import os
 import textwrap
 from inspect import cleandoc
 from pathlib import Path
-
-# We need to manually import all fixtures that we use, directly or indirectly,
-# since the pytest won't do this for us.
-from test.integration.ui.common.utils.notebook_test_utils import (
-    run_notebook,
-    set_log_level_for_libraries,
-)
+from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 
 import boto3
 from botocore.exceptions import ClientError as BotoClientError
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
-
-set_log_level_for_libraries()
 
 
 def _create_aws_s3_bucket() -> str:
