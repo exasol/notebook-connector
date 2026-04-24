@@ -8,7 +8,7 @@ NC contains multiple dependencies including the following
 +=========================================================================================+================================================================+=======================================================+
 | ``script-languages-container-tool`` (SLCT)                                              | File `pyproject.toml <slct_dep_>`_                             | ``exasol-script-languages-container-tool = "^1.0.0"`` |
 +-----------------------------------------------------------------------------------------+----------------------------------------------------------------+-------------------------------------------------------+
-| A release of the Exasol Script Languages Containers ``script-languages-release`` (SLCR) | File `exasol/nb_connector/slct/constants.py <slc_constants_>`_ | ``SLC_RELEASE_TAG = "11.1.0"``                        |
+| A release of the Exasol Script Languages Containers ``script-languages-release`` (SLCR) | File `exasol/nb_connector/slct/constants.py <slc_constants_>`_ | ``SLC_RELEASE_TAG = "11.1.1"``                        |
 +-----------------------------------------------------------------------------------------+----------------------------------------------------------------+-------------------------------------------------------+
 
 .. _slct_dep: https://github.com/exasol/notebook-connector/blob/main/pyproject.toml
