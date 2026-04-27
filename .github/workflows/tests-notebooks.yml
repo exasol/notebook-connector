@@ -2,37 +2,71 @@ name: Notebook Tests
 
 on:
   workflow_call:
+    inputs:
+      status-filter:
+        description: 'Only nb tests with the given status will be executed (stable or unstable).'
+        required: true
+        type: string
+      test-classification:
+        description: 'Test classification: normal, large or gpu'
+        required: true
+        type: string
 
 jobs:
 
+  fetch-notebook-tests:
+    runs-on: ubuntu-24.04
+    name: Fetching notebook tests
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v5
+        with:
+          poetry-version: "2.3.0"
+
+      - id: set-tests
+        run: |
+          TESTS=$(poetry run -- nox -s get-notebook-tests -- \
+            --test-status ${{ inputs.status-filter }} \
+            --test-classification ${{ inputs.test-classification }})
+          echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
+
+      - id: set-runner
+        run: |
+          RUNNER=$(poetry run -- nox -s get-notebook-runner -- \
+            --test-status ${{ inputs.status-filter }} \
+            --test-classification ${{ inputs.test-classification }})
+          echo "runner=$RUNNER" >> "$GITHUB_OUTPUT"
+
+      - id: set-pytest-params
+        run: |
+          PARAMS=$(poetry run -- nox -s get-notebook-pytest-params -- \
+            --test-status ${{ inputs.status-filter }} \
+            --test-classification ${{ inputs.test-classification }})
+          echo "pytest_params=$PARAMS" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      tests: ${{ steps.set-tests.outputs.tests }}
+      runner: ${{ steps.set-runner.outputs.runner }}
+      pytest_params: ${{ steps.set-pytest-params.outputs.pytest_params }}
+
+
   notebook-tests:
-    name: ${{ matrix.name }}
-    runs-on: ubuntu-24.04
+    name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
+    needs: fetch-notebook-tests
+    runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
     permissions:
       contents: read
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - file: test_first_steps.py
-            name: First Steps
-          - file: test_sklearn.py
-            name: SKlearn
-          - file: test_pyexasol.py
-            name: PyExasol
-          - file: test_jupysql.py
-            name: JupySql
-          - file: test_ibis.py
-            name: IBIS
-          - file: test_script_languages_container.py
-            name: SLC
-          - file: test_useful_urls.py
-            name: URLs
-          - file: test_cloud.py
-            name: Cloud
+        nb_test: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
 
     steps:
-
       - name: SCM Checkout
         uses: actions/checkout@v4
         with:
@@ -64,121 +98,14 @@ jobs:
         run: |
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      - name: Pytest
+      - name: Run Notebook Test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
+          SAAS_HOST: ${{ secrets.SAAS_HOST }}
+          SAAS_ACCOUNT_ID: ${{ secrets.SAAS_ACCOUNT_ID }}
+          SAAS_PAT: ${{ secrets.SAAS_PAT }}
+        run: 
           poetry run -- pytest -rA --setup-show \
-            --backend onprem \
-            --itde-nameserver 8.8.8.8 \
-            test/notebooks/${{ matrix.file }}
-
-  notebook-tests-sagemaker:
-    name: Sagemaker
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-
-    steps:
-
-      - name: SCM Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          large-packages: false
-          haskell: true
-
-      - name: Free disk space by removing large directories
-        run: |
-          sudo rm -rf /usr/local/graalvm/
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/local/share/chromium
-          sudo rm -rf /usr/local/lib/node_modules
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v5
-        with:
-          poetry-version: "2.3.0"
-
-      - name: Install All Optional Dependencies (aka. "extras")
-        run: poetry install --all-extras
-
-      - name: Allow unprivileged user namespaces
-        run: |
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      - name: Pytest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NBTEST_AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          NBTEST_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          NBTEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          poetry run -- pytest -rA --setup-show \
-            --backend onprem \
-            --itde-nameserver 8.8.8.8 \
-            test/notebooks/test_sagemaker.py
-
-  notebook-tests-large-runner:
-    name: ${{ matrix.name }} (large)
-    runs-on:
-      labels: int-linux-x64-4core-ubuntu24.04-1
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - file: test_transformers.py
-            name: TE
-          - file: test_text_ai.py
-            name: TXAIE
-
-    steps:
-
-      - name: SCM Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          large-packages: false
-
-      - name: Free disk space by removing large directories
-        run: |
-          sudo rm -rf /usr/local/graalvm/
-          sudo rm -rf /usr/local/.ghcup/
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/local/share/chromium
-          sudo rm -rf /usr/local/lib/node_modules
-          sudo rm -rf /opt/ghc
-
-      - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v5
-        with:
-          poetry-version: "2.3.0"
-
-      - name: Install All Optional Dependencies (aka. "extras")
-        run: poetry install --all-extras
-
-      - name: Allow unprivileged user namespaces
-        run: |
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      - name: Pytest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          INTERACTIVE: False
-        run: |
-          poetry run -- pytest -rA --setup-show \
-            --backend onprem \
-            --itde-nameserver 8.8.8.8 \
-            test/notebooks/${{ matrix.file }}
+            --backend ${{ matrix.nb_test.test_backend }} \
+            ${{ needs.fetch-notebook-tests.outputs.pytest_params }} \
+            test/notebooks/${{ matrix.nb_test.test_file }}

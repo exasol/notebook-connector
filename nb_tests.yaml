@@ -1,0 +1,90 @@
+# Notebook test registry for notebook-connector CI.
+# Read by the nox session "get-notebook-tests" in noxfile.py.
+#
+# stable   — tests that must pass for a PR to merge (reliable, well-understood failures)
+# unstable — tests that are allowed to fail without blocking a merge
+#            (flaky, SaaS-dependent, or work-in-progress)
+
+normal:
+  runner: ubuntu-24.04
+  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
+  stable:
+    tests:
+      - name: First Steps notebook
+        test_file: test_first_steps.py
+        test_backend: onprem
+      - name: sklearn notebook
+        test_file: test_sklearn.py
+        test_backend: onprem
+      - name: pyexasol notebook
+        test_file: test_pyexasol.py
+        test_backend: onprem
+      - name: jupysql notebook
+        test_file: test_jupysql.py
+        test_backend: onprem
+      - name: ibis notebook
+        test_file: test_ibis.py
+        test_backend: onprem
+      - name: SLC notebook
+        test_file: test_script_languages_container.py
+        test_backend: onprem
+      - name: Useful URLs notebook
+        test_file: test_useful_urls.py
+        test_backend: onprem
+  unstable:
+    tests:
+      - name: Cloud notebook (onprem)
+        test_file: test_cloud.py
+        test_backend: onprem
+      - name: Cloud notebook (saas)
+        test_file: test_cloud.py
+        test_backend: saas
+      - name: Sagemaker notebook (onprem)
+        test_file: test_sagemaker.py
+        test_backend: onprem
+      - name: Sagemaker notebook (saas)
+        test_file: test_sagemaker.py
+        test_backend: saas
+      - name: sklearn notebook (saas)
+        test_file: test_sklearn.py
+        test_backend: saas
+      - name: ibis notebook (saas)
+        test_file: test_ibis.py
+        test_backend: saas
+      - name: ITDE notebook
+        test_file: test_itde.py
+        test_backend: onprem
+      - name: Environment test notebook
+        test_file: test_environment_test.py
+        test_backend: onprem
+
+large:
+  runner: ubuntu-24.04
+  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
+  stable:
+    tests:
+      - name: Transformers notebook (onprem)
+        test_file: test_transformers.py
+        test_backend: onprem
+      - name: Text AI notebook (onprem)
+        test_file: test_text_ai.py
+        test_backend: onprem
+  unstable:
+    tests:
+      - name: Transformers notebook (saas)
+        test_file: test_transformers.py
+        test_backend: saas
+      - name: Text AI notebook (saas)
+        test_file: test_text_ai.py
+        test_backend: saas
+
+gpu:
+  runner: ubuntu-24.04
+  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
+  stable:
+    tests:
+      - name: GPU notebook
+        test_file: test_gpu.py
+        test_backend: onprem
+  unstable:
+    tests: []
