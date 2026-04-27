@@ -122,7 +122,7 @@ def start(
     show_default=True,
     help="Flag to overwrite existing notebooks in target directory",
 )
-def deploy_notebooks(target_dir: Path | None, overwrite: bool) -> None:
+def deploy_notebooks(target_dir: Path, overwrite: bool) -> None:
     """Deploy JupyterLab notebooks"""
     source = _notebook_dir()
     if not Path(source).is_dir():
