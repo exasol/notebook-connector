@@ -103,7 +103,12 @@ def start(
 
     click.echo(f"Starting JupyterLab on http://{ip}:{port} (notebook dir: {root})")
     if detach:
-        process = subprocess.Popen(cmd)
+        process = subprocess.Popen(
+            cmd,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         pid_file = _pid_file()
         pid_file.parent.mkdir(parents=True, exist_ok=True)
         pid_file.write_text(str(process.pid))
