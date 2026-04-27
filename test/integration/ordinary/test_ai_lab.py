@@ -230,8 +230,11 @@ class TestStartStopIntegration:
 
         try:
             start_result = ai_lab(
-                "start", "--detach", "--no-browser",
-                "--notebook-dir", str(tmp_path),
+                "start",
+                "--detach",
+                "--no-browser",
+                "--notebook-dir",
+                str(tmp_path),
                 env=isolated_pid_env,
             )
             assert start_result.returncode == 0, start_result.stderr
@@ -284,14 +287,19 @@ class TestStartStopIntegration:
         combined = (result.stdout + result.stderr).lower()
         assert "no detached" in combined, f"Unexpected output: {combined}"
 
-    def test_start_detach_pid_file_contains_valid_integer(self, tmp_path, isolated_pid_env):
+    def test_start_detach_pid_file_contains_valid_integer(
+        self, tmp_path, isolated_pid_env
+    ):
         """PID file written by start --detach contains a valid positive integer."""
         pid_path = Path(isolated_pid_env["AI_LAB_PID_FILE"])
 
         try:
             result = ai_lab(
-                "start", "--detach", "--no-browser",
-                "--notebook-dir", str(tmp_path),
+                "start",
+                "--detach",
+                "--no-browser",
+                "--notebook-dir",
+                str(tmp_path),
                 env=isolated_pid_env,
             )
             assert result.returncode == 0, result.stderr
