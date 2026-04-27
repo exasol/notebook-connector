@@ -53,6 +53,9 @@ jobs:
           - file: test_cloud_storage.py
             name: CSE
             extra_param: ""
+          - file: test_ai_lab.py
+            name: AI Lab CLI
+            extra_param: ""
 
     steps:
 
