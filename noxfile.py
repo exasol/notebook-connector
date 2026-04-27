@@ -35,31 +35,21 @@ def jupyter(session: nox.Session) -> None:
     """Start JupyterLab pointing at the notebooks embedded in the package.
 
     Usage:
-        nox -s jupyter                          # default port 8888
-        nox -s jupyter -- --port 9999           # custom port
-        nox -s jupyter -- --ip 0.0.0.0          # bind to all interfaces
-        nox -s jupyter -- --no-browser          # suppress auto-open
+        nox -s jupyter                    # default port 8888
+        nox -s jupyter -- --port 9999     # custom port
+        nox -s jupyter -- --ip 0.0.0.0   # bind to all interfaces
+        nox -s jupyter -- --no-browser    # suppress auto-open
+        nox -s jupyter -- --detach        # detach jupyter to run in background
 
-    The session installs the 'jupyter' and 'notebook-dependencies' extras
-    before starting the server, so a clean virtual environment always works.
-    Extra arguments after '--' are forwarded to `ai-lab start`.
+    Extra arguments after '--' are forwarded to ai-lab start.
     """
+    session.run("poetry", "install", "--all-extras", external=True)
     session.run(
-        "pip",
-        "install",
-        "--quiet",
-        ".[jupyter,notebook-dependencies,sqlalchemy,pyexasol,pyexasol-extra,bucketfs]",
-        external=True,
-    )
-    notebooks_dir = (
-        PROJECT_CONFIG.root_path / "exasol" / "nb_connector" / "resources" / "notebooks"
-    )
-    cmd = [
         "ai-lab",
         "start",
-        f"--notebook-dir={notebooks_dir}",
-    ] + list(session.posargs)
-    session.run(*cmd, external=True)
+        *session.posargs,
+        external=True,
+    )
 
 
 def rename(file: Path, prefix: str = "", suffix: str = ""):

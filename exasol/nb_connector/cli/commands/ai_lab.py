@@ -7,20 +7,24 @@ Start JupyterLab on port 8888 (default):
 
     ai-lab start
 
-Start on a custom port and bind to all interfaces:
+Start on a cutsom port:
 
     ai-lab start --port 9999 --ip 0.0.0.0
 
-Deploy (copy) the bundled notebooks to a local directory:
+Deploy the bundled notebooks to a local directory:
 
-    ai-lab deploy-notebooks --target-dir ~/my-notebooks
+    ai-lab deploy-notebooks --target-dir ~/notebooks-dir-name
+
 """
 
 from __future__ import annotations
 
+import os
 import shutil
+import signal
 import subprocess
 import sys
+from importlib.resources import files
 from pathlib import Path
 
 import click
@@ -28,16 +32,14 @@ import click
 from exasol.nb_connector.cli.groups import cli
 
 
-def _notebooks_dir() -> Path:
-    """Return the path to the notebooks bundled with this package."""
-    # __file__ = exasol/nb_connector/cli/commands/ai_lab.py
-    # parents[2] = exasol/nb_connector/
-    return Path(__file__).parents[2] / "resources" / "notebooks"
+def _notebook_dir():
+    """Returns the path of the notebooks directory"""
+    return files("exasol.nb_connector.resources").joinpath("notebooks")
 
 
-# ---------------------------------------------------------------------------
-# start
-# ---------------------------------------------------------------------------
+def _pid_file() -> Path:
+    """Returns the path of the PID file"""
+    return Path.home() / ".ai-lab" / "jupyter.pid"
 
 
 @cli.command("start")
@@ -46,39 +48,39 @@ def _notebooks_dir() -> Path:
     default=8888,
     show_default=True,
     type=int,
-    help="Port on which JupyterLab will listen.",
+    help="Port on which JupyterLab will be listening",
 )
 @click.option(
     "--ip",
     default="localhost",
     show_default=True,
-    help="IP address JupyterLab will bind to.  Use 0.0.0.0 to accept remote connections.",
+    help="IP address JupyterLab will bind to. Use 0.0.0.0 to accept remote connections",
 )
 @click.option(
     "--notebook-dir",
     default=None,
     type=click.Path(file_okay=False, path_type=Path),
-    help=(
-        "Directory that JupyterLab will use as its root.  "
-        "Defaults to the notebooks embedded in this package."
-    ),
+    help="Directory that JupyterLab will use as its root. Defaults to the notebooks embedded in the package.",
 )
 @click.option(
     "--no-browser",
     is_flag=True,
     default=False,
-    help="Do not open a browser window automatically.",
+    help="Flag to prevent JupyterLab from opening in the default web browser",
 )
-def start(port: int, ip: str, notebook_dir: Path | None, no_browser: bool) -> None:
-    """Start a JupyterLab server pointing at the bundled notebooks.
-
-    Requires JupyterLab to be installed.  Install it with:
-
-        pip install "exasol-notebook-connector[jupyter,notebook-dependencies]"
-    """
+@click.option(
+    "--detach",
+    is_flag=True,
+    default=False,
+    help="Run JupyterLab detached.",
+)
+def start(
+    port: int, ip: str, notebook_dir: Path | None, no_browser: bool, detach: bool
+) -> None:
+    """Start JupyterLab server"""
     _check_jupyterlab()
 
-    root = notebook_dir if notebook_dir is not None else _notebooks_dir()
+    root = notebook_dir if notebook_dir else _notebook_dir()
 
     cmd = [
         sys.executable,
@@ -92,16 +94,19 @@ def start(port: int, ip: str, notebook_dir: Path | None, no_browser: bool) -> No
     if no_browser:
         cmd.append("--no-browser")
 
-    click.echo(f"Starting JupyterLab on http://{ip}:{port}  (notebook dir: {root})")
-    try:
-        subprocess.run(cmd, check=True)
-    except KeyboardInterrupt:
-        click.echo("\nJupyterLab stopped.")
-
-
-# ---------------------------------------------------------------------------
-# deploy-notebooks
-# ---------------------------------------------------------------------------
+    click.echo(f"Starting JupyterLab on http://{ip}:{port} (notebook dir: {root})")
+    if detach:
+        process = subprocess.Popen(cmd)
+        pid_file = _pid_file()
+        pid_file.parent.mkdir(parents=True, exist_ok=True)
+        pid_file.write_text(str(process.pid))
+        click.echo(f"JupyterLab started in detached mode, PID is {process.pid}")
+        click.echo("Run 'ai-lab stop' to stop it.")
+    else:
+        try:
+            subprocess.run(cmd, check=True)
+        except KeyboardInterrupt:
+            click.echo("\nJupyterLab stopped")
 
 
 @cli.command("deploy-notebooks")
@@ -109,31 +114,26 @@ def start(port: int, ip: str, notebook_dir: Path | None, no_browser: bool) -> No
     "--target-dir",
     required=True,
     type=click.Path(file_okay=False, path_type=Path),
-    help="Directory to copy the bundled notebooks into.",
+    help="Directory that JupyterLab will be deployed to",
 )
 @click.option(
     "--overwrite/--no-overwrite",
     default=False,
     show_default=True,
-    help="Overwrite files that already exist in the target directory.",
+    help="Flag to overwrite existing notebooks in target directory",
 )
-def deploy_notebooks(target_dir: Path, overwrite: bool) -> None:
-    """Copy the bundled notebooks to a local directory.
-
-    After deployment you can start JupyterLab in that directory:
-
-        jupyter lab --notebook-dir <target-dir>
-    """
-    source = _notebooks_dir()
-    if not source.is_dir():
-        click.echo(f"Error: bundled notebook directory not found: {source}", err=True)
+def deploy_notebooks(target_dir: Path | None, overwrite: bool) -> None:
+    """Deploy JupyterLab notebooks"""
+    source = _notebook_dir()
+    if not Path(source).is_dir():
+        click.echo(
+            f"Error: {source} is not a directory or directory not found", err=True
+        )
         sys.exit(1)
-
     target_dir.mkdir(parents=True, exist_ok=True)
-
     copied = 0
     skipped = 0
-    for src_path in source.rglob("*"):
+    for src_path in Path(source).rglob("*"):
         if src_path.is_dir():
             continue
         rel = src_path.relative_to(source)
@@ -144,27 +144,45 @@ def deploy_notebooks(target_dir: Path, overwrite: bool) -> None:
             continue
         shutil.copy2(src_path, dst_path)
         copied += 1
-
     click.echo(
-        f"Deployed {copied} file(s) to '{target_dir}'"
-        + (f" ({skipped} skipped, use --overwrite to replace them)" if skipped else "")
+        f"Deployed {copied} notebooks to {target_dir}. "
+        + (
+            f"{skipped} notebooks skipped, use --overwrite flag to overwrite existing notebooks"
+            if skipped
+            else ""
+        )
     )
 
 
-# ---------------------------------------------------------------------------
-# helpers
-# ---------------------------------------------------------------------------
+@cli.command("stop")
+def stop() -> None:
+    """Stop a detached JupyterLab server"""
+    pid_file = _pid_file()
+    if not pid_file.exists():
+        click.echo("No detached JupyterLab server found.", err=True)
+        sys.exit(1)
+
+    pid = int(pid_file.read_text().strip())
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        click.echo(f"No process found with PID {pid}. It may have already stopped")
+        pid_file.unlink()
+        sys.exit(1)
+    os.kill(pid, signal.SIGTERM)
+    pid_file.unlink()
+    click.echo(f"Stopped JupyterLab server, PID is {pid}")
 
 
 def _check_jupyterlab() -> None:
-    """Abort with a helpful message when JupyterLab is not installed."""
+    """Checks whether JupyterLab is installed"""
     try:
         import jupyter_core  # noqa: F401
         import jupyterlab  # noqa: F401
     except ImportError:
         click.echo(
-            "JupyterLab is not installed.  "
-            'Install it with:\n\n  pip install "exasol-notebook-connector[jupyter,notebook-dependencies]"\n',
+            "JupyterLab is not installed. "
+            "Install it with:\n\n  poetry install --all-extras\n",
             err=True,
         )
         sys.exit(1)

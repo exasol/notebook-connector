@@ -23,6 +23,7 @@ dependencies = [
   "pickleshare(>=0.7.5)", # See https://github.com/exasol/ai-lab/issues/291 for details.
   "jupysql (>=0.11.1,<0.12.0)",
   "tenacity (>=8.5.0)",
+  "click (>=8.0.0)",
 ]
 
 [project.optional-dependencies]
@@ -202,4 +203,4 @@ exclusions = "exasol/nb_connector/resources/notebooks/**"
 
 [tool.poetry.plugins."console_scripts"]
 scs = 'exasol.nb_connector.cli.main:main'
-ai-lab = 'exasol.nb_connector.cli.main:main' # added this to enable new cli for ai-lab
+ai-lab = 'exasol.nb_connector.cli.main:main'
