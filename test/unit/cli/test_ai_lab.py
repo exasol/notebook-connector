@@ -14,7 +14,6 @@ from unittest.mock import (
 )
 
 import psutil
-
 import pytest
 from click.testing import CliRunner
 
