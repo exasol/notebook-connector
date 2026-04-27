@@ -53,8 +53,6 @@ transformers = [
 text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
 sagemaker = [ "exasol-sagemaker-extension (>=0.11.5)" ]
 
-# These packages are needed to run notebooks interactively (JupyterLab server).
-# Created this file based on ai-lab jupyter_requirements.txt and notebook_requirements.txt.
 jupyter = [
     "jupyterlab (>=4.2.5, <5)",
     "pexpect (>=4.8.0, <5)",
@@ -102,8 +100,6 @@ pytest-exasol-backend = ">=1.1.0,<2"
 pytest-ipywidgets = ">=1.52.0,<2.0.0"
 starlette = "<1" # see https://github.com/exasol/notebook-connector/issues/378
 notebook = ">=7.4,<8"
-# the below are the dependencies that added to replicate test_dependencies.txt
-# because we deleted the test_dependencies.txt
 nbclient = ">=0.10.0"
 nbformat = ">=5.10.0"
 testbook = ">=0.4.2"
