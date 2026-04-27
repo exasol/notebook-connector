@@ -7,12 +7,13 @@ Unit tests for the ai_lab CLI commands:
 
 from __future__ import annotations
 
-import signal
 from pathlib import Path
 from unittest.mock import (
     MagicMock,
     patch,
 )
+
+import psutil
 
 import pytest
 from click.testing import CliRunner
@@ -197,25 +198,34 @@ def test_start_detach_no_browser_flag_forwarded(runner, notebooks_dir, tmp_path)
 
 
 def test_stop_success(runner, tmp_path):
-    """stop reads PID file, checks process, sends SIGTERM, deletes file."""
+    """stop reads PID file, checks process ownership, terminates, deletes file."""
     pid_path = tmp_path / ".ai-lab" / "jupyter.pid"
     pid_path.parent.mkdir(parents=True)
     pid_path.write_text("12345")
+
+    mock_proc = MagicMock()
+    mock_proc.username.return_value = "testuser"
+    mock_self = MagicMock()
+    mock_self.username.return_value = "testuser"
+
+    def fake_process(pid=None):
+        if pid is None:
+            return mock_self
+        return mock_proc
 
     with patch(
         "exasol.nb_connector.cli.commands.ai_lab._pid_file",
         return_value=pid_path,
     ):
-        with patch("exasol.nb_connector.cli.commands.ai_lab.os.kill") as mock_kill:
+        with patch(
+            "exasol.nb_connector.cli.commands.ai_lab.psutil.Process",
+            side_effect=fake_process,
+        ):
             result = runner.invoke(stop)
 
     assert result.exit_code == 0
     assert "12345" in result.output
-    # First call: signal 0 (check existence)
-    mock_kill.assert_any_call(12345, 0)
-    # Second call: SIGTERM (graceful shutdown)
-    mock_kill.assert_any_call(12345, signal.SIGTERM)
-    # PID file must be deleted after stopping
+    mock_proc.terminate.assert_called_once()
     assert not pid_path.exists()
 
 
@@ -243,7 +253,10 @@ def test_stop_process_already_dead(runner, tmp_path):
         "exasol.nb_connector.cli.commands.ai_lab._pid_file",
         return_value=pid_path,
     ):
-        with patch("os.kill", side_effect=ProcessLookupError):
+        with patch(
+            "exasol.nb_connector.cli.commands.ai_lab.psutil.Process",
+            side_effect=psutil.NoSuchProcess(99999),
+        ):
             result = runner.invoke(stop)
 
     assert result.exit_code == 1
@@ -251,7 +264,6 @@ def test_stop_process_already_dead(runner, tmp_path):
         "already stopped" in result.output.lower()
         or "not found" in result.output.lower()
     )
-    # PID file must be cleaned up
     assert not pid_path.exists()
 
 

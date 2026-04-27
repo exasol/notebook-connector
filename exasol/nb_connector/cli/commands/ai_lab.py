@@ -21,13 +21,13 @@ from __future__ import annotations
 
 import os
 import shutil
-import signal
 import subprocess
 import sys
 from importlib.resources import files
 from pathlib import Path
 
 import click
+import psutil
 
 from exasol.nb_connector.cli.groups import cli
 
@@ -176,12 +176,23 @@ def stop() -> None:
 
     pid = int(pid_file.read_text().strip())
     try:
-        os.kill(pid, 0)
-    except ProcessLookupError:
+        proc = psutil.Process(pid)
+        current_user = psutil.Process().username()
+        proc_user = proc.username()
+        if proc_user != current_user:
+            click.echo(
+                f"Permission denied: process {pid} belongs to '{proc_user}', not '{current_user}'",
+                err=True,
+            )
+            sys.exit(1)
+        proc.terminate()
+    except psutil.NoSuchProcess:
         click.echo(f"No process found with PID {pid}. It may have already stopped")
         pid_file.unlink()
         sys.exit(1)
-    os.kill(pid, signal.SIGTERM)
+    except psutil.AccessDenied:
+        click.echo(f"Access denied when trying to stop process {pid}", err=True)
+        sys.exit(1)
     pid_file.unlink()
     click.echo(f"Stopped JupyterLab server, PID is {pid}")
 
