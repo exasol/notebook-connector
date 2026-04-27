@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import os
 import shutil
-import subprocess
+import subprocess  # nosec: B404
 import sys
 from importlib.resources import files
 from pathlib import Path
@@ -103,7 +103,7 @@ def start(
 
     click.echo(f"Starting JupyterLab on http://{ip}:{port} (notebook dir: {root})")
     if detach:
-        process = subprocess.Popen(
+        process = subprocess.Popen(  # nosec: B603
             cmd,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
@@ -116,7 +116,7 @@ def start(
         click.echo("Run 'ai-lab stop' to stop it.")
     else:
         try:
-            subprocess.run(cmd, check=True)
+            subprocess.run(cmd, check=True)  # nosec: B603
         except KeyboardInterrupt:
             click.echo("\nJupyterLab stopped")
 
