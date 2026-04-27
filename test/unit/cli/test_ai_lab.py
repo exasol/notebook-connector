@@ -206,7 +206,7 @@ def test_stop_success(runner, tmp_path):
         "exasol.nb_connector.cli.commands.ai_lab._pid_file",
         return_value=pid_path,
     ):
-        with patch("os.kill") as mock_kill:
+        with patch("exasol.nb_connector.cli.commands.ai_lab.os.kill") as mock_kill:
             result = runner.invoke(stop)
 
     assert result.exit_code == 0

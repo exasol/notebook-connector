@@ -38,7 +38,14 @@ def _notebook_dir():
 
 
 def _pid_file() -> Path:
-    """Returns the path of the PID file"""
+    """Returns the path of the PID file.
+
+    The location can be overridden via the AI_LAB_PID_FILE environment variable,
+    which is used in tests to avoid touching the real ~/.ai-lab/jupyter.pid.
+    """
+    override = os.environ.get("AI_LAB_PID_FILE")
+    if override:
+        return Path(override)
     return Path.home() / ".ai-lab" / "jupyter.pid"
 
 

@@ -12,7 +12,9 @@ Test classes:
 
 from __future__ import annotations
 
+import os
 import re
+import signal
 import subprocess
 import sys
 import time
@@ -24,13 +26,17 @@ import pytest
 # Helper
 # ---------------------------------------------------------------------------
 
+_SUBPROCESS_TIMEOUT = 60  # seconds — prevents CI from hanging forever
 
-def ai_lab(*args: str) -> subprocess.CompletedProcess:
+
+def ai_lab(*args: str, env: dict | None = None) -> subprocess.CompletedProcess:
     """Invoke the real ai-lab entry-point via the current Python interpreter."""
     return subprocess.run(
         [sys.executable, "-m", "exasol.nb_connector.cli.main"] + list(args),
         capture_output=True,
         text=True,
+        timeout=_SUBPROCESS_TIMEOUT,
+        env=env or os.environ.copy(),
     )
 
 
@@ -47,6 +53,20 @@ def notebooks_root() -> Path:
     path = Path(str(files("exasol.nb_connector.resources").joinpath("notebooks")))
     assert path.is_dir(), f"Bundled notebooks not found at: {path}"
     return path
+
+
+@pytest.fixture()
+def isolated_pid_env(tmp_path: Path) -> dict:
+    """
+    Returns an env dict that overrides AI_LAB_PID_FILE to a temp location.
+    This ensures tests never touch the real ~/.ai-lab/jupyter.pid and can
+    run safely in parallel CI jobs.
+    """
+    pid_path = tmp_path / ".ai-lab" / "jupyter.pid"
+    pid_path.parent.mkdir(parents=True, exist_ok=True)
+    env = os.environ.copy()
+    env["AI_LAB_PID_FILE"] = str(pid_path)
+    return env
 
 
 # ---------------------------------------------------------------------------
@@ -161,7 +181,7 @@ class TestDeployNotebooksIntegration:
 
         assert result.returncode != 0
         combined = (result.stdout + result.stderr).lower()
-        assert "target-dir" in combined
+        assert "target-dir" in combined, f"Expected 'target-dir' in output: {combined}"
 
     def test_deploy_second_run_skips_all_and_reports(self, tmp_path):
         """Running deploy twice without --overwrite skips all on the second run."""
@@ -200,27 +220,19 @@ class TestDeployNotebooksIntegration:
 @pytest.mark.slow
 class TestStartStopIntegration:
 
-    def test_start_detach_and_stop(self, tmp_path):
+    def test_start_detach_and_stop(self, tmp_path, isolated_pid_env):
         """
         Real end-to-end: start --detach spawns JupyterLab, writes a real PID
         file, and ai-lab stop kills the process and removes the PID file.
+        Uses AI_LAB_PID_FILE env var for test isolation (no shared state).
         """
-        import os
-        import signal as _signal
-
-        from exasol.nb_connector.cli.commands.ai_lab import _pid_file
-
-        pid_path = _pid_file()
-        if pid_path.exists():
-            pid_path.unlink()
+        pid_path = Path(isolated_pid_env["AI_LAB_PID_FILE"])
 
         try:
             start_result = ai_lab(
-                "start",
-                "--detach",
-                "--no-browser",
-                "--notebook-dir",
-                str(tmp_path),
+                "start", "--detach", "--no-browser",
+                "--notebook-dir", str(tmp_path),
+                env=isolated_pid_env,
             )
             assert start_result.returncode == 0, start_result.stderr
 
@@ -238,62 +250,53 @@ class TestStartStopIntegration:
             os.kill(pid, 0)
 
             # Stop it
-            stop_result = ai_lab("stop")
+            stop_result = ai_lab("stop", env=isolated_pid_env)
             assert stop_result.returncode == 0, stop_result.stderr
             assert str(pid) in stop_result.stdout
 
             # PID file must be deleted
             assert not pid_path.exists()
 
-            # Give OS time to clean up the process
-            time.sleep(1)
-            with pytest.raises(ProcessLookupError):
-                os.kill(pid, 0)
+            # Poll instead of fixed sleep — wait up to 5s for process to die
+            for _ in range(10):
+                try:
+                    os.kill(pid, 0)
+                    time.sleep(0.5)
+                except ProcessLookupError:
+                    break
+            else:
+                pytest.fail(f"Process {pid} still running after stop")
 
         finally:
+            # Safety cleanup — kill any leaked process
             if pid_path.exists():
                 try:
-                    import os as _os
-
-                    _os.kill(int(pid_path.read_text().strip()), _signal.SIGTERM)
-                except Exception:
-                    pass
+                    os.kill(int(pid_path.read_text().strip()), signal.SIGTERM)
+                except (ProcessLookupError, ValueError):
+                    pass  # already gone or invalid PID — both are fine
                 pid_path.unlink(missing_ok=True)
 
-    def test_stop_when_no_server_running(self):
+    def test_stop_when_no_server_running(self, tmp_path, isolated_pid_env):
         """ai-lab stop exits with code 1 when no detached server is running."""
-        from exasol.nb_connector.cli.commands.ai_lab import _pid_file
-
-        pid_path = _pid_file()
-        if pid_path.exists():
-            pid_path.unlink()
-
-        result = ai_lab("stop")
+        result = ai_lab("stop", env=isolated_pid_env)
 
         assert result.returncode == 1
         combined = (result.stdout + result.stderr).lower()
-        assert "no detached" in combined
+        assert "no detached" in combined, f"Unexpected output: {combined}"
 
-    def test_start_detach_pid_file_contains_valid_integer(self, tmp_path):
+    def test_start_detach_pid_file_contains_valid_integer(self, tmp_path, isolated_pid_env):
         """PID file written by start --detach contains a valid positive integer."""
-        import signal as _signal
-
-        from exasol.nb_connector.cli.commands.ai_lab import _pid_file
-
-        pid_path = _pid_file()
-        if pid_path.exists():
-            pid_path.unlink()
+        pid_path = Path(isolated_pid_env["AI_LAB_PID_FILE"])
 
         try:
             result = ai_lab(
-                "start",
-                "--detach",
-                "--no-browser",
-                "--notebook-dir",
-                str(tmp_path),
+                "start", "--detach", "--no-browser",
+                "--notebook-dir", str(tmp_path),
+                env=isolated_pid_env,
             )
             assert result.returncode == 0, result.stderr
 
+            # Poll for PID file
             for _ in range(20):
                 if pid_path.exists():
                     break
@@ -307,11 +310,9 @@ class TestStartStopIntegration:
         finally:
             if pid_path.exists():
                 try:
-                    import os
-
-                    os.kill(int(pid_path.read_text().strip()), _signal.SIGTERM)
-                except Exception:
-                    pass
+                    os.kill(int(pid_path.read_text().strip()), signal.SIGTERM)
+                except (ProcessLookupError, ValueError):
+                    pass  # already gone or invalid PID — both are fine
                 pid_path.unlink(missing_ok=True)
 
 
@@ -360,20 +361,14 @@ class TestEdgeCases:
         assert result.returncode == 0, result.stderr
         assert "8888" in result.stdout
 
-    def test_stop_corrupt_pid_file(self):
-        """When the real PID file contains garbage, ai-lab stop exits non-zero."""
-        from exasol.nb_connector.cli.commands.ai_lab import _pid_file
+    def test_stop_corrupt_pid_file(self, tmp_path, isolated_pid_env):
+        """When the PID file contains garbage, ai-lab stop exits non-zero.
+        Uses isolated env var so the real ~/.ai-lab/jupyter.pid is never touched.
+        """
+        pid_path = Path(isolated_pid_env["AI_LAB_PID_FILE"])
+        pid_path.write_text("not-a-valid-pid")
 
-        pid_path = _pid_file()
-        pid_path.parent.mkdir(parents=True, exist_ok=True)
-        backup = pid_path.read_text() if pid_path.exists() else None
+        result = ai_lab("stop", env=isolated_pid_env)
 
-        try:
-            pid_path.write_text("not-a-valid-pid")
-            result = ai_lab("stop")
-            assert result.returncode != 0
-        finally:
-            if backup is not None:
-                pid_path.write_text(backup)
-            else:
-                pid_path.unlink(missing_ok=True)
+        assert result.returncode != 0
+        assert not pid_path.exists() or pid_path.read_text() == "not-a-valid-pid"
