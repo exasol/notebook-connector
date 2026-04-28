@@ -41,10 +41,20 @@ jobs:
     permissions:
       contents: read
 
+  approve-notebook-tests:
+    name: Run Jupyter Notebook Tests?
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    environment: approve-test-execution
+    steps:
+      - name: Detect Running Notebook Tests
+        run: true
+
   run-stable-notebook-tests:
     name: Notebook Tests (stable)
     needs:
-      - approve-run-slow-tests
+      - approve-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
     secrets: inherit
     permissions:
@@ -60,7 +70,7 @@ jobs:
   run-unstable-notebook-tests:
     name: Notebook Tests (unstable)
     needs:
-      - approve-run-slow-tests
+      - approve-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
     secrets: inherit
     permissions:
@@ -73,6 +83,29 @@ jobs:
       status-filter: unstable
       test-classification: ${{ matrix.class }}
 
+  approve-gpu-notebook-tests:
+    name: Run Jupyter GPU Notebook Tests?
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    environment: approve-gpu-test-execution
+    steps:
+      - name: Detect Running GPU Notebook Tests
+        run: true
+
+  run-stable-gpu-notebook-tests:
+    name: Notebook Tests GPU (stable)
+    needs:
+      - approve-notebook-tests
+      - approve-gpu-notebook-tests
+    uses: ./.github/workflows/tests-notebooks.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    with:
+      status-filter: stable
+      test-classification: gpu
+
   performance-checks:
     name: Performance
     uses: ./.github/workflows/performance-checks.yml
@@ -82,14 +115,20 @@ jobs:
   # This job ensures inputs have been executed successfully.
   allow-merge:
     name: Allow Merge
+    if: ${{ !cancelled() }}
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
-    # If you need additional jobs to be part of the merge gate, add them below
     needs:
       - run-fast-checks
       - run-slow-checks
-    # Each job requires a step, so we added this dummy step.
+      - run-stable-notebook-tests
+      - run-stable-gpu-notebook-tests
     steps:
+      - name: Branch Protection - failure if any ancestor failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: |
+          echo '${{ toJSON(needs) }}'
+          exit 1
       - name: Approve
         run: echo "Merge Approved"
