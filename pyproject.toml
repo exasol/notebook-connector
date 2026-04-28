@@ -43,7 +43,7 @@ docker-db = [
 # See developer guide, section "Selecting the Versions for SLCT and SLCR".
 slc = [
     "exasol-script-languages-container-tool (>4, <5)",
-    "GitPython (>=2.1.0)",
+    "GitPython (>=3.1.47)",
 ]
 ibis = [ "ibis-framework [exasol] (>=11, <12)" ]
 transformers = [
