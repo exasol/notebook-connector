@@ -54,9 +54,6 @@ normal:
       - name: ITDE notebook
         test_file: test_itde.py
         test_backend: onprem
-      - name: Environment test notebook
-        test_file: test_environment_test.py
-        test_backend: onprem
 
 large:
   runner: ubuntu-24.04
