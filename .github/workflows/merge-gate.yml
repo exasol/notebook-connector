@@ -41,6 +41,38 @@ jobs:
     permissions:
       contents: read
 
+  run-stable-notebook-tests:
+    name: Notebook Tests (stable)
+    needs:
+      - approve-run-slow-tests
+    uses: ./.github/workflows/tests-notebooks.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        class: [normal, large]
+    with:
+      status-filter: stable
+      test-classification: ${{ matrix.class }}
+
+  run-unstable-notebook-tests:
+    name: Notebook Tests (unstable)
+    needs:
+      - approve-run-slow-tests
+    uses: ./.github/workflows/tests-notebooks.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        class: [normal, large]
+    with:
+      status-filter: unstable
+      test-classification: ${{ matrix.class }}
+
   performance-checks:
     name: Performance
     uses: ./.github/workflows/performance-checks.yml

@@ -28,31 +28,3 @@ jobs:
     uses: ./.github/workflows/tests-ui.yml
     permissions:
       contents: read
-
-  run-stable-notebook-tests:
-    name: Notebook Tests (stable)
-    uses: ./.github/workflows/tests-notebooks.yml
-    secrets: inherit
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        class: [normal, large]
-    with:
-      status-filter: stable
-      test-classification: ${{ matrix.class }}
-
-  run-unstable-notebook-tests:
-    name: Notebook Tests (unstable)
-    uses: ./.github/workflows/tests-notebooks.yml
-    secrets: inherit
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        class: [normal, large]
-    with:
-      status-filter: unstable
-      test-classification: ${{ matrix.class }}
