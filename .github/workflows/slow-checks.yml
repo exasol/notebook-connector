@@ -29,8 +29,8 @@ jobs:
     permissions:
       contents: read
 
-  notebook-tests:
-    name: Notebook Tests
+  run-stable-notebook-tests:
+    name: Notebook Tests (stable)
     uses: ./.github/workflows/tests-notebooks.yml
     secrets: inherit
     permissions:
@@ -43,7 +43,7 @@ jobs:
       status-filter: stable
       test-classification: ${{ matrix.class }}
 
-  notebook-tests-unstable:
+  run-unstable-notebook-tests:
     name: Notebook Tests (unstable)
     uses: ./.github/workflows/tests-notebooks.yml
     secrets: inherit

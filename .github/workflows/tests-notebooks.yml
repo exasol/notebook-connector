@@ -104,7 +104,7 @@ jobs:
           SAAS_HOST: ${{ secrets.SAAS_HOST }}
           SAAS_ACCOUNT_ID: ${{ secrets.SAAS_ACCOUNT_ID }}
           SAAS_PAT: ${{ secrets.SAAS_PAT }}
-        run: 
+        run: |
           poetry run -- pytest -rA --setup-show \
             --backend ${{ matrix.nb_test.test_backend }} \
             ${{ needs.fetch-notebook-tests.outputs.pytest_params }} \
