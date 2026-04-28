@@ -101,9 +101,9 @@ jobs:
       - name: Run Notebook Test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SAAS_HOST: ${{ secrets.SAAS_HOST }}
-          SAAS_ACCOUNT_ID: ${{ secrets.SAAS_ACCOUNT_ID }}
-          SAAS_PAT: ${{ secrets.SAAS_PAT }}
+          SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+          SAAS_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+          SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
         run: |
           poetry run -- pytest -rA --setup-show \
             --backend ${{ matrix.nb_test.test_backend }} \
