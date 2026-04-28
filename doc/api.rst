@@ -48,12 +48,6 @@ exasol.nb_connector.script_language_container
 .. autoclass:: exasol.nb_connector.slc.script_language_container.ScriptLanguageContainer
    :members:
    :undoc-members:
-.. autoclass:: exasol.nb_connector.slc.CondaPackageDefinition
-   :members:
-   :undoc-members:
-.. autoclass:: exasol.nb_connector.slc.PipPackageDefinition
-   :members:
-   :undoc-members:
 .. autoclass:: exasol.nb_connector.slc.ScriptLanguageContainer
    :members:
    :undoc-members:
