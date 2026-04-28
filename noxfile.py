@@ -1,15 +1,17 @@
-from argparse import ArgumentParser, Namespace
+from argparse import (
+    ArgumentParser,
+    Namespace,
+)
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional
 
 import nox
 import yaml
-from pydantic import BaseModel
 
 # imports all nox task provided by the toolbox
 # no-qa: disables ruff error
 from exasol.toolbox.nox.tasks import *  # noqa: F403
+from pydantic import BaseModel
 
 from noxconfig import PROJECT_CONFIG
 
@@ -27,11 +29,16 @@ def start_database(session):
     session.run(
         "itde",
         "spawn-test-environment",
-        "--environment-name", "test",
-        "--database-port-forward", "8563",
-        "--bucketfs-port-forward", "2580",
-        "--db-mem-size", "8GB",
-        "--nameserver", "8.8.8.8",
+        "--environment-name",
+        "test",
+        "--database-port-forward",
+        "8563",
+        "--bucketfs-port-forward",
+        "2580",
+        "--db-mem-size",
+        "8GB",
+        "--nameserver",
+        "8.8.8.8",
     )
 
 
@@ -73,21 +80,26 @@ class TestClassification(Enum):
     gpu = "gpu"
 
 
+class NBTestBackend(Enum):
+    onprem = "onprem"
+    saas = "saas"
+
+
 class NBTestDescription(BaseModel):
     name: str
     test_file: str
-    test_backend: str
+    test_backend: NBTestBackend
 
 
 class TestList(BaseModel):
-    tests: List[NBTestDescription]
+    tests: list[NBTestDescription]
 
 
 class TestSets(BaseModel):
     stable: TestList
     unstable: TestList
     runner: str
-    additional_pytest_parameters: Optional[str] = None
+    additional_pytest_parameters: str | None = None
 
 
 class TestRepository(BaseModel):
@@ -98,39 +110,58 @@ class TestRepository(BaseModel):
 
 def _load_test_repository() -> TestRepository:
     yaml_file_path = PROJECT_CONFIG.root_path / "nb_tests.yaml"
-    with open(yaml_file_path, "r") as f:
+    with open(yaml_file_path) as f:
         return TestRepository(**yaml.safe_load(f))
 
 
 def _parse_nb_args(session: nox.Session) -> Namespace:
-    parser = ArgumentParser()
+    test_status_values = [ts.value for ts in TestStatus]
+    test_classification_values = [tc.value for tc in TestClassification]
+    usage = " ".join(
+        [
+            "nox",
+            "-s",
+            session.name,
+            "--",
+            "--test-status",
+            "{" + ", ".join(test_status_values) + "}",
+            "[",
+            "--test-classification",
+            "{" + ", ".join(test_classification_values) + "}",
+            "]",
+        ]
+    )
+    parser = ArgumentParser(usage=usage)
     parser.add_argument(
-        "--test-status", type=TestStatus, required=True,
-        help="stable or unstable",
+        "--test-status", type=TestStatus, required=True, help="Test status"
     )
     parser.add_argument(
-        "--test-classification", type=TestClassification,
-        default=TestClassification.normal,
-        help="normal, large or gpu",
+        "--test-classification",
+        type=TestClassification,
+        default=TestClassification.normal.value,
+        help="Test classification",
     )
     return parser.parse_args(session.posargs)
 
 
 def _get_test_sets(classification: TestClassification) -> TestSets:
-    repo = _load_test_repository()
-    return {
-        TestClassification.normal: repo.normal,
-        TestClassification.large: repo.large,
-        TestClassification.gpu: repo.gpu,
-    }[classification]
+    test_repository = _load_test_repository()
+    mapping = {
+        TestClassification.normal: test_repository.normal,
+        TestClassification.large: test_repository.large,
+        TestClassification.gpu: test_repository.gpu,
+    }
+    return mapping[classification]
 
 
 @nox.session(name="get-notebook-tests", python=False)
 def get_notebook_tests(session: nox.Session) -> None:
-    """Print the notebook test list (stable or unstable) as JSON for CI matrix."""
+    """Filters notebook tests for test-status and test-classification and prints as JSON."""
     args = _parse_nb_args(session)
-    sets = _get_test_sets(args.test_classification)
-    tests = sets.stable if args.test_status == TestStatus.stable else sets.unstable
+    nb_tests = _get_test_sets(args.test_classification)
+    tests = (
+        nb_tests.stable if args.test_status == TestStatus.stable else nb_tests.unstable
+    )
     print(tests.model_dump_json())
 
 
@@ -138,17 +169,17 @@ def get_notebook_tests(session: nox.Session) -> None:
 def get_notebook_runner(session: nox.Session) -> None:
     """Print the GitHub runner to use for the given test classification."""
     args = _parse_nb_args(session)
-    sets = _get_test_sets(args.test_classification)
-    print(sets.runner)
+    nb_tests = _get_test_sets(args.test_classification)
+    print(nb_tests.runner)
 
 
 @nox.session(name="get-notebook-pytest-params", python=False)
 def get_notebook_pytest_params(session: nox.Session) -> None:
     """Print additional pytest parameters for the given test classification."""
     args = _parse_nb_args(session)
-    sets = _get_test_sets(args.test_classification)
-    if sets.additional_pytest_parameters:
-        print(sets.additional_pytest_parameters)
+    nb_tests = _get_test_sets(args.test_classification)
+    if nb_tests.additional_pytest_parameters:
+        print(nb_tests.additional_pytest_parameters)
 
 
 # ---------------------------------------------------------------------------

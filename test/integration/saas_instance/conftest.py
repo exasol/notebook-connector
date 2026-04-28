@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import os
 from collections.abc import Generator
-from pathlib import Path
 
 import pytest
 
@@ -18,7 +16,7 @@ def saas_secrets(
     saas_pat,
     saas_account_id,
     backend_aware_saas_database_id,
-) -> Generator[Secrets, None, None]:
+) -> Generator[Secrets]:
     """
     Creates a temporary Secrets store pre-configured for a SaaS backend.
     Requires the following environment variables to be set:
