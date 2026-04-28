@@ -16,7 +16,7 @@ jobs:
 
   fetch-notebook-tests:
     runs-on: ubuntu-24.04
-    name: Fetching notebook tests
+    name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v4
