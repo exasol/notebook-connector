@@ -25,6 +25,8 @@ PATH_IN_BUCKET = "SME"
 
 LANGUAGE_ALIAS = "PYTHON3_SME"
 
+LEGACY_UDF_CLIENT_BINARY = "exaudfclient_py3"
+
 LATEST_KNOWN_VERSION = version("exasol_sagemaker_extension")
 
 # Activation SQL for the Sagemaker Extension will be saved in the secret
@@ -114,6 +116,7 @@ def initialize_sme_extension(
             activation_key=ACTIVATION_KEY,
             path_in_bucket=PATH_IN_BUCKET,
             allow_override=allow_override,
+            udf_client_binary=LEGACY_UDF_CLIENT_BINARY,
         )
 
     # Create the required objects in the database

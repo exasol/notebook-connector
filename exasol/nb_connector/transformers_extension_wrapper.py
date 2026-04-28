@@ -22,6 +22,8 @@ from exasol.nb_connector.secret_store import Secrets
 
 LANGUAGE_ALIAS = "PYTHON3_TE"
 
+LEGACY_UDF_CLIENT_BINARY = "exaudfclient_py3"
+
 LATEST_KNOWN_VERSION = version("exasol_transformers_extension")
 
 # Activation SQL for the Transformers Extension will be saved in the secret
@@ -124,6 +126,7 @@ def initialize_te_extension(
             activation_key=ACTIVATION_KEY,
             path_in_bucket=PATH_IN_BUCKET_FOR_SLC,
             allow_override=allow_override,
+            udf_client_binary=LEGACY_UDF_CLIENT_BINARY,
         )
 
     ensure_bfs_connection(conf)

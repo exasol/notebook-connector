@@ -9,6 +9,11 @@ from test.package_manager import PackageManager
 
 import pytest
 from docker.models.images import Image as DockerImage
+from exasol.exaslpm.model.package_file_config import (
+    CondaPackage,
+    PipPackage,
+)
+from exasol.exaslpm.pkg_mgmt.package_file_session import PackageFileSession
 from exasol.slc.models.compression_strategy import CompressionStrategy
 from exasol_integration_test_docker_environment.lib.docker import ContextDockerClient
 from exasol_integration_test_docker_environment.lib.models.api_errors import (
@@ -21,8 +26,6 @@ from exasol.nb_connector.language_container_activation import (
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc.script_language_container import (
-    CondaPackageDefinition,
-    PipPackageDefinition,
     ScriptLanguageContainer,
     constants,
 )
@@ -200,12 +203,23 @@ def test_append_custom_pip_packages(
     # Cannot skip the test if it's not a Pip package manager, otherwise dependent tests below won't run
     if package_manager == PackageManager.PIP:
         sample_slc.append_custom_pip_packages(
-            [PipPackageDefinition(pkg, version) for pkg, version, _ in custom_packages]
+            [
+                PipPackage(name=pkg, version=f"=={version}")
+                for pkg, version, _ in custom_packages
+            ],
         )
-        with open(sample_slc.custom_pip_file) as f:
-            pip_content = f.read()
-            for custom_package, version, _ in custom_packages:
-                assert f"{custom_package}|{version}" in pip_content
+        package_file_session = PackageFileSession(sample_slc.public_package_file)
+        pip_packages = (
+            package_file_session.package_file_config.find_build_step(
+                "flavor_customization"
+            )
+            .find_phase("install_pip_packages")
+            .pip
+        )
+        for custom_package, version, _ in custom_packages:
+            # The find_package method raises an exception if the package is not found
+            found_package = pip_packages.find_package(custom_package)
+            assert found_package.version == f"=={version}"
 
 
 @pytest.mark.dependency(name="append_custom_conda_packages", depends=["deploy_slc"])
@@ -218,14 +232,22 @@ def test_append_custom_conda_packages(
     if package_manager == PackageManager.CONDA:
         sample_slc.append_custom_conda_packages(
             [
-                CondaPackageDefinition(pkg, version)
+                CondaPackage(name=pkg, version=f"={version}")
                 for pkg, version, _ in custom_packages
-            ]
+            ],
         )
-        with open(sample_slc.custom_conda_file) as f:
-            conda_content = f.read()
-            for custom_package, version, _ in custom_packages:
-                assert f"{custom_package}|{version}" in conda_content
+        package_file_session = PackageFileSession(sample_slc.public_package_file)
+        conda_packages = (
+            package_file_session.package_file_config.find_build_step(
+                "flavor_customization"
+            )
+            .find_phase("install_conda_packages")
+            .conda
+        )
+        for custom_package, version, _ in custom_packages:
+            found_package = conda_packages.find_package(custom_package)
+            # The find_package method raises an exception if the package is not found
+            assert found_package.version == f"={version}"
 
 
 @pytest.mark.dependency(
@@ -358,37 +380,61 @@ def test_fresh_clone_if_repo_is_corrupt(
     assert expected_error in caplog.text
 
 
-def test_restore_pip_custom_file(
-    temp_cwd_func,
-    secrets_module: Secrets,
-    default_flavor: str,
-    compression_strategy: CompressionStrategy,
-):
-    slc_name = "slc_restore_pip_custom_file"
-    slc = create_slc(secrets_module, slc_name, default_flavor, compression_strategy)
-
-    slc.append_custom_pip_packages([PipPackageDefinition("my_test_package", "1.2.3")])
-    custom_pip_file_content = slc.custom_pip_file.read_text()
-    assert "my_test_package" in custom_pip_file_content
-    slc.restore_custom_pip_file()
-    custom_pip_file_content = slc.custom_pip_file.read_text()
-    assert "my_test_package" not in custom_pip_file_content
-
-
-def test_restore_conda_custom_file(
-    temp_cwd_func,
+def restore_package_file(
+    flavor: PackageManager,
     secrets_module: Secrets,
     compression_strategy: CompressionStrategy,
 ):
-    slc_name = "slc_restore_conda_custom_file"
-    flavor = DEFAULT_FLAVORS[PackageManager.CONDA]
-    slc = create_slc(secrets_module, slc_name, flavor, compression_strategy)
-
-    slc.append_custom_conda_packages(
-        [CondaPackageDefinition("my_test_package", "1.2.3")]
+    slc_name = f"slc_{flavor.value}_restore_package_file"
+    slc = create_slc(
+        secrets_module,
+        slc_name,
+        DEFAULT_FLAVORS[flavor],
+        compression_strategy,
     )
-    custom_conda_file_content = slc.custom_conda_file.read_text()
-    assert "my_test_package" in custom_conda_file_content
-    slc.restore_custom_conda_file()
-    custom_conda_file_content = slc.custom_conda_file.read_text()
-    assert "my_test_package" not in custom_conda_file_content
+    if flavor == PackageManager.PIP:
+        slc.append_custom_pip_packages(
+            [PipPackage(name="my_test_package", version="1.2.3")],
+        )
+    if flavor == PackageManager.CONDA:
+        slc.append_custom_conda_packages(
+            [CondaPackage(name="my_test_package", version="1.2.3")],
+        )
+    session = PackageFileSession(slc.public_package_file)
+    build_step = session.package_file_config.find_build_step("flavor_customization")
+    phase = (
+        "install_pip_packages"
+        if flavor == PackageManager.PIP
+        else "install_conda_packages"
+    )
+    packages = (
+        build_step.find_phase(phase).pip
+        if flavor == PackageManager.PIP
+        else build_step.find_phase(phase).conda
+    )
+    found_package = packages.find_package("my_test_package")
+    assert found_package.version == "1.2.3"
+
+    slc.restore_public_package_file()
+    session_after = PackageFileSession(slc.public_package_file)
+    build_step_after = session_after.package_file_config.find_build_step(
+        "flavor_customization"
+    )
+    packages_after = (
+        build_step_after.find_phase(phase).pip
+        if flavor == PackageManager.PIP
+        else build_step_after.find_phase(phase).conda
+    )
+    found_package_after = packages_after.find_package(
+        "my_test_package", raise_if_not_found=False
+    )
+    assert found_package_after is None
+
+
+def test_restore_package_file(
+    temp_cwd_func,
+    secrets_module: Secrets,
+    compression_strategy: CompressionStrategy,
+):
+    restore_package_file(PackageManager.PIP, secrets_module, compression_strategy)
+    restore_package_file(PackageManager.CONDA, secrets_module, compression_strategy)

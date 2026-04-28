@@ -1,67 +1,61 @@
 import logging
 from pathlib import Path
 
-from exasol.nb_connector.slc.package_types import (
-    CondaPackageDefinition,
-    PipPackageDefinition,
+from exasol.exaslpm.model.package_file_config import (
+    CondaPackage,
+    PipPackage,
 )
+from exasol.exaslpm.pkg_mgmt.package_file_session import PackageFileSession
+
 from exasol.nb_connector.slc.slc_error import SlcError
 
-
-def _read_packages(file_path: Path, package_definition: type) -> list:
-    packages = []
-    with file_path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue  # skip empty or commented lines
-            # Take everything before the '|' as package name
-            package, version = line.split("|", 1)
-            packages.append(package_definition(package, version))
-    return packages
+logger = logging.getLogger(__name__)
 
 
-def _ends_with_newline(file_path: Path) -> bool:
-    content = file_path.read_text()
-    return content.endswith("\n")
+def _get_container(phase_obj, package_definition):
+    if package_definition is PipPackage:
+        return phase_obj.pip
+    if package_definition is CondaPackage:
+        return phase_obj.conda
+    raise SlcError(f"Package type not supported: {package_definition}")
 
 
-def _filter_packages(
-    original_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-    new_packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-) -> list[PipPackageDefinition | CondaPackageDefinition]:
-    filtered_packages = []
-    for package in new_packages:
-        add_package = True
-        for original_package in original_packages:
-            if package.pkg == original_package.pkg:
-                add_package = False
-                if package.version == original_package.version:
-                    logging.warning("Package already exists: %s", original_package)
-                else:
-                    raise SlcError(
-                        "Package already exists: %s but with different version",
-                        original_package,
-                    )
-        if add_package:
-            filtered_packages.append(package)
-    return filtered_packages
+def _add_package(container, package):
+    try:
+        container.add_package(package)
+    except ValueError:
+        existing = container.find_package(package.name, raise_if_not_found=False)
+        if existing is not None and existing.version == package.version:
+            logger.warning(
+                "Package already exists: %s==%s. Skipping.",
+                package.name,
+                package.version,
+            )
+        else:
+            raise SlcError(
+                f"Package already exists with a different version: "
+                f"'{package.name}'. Existing: {existing.version if existing else 'unknown'}, "
+                f"Requested: {package.version}"
+            )
 
 
 def append_packages(
     file_path: Path,
     package_definition: type,
-    packages: list[PipPackageDefinition] | list[CondaPackageDefinition],
-):
+    packages: list[PipPackage] | list[CondaPackage],
+    build_step: str,
+    phase: str,
+) -> None:
     """
     Appends packages to the custom packages file.
     """
-    original_packages = _read_packages(file_path, package_definition)
-    filtered_packages = _filter_packages(original_packages, packages)
-    ends_with_newline = _ends_with_newline(file_path)
-    if filtered_packages:
-        with open(file_path, "a") as f:
-            if not ends_with_newline:
-                f.write("\n")
-            for p in filtered_packages:
-                print(f"{p.pkg}|{p.version}", file=f)
+    session = PackageFileSession(file_path)
+    build_step_obj = session.package_file_config.find_build_step(build_step)
+    phase_obj = build_step_obj.find_phase(phase)
+    container = _get_container(phase_obj, package_definition)
+
+    if container is not None:
+        for package in packages:
+            _add_package(container, package)
+
+    session.commit_changes()

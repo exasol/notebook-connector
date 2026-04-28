@@ -77,6 +77,7 @@ def deploy_language_container(
     container_name: str | None = None,
     allow_override: bool = True,
     timeout: timedelta = timedelta(minutes=10),
+    udf_client_binary: str = "exaudfclient",
 ) -> None:
     """
     Downloads language container from the specified location and uploads it to the
@@ -113,6 +114,9 @@ def deploy_language_container(
             Maximum time allowed for saving the container in the BucketFS.
             This includes the time required to unpack the container.
             The downloading time is not included.
+        udf_client_binary:
+            Name of the UDF client binary used in the language definition URL.
+            Defaults to "exaudfclient".
     """
 
     with open_pyexasol_connection(conf, compression=True) as conn:
@@ -123,6 +127,7 @@ def deploy_language_container(
             language_alias=language_alias,
             bucketfs_path=bucketfs_location,
             extract_validator=validator,
+            udf_client_binary=udf_client_binary,
         )
 
         if container_file:
