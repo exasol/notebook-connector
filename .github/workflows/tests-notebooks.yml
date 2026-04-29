@@ -106,7 +106,7 @@ jobs:
           SAAS_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
           NBTEST_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           NBTEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          NBTEST_AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+          NBTEST_AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
           poetry run -- pytest -rA --setup-show \
             --backend ${{ matrix.nb_test.test_backend }} \
