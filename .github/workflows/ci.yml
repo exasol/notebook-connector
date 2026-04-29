@@ -15,6 +15,71 @@ jobs:
     permissions:
       contents: read
 
+  approve-notebook-tests:
+    name: Run Jupyter Notebook Tests?
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    environment: manual-approval
+    steps:
+      - name: Detect Running Notebook Tests
+        run: true
+
+  run-stable-notebook-tests:
+    name: Notebook Tests (stable)
+    needs:
+      - approve-notebook-tests
+    uses: ./.github/workflows/tests-notebooks.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        class: [normal, large]
+    with:
+      status-filter: stable
+      test-classification: ${{ matrix.class }}
+
+  run-unstable-notebook-tests:
+    name: Notebook Tests (unstable)
+    needs:
+      - approve-notebook-tests
+    uses: ./.github/workflows/tests-notebooks.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        class: [normal, large]
+    with:
+      status-filter: unstable
+      test-classification: ${{ matrix.class }}
+
+  approve-gpu-notebook-tests:
+    name: Run Jupyter GPU Notebook Tests?
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    environment: manual-approval
+    steps:
+      - name: Detect Running GPU Notebook Tests
+        run: true
+
+  run-stable-gpu-notebook-tests:
+    name: Notebook Tests GPU (stable)
+    needs:
+      - approve-notebook-tests
+      - approve-gpu-notebook-tests
+    uses: ./.github/workflows/tests-notebooks.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    with:
+      status-filter: stable
+      test-classification: gpu
+
   report:
     name: Report
     needs:

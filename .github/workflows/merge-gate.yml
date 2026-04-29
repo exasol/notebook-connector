@@ -15,8 +15,10 @@ jobs:
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
-    # Configure this environment with required reviewers in GitHub settings.
-    environment: approve-slow-test-execution
+    # Even though the environment "manual-approval" will be created automatically,
+    # it still needs to be configured to require interactive review.
+    # See project settings on GitHub (Settings / Environments / manual-approval).
+    environment: manual-approval
     steps:
       - name: Tests
         run: echo "Slow tests approved"
@@ -45,72 +47,6 @@ jobs:
     permissions:
       contents: read
 
-  approve-notebook-tests:
-    name: Run Jupyter Notebook Tests?
-    runs-on: "ubuntu-24.04"
-    permissions:
-      contents: read
-    # Configure this environment with required reviewers in GitHub settings.
-    environment: approve-test-execution
-    steps:
-      - name: Detect Running Notebook Tests
-        run: true
-
-  run-stable-notebook-tests:
-    name: Notebook Tests (stable)
-    needs:
-      - approve-notebook-tests
-    uses: ./.github/workflows/tests-notebooks.yml
-    secrets: inherit
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        class: [normal, large]
-    with:
-      status-filter: stable
-      test-classification: ${{ matrix.class }}
-
-  run-unstable-notebook-tests:
-    name: Notebook Tests (unstable)
-    needs:
-      - approve-notebook-tests
-    uses: ./.github/workflows/tests-notebooks.yml
-    secrets: inherit
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        class: [normal, large]
-    with:
-      status-filter: unstable
-      test-classification: ${{ matrix.class }}
-
-  approve-gpu-notebook-tests:
-    name: Run Jupyter GPU Notebook Tests?
-    runs-on: "ubuntu-24.04"
-    permissions:
-      contents: read
-    # Configure this environment with required reviewers in GitHub settings.
-    environment: approve-gpu-test-execution
-    steps:
-      - name: Detect Running GPU Notebook Tests
-        run: true
-
-  run-stable-gpu-notebook-tests:
-    name: Notebook Tests GPU (stable)
-    needs:
-      - approve-gpu-notebook-tests
-    uses: ./.github/workflows/tests-notebooks.yml
-    secrets: inherit
-    permissions:
-      contents: read
-    with:
-      status-filter: stable
-      test-classification: gpu
-
   # This job ensures inputs have been executed successfully.
   allow-merge:
     name: Allow Merge
@@ -121,14 +57,9 @@ jobs:
     needs:
       - run-fast-checks
       - run-slow-checks
-      - optional-slow-checks
-      - performance-checks
-      - run-stable-notebook-tests
-      - run-unstable-notebook-tests
-      - run-stable-gpu-notebook-tests
     steps:
       - name: Branch Protection - failure if any ancestor failed
-        if: ${{ needs.run-fast-checks.result == 'failure' || needs.run-slow-checks.result == 'failure' || needs.run-stable-notebook-tests.result == 'failure' || needs.run-stable-gpu-notebook-tests.result == 'failure' }}
+        if: ${{ contains(needs.*.result, 'failure') }}
         run: |
           echo '${{ toJSON(needs) }}'
           exit 1
