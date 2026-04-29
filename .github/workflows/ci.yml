@@ -20,7 +20,7 @@ jobs:
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
-    environment: approve-test-execution
+    environment: manual-approval
     steps:
       - name: Detect Running Notebook Tests
         run: true
@@ -62,7 +62,7 @@ jobs:
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
-    environment: approve-gpu-test-execution
+    environment: manual-approval
     steps:
       - name: Detect Running GPU Notebook Tests
         run: true
