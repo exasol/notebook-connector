@@ -82,8 +82,12 @@ jobs:
 
   report:
     name: Report
+    if: ${{ !cancelled() }}
     needs:
       - merge-gate
+      - run-stable-notebook-tests
+      - run-unstable-notebook-tests
+      - run-stable-gpu-notebook-tests
     uses: ./.github/workflows/report.yml
     secrets: inherit
     permissions:
