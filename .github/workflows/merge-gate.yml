@@ -2,6 +2,15 @@ name: Merge-Gate
 
 on:
   workflow_call:
+    inputs:
+      stable_notebook_tests_result:
+        required: false
+        type: string
+        default: success
+      stable_gpu_notebook_tests_result:
+        required: false
+        type: string
+        default: success
 
 jobs:
   run-fast-checks:
@@ -57,11 +66,15 @@ jobs:
     needs:
       - run-fast-checks
       - run-slow-checks
+      - optional-slow-checks
+      - performance-checks
     steps:
       - name: Branch Protection - failure if any ancestor failed
-        if: ${{ contains(needs.*.result, 'failure') }}
+        if: ${{ needs.run-fast-checks.result == 'failure' || needs.run-slow-checks.result == 'failure' || inputs.stable_notebook_tests_result != 'success' || inputs.stable_gpu_notebook_tests_result != 'success' }}
         run: |
           echo '${{ toJSON(needs) }}'
+          echo "stable_notebook_tests_result=${{ inputs.stable_notebook_tests_result }}"
+          echo "stable_gpu_notebook_tests_result=${{ inputs.stable_gpu_notebook_tests_result }}"
           exit 1
       - name: Approve
         run: echo "Merge Approved"

@@ -10,7 +10,15 @@ on:
 jobs:
   merge-gate:
     name: Merge Gate
+    needs:
+      - run-stable-notebook-tests
+      - run-unstable-notebook-tests
+      - run-stable-gpu-notebook-tests
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/merge-gate.yml
+    with:
+      stable_notebook_tests_result: ${{ needs.run-stable-notebook-tests.result }}
+      stable_gpu_notebook_tests_result: ${{ needs.run-stable-gpu-notebook-tests.result }}
     secrets: inherit
     permissions:
       contents: read
