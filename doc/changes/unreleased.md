@@ -39,3 +39,4 @@ For the following vulnerable packages there is no update available, yet:
 * #382: Moved notebooks from ai-lab into notebook-connector including tests 
 * #392: Used unique job names in CI matrix build
 * #387: Added CI workflow for test/notebooks
+* #401: Split as stable and unstable in CI workflow for normal and large tests

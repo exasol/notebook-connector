@@ -50,14 +50,18 @@ jobs:
   # This job ensures inputs have been executed successfully.
   allow-merge:
     name: Allow Merge
+    if: ${{ !cancelled() }}
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
-    # If you need additional jobs to be part of the merge gate, add them below
     needs:
       - run-fast-checks
       - run-slow-checks
-    # Each job requires a step, so we added this dummy step.
     steps:
+      - name: Branch Protection - failure if any ancestor failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: |
+          echo '${{ toJSON(needs) }}'
+          exit 1
       - name: Approve
         run: echo "Merge Approved"
