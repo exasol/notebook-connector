@@ -59,6 +59,8 @@ from exasol.nb_connector.transformers_extension_wrapper import (
 
 LANGUAGE_ALIAS = "PYTHON3_TXAIE"
 
+LEGACY_UDF_CLIENT_BINARY = "exaudfclient_py3"
+
 ACTIVATION_KEY = ACTIVATION_KEY_PREFIX + "txaie"
 """
 Activation SQL for the Text AI Extension will be saved in the secret store
@@ -171,6 +173,7 @@ def initialize_text_ai_extension(
             activation_key=ACTIVATION_KEY,
             path_in_bucket=PATH_IN_BUCKET_FOR_SLC,
             allow_override=allow_override_language_alias,
+            udf_client_binary=LEGACY_UDF_CLIENT_BINARY,
         )
 
     print("Text AI: Updating Secure Configuration Storage")

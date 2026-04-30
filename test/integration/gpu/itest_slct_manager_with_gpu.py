@@ -3,6 +3,9 @@ from collections.abc import Iterator
 from test.utils.secrets import sample_db_file
 
 import pytest
+from exasol.exaslpm.model.package_file_config import (
+    CondaPackage,
+)
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.ai_lab_config import (
@@ -14,7 +17,6 @@ from exasol.nb_connector.language_container_activation import (
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import ScriptLanguageContainer
-from exasol.nb_connector.slc.script_language_container import CondaPackageDefinition
 
 DEFAULT_GPU_FLAVOR = "template-Exasol-8-python-3.10-cuda-conda"
 """
@@ -52,7 +54,10 @@ def test_append_custom_packages(
     custom_packages: list[tuple[str, str]],
 ):
     sample_slc.append_custom_conda_packages(
-        [CondaPackageDefinition(pkg, version) for pkg, version in custom_packages]
+        [
+            CondaPackage(name=pkg, version=f"={version}")
+            for pkg, version in custom_packages
+        ]
     )
 
 

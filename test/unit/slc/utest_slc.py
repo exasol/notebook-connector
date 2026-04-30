@@ -19,6 +19,10 @@ from unittest.mock import (
 import pytest
 import requests
 from _pytest.monkeypatch import MonkeyPatch
+from exasol.exaslpm.model.package_file_config import (
+    CondaPackage,
+    PipPackage,
+)
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
@@ -29,7 +33,6 @@ from exasol.nb_connector.slc import (
 )
 from exasol.nb_connector.slc.git_access import GitAccess
 from exasol.nb_connector.slc.script_language_container import (
-    PipPackageDefinition,
     ScriptLanguageContainer,
 )
 from exasol.nb_connector.slc.slc_flavor import (
@@ -113,10 +116,10 @@ def _validate_slc(flavor_name, sample_slc_name, slc, path):
         slc.flavor_path
         == checkout_dir / constants.FLAVORS_PATH_IN_SLC_REPO / flavor_name
     )
-    assert slc.custom_pip_file.parts[-3:] == (
-        "flavor_customization",
-        "packages",
-        "python3_pip_packages",
+    assert slc.public_package_file.parts[-3:] == (
+        "flavors",
+        flavor_name,
+        "packages.yml",
     )
     assert slc.compression_strategy == CompressionStrategy.GZIP
 
@@ -505,66 +508,117 @@ def test_slc_create_or_open_workspace_exists(
                 _validate_slc(flavor, sample_slc_name, testee, slc_factory_create.path)
 
 
-def write_package_file(file_path: Path, trailing_newline: bool):
+def write_pip_package_file(file_path: Path) -> None:
     content = textwrap.dedent("""
-    package_a|v1.2.3
-    package_b|v4.5.6
-    package_c|v5.6.7
-    """).lstrip("\n")
-    if not trailing_newline:
-        content = content.rstrip("\n")
+        version: '1.0.0'
+        build_steps:
+        - name: flavor_customization
+          phases:
+          - name: install_pip_packages
+            pip:
+              packages:
+              - name: package_a
+                version: v1.2.3
+              - name: package_b
+                version: v4.5.6
+              - name: package_c
+                version: v5.6.7
+          validation_cfg:
+            version_mandatory: false
+        """).lstrip("\n")
     file_path.parent.mkdir(parents=True, exist_ok=True)
     file_path.write_text(content)
 
 
-@pytest.fixture(
-    params=[True, False], ids=["with_trailing_newline", "without_trailing_newline"]
-)
-def slc_with_packages(request, sample_slc_name, slc_factory_create):
+@pytest.fixture
+def slc_with_packages(sample_slc_name, slc_factory_create):
     flavor = "Strawberry"
     with slc_factory_create.context(sample_slc_name, flavor) as testee:
-        write_package_file(testee.custom_pip_file, request.param)
-        write_package_file(testee.custom_conda_file, request.param)
+        write_pip_package_file(testee.public_package_file)
         yield testee
 
 
 def test_add_new_pip_package(slc_with_packages):
     slc_with_packages.append_custom_pip_packages(
-        [PipPackageDefinition("package_d", "v10.0")]
+        [PipPackage(name="package_d", version="v10.0")],
     )
-    expected_content = textwrap.dedent("""
-    package_a|v1.2.3
-    package_b|v4.5.6
-    package_c|v5.6.7
-    package_d|v10.0
-    """).lstrip("\n")
-    assert slc_with_packages.custom_pip_file.read_text() == expected_content
+    content = slc_with_packages.public_package_file.read_text()
+    assert "package_d" in content
+    assert "v10.0" in content
 
 
 def test_add_existing_pip_package_same_version(caplog, slc_with_packages):
-    with caplog.at_level(logging.INFO):
+    with caplog.at_level(logging.WARNING):
         slc_with_packages.append_custom_pip_packages(
-            [PipPackageDefinition("package_a", "v1.2.3")]
+            [PipPackage(name="package_a", version="v1.2.3")],
         )
-        expected_content = textwrap.dedent("""
-        package_a|v1.2.3
-        package_b|v4.5.6
-        package_c|v5.6.7
-        """)
-        assert (
-            slc_with_packages.custom_pip_file.read_text().strip()
-            == expected_content.strip()
-        )
-        assert (
-            "Package already exists: PipPackageDefinition(pkg='package_a', version='v1.2.3')"
-            in caplog.text
-        )
+        content = slc_with_packages.public_package_file.read_text()
+        assert content.count("package_a") == 1
+        assert "Package already exists" in caplog.text
+        assert "package_a" in caplog.text
 
 
-def test_add_existing_pip_package_different_version(caplog, slc_with_packages):
+def test_add_existing_pip_package_different_version(slc_with_packages):
     with pytest.raises(SlcError, match=r"Package already exists"):
         slc_with_packages.append_custom_pip_packages(
-            [PipPackageDefinition("package_a", "v9.9.9")]
+            [PipPackage(name="package_a", version="v9.9.9")],
+        )
+
+
+def write_conda_package_file(file_path: Path) -> None:
+    content = textwrap.dedent("""
+        version: '1.0.0'
+        build_steps:
+        - name: flavor_customization
+          phases:
+          - name: install_conda_packages
+            conda:
+              packages:
+              - name: package_a
+                version: v1.2.3
+              - name: package_b
+                version: v4.5.6
+              - name: package_c
+                version: v5.6.7
+          validation_cfg:
+            version_mandatory: false
+        """).lstrip("\n")
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    file_path.write_text(content)
+
+
+@pytest.fixture
+def slc_with_conda_packages(sample_slc_name, slc_factory_create):
+    flavor = "Strawberry"
+    with slc_factory_create.context(sample_slc_name, flavor) as testee:
+        write_conda_package_file(testee.public_package_file)
+        yield testee
+
+
+def test_add_new_conda_package(slc_with_conda_packages):
+    slc_with_conda_packages.append_custom_conda_packages(
+        [CondaPackage(name="package_d", version="v10.0")],
+    )
+    content = slc_with_conda_packages.public_package_file.read_text()
+    assert "package_d" in content
+    assert "v10.0" in content
+
+
+def test_add_existing_conda_package_same_version(caplog, slc_with_conda_packages):
+    with caplog.at_level(logging.WARNING):
+        slc_with_conda_packages.append_custom_conda_packages(
+            [CondaPackage(name="package_a", version="v1.2.3")],
+        )
+        content = slc_with_conda_packages.public_package_file.read_text()
+        assert content.count("package_a") == 1
+        assert "Package already exists" in caplog.text
+        assert "package_a" in caplog.text
+
+
+def test_add_existing_conda_package_different_version(slc_with_conda_packages):
+    with pytest.raises(SlcError, match=r"Package already exists"):
+        slc_with_conda_packages.append_custom_conda_packages(
+            [CondaPackage(name="package_a", version="v9.9.9")],
         )
 
 
@@ -638,19 +692,17 @@ def test_generate_activation_key(
             assert slc.secrets.get(slc._alias_key) is None
 
 
-def test_restore_pip_package_file(sample_slc_name, slc_factory_create, git_access_mock):
+def test_restore_public_package_file(
+    sample_slc_name, slc_factory_create, git_access_mock
+):
     flavor = "Strawberry"
     with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
         with git_access_mock(flavor) as git_access:
-            slc.restore_custom_pip_file()
+            slc.restore_public_package_file()
             assert git_access.checkout_file.mock_calls == [
                 mock.call(
                     slc.workspace.git_clone_path / "script-languages",
-                    Path("flavors")
-                    / flavor
-                    / "flavor_customization"
-                    / "packages"
-                    / "python3_pip_packages",
+                    Path("flavors") / flavor / "packages.yml",
                 )
             ]
 
@@ -661,14 +713,10 @@ def test_restore_conda_package_file(
     flavor = "Strawberry"
     with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
         with git_access_mock(flavor) as git_access:
-            slc.restore_custom_conda_file()
+            slc.restore_internal_package_file()
             assert git_access.checkout_file.mock_calls == [
                 mock.call(
                     slc.workspace.git_clone_path / "script-languages",
-                    Path("flavors")
-                    / flavor
-                    / "flavor_customization"
-                    / "packages"
-                    / "conda_packages",
+                    Path("flavors") / flavor / "flavor_base" / "packages.yml",
                 )
             ]

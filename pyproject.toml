@@ -37,14 +37,14 @@ pyexasol-extra = [
 ]
 bucketfs = [ "exasol-bucketfs (>=1.0.1, <3)" ]
 docker-db = [
-    "exasol-integration-test-docker-environment (>=4.4.1, <6)",
+    "exasol-integration-test-docker-environment (>=6.1.0, <7)",
     "ifaddr (>=0.2.0, <0.3)",
 ]
 # The version of SLCT is dictated by its usage in the python-extension-common,
-# which at the moment still uses version 3.*.
+# which at the moment uses >=3 <5
 # See developer guide, section "Selecting the Versions for SLCT and SLCR".
 slc = [
-    "exasol-script-languages-container-tool (>=3, <4)",
+    "exasol-script-languages-container-tool (>4, <5)",
     "GitPython (>=2.1.0)",
 ]
 ibis = [ "ibis-framework [exasol] (>=11, <12)" ]
@@ -180,6 +180,9 @@ module = [
 ignore_errors = true
 follow_untyped_imports = true
 
+
+[tool.ruff]
+exclude = [".venv", ".venv-1"]
 
 [tool.ruff.lint]
 extend-ignore = [
