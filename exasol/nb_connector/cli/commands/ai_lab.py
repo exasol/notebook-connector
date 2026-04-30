@@ -35,11 +35,6 @@ def _notebook_dir():
     return files("exasol.nb_connector.resources").joinpath("notebooks")
 
 
-def _default_notebook_dir() -> Path:
-    """Returns the default on-disk directory used by `ai-lab start`."""
-    return Path.cwd() / "notebooks"
-
-
 def _iter_resource_files(
     source,
     relative: Path = Path(),
@@ -100,7 +95,7 @@ def _deploy_notebooks_to(target_dir: Path, overwrite: bool) -> tuple[int, int]:
     "--notebook-dir",
     default=None,
     type=click.Path(file_okay=False, path_type=Path),
-    help="Directory that JupyterLab will use as its root. Defaults to './notebooks' in the current working directory.",
+    help="Directory that JupyterLab will use as its root. Defaults to the bundled notebooks location.",
 )
 @click.option(
     "--no-browser",
@@ -112,12 +107,18 @@ def start(port: int, ip: str, notebook_dir: Path | None, no_browser: bool) -> No
     """Start JupyterLab server"""
     _check_jupyterlab()
 
+    default_root = Path(str(_notebook_dir()))
     if notebook_dir:
-        root = notebook_dir
+        if notebook_dir.is_dir():
+            root = notebook_dir
+        else:
+            click.echo(
+                f"Notebook directory '{notebook_dir}' is invalid. "
+                f"Falling back to default directory '{default_root}'."
+            )
+            root = default_root
     else:
-        root = _default_notebook_dir()
-        copied, skipped = _deploy_notebooks_to(root, overwrite=False)
-        click.echo(f"Prepared notebooks in {root} ({copied} copied, {skipped} skipped)")
+        root = default_root
 
     cmd = [
         sys.executable,

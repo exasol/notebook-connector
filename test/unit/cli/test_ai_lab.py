@@ -127,27 +127,51 @@ def test_start_jupyterlab_not_installed(runner, notebooks_dir):
     assert result.exit_code == 1
 
 
-def test_start_without_notebook_dir_uses_default_deployed_dir(runner, tmp_path):
-    """Without --notebook-dir, start deploys notebooks to the default directory."""
-    default_dir = tmp_path / "default-notebooks"
+def test_start_without_notebook_dir_uses_notebook_dir_resource(runner, tmp_path):
+    """Without --notebook-dir, start uses the bundled notebooks location."""
+    default_dir = tmp_path / "bundled-notebooks"
+    default_dir.mkdir()
     with patch("subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0)
         with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
             with patch(
-                "exasol.nb_connector.cli.commands.ai_lab._default_notebook_dir",
+                "exasol.nb_connector.cli.commands.ai_lab._notebook_dir",
                 return_value=default_dir,
-            ):
+            ) as mock_notebook_dir:
                 with patch(
                     "exasol.nb_connector.cli.commands.ai_lab._deploy_notebooks_to",
-                    return_value=(3, 1),
                 ) as mock_deploy:
                     result = runner.invoke(start, ["--no-browser"])
 
     assert result.exit_code == 0
-    mock_deploy.assert_called_once_with(default_dir, overwrite=False)
+    mock_notebook_dir.assert_called_once()
+    mock_deploy.assert_not_called()
     called_cmd = mock_run.call_args[0][0]
     assert f"--notebook-dir={default_dir}" in called_cmd
-    assert "Prepared notebooks" in result.output
+
+
+def test_start_invalid_notebook_dir_falls_back_to_default(runner, tmp_path):
+    """Invalid --notebook-dir falls back to the default bundled notebooks path."""
+    default_dir = tmp_path / "bundled-notebooks"
+    default_dir.mkdir()
+    invalid_dir = tmp_path / "does-not-exist"
+
+    with patch("subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0)
+        with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
+            with patch(
+                "exasol.nb_connector.cli.commands.ai_lab._notebook_dir",
+                return_value=default_dir,
+            ):
+                result = runner.invoke(
+                    start,
+                    ["--notebook-dir", str(invalid_dir), "--no-browser"],
+                )
+
+    assert result.exit_code == 0
+    called_cmd = mock_run.call_args[0][0]
+    assert f"--notebook-dir={default_dir}" in called_cmd
+    assert "Falling back to default directory" in result.output
 
 
 def test_start_rejects_detach_option(runner):
