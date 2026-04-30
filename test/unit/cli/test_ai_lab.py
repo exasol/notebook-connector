@@ -1,7 +1,6 @@
 """
 Unit tests for the ai_lab CLI commands:
   - start
-  - stop
   - deploy-notebooks
 """
 
@@ -13,7 +12,6 @@ from unittest.mock import (
     patch,
 )
 
-import psutil
 import pytest
 from click.testing import CliRunner
 
@@ -21,7 +19,6 @@ from exasol.nb_connector.cli.commands.ai_lab import (
     _notebook_dir,
     deploy_notebooks,
     start,
-    stop,
 )
 
 # ---------------------------------------------------------------------------
@@ -61,12 +58,12 @@ def test_notebook_dir_returns_traversable():
 
 
 # ---------------------------------------------------------------------------
-# start — foreground (no --detach)
+# start
 # ---------------------------------------------------------------------------
 
 
-def test_start_foreground_success(runner, notebooks_dir):
-    """start runs jupyter lab in foreground when --detach is not given."""
+def test_start_success(runner, notebooks_dir):
+    """start runs jupyter lab in foreground with expected args."""
     with patch("subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0)
         with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
@@ -82,7 +79,7 @@ def test_start_foreground_success(runner, notebooks_dir):
     assert "--no-browser" in called_cmd
 
 
-def test_start_foreground_custom_port(runner, notebooks_dir):
+def test_start_custom_port_and_ip(runner, notebooks_dir):
     """--port and --ip are forwarded to the jupyter command."""
     with patch("subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0)
@@ -105,7 +102,7 @@ def test_start_foreground_custom_port(runner, notebooks_dir):
     assert "--ip=0.0.0.0" in called_cmd
 
 
-def test_start_foreground_keyboard_interrupt(runner, notebooks_dir):
+def test_start_keyboard_interrupt(runner, notebooks_dir):
     """Ctrl-C (KeyboardInterrupt) is caught and a clean message is shown."""
     with patch("subprocess.run", side_effect=KeyboardInterrupt):
         with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
@@ -130,155 +127,36 @@ def test_start_jupyterlab_not_installed(runner, notebooks_dir):
     assert result.exit_code == 1
 
 
-# ---------------------------------------------------------------------------
-# start — detached (--detach)
-# ---------------------------------------------------------------------------
-
-
-def test_start_detach_writes_pid_file(runner, notebooks_dir, tmp_path):
-    """--detach starts Popen and writes a PID file."""
-    pid_path = tmp_path / ".ai-lab" / "jupyter.pid"
-
-    mock_process = MagicMock()
-    mock_process.pid = 12345
-
-    with patch("subprocess.Popen", return_value=mock_process) as mock_popen:
+def test_start_without_notebook_dir_uses_default_deployed_dir(runner, tmp_path):
+    """Without --notebook-dir, start deploys notebooks to the default directory."""
+    default_dir = tmp_path / "default-notebooks"
+    with patch("subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0)
         with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
             with patch(
-                "exasol.nb_connector.cli.commands.ai_lab._pid_file",
-                return_value=pid_path,
+                "exasol.nb_connector.cli.commands.ai_lab._default_notebook_dir",
+                return_value=default_dir,
             ):
-                result = runner.invoke(
-                    start,
-                    [
-                        "--notebook-dir",
-                        str(notebooks_dir),
-                        "--no-browser",
-                        "--detach",
-                    ],
-                )
+                with patch(
+                    "exasol.nb_connector.cli.commands.ai_lab._deploy_notebooks_to",
+                    return_value=(3, 1),
+                ) as mock_deploy:
+                    result = runner.invoke(start, ["--no-browser"])
 
     assert result.exit_code == 0
-    assert "12345" in result.output
-    mock_popen.assert_called_once()
-    assert pid_path.exists()
-    assert pid_path.read_text().strip() == "12345"
+    mock_deploy.assert_called_once_with(default_dir, overwrite=False)
+    called_cmd = mock_run.call_args[0][0]
+    assert f"--notebook-dir={default_dir}" in called_cmd
+    assert "Prepared notebooks" in result.output
 
 
-def test_start_detach_no_browser_flag_forwarded(runner, notebooks_dir, tmp_path):
-    """--no-browser is forwarded to the subprocess even in detached mode."""
-    pid_path = tmp_path / ".ai-lab" / "jupyter.pid"
-    mock_process = MagicMock()
-    mock_process.pid = 99
-
-    with patch("subprocess.Popen", return_value=mock_process) as mock_popen:
-        with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
-            with patch(
-                "exasol.nb_connector.cli.commands.ai_lab._pid_file",
-                return_value=pid_path,
-            ):
-                result = runner.invoke(
-                    start,
-                    [
-                        "--notebook-dir",
-                        str(notebooks_dir),
-                        "--no-browser",
-                        "--detach",
-                    ],
-                )
-    assert result.exit_code == 0
-    called_cmd = mock_popen.call_args[0][0]
-    assert "--no-browser" in called_cmd
-
-
-# ---------------------------------------------------------------------------
-# stop
-# ---------------------------------------------------------------------------
-
-
-def test_stop_success(runner, tmp_path):
-    """stop reads PID file, checks process ownership, terminates, deletes file."""
-    pid_path = tmp_path / ".ai-lab" / "jupyter.pid"
-    pid_path.parent.mkdir(parents=True)
-    pid_path.write_text("12345")
-
-    mock_proc = MagicMock()
-    mock_proc.username.return_value = "testuser"
-    mock_self = MagicMock()
-    mock_self.username.return_value = "testuser"
-
-    def fake_process(pid=None):
-        if pid is None:
-            return mock_self
-        return mock_proc
-
-    with patch(
-        "exasol.nb_connector.cli.commands.ai_lab._pid_file",
-        return_value=pid_path,
-    ):
-        with patch(
-            "exasol.nb_connector.cli.commands.ai_lab.psutil.Process",
-            side_effect=fake_process,
-        ):
-            result = runner.invoke(stop)
-
-    assert result.exit_code == 0
-    assert "12345" in result.output
-    mock_proc.terminate.assert_called_once()
-    assert not pid_path.exists()
-
-
-def test_stop_no_pid_file(runner, tmp_path):
-    """stop exits with code 1 and error message when no PID file exists."""
-    pid_path = tmp_path / ".ai-lab" / "jupyter.pid"
-
-    with patch(
-        "exasol.nb_connector.cli.commands.ai_lab._pid_file",
-        return_value=pid_path,
-    ):
-        result = runner.invoke(stop)
-
-    assert result.exit_code == 1
-    assert "no detached" in result.output.lower()
-
-
-def test_stop_process_already_dead(runner, tmp_path):
-    """stop cleans up PID file and exits with code 1 if process no longer exists."""
-    pid_path = tmp_path / ".ai-lab" / "jupyter.pid"
-    pid_path.parent.mkdir(parents=True)
-    pid_path.write_text("99999")
-
-    with patch(
-        "exasol.nb_connector.cli.commands.ai_lab._pid_file",
-        return_value=pid_path,
-    ):
-        with patch(
-            "exasol.nb_connector.cli.commands.ai_lab.psutil.Process",
-            side_effect=psutil.NoSuchProcess(99999),
-        ):
-            result = runner.invoke(stop)
-
-    assert result.exit_code == 1
-    assert (
-        "already stopped" in result.output.lower()
-        or "not found" in result.output.lower()
-    )
-    assert not pid_path.exists()
-
-
-def test_stop_pid_file_corrupt(runner, tmp_path):
-    """stop exits with non-zero code when PID file contains non-integer content."""
-    pid_path = tmp_path / ".ai-lab" / "jupyter.pid"
-    pid_path.parent.mkdir(parents=True)
-    pid_path.write_text("not-a-number")
-
-    with patch(
-        "exasol.nb_connector.cli.commands.ai_lab._pid_file",
-        return_value=pid_path,
-    ):
-        result = runner.invoke(stop)
+def test_start_rejects_detach_option(runner):
+    """--detach is no longer supported."""
+    result = runner.invoke(start, ["--detach"])
 
     assert result.exit_code != 0
+    assert "no such option" in result.output.lower()
+    assert "--detach" in result.output
 
 
 # ---------------------------------------------------------------------------

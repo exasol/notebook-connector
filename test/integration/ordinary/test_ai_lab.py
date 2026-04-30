@@ -2,11 +2,10 @@
 Integration tests for the ai_lab CLI commands.
 
 These tests run the real `ai-lab` binary via subprocess with NO mocks or patches.
-Every test touches the real filesystem and real processes.
+Every test touches the real filesystem.
 
 Test classes:
   - TestDeployNotebooksIntegration : real file copy scenarios
-  - TestStartStopIntegration       : real JupyterLab process (marked slow)
   - TestEdgeCases                  : boundary conditions on real data
 """
 
@@ -14,10 +13,8 @@ from __future__ import annotations
 
 import os
 import re
-import signal
 import subprocess
 import sys
-import time
 from pathlib import Path
 
 import pytest
@@ -40,33 +37,40 @@ def ai_lab(*args: str, env: dict | None = None) -> subprocess.CompletedProcess:
     )
 
 
+def _resource_files(
+    root,
+    relative: Path = Path(),
+) -> list[Path]:
+    files: list[Path] = []
+    for entry in root.iterdir():
+        entry_relative = relative / entry.name
+        if entry.is_dir():
+            files.extend(_resource_files(entry, entry_relative))
+        elif entry.is_file():
+            files.append(entry_relative)
+    return files
+
+
+def _resource_at(root, relative: Path):
+    resource = root
+    for part in relative.parts:
+        resource = resource.joinpath(part)
+    return resource
+
+
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="module")
-def notebooks_root() -> Path:
+def notebooks_root():
     """Real bundled notebooks directory shipped with the package."""
     from importlib.resources import files
 
-    path = Path(str(files("exasol.nb_connector.resources").joinpath("notebooks")))
-    assert path.is_dir(), f"Bundled notebooks not found at: {path}"
-    return path
-
-
-@pytest.fixture()
-def isolated_pid_env(tmp_path: Path) -> dict:
-    """
-    Returns an env dict that overrides AI_LAB_PID_FILE to a temp location.
-    This ensures tests never touch the real ~/.ai-lab/jupyter.pid and can
-    run safely in parallel CI jobs.
-    """
-    pid_path = tmp_path / ".ai-lab" / "jupyter.pid"
-    pid_path.parent.mkdir(parents=True, exist_ok=True)
-    env = os.environ.copy()
-    env["AI_LAB_PID_FILE"] = str(pid_path)
-    return env
+    root = files("exasol.nb_connector.resources").joinpath("notebooks")
+    assert root.is_dir(), f"Bundled notebooks not found at: {root}"
+    return root
 
 
 # ---------------------------------------------------------------------------
@@ -94,7 +98,7 @@ class TestDeployNotebooksIntegration:
         result = ai_lab("deploy-notebooks", "--target-dir", str(target))
 
         assert result.returncode == 0, result.stderr
-        source_files = [f for f in notebooks_root.rglob("*") if f.is_file()]
+        source_files = _resource_files(notebooks_root)
         target_files = [f for f in target.rglob("*") if f.is_file()]
         assert len(target_files) == len(source_files)
 
@@ -117,10 +121,9 @@ class TestDeployNotebooksIntegration:
         ai_lab("deploy-notebooks", "--target-dir", str(target))
 
         non_nb_sources = [
-            f for f in notebooks_root.rglob("*") if f.is_file() and f.suffix != ".ipynb"
+            rel for rel in _resource_files(notebooks_root) if rel.suffix != ".ipynb"
         ]
-        for src in non_nb_sources:
-            rel = src.relative_to(notebooks_root)
+        for rel in non_nb_sources:
             assert (target / rel).exists(), f"Non-notebook file not deployed: {rel}"
 
     def test_deploy_creates_nested_target_dir(self, tmp_path):
@@ -200,128 +203,15 @@ class TestDeployNotebooksIntegration:
 
         ai_lab("deploy-notebooks", "--target-dir", str(target))
 
-        for src_file in notebooks_root.rglob("*"):
-            if src_file.is_file() and not any(
-                p.name.startswith(".") for p in src_file.parents
-            ):
-                rel = src_file.relative_to(notebooks_root)
-                dst_file = target / rel
-                assert dst_file.exists(), f"File missing in target: {rel}"
-                assert (
-                    dst_file.read_bytes() == src_file.read_bytes()
-                ), f"Content mismatch for: {rel}"
-
-
-# ---------------------------------------------------------------------------
-# start + stop — real JupyterLab process
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.slow
-class TestStartStopIntegration:
-
-    def test_start_detach_and_stop(self, tmp_path, isolated_pid_env):
-        """
-        Real end-to-end: start --detach spawns JupyterLab, writes a real PID
-        file, and ai-lab stop kills the process and removes the PID file.
-        Uses AI_LAB_PID_FILE env var for test isolation (no shared state).
-        """
-        pid_path = Path(isolated_pid_env["AI_LAB_PID_FILE"])
-
-        try:
-            start_result = ai_lab(
-                "start",
-                "--detach",
-                "--no-browser",
-                "--notebook-dir",
-                str(tmp_path),
-                env=isolated_pid_env,
-            )
-            assert start_result.returncode == 0, start_result.stderr
-
-            # Wait for PID file to appear (up to 10 seconds)
-            for _ in range(20):
-                if pid_path.exists():
-                    break
-                time.sleep(0.5)
-
-            assert pid_path.exists(), "PID file was not created after start --detach"
-            pid = int(pid_path.read_text().strip())
-            assert pid > 0
-
-            # Process must actually be running
-            os.kill(pid, 0)
-
-            # Stop it
-            stop_result = ai_lab("stop", env=isolated_pid_env)
-            assert stop_result.returncode == 0, stop_result.stderr
-            assert str(pid) in stop_result.stdout
-
-            # PID file must be deleted
-            assert not pid_path.exists()
-
-            # Poll instead of fixed sleep — wait up to 5s for process to die
-            for _ in range(10):
-                try:
-                    os.kill(pid, 0)
-                    time.sleep(0.5)
-                except ProcessLookupError:
-                    break
-            else:
-                pytest.fail(f"Process {pid} still running after stop")
-
-        finally:
-            # Safety cleanup — kill any leaked process
-            if pid_path.exists():
-                try:
-                    os.kill(int(pid_path.read_text().strip()), signal.SIGTERM)
-                except (ProcessLookupError, ValueError):
-                    pass  # already gone or invalid PID — both are fine
-                pid_path.unlink(missing_ok=True)
-
-    def test_stop_when_no_server_running(self, tmp_path, isolated_pid_env):
-        """ai-lab stop exits with code 1 when no detached server is running."""
-        result = ai_lab("stop", env=isolated_pid_env)
-
-        assert result.returncode == 1
-        combined = (result.stdout + result.stderr).lower()
-        assert "no detached" in combined, f"Unexpected output: {combined}"
-
-    def test_start_detach_pid_file_contains_valid_integer(
-        self, tmp_path, isolated_pid_env
-    ):
-        """PID file written by start --detach contains a valid positive integer."""
-        pid_path = Path(isolated_pid_env["AI_LAB_PID_FILE"])
-
-        try:
-            result = ai_lab(
-                "start",
-                "--detach",
-                "--no-browser",
-                "--notebook-dir",
-                str(tmp_path),
-                env=isolated_pid_env,
-            )
-            assert result.returncode == 0, result.stderr
-
-            # Poll for PID file
-            for _ in range(20):
-                if pid_path.exists():
-                    break
-                time.sleep(0.5)
-
-            assert pid_path.exists()
-            content = pid_path.read_text().strip()
-            assert content.isdigit(), f"PID file contains non-integer: {content!r}"
-            assert int(content) > 0
-
-        finally:
-            if pid_path.exists():
-                try:
-                    os.kill(int(pid_path.read_text().strip()), signal.SIGTERM)
-                except (ProcessLookupError, ValueError):
-                    pass  # already gone or invalid PID — both are fine
-                pid_path.unlink(missing_ok=True)
+        for rel in _resource_files(notebooks_root):
+            if any(part.startswith(".") for part in rel.parts):
+                continue
+            src_file = _resource_at(notebooks_root, rel)
+            dst_file = target / rel
+            assert dst_file.exists(), f"File missing in target: {rel}"
+            assert (
+                dst_file.read_bytes() == src_file.read_bytes()
+            ), f"Content mismatch for: {rel}"
 
 
 # ---------------------------------------------------------------------------
@@ -336,15 +226,17 @@ class TestEdgeCases:
         result = ai_lab("start", "--help")
 
         assert result.returncode == 0, result.stderr
-        for option in ["--port", "--ip", "--notebook-dir", "--no-browser", "--detach"]:
+        for option in ["--port", "--ip", "--notebook-dir", "--no-browser"]:
             assert option in result.stdout, f"Option missing: {option}"
 
-    def test_stop_help(self):
-        """stop --help exits 0 and shows usage info."""
-        result = ai_lab("stop", "--help")
+    def test_start_rejects_detach_option(self):
+        """start --detach fails because detach mode is no longer supported."""
+        result = ai_lab("start", "--detach")
 
-        assert result.returncode == 0, result.stderr
-        assert "stop" in result.stdout.lower()
+        assert result.returncode != 0
+        combined = (result.stdout + result.stderr).lower()
+        assert "no such option" in combined
+        assert "--detach" in combined
 
     def test_deploy_notebooks_help(self):
         """deploy-notebooks --help exits 0 and lists all options."""
@@ -355,12 +247,13 @@ class TestEdgeCases:
             assert option in result.stdout, f"Option missing: {option}"
 
     def test_ai_lab_help_lists_all_commands(self):
-        """ai-lab --help lists start, stop and deploy-notebooks."""
+        """ai-lab --help lists start and deploy-notebooks."""
         result = ai_lab("--help")
 
         assert result.returncode == 0, result.stderr
-        for cmd in ["start", "stop", "deploy-notebooks"]:
+        for cmd in ["start", "deploy-notebooks"]:
             assert cmd in result.stdout, f"Command missing from --help: {cmd}"
+        assert "stop" not in result.stdout
 
     def test_start_help_shows_default_port(self):
         """Default port 8888 is visible in start --help output."""
@@ -368,15 +261,3 @@ class TestEdgeCases:
 
         assert result.returncode == 0, result.stderr
         assert "8888" in result.stdout
-
-    def test_stop_corrupt_pid_file(self, tmp_path, isolated_pid_env):
-        """When the PID file contains garbage, ai-lab stop exits non-zero.
-        Uses isolated env var so the real ~/.ai-lab/jupyter.pid is never touched.
-        """
-        pid_path = Path(isolated_pid_env["AI_LAB_PID_FILE"])
-        pid_path.write_text("not-a-valid-pid")
-
-        result = ai_lab("stop", env=isolated_pid_env)
-
-        assert result.returncode != 0
-        assert not pid_path.exists() or pid_path.read_text() == "not-a-valid-pid"
