@@ -30,6 +30,28 @@ def start_database(session):
     )
 
 
+@nox.session(name="jupyter", python=False)
+def jupyter(session: nox.Session) -> None:
+    """Start JupyterLab pointing at the notebooks embedded in the package.
+
+    Usage:
+        nox -s jupyter                    # default port 8888
+        nox -s jupyter -- --port 9999     # custom port
+        nox -s jupyter -- --ip 0.0.0.0   # bind to all interfaces
+        nox -s jupyter -- --no-browser    # suppress auto-open
+        nox -s jupyter -- --detach        # detach jupyter to run in background
+
+    Extra arguments after '--' are forwarded to ai-lab start.
+    """
+    session.run("poetry", "install", "--all-extras", external=True)
+    session.run(
+        "ai-lab",
+        "start",
+        *session.posargs,
+        external=True,
+    )
+
+
 def rename(file: Path, prefix: str = "", suffix: str = ""):
     name = file.with_suffix("").name
     return file.parent / f"{prefix}{name}{suffix}"
