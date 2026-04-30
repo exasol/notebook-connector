@@ -54,7 +54,7 @@ text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
 sagemaker = [ "exasol-sagemaker-extension (>=0.11.5)" ]
 
 jupyter = [
-    "jupyterlab (>=4.2.5, <5)",
+    "jupyterlab (>=4.5.7, <5)",
     "pexpect (>=4.8.0, <5)",
 ]
 notebook-dependencies = [
