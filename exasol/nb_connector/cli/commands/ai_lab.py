@@ -95,7 +95,7 @@ def _deploy_notebooks_to(target_dir: Path, overwrite: bool) -> tuple[int, int]:
     "--notebook-dir",
     default=None,
     type=click.Path(file_okay=False, path_type=Path),
-    help="Directory that JupyterLab will use as its root. Defaults to the bundled notebooks location.",
+    help="Directory that JupyterLab will use as its root. Defaults to the current working directory.",
 )
 @click.option(
     "--no-browser",
@@ -107,18 +107,25 @@ def start(port: int, ip: str, notebook_dir: Path | None, no_browser: bool) -> No
     """Start JupyterLab server"""
     _check_jupyterlab()
 
-    default_root = Path(str(_notebook_dir()))
+    default_root = Path.cwd()
     if notebook_dir:
-        if notebook_dir.is_dir():
-            root = notebook_dir
+        if notebook_dir.exists():
+            if notebook_dir.is_dir():
+                root = notebook_dir
+            else:
+                click.echo(
+                    f"Error: notebook path '{notebook_dir}' points to a file. "
+                    "Please provide a directory path.",
+                    err=True,
+                )
+                sys.exit(1)
         else:
-            click.echo(
-                f"Notebook directory '{notebook_dir}' is invalid. "
-                f"Falling back to default directory '{default_root}'."
-            )
-            root = default_root
+            notebook_dir.mkdir(parents=True, exist_ok=True)
+            root = notebook_dir
     else:
         root = default_root
+
+    _deploy_notebooks_to(root, overwrite=False)
 
     cmd = [
         sys.executable,

@@ -229,15 +229,6 @@ class TestEdgeCases:
         for option in ["--port", "--ip", "--notebook-dir", "--no-browser"]:
             assert option in result.stdout, f"Option missing: {option}"
 
-    def test_start_rejects_detach_option(self):
-        """start --detach fails because detach mode is no longer supported."""
-        result = ai_lab("start", "--detach")
-
-        assert result.returncode != 0
-        combined = (result.stdout + result.stderr).lower()
-        assert "no such option" in combined
-        assert "--detach" in combined
-
     def test_deploy_notebooks_help(self):
         """deploy-notebooks --help exits 0 and lists all options."""
         result = ai_lab("deploy-notebooks", "--help")

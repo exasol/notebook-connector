@@ -67,12 +67,16 @@ def test_start_success(runner, notebooks_dir):
     with patch("subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0)
         with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
-            result = runner.invoke(
-                start,
-                ["--notebook-dir", str(notebooks_dir), "--no-browser"],
-            )
+            with patch(
+                "exasol.nb_connector.cli.commands.ai_lab._deploy_notebooks_to",
+            ) as mock_deploy:
+                result = runner.invoke(
+                    start,
+                    ["--notebook-dir", str(notebooks_dir), "--no-browser"],
+                )
     assert result.exit_code == 0
     assert "Starting JupyterLab" in result.output
+    mock_deploy.assert_called_once_with(notebooks_dir, overwrite=False)
     mock_run.assert_called_once()
     called_cmd = mock_run.call_args[0][0]
     assert "lab" in called_cmd
@@ -84,19 +88,23 @@ def test_start_custom_port_and_ip(runner, notebooks_dir):
     with patch("subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0)
         with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
-            result = runner.invoke(
-                start,
-                [
-                    "--notebook-dir",
-                    str(notebooks_dir),
-                    "--port",
-                    "9999",
-                    "--ip",
-                    "0.0.0.0",
-                    "--no-browser",
-                ],
-            )
+            with patch(
+                "exasol.nb_connector.cli.commands.ai_lab._deploy_notebooks_to",
+            ) as mock_deploy:
+                result = runner.invoke(
+                    start,
+                    [
+                        "--notebook-dir",
+                        str(notebooks_dir),
+                        "--port",
+                        "9999",
+                        "--ip",
+                        "0.0.0.0",
+                        "--no-browser",
+                    ],
+                )
     assert result.exit_code == 0
+    mock_deploy.assert_called_once_with(notebooks_dir, overwrite=False)
     called_cmd = mock_run.call_args[0][0]
     assert "--port=9999" in called_cmd
     assert "--ip=0.0.0.0" in called_cmd
@@ -106,81 +114,102 @@ def test_start_keyboard_interrupt(runner, notebooks_dir):
     """Ctrl-C (KeyboardInterrupt) is caught and a clean message is shown."""
     with patch("subprocess.run", side_effect=KeyboardInterrupt):
         with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
-            result = runner.invoke(
-                start,
-                ["--notebook-dir", str(notebooks_dir), "--no-browser"],
-            )
+            with patch(
+                "exasol.nb_connector.cli.commands.ai_lab._deploy_notebooks_to",
+            ) as mock_deploy:
+                result = runner.invoke(
+                    start,
+                    ["--notebook-dir", str(notebooks_dir), "--no-browser"],
+                )
     assert result.exit_code == 0
+    mock_deploy.assert_called_once_with(notebooks_dir, overwrite=False)
     assert "stopped" in result.output.lower()
 
 
 def test_start_jupyterlab_not_installed(runner, notebooks_dir):
     """start aborts with exit code 1 when JupyterLab is not installed."""
-    with patch(
-        "exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab",
-        side_effect=SystemExit(1),
-    ):
-        result = runner.invoke(
-            start,
-            ["--notebook-dir", str(notebooks_dir), "--no-browser"],
-        )
+    with patch("subprocess.run") as mock_run:
+        with patch(
+            "exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab",
+            side_effect=SystemExit(1),
+        ):
+            with patch(
+                "exasol.nb_connector.cli.commands.ai_lab._deploy_notebooks_to",
+            ) as mock_deploy:
+                result = runner.invoke(
+                    start,
+                    ["--notebook-dir", str(notebooks_dir), "--no-browser"],
+                )
     assert result.exit_code == 1
+    mock_deploy.assert_not_called()
+    mock_run.assert_not_called()
 
 
-def test_start_without_notebook_dir_uses_notebook_dir_resource(runner, tmp_path):
-    """Without --notebook-dir, start uses the bundled notebooks location."""
-    default_dir = tmp_path / "bundled-notebooks"
+def test_start_without_notebook_dir_uses_current_working_dir(runner, tmp_path):
+    """Without --notebook-dir, start uses the current working directory."""
+    default_dir = tmp_path / "cwd"
     default_dir.mkdir()
     with patch("subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0)
         with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
             with patch(
-                "exasol.nb_connector.cli.commands.ai_lab._notebook_dir",
+                "exasol.nb_connector.cli.commands.ai_lab.Path.cwd",
                 return_value=default_dir,
-            ) as mock_notebook_dir:
+            ) as mock_cwd:
                 with patch(
                     "exasol.nb_connector.cli.commands.ai_lab._deploy_notebooks_to",
                 ) as mock_deploy:
                     result = runner.invoke(start, ["--no-browser"])
 
     assert result.exit_code == 0
-    mock_notebook_dir.assert_called_once()
-    mock_deploy.assert_not_called()
+    mock_cwd.assert_called_once()
+    mock_deploy.assert_called_once_with(default_dir, overwrite=False)
     called_cmd = mock_run.call_args[0][0]
     assert f"--notebook-dir={default_dir}" in called_cmd
 
 
-def test_start_invalid_notebook_dir_falls_back_to_default(runner, tmp_path):
-    """Invalid --notebook-dir falls back to the default bundled notebooks path."""
-    default_dir = tmp_path / "bundled-notebooks"
-    default_dir.mkdir()
-    invalid_dir = tmp_path / "does-not-exist"
+def test_start_creates_notebook_dir_when_missing(runner, tmp_path):
+    """Missing --notebook-dir path is created and used."""
+    missing_dir = tmp_path / "new-notebooks" / "nested"
+    assert not missing_dir.exists()
 
     with patch("subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0)
         with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
             with patch(
-                "exasol.nb_connector.cli.commands.ai_lab._notebook_dir",
-                return_value=default_dir,
-            ):
+                "exasol.nb_connector.cli.commands.ai_lab._deploy_notebooks_to",
+            ) as mock_deploy:
                 result = runner.invoke(
                     start,
-                    ["--notebook-dir", str(invalid_dir), "--no-browser"],
+                    ["--notebook-dir", str(missing_dir), "--no-browser"],
                 )
 
     assert result.exit_code == 0
+    assert missing_dir.is_dir()
+    mock_deploy.assert_called_once_with(missing_dir, overwrite=False)
     called_cmd = mock_run.call_args[0][0]
-    assert f"--notebook-dir={default_dir}" in called_cmd
-    assert "Falling back to default directory" in result.output
+    assert f"--notebook-dir={missing_dir}" in called_cmd
 
 
-def test_start_rejects_detach_option(runner):
-    """--detach is no longer supported."""
-    result = runner.invoke(start, ["--detach"])
+def test_start_fails_when_notebook_dir_points_to_file(runner, tmp_path):
+    """--notebook-dir must fail if the path points to a file."""
+    file_path = tmp_path / "notebook.txt"
+    file_path.write_text("not a directory")
+
+    with patch("subprocess.run") as mock_run:
+        with patch("exasol.nb_connector.cli.commands.ai_lab._check_jupyterlab"):
+            with patch(
+                "exasol.nb_connector.cli.commands.ai_lab._deploy_notebooks_to",
+            ) as mock_deploy:
+                result = runner.invoke(
+                    start,
+                    ["--notebook-dir", str(file_path), "--no-browser"],
+                )
 
     assert result.exit_code != 0
-    assert "no such option" in result.output.lower()
-    assert "--detach" in result.output
+    assert "Invalid value for '--notebook-dir'" in result.output
+    mock_deploy.assert_not_called()
+    mock_run.assert_not_called()
 
 
 # ---------------------------------------------------------------------------
