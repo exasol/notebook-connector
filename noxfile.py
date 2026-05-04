@@ -39,7 +39,6 @@ def jupyter(session: nox.Session) -> None:
         nox -s jupyter -- --port 9999     # custom port
         nox -s jupyter -- --ip 0.0.0.0   # bind to all interfaces
         nox -s jupyter -- --no-browser    # suppress auto-open
-        nox -s jupyter -- --detach        # detach jupyter to run in background
 
     Extra arguments after '--' are forwarded to ai-lab start.
     """
