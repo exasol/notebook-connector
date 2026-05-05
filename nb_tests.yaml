@@ -31,11 +31,14 @@ normal:
       - name: Useful URLs notebook
         test_file: test_useful_urls.py
         test_backend: onprem
-  unstable:
-    tests:
       - name: Cloud notebook (onprem)
         test_file: test_cloud.py
         test_backend: onprem
+      - name: Transformers notebook (onprem)
+        test_file: test_transformers.py
+        test_backend: onprem
+  unstable:
+    tests:
       - name: Cloud notebook (saas)
         test_file: test_cloud.py
         test_backend: saas
@@ -51,24 +54,6 @@ normal:
       - name: ibis notebook (saas)
         test_file: test_ibis.py
         test_backend: saas
-      - name: ITDE notebook
-        test_file: test_itde.py
-        test_backend: onprem
-
-
-large:
-  runner: ubuntu-24.04
-  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
-  stable:
-    tests:
-      - name: Transformers notebook (onprem)
-        test_file: test_transformers.py
-        test_backend: onprem
-      - name: Text AI notebook (onprem)
-        test_file: test_text_ai.py
-        test_backend: onprem
-  unstable:
-    tests:
       - name: Transformers notebook (saas)
         test_file: test_transformers.py
         test_backend: saas
@@ -76,8 +61,24 @@ large:
         test_file: test_text_ai.py
         test_backend: saas
 
+
+large:
+  # Use the larger CI runner for memory/disk headroom (especially ITDE notebook).
+  runner: int-linux-x64-4core-ubuntu24.04-1
+  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
+  stable:
+    tests:
+      - name: Text AI notebook (onprem)
+        test_file: test_text_ai.py
+        test_backend: onprem
+  unstable:
+    tests:
+      - name: ITDE notebook
+        test_file: test_itde.py
+        test_backend: onprem
+
 gpu:
-  runner: ubuntu-24.04
+  runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
   additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
   stable:
     tests:
