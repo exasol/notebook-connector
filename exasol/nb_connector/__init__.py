@@ -1,1 +1,3 @@
-__version__ = version("pytest-exasol-extension")
+from importlib.metadata import version
+
+__version__ = version("exasol-notebook-connector")
