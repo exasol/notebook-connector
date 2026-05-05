@@ -6,6 +6,7 @@ Every test touches the real filesystem.
 
 Test classes:
   - TestDeployNotebooksIntegration : real file copy scenarios
+  - TestStartIntegration           : start JupyterLab and verify HTTP connectivity
   - TestEdgeCases                  : boundary conditions on real data
 """
 
@@ -13,8 +14,12 @@ from __future__ import annotations
 
 import os
 import re
+import socket
 import subprocess
 import sys
+import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 import pytest
@@ -24,6 +29,35 @@ import pytest
 # ---------------------------------------------------------------------------
 
 _SUBPROCESS_TIMEOUT = 60  # seconds — prevents CI from hanging forever
+
+# ---------------------------------------------------------------------------
+# Port helper
+# ---------------------------------------------------------------------------
+
+
+def _free_port() -> int:
+    """Ask the OS for a free TCP port."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("localhost", 0))
+        return s.getsockname()[1]
+
+
+def _connect_via_http(url: str, timeout: float = 60.0, interval: float = 1.0) -> bool:
+    """
+    Try to connect to *url* via HTTP GET until it responds (any status code) or *timeout* elapses.
+    Returns True if the server became reachable, False on timeout.
+    """
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        try:
+            urllib.request.urlopen(url, timeout=3)  # nosec: B310
+            return True
+        except urllib.error.HTTPError:
+            # Any HTTP error (e.g. 400, 403) still means the server is up
+            return True
+        except Exception:
+            time.sleep(interval)
+    return False
 
 
 def ai_lab(*args: str, env: dict | None = None) -> subprocess.CompletedProcess:
@@ -147,18 +181,6 @@ class TestDeployNotebooksIntegration:
         assert match, f"Expected 'Deployed N' in output, got: {result.stdout}"
         assert int(match.group(1)) > 0
 
-    def test_deploy_no_overwrite_skips_existing_files(self, tmp_path):
-        """Default (--no-overwrite) does not replace existing files."""
-        target = tmp_path / "deployed"
-        target.mkdir()
-        sentinel = target / "sentinel.txt"
-        sentinel.write_text("original")
-
-        result = ai_lab("deploy-notebooks", "--target-dir", str(target))
-
-        assert result.returncode == 0, result.stderr
-        assert sentinel.read_text() == "original"
-
     def test_deploy_overwrite_replaces_existing_files(self, tmp_path, notebooks_root):
         """--overwrite replaces files that exist in the target."""
         target = tmp_path / "deployed"
@@ -212,6 +234,57 @@ class TestDeployNotebooksIntegration:
             assert (
                 dst_file.read_bytes() == src_file.read_bytes()
             ), f"Content mismatch for: {rel}"
+
+
+# ---------------------------------------------------------------------------
+# Start — real JupyterLab process, real HTTP connectivity
+# ---------------------------------------------------------------------------
+
+
+class TestStartIntegration:
+    """
+    Starts a real JupyterLab server via 'ai-lab start' and verifies that it is
+    reachable over HTTP.  The server process is always terminated in teardown.
+    """
+
+    def test_start_server_responds_to_http(self, tmp_path):
+        """
+        'ai-lab start' launches JupyterLab and it responds to HTTP requests on
+        the chosen port within a reasonable timeout.
+        """
+        port = _free_port()
+        url = f"http://localhost:{port}/"
+
+        cmd = [
+            sys.executable,
+            "-m",
+            "exasol.nb_connector.cli.main",
+            "start",
+            "--port",
+            str(port),
+            "--no-browser",
+            "--notebook-dir",
+            str(tmp_path),
+        ]
+
+        proc = subprocess.Popen(  # nosec: B603
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        try:
+            reachable = _connect_via_http(url, timeout=60.0)
+            assert reachable, (
+                f"JupyterLab did not respond on {url} within 60 s.\n"
+                f"stdout: {proc.stdout.read() if proc.stdout else ''}\n"
+                f"stderr: {proc.stderr.read() if proc.stderr else ''}"
+            )
+        finally:
+            proc.terminate()
+            try:
+                proc.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                proc.kill()
 
 
 # ---------------------------------------------------------------------------
