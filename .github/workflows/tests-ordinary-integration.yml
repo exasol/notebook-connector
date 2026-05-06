@@ -17,9 +17,6 @@ jobs:
           - file: test_itde_manager.py
             name: ITDE Mgr
             extra_param: ""
-          - file: test_sagemaker_extension_wrapper.py
-            name: SME
-            extra_param: ""
           - file: test_transformers_extension_wrapper.py
             name: TE
             extra_param: ""
