@@ -12,11 +12,12 @@ from exasol.nb_connector.secret_store import Secrets
 set_log_level_for_libraries()
 
 
-def test_itde(tmp_path):
+def test_itde(tmp_path, backend_aware_onprem_database):
     store_path = tmp_path / "tmp_config.sqlite"
     store_password = "password"
     secrets = Secrets(store_path, master_password=store_password)
-    bring_itde_up(secrets)
+    # reuse backend fixture to avoid creating new environment
+    bring_itde_up(secrets, backend_aware_onprem_database)
     try:
         con = open_pyexasol_connection(secrets)
         try:
@@ -25,4 +26,5 @@ def test_itde(tmp_path):
         finally:
             con.close()
     finally:
-        take_itde_down(secrets)
+        # making db not stop
+        take_itde_down(secrets, stop_db=False)

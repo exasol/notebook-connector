@@ -30,7 +30,7 @@ normal:
         test_backend: onprem
       - name: Useful URLs notebook
         test_file: test_useful_urls.py
-        test_backend: onprem
+        test_backend: ""
       - name: Cloud notebook (onprem)
         test_file: test_cloud.py
         test_backend: onprem

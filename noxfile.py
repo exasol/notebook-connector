@@ -83,6 +83,7 @@ class TestClassification(Enum):
 class NBTestBackend(Enum):
     onprem = "onprem"
     saas = "saas"
+    empty = ""
 
 
 class NBTestDescription(BaseModel):
