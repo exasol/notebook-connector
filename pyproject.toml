@@ -57,7 +57,6 @@ transformers = [
     "yaspin (>=3.1.0, <4)",
 ]
 text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
-sagemaker = [ "exasol-sagemaker-extension (>=0.11.5)" ]
 
 jupyter = [
     "jupyterlab (>=4.2.5, <5)",

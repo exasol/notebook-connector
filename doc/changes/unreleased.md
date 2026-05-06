@@ -13,3 +13,4 @@
 * #382: Moved notebooks from ai-lab into notebook-connector including tests
 * #392: Used unique job names in CI matrix build
 * #387: Added CI workflow for test/notebooks
+* #408: Removed sagemaker related code and tests

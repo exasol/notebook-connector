@@ -35,8 +35,6 @@ Here is a comprehensive list of all NC's optional dependency categories
 +------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
 | ``transformers`` | An `Exasol extension <te_ext_>`_ for using state-of-the-art pretrained machine learning models via the `Hugging Face Transformers API <hface_>`_     |
 +------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| ``sagemaker``    | An `Exasol extension <sm_ext_>`_ to interact with `AWS SageMaker <sagemaker_>`_ from inside the database                                             |
-+------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. _sql_alchemy: https://pypi.org/project/sqlalchemy_exasol
 .. _pyexasol: https://pypi.org/project/pyexasol
@@ -49,8 +47,6 @@ Here is a comprehensive list of all NC's optional dependency categories
 .. _ibis: https://pypi.org/project/ibis-framework
 .. _te_ext: https://pypi.org/project/exasol-transformers-extension
 .. _hface: https://github.com/huggingface/transformers
-.. _sm_ext: https://pypi.org/project/exasol-sagemaker-extension
-.. _sagemaker: https://pypi.org/project/sagemaker
 
 
 You can install selected dependencies using the following syntax
