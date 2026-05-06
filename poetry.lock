@@ -11468,4 +11468,4 @@ transformers = ["exasol-transformers-extension", "yaspin"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "1a2c89cbec4bca6a1122c1ef33ca105bb4563c208b505dd6e57be70f64811813"
+content-hash = "3dbfb2e297b7ca3b7c17dc29c181366026d45a0d6ac272dda8f34bf04d9be26d"
