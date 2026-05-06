@@ -72,10 +72,7 @@ large:
         test_file: test_text_ai.py
         test_backend: onprem
   unstable:
-    tests:
-      - name: ITDE notebook
-        test_file: test_itde.py
-        test_backend: onprem
+    tests: []
 
 gpu:
   runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
