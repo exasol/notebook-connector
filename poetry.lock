@@ -1048,7 +1048,6 @@ files = [
     {file = "click-8.3.3-py3-none-any.whl", hash = "sha256:a2bf429bb3033c89fa4936ffb35d5cb471e3719e1f3c8a7c3fff0b8314305613"},
     {file = "click-8.3.3.tar.gz", hash = "sha256:398329ad4837b2ff7cbe1dd166a4c0f8900c3ca3a218de04466f38f6497f18a2"},
 ]
-markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\""}
 
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
@@ -1086,7 +1085,7 @@ files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
-markers = {main = "platform_system == \"Windows\" and (extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\") or sys_platform == \"win32\" and (extra == \"text-ai\" or extra == \"jupyter\" or extra == \"notebook-dependencies\")", dev = "platform_system == \"Windows\" or sys_platform == \"win32\"", performance = "sys_platform == \"win32\""}
+markers = {main = "(extra == \"text-ai\" or extra == \"jupyter\" or extra == \"notebook-dependencies\" or platform_system == \"Windows\") and (sys_platform == \"win32\" or platform_system == \"Windows\")", dev = "platform_system == \"Windows\" or sys_platform == \"win32\"", performance = "sys_platform == \"win32\""}
 
 [[package]]
 name = "colorlog"
@@ -6314,7 +6313,6 @@ files = [
     {file = "psutil-7.2.2-cp37-abi3-win_arm64.whl", hash = "sha256:8c233660f575a5a89e6d4cb65d9f938126312bca76d8fe087b947b3a1aaac9ee"},
     {file = "psutil-7.2.2.tar.gz", hash = "sha256:0746f5f8d406af344fd547f1c8daa5f5c33dbc293bb8d6a16d80b4bb88f59372"},
 ]
-markers = {main = "extra == \"transformers\" or extra == \"text-ai\" or extra == \"jupyter\" or python_version >= \"3.11\" and (extra == \"transformers\" or extra == \"text-ai\" or extra == \"jupyter\" or extra == \"notebook-dependencies\")"}
 
 [package.extras]
 dev = ["abi3audit", "black", "check-manifest", "colorama ; os_name == \"nt\"", "coverage", "packaging", "psleak", "pylint", "pyperf", "pypinfo", "pyreadline3 ; os_name == \"nt\"", "pytest", "pytest-cov", "pytest-instafail", "pytest-xdist", "pywin32 ; os_name == \"nt\" and implementation_name != \"pypy\"", "requests", "rstcheck", "ruff", "setuptools", "sphinx", "sphinx_rtd_theme", "toml-sort", "twine", "validate-pyproject[all]", "virtualenv", "vulture", "wheel", "wheel ; os_name == \"nt\" and implementation_name != \"pypy\"", "wmi ; os_name == \"nt\" and implementation_name != \"pypy\""]
@@ -11001,4 +10999,4 @@ transformers = ["exasol-transformers-extension", "yaspin"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "f639f7e3aec9eed1ffc169b002e2067346ca03371505c5a6aa52e0152640e007"
+content-hash = "dd7b0419a1af3e8cd9bb78609a9e7300334693496ccbcd4c354d6c6da2ce79f0"
