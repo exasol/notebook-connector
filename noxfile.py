@@ -1,17 +1,10 @@
-from argparse import (
-    ArgumentParser,
-    Namespace,
-)
-from enum import Enum
 from pathlib import Path
 
 import nox
-import yaml
 
 # imports all nox task provided by the toolbox
 # no-qa: disables ruff error
 from exasol.toolbox.nox.tasks import *  # noqa: F403
-from pydantic import BaseModel
 
 from noxconfig import PROJECT_CONFIG
 
