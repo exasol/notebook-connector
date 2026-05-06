@@ -5,12 +5,18 @@ requires-python = ">=3.10,<3.13"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [{ include = "exasol" }, ]
 authors = [
-    { name = "Christoph Kuhnke", email = "christoph.kuhnke@exasol.com" },
-]
-maintainers = [
-    { name = "Christoph Kuhnke", email = "christoph.kuhnke@exasol.com" },
+  { name="Christoph Kuhnke", email="christoph.kuhnke@exasol.com" },
+  { name="Michael Beck", email="michael.beck@exasol.com" },
+  { name="Janaarthanan Selvarajan", email="janaarthanan.selvarajan@exasol.com" },
 ]
 readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 license = "MIT"
 dynamic = ["classifiers"]
 
@@ -75,7 +81,7 @@ Source = "https://github.io/exasol/notebook-connector"
 Issues = "https://github.io/exasol/notebook-connector/issues"
 
 [tool.poetry]
-requires-poetry = ">=2.1.0"
+requires-poetry = ">=2.3.0"
 packages = [
     { include = "exasol" }
 ]
@@ -92,20 +98,21 @@ classifiers = [
 requires = ["poetry_core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.1"
-pytest-mock = "^3.7.0"
-pytest_dependency = ">=0.6.0"
-exasol-toolbox = ">=6"
-pytest-exasol-backend = ">=1.1.0,<2"
-pytest-ipywidgets = ">=1.52.0,<2.0.0"
-starlette = "<1" # see https://github.com/exasol/notebook-connector/issues/378
-notebook = ">=7.4,<8"
-nbclient = ">=0.10.0"
-nbformat = ">=5.10.0"
-testbook = ">=0.4.2"
-pytest-check-links = ">=0.10.0"
+[dependency-groups]
+dev = [
+    "pytest>=8.1",
+    "pytest-mock>=3.7.0",
+    "pytest_dependency>=0.6.0",
+    "exasol-toolbox>=6",
+    "pytest-exasol-backend>=1.1.0,<2",
+    "pytest-ipywidgets>=1.52.0,<2.0.0",
+    "starlette<1", # see https://github.com/exasol/notebook-connector/issues/378
+    "notebook>=7.4,<8",
+    "nbclient>=0.10.0",
+    "nbformat>=5.10.0",
+    "testbook>=0.4.2",
+    "pytest-check-links>=0.10.0",
+]
 
 # See more details in the developer guide, section dependencies.
 
@@ -199,9 +206,12 @@ unfixable = []
 max-line-length = 88
 max-module-lines = 800
 
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+
 [tool.sonar]
 projectKey = "com.exasol:notebook-connector"
-hostUrl = "https://sonarcloud.io"
+host.url = "https://sonarcloud.io"
 organization = "exasol"
 exclusions = "exasol/nb_connector/resources/notebooks/**"
 
