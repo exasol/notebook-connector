@@ -165,9 +165,7 @@ def get_notebook_tests(session: nox.Session) -> None:
     args = _parse_nb_args(session)
     nb_tests = _get_test_sets(args.test_classification)
     tests = (
-        nb_tests.stable
-        if args.test_status == TestStatus.stable
-        else nb_tests.unstable
+        nb_tests.stable if args.test_status == TestStatus.stable else nb_tests.unstable
     )
     print(tests.model_dump_json())
 
