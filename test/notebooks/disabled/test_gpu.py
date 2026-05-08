@@ -1,3 +1,6 @@
+"""Temporarily disabled due to the SLC issue, Enable the test when SLC is fixed
+move the test file outside disabled folder to enable."""
+
 import os
 import shutil
 from datetime import (
