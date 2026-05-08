@@ -112,6 +112,7 @@ dev = [
     "nbformat>=5.10.0",
     "testbook>=0.4.2",
     "pytest-check-links>=0.10.0",
+    "types-pyyaml>=6.0.12,<7.0.0",
 ]
 
 # See more details in the developer guide, section dependencies.
