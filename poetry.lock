@@ -10437,14 +10437,14 @@ typer = ">=0.24.0"
 name = "types-pyyaml"
 version = "6.0.12.20260408"
 description = "Typing stubs for PyYAML"
-optional = true
+optional = false
 python-versions = ">=3.10"
-groups = ["main"]
-markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\""
+groups = ["main", "dev"]
 files = [
     {file = "types_pyyaml-6.0.12.20260408-py3-none-any.whl", hash = "sha256:fbc42037d12159d9c801ebfcc79ebd28335a7c13b08a4cfbc6916df78fee9384"},
     {file = "types_pyyaml-6.0.12.20260408.tar.gz", hash = "sha256:92a73f2b8d7f39ef392a38131f76b970f8c66e4c42b3125ae872b7c93b556307"},
 ]
+markers = {main = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\""}
 
 [[package]]
 name = "types-requests"
@@ -10999,4 +10999,4 @@ transformers = ["exasol-transformers-extension", "yaspin"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "dd7b0419a1af3e8cd9bb78609a9e7300334693496ccbcd4c354d6c6da2ce79f0"
+content-hash = "53b74cba874ff8daa2ec2ff38033a59ec5882938b67a91474cbec33624b45b56"

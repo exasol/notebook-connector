@@ -57,29 +57,7 @@ jobs:
 
   notebook-tests:
     name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
-    needs: fetch-no        run: |
-          RUNNER=$(poetry run -- nox -s get-notebook-runner -- \
-            --test-status ${{ inputs.status-filter }} \
-            --test-classification ${{ inputs.test-classification }})
-          echo "runner=$RUNNER" >> "$GITHUB_OUTPUT"
-
-      - id: set-pytest-params
-        run: |
-          PARAMS=$(poetry run -- nox -s get-notebook-pytest-params -- \
-            --test-status ${{ inputs.status-filter }} \
-            --test-classification ${{ inputs.test-classification }})
-          echo "pytest_params=$PARAMS" >> "$GITHUB_OUTPUT"
-
-    outputs:
-      tests: ${{ steps.set-tests.outputs.tests }}
-      runner: ${{ steps.set-runner.outputs.runner }}
-      pytest_params: ${{ steps.set-pytest-params.outputs.pytest_params }}
-
-
-  notebook-tests:
-    name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
     needs: fetch-notebook-tests
-    runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}tebook-tests
     runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
     permissions:
       contents: read
