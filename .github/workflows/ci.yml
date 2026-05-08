@@ -59,28 +59,29 @@ jobs:
       status-filter: unstable
       test-classification: ${{ matrix.class }}
 
-  approve-gpu-notebook-tests:
-    name: Run Jupyter GPU Notebook Tests?
-    runs-on: "ubuntu-24.04"
-    permissions:
-      contents: read
-    environment: manual-approval
-    steps:
-      - name: Detect Running GPU Notebook Tests
-        run: true
+  # GPU notebook tests are temporarily disabled due to an SLC issue being fixed separately.
+  # approve-gpu-notebook-tests:
+  #   name: Run Jupyter GPU Notebook Tests?
+  #   runs-on: "ubuntu-24.04"
+  #   permissions:
+  #     contents: read
+  #   environment: manual-approval
+  #   steps:
+  #     - name: Detect Running GPU Notebook Tests
+  #       run: true
 
-  run-stable-gpu-notebook-tests:
-    name: Notebook Tests GPU (stable)
-    needs:
-      - approve-notebook-tests
-      - approve-gpu-notebook-tests
-    uses: ./.github/workflows/tests-notebooks.yml
-    secrets: inherit
-    permissions:
-      contents: read
-    with:
-      status-filter: stable
-      test-classification: gpu
+  # run-stable-gpu-notebook-tests:
+  #   name: Notebook Tests GPU (stable)
+  #   needs:
+  #     - approve-notebook-tests
+  #     - approve-gpu-notebook-tests
+  #   uses: ./.github/workflows/tests-notebooks.yml
+  #   secrets: inherit
+  #   permissions:
+  #     contents: read
+  #   with:
+  #     status-filter: stable
+  #     test-classification: gpu
 
   report:
     # Job merge-gate requires manual approval for running the slow checks.  If
@@ -94,7 +95,7 @@ jobs:
       - merge-gate
       - run-stable-notebook-tests
       - run-unstable-notebook-tests
-      - run-stable-gpu-notebook-tests
+      # - run-stable-gpu-notebook-tests  # disabled: SLC issue being fixed separately
     uses: ./.github/workflows/report.yml
     secrets: inherit
     permissions:
