@@ -1,8 +1,3 @@
-"""
-This test is disabled in CI temporarily due to the SLC issue, Enable this when SLC is fixed.
-Move this file just one step outside the current disabled folder.
-"""
-
 import os
 import shutil
 from datetime import (
