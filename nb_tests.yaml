@@ -42,13 +42,6 @@ normal:
       - name: Cloud notebook (saas)
         test_file: test_cloud.py
         test_backend: saas
-      # Sagemaker removed: sagemaker support has been removed from the project.
-      # - name: Sagemaker notebook (onprem)
-      #   test_file: test_sagemaker.py
-      #   test_backend: onprem
-      # - name: Sagemaker notebook (saas)
-      #   test_file: test_sagemaker.py
-      #   test_backend: saas
       - name: sklearn notebook (saas)
         test_file: test_sklearn.py
         test_backend: saas
