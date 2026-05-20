@@ -14,3 +14,4 @@
 * #392: Used unique job names in CI matrix build
 * #387: Added CI workflow for test/notebooks
 * #401: Split as stable and unstable in CI workflow for normal and large tests
+* #408: Removed sagemaker related code and tests

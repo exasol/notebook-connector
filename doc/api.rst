@@ -61,7 +61,6 @@ Functions and Classes in Other Packages
    :members:
    :undoc-members:
 .. autofunction:: exasol.nb_connector.model_installation.install_model
-.. autofunction:: exasol.nb_connector.sagemaker_extension_wrapper.initialize_sme_extension
 .. autofunction:: exasol.nb_connector.secret_store.Secrets
 .. autoclass:: exasol.nb_connector.text_ai_extension_wrapper.Extraction
    :members:

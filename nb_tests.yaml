@@ -42,12 +42,6 @@ normal:
       - name: Cloud notebook (saas)
         test_file: test_cloud.py
         test_backend: saas
-      - name: Sagemaker notebook (onprem)
-        test_file: test_sagemaker.py
-        test_backend: onprem
-      - name: Sagemaker notebook (saas)
-        test_file: test_sagemaker.py
-        test_backend: saas
       - name: sklearn notebook (saas)
         test_file: test_sklearn.py
         test_backend: saas
@@ -78,9 +72,11 @@ gpu:
   runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
   additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
   stable:
-    tests:
-      - name: GPU notebook
-        test_file: test_gpu.py
-        test_backend: onprem
+    # GPU notebook tests are temporarily disabled due to an SLC issue being fixed separately.
+    tests: []
+    # tests:
+    #   - name: GPU notebook
+    #     test_file: test_gpu.py
+    #     test_backend: onprem
   unstable:
     tests: []
