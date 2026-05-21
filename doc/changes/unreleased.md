@@ -15,3 +15,4 @@
 * #387: Added CI workflow for test/notebooks
 * #401: Split as stable and unstable in CI workflow for normal and large tests
 * #408: Removed sagemaker related code and tests
+* #410: Updated Documentation for CLIs and Python APIs in notebook-connector
