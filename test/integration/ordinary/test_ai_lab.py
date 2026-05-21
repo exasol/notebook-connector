@@ -63,7 +63,12 @@ def _connect_via_http(url: str, timeout: float = 60.0, interval: float = 1.0) ->
 def ai_lab(*args: str, env: dict | None = None) -> subprocess.CompletedProcess:
     """Invoke the real ai-lab entry-point via the current Python interpreter."""
     return subprocess.run(
-        [sys.executable, "-m", "exasol.nb_connector.cli.main"] + list(args),
+        [
+            sys.executable,
+            "-c",
+            "from exasol.nb_connector.cli.main import ai_lab_main; ai_lab_main()",
+        ]
+        + list(args),
         capture_output=True,
         text=True,
         timeout=_SUBPROCESS_TIMEOUT,
@@ -257,8 +262,8 @@ class TestStartIntegration:
 
         cmd = [
             sys.executable,
-            "-m",
-            "exasol.nb_connector.cli.main",
+            "-c",
+            "from exasol.nb_connector.cli.main import ai_lab_main; ai_lab_main()",
             "start",
             "--port",
             str(port),

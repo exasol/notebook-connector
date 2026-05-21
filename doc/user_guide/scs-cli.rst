@@ -1,17 +1,14 @@
 :octicon:`terminal` Command Line Interface for the Secure Configuration Storage (SCS)
 #####################################################################################
 
-Notebook Connector installs two console entry points, ``scs`` and ``ai-lab``.
-Both names invoke the same underlying CLI group and expose the same commands:
+Notebook Connector installs the ``scs`` command line interface for managing
+Secure Configuration Storage files.
+
+The ``scs`` CLI exposes three commands:
 
 * ``check``
 * ``configure``
-* ``deploy-notebooks``
 * ``show``
-* ``start``
-
-This page focuses on the configuration-related commands. The notebook-related
-commands are documented in :doc:`ai-lab-cli`.
 
 Help
 ****

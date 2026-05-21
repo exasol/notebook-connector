@@ -4,16 +4,7 @@
 Notebook Connector installs the ``ai-lab`` command line interface for working
 with the bundled Jupyter notebooks.
 
-``ai-lab`` and ``scs`` currently invoke the same underlying CLI group, so both
-entry points expose the same five commands:
-
-* ``check``
-* ``configure``
-* ``deploy-notebooks``
-* ``show``
-* ``start``
-
-The CLI currently provides two commands:
+The top-level ``ai-lab`` command exposes exactly two subcommands:
 
 * ``start`` starts JupyterLab and deploys the bundled notebooks into the
   notebook root directory if they are not present yet.
