@@ -43,13 +43,13 @@ Common options:
    * - Option
      - Meaning
    * - ``--port``
-     - JupyterLab listen port. Default: ``8888``.
+     - JupyterLab listen port. Default: ``49494``.
    * - ``--ip``
-     - Bind address. Default: ``localhost``. Use ``0.0.0.0`` for remote
-       access.
+     - Bind address. Default: ``localhost``. Use ``0.0.0.0`` to allow remote
+       access from arbitrary other addresses.
    * - ``--notebook-dir``
-     - Notebook root directory. If omitted, the current working directory is
-       used. Missing directories are created.
+     - JupyterLab root directory. If omitted, the current working directory is
+       used as the notebook root. Missing directories are created.
    * - ``--no-browser``
      - Prevent JupyterLab from opening in the default browser.
 

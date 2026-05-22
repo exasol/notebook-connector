@@ -3,7 +3,7 @@ CLI commands for the Exasol AI Lab Jupyter server and notebook deployment.
 
 Usage examples
 --------------
-Start JupyterLab on port 8888 (default):
+Start JupyterLab on port 49494 (default):
 
     ai-lab start
 
@@ -80,7 +80,7 @@ def _deploy_notebooks_to(target_dir: Path, overwrite: bool) -> tuple[int, int]:
 @ai_lab_cli.command("start")
 @click.option(
     "--port",
-    default=8888,
+    default=49494,
     show_default=True,
     type=int,
     help="Port on which JupyterLab will be listening",

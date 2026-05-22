@@ -325,8 +325,8 @@ class TestEdgeCases:
         assert "stop" not in result.stdout
 
     def test_start_help_shows_default_port(self):
-        """Default port 8888 is visible in start --help output."""
+        """Default port 49494 is visible in start --help output."""
         result = ai_lab("start", "--help")
 
         assert result.returncode == 0, result.stderr
-        assert "8888" in result.stdout
+        assert "49494" in result.stdout
