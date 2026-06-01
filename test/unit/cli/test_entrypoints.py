@@ -1,21 +1,9 @@
-import exasol.nb_connector.cli.main as main_module
+import exasol.nb_connector.cli.groups as groups_module
 
 
-def test_scs_main_invokes_scs_cli(monkeypatch):
-    called = []
-
-    monkeypatch.setattr(main_module, "scs_cli", lambda: called.append("scs"))
-
-    main_module.scs_main()
-
-    assert called == ["scs"]
+def test_scs_entrypoint_uses_scs_command_group():
+    assert groups_module.scs_cli.name == "scs"
 
 
-def test_ai_lab_main_invokes_ai_lab_cli(monkeypatch):
-    called = []
-
-    monkeypatch.setattr(main_module, "ai_lab_cli", lambda: called.append("ai-lab"))
-
-    main_module.ai_lab_main()
-
-    assert called == ["ai-lab"]
+def test_ai_lab_entrypoint_uses_ai_lab_command_group():
+    assert groups_module.ai_lab_cli.name == "ai-lab"

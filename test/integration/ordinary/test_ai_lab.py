@@ -66,7 +66,7 @@ def ai_lab(*args: str, env: dict | None = None) -> subprocess.CompletedProcess:
         [
             sys.executable,
             "-c",
-            "from exasol.nb_connector.cli.main import ai_lab_main; ai_lab_main()",
+            "from exasol.nb_connector.cli.groups import ai_lab_cli; ai_lab_cli()",
         ]
         + list(args),
         capture_output=True,
@@ -263,7 +263,7 @@ class TestStartIntegration:
         cmd = [
             sys.executable,
             "-c",
-            "from exasol.nb_connector.cli.main import ai_lab_main; ai_lab_main()",
+            "from exasol.nb_connector.cli.groups import ai_lab_cli; ai_lab_cli()",
             "start",
             "--port",
             str(port),

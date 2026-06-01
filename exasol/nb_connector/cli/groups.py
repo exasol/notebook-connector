@@ -1,5 +1,7 @@
 import click
 
+import exasol.nb_connector.cli.commands  # noqa: E402,F401
+
 
 @click.group(name="scs")
 def scs_cli():
