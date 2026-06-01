@@ -17,9 +17,9 @@ from exasol_integration_test_docker_environment.lib.models.data.environment_info
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
+from exasol.nb_connector import itde_manager
 from exasol.nb_connector.ai_lab_config import Accelerator
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector import itde_manager
 from exasol.nb_connector.itde_manager import (
     ENVIRONMENT_NAME,
     NAME_SERVER_ADDRESS,
