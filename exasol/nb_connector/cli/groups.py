@@ -1,7 +1,5 @@
 import click
 
-import exasol.nb_connector.cli.commands  # noqa: E402,F401
-
 
 @click.group(name="scs")
 def scs_cli():
@@ -26,3 +24,6 @@ def ai_lab_cli():
     into a target directory.
     """
     pass
+
+
+import exasol.nb_connector.cli.commands  # noqa: E402,F401
