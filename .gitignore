@@ -14,3 +14,5 @@ __pycache__/
 .workspace
 # actual screenshots created by solara if different from expected in folder `ui_screenshots/`.
 /test-results
+/exasol/nb_connector/resources/notebooks/.ipynb_checkpoints/
+/exasol/nb_connector/resources/notebooks/ai_lab_secure_configuration_storage.sqlite

@@ -1,8 +1,11 @@
 import logging
 import os
+import threading
 from enum import IntFlag
+from contextlib import contextmanager
 
 import docker
+import luigi.configuration
 from docker.models.networks import Network
 from exasol_integration_test_docker_environment.cli.options.test_environment_options import (
     LATEST_DB_VERSION,
@@ -37,6 +40,8 @@ from exasol.nb_connector.secret_store import Secrets
 ENVIRONMENT_NAME = "DemoDb"
 NAME_SERVER_ADDRESS = "8.8.8.8"
 TEST_DB_VERSION_ENV_VAR = "TEST_DB_VERSION"
+_LUIGI_WORKER_SECTION = "worker"
+_LUIGI_WORKER_NO_INSTALL_SHUTDOWN_HANDLER = "no_install_shutdown_handler"
 
 
 class ItdeContainerStatus(IntFlag):
@@ -45,6 +50,55 @@ class ItdeContainerStatus(IntFlag):
     RUNNING = 3
     VISIBLE = 5
     READY = RUNNING | VISIBLE
+
+
+@contextmanager
+def _temporarily_disable_luigi_worker_shutdown_handler():
+    """
+    Luigi installs a SIGUSR1 worker handler by default.
+
+    That is fine in the main thread, but Jupyter/Solara callbacks may execute in a
+    non-main thread where signal registration raises ValueError.
+    """
+    if threading.current_thread() is threading.main_thread():
+        yield
+        return
+
+    config = luigi.configuration.get_config()
+    had_section = config.has_section(_LUIGI_WORKER_SECTION)
+    had_option = config.has_option(
+        _LUIGI_WORKER_SECTION, _LUIGI_WORKER_NO_INSTALL_SHUTDOWN_HANDLER
+    )
+    original_value = (
+        config.get(
+            _LUIGI_WORKER_SECTION, _LUIGI_WORKER_NO_INSTALL_SHUTDOWN_HANDLER
+        )
+        if had_option
+        else None
+    )
+
+    if not had_section:
+        config.add_section(_LUIGI_WORKER_SECTION)
+    config.set(
+        _LUIGI_WORKER_SECTION,
+        _LUIGI_WORKER_NO_INSTALL_SHUTDOWN_HANDLER,
+        "True",
+    )
+    try:
+        yield
+    finally:
+        if had_option and original_value is not None:
+            config.set(
+                _LUIGI_WORKER_SECTION,
+                _LUIGI_WORKER_NO_INSTALL_SHUTDOWN_HANDLER,
+                original_value,
+            )
+        else:
+            config.remove_option(
+                _LUIGI_WORKER_SECTION, _LUIGI_WORKER_NO_INSTALL_SHUTDOWN_HANDLER
+            )
+            if not had_section:
+                config.remove_section(_LUIGI_WORKER_SECTION)
 
 
 def bring_itde_up(conf: Secrets, env_info: EnvironmentInfo | None = None) -> None:
@@ -88,17 +142,18 @@ def bring_itde_up(conf: Secrets, env_info: EnvironmentInfo | None = None) -> Non
             )
             itde_accelerator = ("nvidia=all",)
 
-        env_info, _ = api.spawn_test_environment(
-            environment_name=ENVIRONMENT_NAME,
-            nameserver=(NAME_SERVER_ADDRESS,),
-            db_mem_size=mem_size,
-            db_disk_size=disk_size,
-            docker_db_image_version=db_version,
-            docker_environment_variable=docker_environment_variable,
-            accelerator=itde_accelerator,
-            additional_db_parameter=additional_db_parameter,
-            log_level=logging.getLevelName(logging.INFO),
-        )
+        with _temporarily_disable_luigi_worker_shutdown_handler():
+            env_info, _ = api.spawn_test_environment(
+                environment_name=ENVIRONMENT_NAME,
+                nameserver=(NAME_SERVER_ADDRESS,),
+                db_mem_size=mem_size,
+                db_disk_size=disk_size,
+                docker_db_image_version=db_version,
+                docker_environment_variable=docker_environment_variable,
+                accelerator=itde_accelerator,
+                additional_db_parameter=additional_db_parameter,
+                log_level=logging.getLevelName(logging.INFO),
+            )
 
     db_info = env_info.database_info
     container_info = db_info.container_info
