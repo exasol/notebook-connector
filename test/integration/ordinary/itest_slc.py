@@ -4,9 +4,9 @@ import textwrap
 from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from threading import Thread
 from test.bucketfs_protocol import BucketFSProtocol
 from test.package_manager import PackageManager
+from threading import Thread
 
 import pytest
 from docker.models.images import Image as DockerImage

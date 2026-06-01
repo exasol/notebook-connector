@@ -751,7 +751,9 @@ def test_export_uses_luigi_shutdown_handler_guard(
     flavor = "Strawberry"
     with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
         export_mock = Mock()
-        monkeypatch.setattr(script_language_container.exaslct_api, "export", export_mock)
+        monkeypatch.setattr(
+            script_language_container.exaslct_api, "export", export_mock
+        )
 
         slc.export()
 
@@ -774,7 +776,9 @@ def test_export_no_copy_uses_luigi_shutdown_handler_guard(
     flavor = "Strawberry"
     with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
         export_mock = Mock()
-        monkeypatch.setattr(script_language_container.exaslct_api, "export", export_mock)
+        monkeypatch.setattr(
+            script_language_container.exaslct_api, "export", export_mock
+        )
 
         slc.export_no_copy()
 
@@ -813,7 +817,9 @@ def test_deploy_uses_luigi_shutdown_handler_guard(
                 slc._flavor_path_rel: {"release": deploy_result},
             }
         )
-        monkeypatch.setattr(script_language_container.exaslct_api, "deploy", deploy_mock)
+        monkeypatch.setattr(
+            script_language_container.exaslct_api, "deploy", deploy_mock
+        )
 
         slc.deploy()
 
