@@ -720,3 +720,119 @@ def test_restore_conda_package_file(
                     Path("flavors") / flavor / "flavor_base" / "packages.yml",
                 )
             ]
+
+
+@pytest.fixture
+def luigi_shutdown_handler_guard(monkeypatch: MonkeyPatch):
+    calls: list[str] = []
+
+    @contextlib.contextmanager
+    def guard():
+        calls.append("enter")
+        try:
+            yield
+        finally:
+            calls.append("exit")
+
+    monkeypatch.setattr(
+        script_language_container,
+        "temporarily_disable_luigi_worker_shutdown_handler",
+        guard,
+    )
+    return calls
+
+
+def test_export_uses_luigi_shutdown_handler_guard(
+    sample_slc_name,
+    slc_factory_create,
+    luigi_shutdown_handler_guard,
+    monkeypatch: MonkeyPatch,
+):
+    flavor = "Strawberry"
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        export_mock = Mock()
+        monkeypatch.setattr(script_language_container.exaslct_api, "export", export_mock)
+
+        slc.export()
+
+        assert luigi_shutdown_handler_guard == ["enter", "exit"]
+        export_mock.assert_called_once_with(
+            flavor_path=(str(slc._flavor_path_rel),),
+            export_path=str(slc.workspace.export_path),
+            output_directory=str(slc.workspace.output_path),
+            release_name=slc.language_alias,
+            compression_strategy=slc.compression_strategy,
+        )
+
+
+def test_export_no_copy_uses_luigi_shutdown_handler_guard(
+    sample_slc_name,
+    slc_factory_create,
+    luigi_shutdown_handler_guard,
+    monkeypatch: MonkeyPatch,
+):
+    flavor = "Strawberry"
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        export_mock = Mock()
+        monkeypatch.setattr(script_language_container.exaslct_api, "export", export_mock)
+
+        slc.export_no_copy()
+
+        assert luigi_shutdown_handler_guard == ["enter", "exit"]
+        export_mock.assert_called_once_with(
+            flavor_path=(str(slc._flavor_path_rel),),
+            output_directory=str(slc.workspace.output_path),
+            release_name=slc.language_alias,
+            compression_strategy=slc.compression_strategy,
+        )
+
+
+def test_deploy_uses_luigi_shutdown_handler_guard(
+    sample_slc_name,
+    slc_factory_create,
+    luigi_shutdown_handler_guard,
+    monkeypatch: MonkeyPatch,
+):
+    flavor = "Strawberry"
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        slc.secrets.save(CKey.bfs_host_name, "bucketfs-host")
+        slc.secrets.save(CKey.bfs_port, "2581")
+        slc.secrets.save(CKey.bfs_user, "w")
+        slc.secrets.save(CKey.bfs_password, "write")
+        slc.secrets.save(CKey.bfs_service, "bfsdefault")
+        slc.secrets.save(CKey.bfs_bucket, "default")
+
+        language_definition_builder = Mock()
+        language_definition_builder.generate_definition_components.return_value = [
+            Mock(alias="original_alias"),
+        ]
+        language_definition_builder.generate_definition.return_value = "activation_sql"
+        deploy_result = Mock(language_definition_builder=language_definition_builder)
+        deploy_mock = Mock(
+            return_value={
+                slc._flavor_path_rel: {"release": deploy_result},
+            }
+        )
+        monkeypatch.setattr(script_language_container.exaslct_api, "deploy", deploy_mock)
+
+        slc.deploy()
+
+        assert luigi_shutdown_handler_guard == ["enter", "exit"]
+        deploy_mock.assert_called_once_with(
+            flavor_path=(str(slc._flavor_path_rel),),
+            bucketfs_host="bucketfs-host",
+            bucketfs_port="2581",
+            bucketfs_user="w",
+            bucketfs_password="write",
+            bucketfs_name="bfsdefault",
+            bucket="default",
+            path_in_bucket=constants.PATH_IN_BUCKET,
+            release_name=slc.language_alias,
+            output_directory=str(slc.workspace.output_path),
+            compression_strategy=slc.compression_strategy,
+        )
+        language_definition_builder.add_custom_alias.assert_called_once_with(
+            "original_alias",
+            slc.language_alias,
+        )
+        assert slc.secrets.get(slc._alias_key) == "activation_sql"

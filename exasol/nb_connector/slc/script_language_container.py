@@ -27,6 +27,9 @@ from exasol_integration_test_docker_environment.lib.docker import (
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.luigi_utils import (
+    temporarily_disable_luigi_worker_shutdown_handler,
+)
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.git_access import GitAccess
@@ -214,25 +217,27 @@ class ScriptLanguageContainer:
         Exports the current SLC to the export directory.
         """
         with current_directory(self.checkout_dir):
-            exaslct_api.export(
-                flavor_path=(str(self._flavor_path_rel),),
-                export_path=str(self.workspace.export_path),
-                output_directory=str(self.workspace.output_path),
-                release_name=self.language_alias,
-                compression_strategy=self.compression_strategy,
-            )
+            with temporarily_disable_luigi_worker_shutdown_handler():
+                exaslct_api.export(
+                    flavor_path=(str(self._flavor_path_rel),),
+                    export_path=str(self.workspace.export_path),
+                    output_directory=str(self.workspace.output_path),
+                    release_name=self.language_alias,
+                    compression_strategy=self.compression_strategy,
+                )
 
     def export_no_copy(self) -> None:
         """
         Exports the current SLC to the internal output directory only, without copying to the export directory.
         """
         with current_directory(self.checkout_dir):
-            exaslct_api.export(
-                flavor_path=(str(self._flavor_path_rel),),
-                output_directory=str(self.workspace.output_path),
-                release_name=self.language_alias,
-                compression_strategy=self.compression_strategy,
-            )
+            with temporarily_disable_luigi_worker_shutdown_handler():
+                exaslct_api.export(
+                    flavor_path=(str(self._flavor_path_rel),),
+                    output_directory=str(self.workspace.output_path),
+                    release_name=self.language_alias,
+                    compression_strategy=self.compression_strategy,
+                )
 
     def _generate_bfs_params_from_secret_store(self):
         bfs_params: dict[str, Any] = {
@@ -266,14 +271,15 @@ class ScriptLanguageContainer:
         bfs_params = self._generate_bfs_params_from_secret_store()
 
         with current_directory(self.checkout_dir):
-            result = exaslct_api.deploy(
-                flavor_path=(str(self._flavor_path_rel),),
-                **bfs_params,
-                path_in_bucket=constants.PATH_IN_BUCKET,
-                release_name=self.language_alias,
-                output_directory=str(self.workspace.output_path),
-                compression_strategy=self.compression_strategy,
-            )
+            with temporarily_disable_luigi_worker_shutdown_handler():
+                result = exaslct_api.deploy(
+                    flavor_path=(str(self._flavor_path_rel),),
+                    **bfs_params,
+                    path_in_bucket=constants.PATH_IN_BUCKET,
+                    release_name=self.language_alias,
+                    output_directory=str(self.workspace.output_path),
+                    compression_strategy=self.compression_strategy,
+                )
             deploy_result = result[self._flavor_path_rel]["release"]
             builder = deploy_result.language_definition_builder
             components = builder.generate_definition_components()

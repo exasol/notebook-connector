@@ -4,6 +4,7 @@ import textwrap
 from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from threading import Thread
 from test.bucketfs_protocol import BucketFSProtocol
 from test.package_manager import PackageManager
 
@@ -112,6 +113,21 @@ def _check_exported_slc_exists(expected_suffix: str, expected_path: Path) -> Non
     assert tar_sum[0].is_file()
 
 
+def _run_in_background_thread(action):
+    errors = []
+
+    def run():
+        try:
+            action()
+        except Exception as exc:  # pragma: no cover - captured for assertion
+            errors.append(exc)
+
+    thread = Thread(target=run)
+    thread.start()
+    thread.join()
+    return errors
+
+
 @pytest.mark.dependency(name="export_slc_no_copy")
 def test_export_slc_no_copy(
     sample_slc: ScriptLanguageContainer, compression_strategy: CompressionStrategy
@@ -188,6 +204,17 @@ def test_deploy_cert_fails(
 @pytest.mark.dependency(name="deploy_slc", depends=["deploy_cert_fails"])
 def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
     sample_slc.deploy()
+    assert sample_slc.activation_key == expected_activation_key(sample_slc)
+    act_key_from_deploy = sample_slc.secrets.get(sample_slc._alias_key)
+    act_key_from_generate = sample_slc.generate_activation_key(False)
+    assert act_key_from_deploy == act_key_from_generate
+
+
+def test_deploy_in_background_thread_disables_luigi_signal_handler(
+    sample_slc: ScriptLanguageContainer, setup_itde_module
+):
+    errors = _run_in_background_thread(sample_slc.deploy)
+    assert errors == []
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
     act_key_from_deploy = sample_slc.secrets.get(sample_slc._alias_key)
     act_key_from_generate = sample_slc.generate_activation_key(False)
