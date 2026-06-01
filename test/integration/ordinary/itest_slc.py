@@ -4,9 +4,9 @@ import textwrap
 from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from threading import Thread
 from test.bucketfs_protocol import BucketFSProtocol
 from test.package_manager import PackageManager
-from threading import Thread
 
 import pytest
 from docker.models.images import Image as DockerImage
@@ -132,7 +132,9 @@ def _run_in_background_thread(action):
 def test_export_slc_no_copy(
     sample_slc: ScriptLanguageContainer, compression_strategy: CompressionStrategy
 ):
-    sample_slc.export_no_copy()
+    errors = _run_in_background_thread(sample_slc.export_no_copy)
+    assert errors == []
+
     export_path = sample_slc.workspace.export_path
     expected_suffix = (
         "tar" if compression_strategy == CompressionStrategy.NONE else "tar.gz"
@@ -147,7 +149,9 @@ def test_export_slc_no_copy(
 def test_export_slc(
     sample_slc: ScriptLanguageContainer, compression_strategy: CompressionStrategy
 ):
-    sample_slc.export()
+    errors = _run_in_background_thread(sample_slc.export)
+    assert errors == []
+
     export_path = sample_slc.workspace.export_path
     expected_suffix = (
         "tar" if compression_strategy == CompressionStrategy.NONE else "tar.gz"
@@ -203,16 +207,6 @@ def test_deploy_cert_fails(
 
 @pytest.mark.dependency(name="deploy_slc", depends=["deploy_cert_fails"])
 def test_deploy(sample_slc: ScriptLanguageContainer, setup_itde_module):
-    sample_slc.deploy()
-    assert sample_slc.activation_key == expected_activation_key(sample_slc)
-    act_key_from_deploy = sample_slc.secrets.get(sample_slc._alias_key)
-    act_key_from_generate = sample_slc.generate_activation_key(False)
-    assert act_key_from_deploy == act_key_from_generate
-
-
-def test_deploy_in_background_thread_disables_luigi_signal_handler(
-    sample_slc: ScriptLanguageContainer, setup_itde_module
-):
     errors = _run_in_background_thread(sample_slc.deploy)
     assert errors == []
     assert sample_slc.activation_key == expected_activation_key(sample_slc)
