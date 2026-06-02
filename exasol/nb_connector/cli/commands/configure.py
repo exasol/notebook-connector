@@ -3,7 +3,7 @@ from pathlib import Path
 from exasol.nb_connector.ai_lab_config import (
     StorageBackend,
 )
-from exasol.nb_connector.cli.groups import cli
+from exasol.nb_connector.cli.groups import scs_cli
 from exasol.nb_connector.cli.options import (
     DOCKER_DB_OPTIONS,
     ONPREM_OPTIONS,
@@ -13,7 +13,7 @@ from exasol.nb_connector.cli.param_wrappers import add_params
 from exasol.nb_connector.cli.processing import processing
 
 
-@cli.group()
+@scs_cli.group()
 def configure():
     """
     Add configuration options to the Secure Configuration Storage.

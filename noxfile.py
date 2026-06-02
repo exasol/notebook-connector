@@ -52,7 +52,7 @@ def jupyter(session: nox.Session) -> None:
     """Start JupyterLab pointing at the notebooks embedded in the package.
 
     Usage:
-        nox -s jupyter                    # default port 8888
+        nox -s jupyter                    # default port 49494
         nox -s jupyter -- --port 9999     # custom port
         nox -s jupyter -- --ip 0.0.0.0   # bind to all interfaces
         nox -s jupyter -- --no-browser    # suppress auto-open

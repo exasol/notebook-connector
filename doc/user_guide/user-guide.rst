@@ -5,6 +5,7 @@
    :maxdepth: 2
    :hidden:
 
+   ai-lab-cli
    scs-cli
 
 .. _install_nc:
