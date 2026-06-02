@@ -26,4 +26,7 @@ def ai_lab_cli():
     pass
 
 
+# The circular import occurs when importing `exasol.nb_connector.cli.commands`,
+# before `scs_cli` and `ai_lab_cli` groups were defined. So, moving this
+# side-effect import to the bottom, allowing the decorators to attach the defined groups.
 import exasol.nb_connector.cli.commands  # noqa: E402,F401
