@@ -45,7 +45,7 @@ SQLAlchemy
 ``open_sqlalchemy_connection`` returns a standard ``sqlalchemy.Engine``.  It is
 the right choice when working with tools that expect SQLAlchemy, such as
 ``pandas.read_sql``, SQLAlchemy ORM models, or `Alembic
-<https://alembic.sqlalchemy.org>`_ migrations.  The ``db_schema`` stored in
+<https://alembic.sqlalchemy.org/en/latest/>`_ migrations.  The ``db_schema`` stored in
 the SCS is automatically set as the connection's default schema.
 
 .. code-block:: python
