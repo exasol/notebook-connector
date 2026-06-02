@@ -1,3 +1,5 @@
+from threading import Thread
+
 from exasol_integration_test_docker_environment.lib.docker import (
     ContextDockerClient,
 )
@@ -39,6 +41,48 @@ def stop_itde(conf: Secrets):
     with ContextDockerClient() as docker_client:
         container = docker_client.containers.get(container_name)
         container.stop()
+
+
+def test_bring_itde_up_in_background_thread_disables_luigi_signal_handler(
+    secrets,
+):
+    secrets.save(AILabConfig.mem_size, "2")
+    secrets.save(AILabConfig.disk_size, "4")
+
+    errors = []
+
+    def run_bring_itde_up():
+        try:
+            bring_itde_up(secrets)
+        except Exception as exc:  # pragma: no cover - captured for assertion
+            errors.append(exc)
+
+    thread = Thread(target=run_bring_itde_up)
+    thread.start()
+    thread.join()
+
+    assert errors == []
+    assert secrets.get(AILabConfig.itde_container) == DB_CONTAINER_NAME
+    assert secrets.get(AILabConfig.itde_volume) == DB_VOLUME_NAME
+    assert secrets.get(AILabConfig.itde_network) == DB_NETWORK_NAME
+    assert secrets.get(AILabConfig.db_host_name) == secrets.get(
+        AILabConfig.bfs_host_name
+    )
+    assert secrets.get(AILabConfig.db_user) == "sys"
+    assert secrets.get(AILabConfig.db_password) == "exasol"
+    assert secrets.get(AILabConfig.db_encryption) == "True"
+    assert secrets.get(AILabConfig.db_port) == "8563"
+    assert secrets.get(AILabConfig.bfs_service) == "bfsdefault"
+    assert secrets.get(AILabConfig.bfs_bucket) == "default"
+    assert secrets.get(AILabConfig.bfs_encryption) == "False"
+    assert secrets.get(AILabConfig.bfs_user) == "w"
+    assert secrets.get(AILabConfig.bfs_password) == "write"
+    assert secrets.get(AILabConfig.bfs_port) == "2580"
+
+    try:
+        assert ItdeContainerStatus.RUNNING in get_itde_status(secrets)
+    finally:
+        remove_itde()
 
 
 def test_bring_itde_up(secrets):
