@@ -7,6 +7,16 @@
 
    ai-lab-cli
    scs-cli
+   cli-examples
+   secret-store-examples
+   database-connection-examples
+   bucketfs-examples
+   itde-examples
+   slc-examples
+   transformers-extension-examples
+   text-ai-extension-examples
+   github-artifacts-examples
+   cloud-storage-examples
 
 .. _install_nc:
 
@@ -111,3 +121,29 @@ Method ``create()`` will then
 The constructor of class ``ScriptLanguageContainer`` verifies the SCS to
 contain the flavor and the SLC repository to be cloned to the local file
 system.
+
+
+CLI Usage
+**********
+
+See :doc:`cli-examples` for step-by-step CLI workflows using the ``scs`` and
+``ai-lab`` commands.
+
+Python API Usage
+*****************
+
+The sections below explain how to use the main Python APIs.  Every API
+function reads its connection parameters from a
+:py:class:`~exasol.nb_connector.secret_store.Secrets` object (the *Secure
+Configuration Storage*, SCS), so setting up the SCS correctly is the very
+first step.
+
+* :doc:`secret-store-examples` – create/open the SCS, save/read keys, choose on-prem or SaaS backend.
+* :doc:`database-connection-examples` – pyexasol, SQLAlchemy, and Ibis connections.
+* :doc:`bucketfs-examples` – upload files to BucketFS and build UDF-visible paths.
+* :doc:`itde-examples` – start and manage a local Docker database.
+* :doc:`slc-examples` – build and deploy custom Script Language Containers.
+* :doc:`transformers-extension-examples` – run Hugging Face models as Exasol UDFs.
+* :doc:`text-ai-extension-examples` – named-entity recognition and feature extraction UDFs.
+* :doc:`github-artifacts-examples` – download the latest extension JARs from GitHub.
+* :doc:`cloud-storage-examples` – read/write S3, Azure Blob, and GCS from Exasol UDFs.
