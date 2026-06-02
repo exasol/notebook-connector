@@ -63,7 +63,12 @@ def _connect_via_http(url: str, timeout: float = 60.0, interval: float = 1.0) ->
 def ai_lab(*args: str, env: dict | None = None) -> subprocess.CompletedProcess:
     """Invoke the real ai-lab entry-point via the current Python interpreter."""
     return subprocess.run(
-        [sys.executable, "-m", "exasol.nb_connector.cli.main"] + list(args),
+        [
+            sys.executable,
+            "-c",
+            "from exasol.nb_connector.cli.groups import ai_lab_cli; ai_lab_cli()",
+        ]
+        + list(args),
         capture_output=True,
         text=True,
         timeout=_SUBPROCESS_TIMEOUT,
@@ -257,8 +262,8 @@ class TestStartIntegration:
 
         cmd = [
             sys.executable,
-            "-m",
-            "exasol.nb_connector.cli.main",
+            "-c",
+            "from exasol.nb_connector.cli.groups import ai_lab_cli; ai_lab_cli()",
             "start",
             "--port",
             str(port),
@@ -320,8 +325,8 @@ class TestEdgeCases:
         assert "stop" not in result.stdout
 
     def test_start_help_shows_default_port(self):
-        """Default port 8888 is visible in start --help output."""
+        """Default port 49494 is visible in start --help output."""
         result = ai_lab("start", "--help")
 
         assert result.returncode == 0, result.stderr
-        assert "8888" in result.stdout
+        assert "49494" in result.stdout

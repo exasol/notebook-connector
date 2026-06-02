@@ -3,7 +3,7 @@ CLI commands for the Exasol AI Lab Jupyter server and notebook deployment.
 
 Usage examples
 --------------
-Start JupyterLab on port 8888 (default):
+Start JupyterLab on port 49494 (default):
 
     ai-lab start
 
@@ -27,7 +27,7 @@ from pathlib import Path
 
 import click
 
-from exasol.nb_connector.cli.groups import cli
+from exasol.nb_connector.cli.groups import ai_lab_cli
 
 
 def _notebook_dir():
@@ -77,10 +77,10 @@ def _deploy_notebooks_to(target_dir: Path, overwrite: bool) -> tuple[int, int]:
     return copied, skipped
 
 
-@cli.command("start")
+@ai_lab_cli.command("start")
 @click.option(
     "--port",
-    default=8888,
+    default=49494,
     show_default=True,
     type=int,
     help="Port on which JupyterLab will be listening",
@@ -146,7 +146,7 @@ def start(port: int, ip: str, notebook_dir: Path | None, no_browser: bool) -> No
         click.echo("\nJupyterLab stopped")
 
 
-@cli.command("deploy-notebooks")
+@ai_lab_cli.command("deploy-notebooks")
 @click.option(
     "--target-dir",
     required=True,

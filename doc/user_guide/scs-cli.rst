@@ -1,38 +1,30 @@
 :octicon:`terminal` Command Line Interface for the Secure Configuration Storage (SCS)
 #####################################################################################
 
-You can invoke Notebook Connector's command line interface for the Secure
-Configuration Storage (SCS) by running ``scs``.
+Notebook Connector installs the ``scs`` command line interface for managing
+Secure Configuration Storage files.
 
-The command line interface for accessing the SCS offers 3 main commands
+The ``scs`` CLI exposes three commands:
 
-* ``configure``: :ref:`Add or update <configure>` configuration items in the SCS.
-
-* ``show``: :ref:`Show <show>` the currently configured database connection.
-
-* ``check``: :ref:`Check <check>` whether the configuration is complete and
-  optionally verify the configuration by connecting to the configured Exasol
-  database instance.
+* ``check``
+* ``configure``
+* ``show``
 
 Help
 ****
 
-By adding option ``--help`` each of the commands will print extensive usage
-information, here is an example:
+Use ``--help`` on the top-level command or any subcommand to inspect the
+currently available command tree and options.
 
 .. code-block:: shell
 
-    Usage: scs configure [OPTIONS] COMMAND [ARGS]...
-
-      Add configuration options to the Secure Configuration Storage.
-
-    Options:
-      --help  Show this message and exit.
-
-    Commands:
-      docker-db  Configure connection to an Exasol Docker instance.
-      onprem     Configure connection to an Exasol on-premise instance.
-      saas       Configure connection to an Exasol SaaS instance.
+    scs --help
+    scs configure --help
+    scs configure onprem --help
+    scs configure saas --help
+    scs configure docker-db --help
+    scs show --help
+    scs check --help
 
 Master Password and SCS File
 ****************************
@@ -44,24 +36,26 @@ your command line shell (e.g. ``~/.bash_history``) the CLI only allows the
 following methods for entering any secret value:
 
 * Interactive typing, the typed characters will be invisible
+* Setting a related environment variable, which is useful for automating the
+  SCS usage
 
-* Setting a related environment variable, which is useful for automating the SCS usage
-
-Additionally all of the CLI commands require to specify the file containing
-the SCS. If the file does not exist then the CLI will create it.  The CLI
-needs the master password for creating a new encrypted file but also for
-accessing an existing encrypted file.
+All commands operate on an SCS file. If the file does not exist then the CLI
+will create it. The CLI needs the master password for creating a new encrypted
+file but also for accessing an existing encrypted file.
 
 Master password and SCS file can be specified by using the following
 environment variables:
 
-+-------------------------+------------------------------------------------------------------+
-| Name                    | Value                                                            |
-+=========================+==================================================================+
-| ``SCS_FILE``            | Path to the encrypted SCS file                                   |
-+-------------------------+------------------------------------------------------------------+
-| ``SCS_MASTER_PASSWORD`` | Master password for creating or accessing the encrypted SCS file |
-+-------------------------+------------------------------------------------------------------+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 1
+
+   * - Name
+     - Value
+   * - ``SCS_FILE``
+     - Path to the encrypted SCS file.
+   * - ``SCS_MASTER_PASSWORD``
+     - Master password for creating or accessing the encrypted SCS file.
 
 
 .. _configure:
@@ -77,30 +71,136 @@ different variants:
 * ``saas``
 * ``docker-db``
 
-Here is the CLI command for configuring a connection to an Exasol SaaS
-instance:
+Common ``configure`` options
+============================
+
+These options are available on every ``configure`` subcommand:
+
+.. list-table::
+   :widths: 35 65
+   :header-rows: 1
+
+   * - Option
+     - Meaning
+   * - ``SCS_FILE``
+     - Positional path to the encrypted SCS file. Can also be provided via
+       the ``SCS_FILE`` environment variable.
+   * - ``--overwrite-backend`` / ``--no-overwrite-backend``
+     - Whether to overwrite a different backend already stored in the SCS.
+   * - ``--db-schema``
+     - Database schema for installing UDFs of Exasol extensions.
+
+Command ``configure onprem``
+============================
+
+Use ``configure onprem`` for an Exasol on-premise instance.
+
+.. code-block:: shell
+
+    scs configure onprem <SCS file>
+
+.. list-table::
+   :widths: 35 65
+   :header-rows: 1
+
+   * - Option
+     - Meaning
+   * - ``--db-host-name``
+     - Database connection host name.
+   * - ``--db-port``
+     - Database connection port. Default: ``8563``.
+   * - ``--db-username``
+     - Database user name.
+   * - ``--db-password``
+     - Database password. Secret option. Related environment variable:
+       ``SCS_EXASOL_DB_PASSWORD``.
+   * - ``--db-use-encryption`` / ``--no-db-use-encryption``
+     - Whether to encrypt communication with the database. Default:
+       ``--db-use-encryption``.
+   * - ``--bucketfs-host``
+     - BucketFS host name.
+   * - ``--bucketfs-host-internal``
+     - BucketFS internal host name. Default: ``localhost``.
+   * - ``--bucketfs-port``
+     - BucketFS port. Default: ``2580``.
+   * - ``--bucketfs-port-internal``
+     - BucketFS internal port. Default: ``2580``.
+   * - ``--bucketfs-user``
+     - BucketFS user name. Default: ``w``.
+   * - ``--bucketfs-password``
+     - BucketFS write password. Secret option. Related environment variable:
+       ``SCS_BUCKETFS_PASSWORD``.
+   * - ``--bucketfs-name``
+     - BucketFS service name, for example ``bfsdefault``.
+   * - ``--bucket``
+     - BucketFS bucket name, for example ``default``.
+   * - ``--bucketfs-use-encryption`` / ``--no-bucketfs-use-encryption``
+     - Whether to encrypt communication with BucketFS. Default:
+       ``--bucketfs-use-encryption``.
+   * - ``--ssl-use-cert-validation`` / ``--no-ssl-use-cert-validation``
+     - Whether to validate SSL certificates. Default:
+       ``--ssl-use-cert-validation``.
+   * - ``--ssl-cert-path``
+     - Path to a trusted CA file or directory.
+
+Command ``configure saas``
+==========================
+
+Use ``configure saas`` for an Exasol SaaS instance.
 
 .. code-block:: shell
 
     scs configure saas <SCS file>
 
-The available configuration options are specific to each of the instance
-variants. Variant ``onprem`` requires to specify ``--db-host-name``, for
-instance, while variant ``saas`` requires ``--saas-token``.
+.. list-table::
+   :widths: 35 65
+   :header-rows: 1
 
-Use the CLI help to show all available options, incl. default values and also
-related environment variables for secrets, e.g. ``SCS_EXASOL_DB_PASSWORD`` for
-``--db-password``:
+   * - Option
+     - Meaning
+   * - ``--saas-url``
+     - Exasol SaaS service URL. Default: ``https://cloud.exasol.com``.
+   * - ``--saas-account-id``
+     - Exasol SaaS account ID.
+   * - ``--saas-database-id``
+     - Exasol SaaS database ID. Can be used instead of
+       ``--saas-database-name``.
+   * - ``--saas-database-name``
+     - Exasol SaaS database name. Can be used instead of
+       ``--saas-database-id``.
+   * - ``--saas-token``
+     - Exasol SaaS personal access token. Secret option. Related environment
+       variable: ``SCS_EXASOL_SAAS_TOKEN``.
+   * - ``--ssl-use-cert-validation`` / ``--no-ssl-use-cert-validation``
+     - Whether to validate SSL certificates. Default:
+       ``--ssl-use-cert-validation``.
+   * - ``--ssl-cert-path``
+     - Path to a trusted CA file or directory.
+
+Command ``configure docker-db``
+===============================
+
+Use ``configure docker-db`` for an Exasol Docker instance managed via ITDE.
 
 .. code-block:: shell
 
-    scs configure onprem --help
-    scs configure saas --help
-    scs configure docker-db --help
+    scs configure docker-db <SCS file>
 
+.. list-table::
+   :widths: 35 65
+   :header-rows: 1
+
+   * - Option
+     - Meaning
+   * - ``--db-mem-size``
+     - Database memory size in GiB. Default: ``8``.
+   * - ``--db-disk-size``
+     - Database disk size in GiB. Default: ``2``.
+   * - ``--accelerator``
+     - Hardware acceleration. Default: ``none``.
 
 Incremental Configuration
--------------------------
+=========================
 
 CLI command ``configure`` allows you to configure the database connection
 partially and add more configuration items incrementally at a later point in
@@ -122,7 +222,7 @@ In the output passwords and other sensitive data are replaced by asterisks
 
 .. code-block:: shell
 
-        scs show <SCS file>
+    scs show <SCS file>
 
 Here is the output for a partially configured connection to an Exasol SaaS instance:
 
@@ -146,6 +246,16 @@ whether there are still some items missing.
 With option ``--connect`` the command also verifies the configuration by
 connecting to the configured Exasol database instance, executing a SQL
 statement and accessing the BucketFS.
+
+.. list-table::
+   :widths: 35 65
+   :header-rows: 1
+
+   * - Option
+     - Meaning
+   * - ``--connect`` / ``--no-connect``
+     - Verify that connecting to the configured Exasol database instance
+       succeeds. Default: ``--no-connect``.
 
 .. code-block:: shell
 

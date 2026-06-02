@@ -216,5 +216,5 @@ organization = "exasol"
 exclusions = "exasol/nb_connector/resources/notebooks/**"
 
 [tool.poetry.plugins."console_scripts"]
-scs = 'exasol.nb_connector.cli.main:main'
-ai-lab = 'exasol.nb_connector.cli.main:main'
+scs = 'exasol.nb_connector.cli.groups:scs_cli'
+ai-lab = 'exasol.nb_connector.cli.groups:ai_lab_cli'

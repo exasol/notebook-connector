@@ -67,3 +67,40 @@ dependency to avoid interferences as reported in `project Pyexasol
 .. _pytest-benchmark: https://pytest-benchmark.readthedocs.io/en/latest/
 .. _pyexasol_benchmark:
    https://exasol.github.io/pyexasol/master/developer_guide.html#performance-tests
+
+Building Documentation
+======================
+
+Generating the Sphinx documentation requires the optional dependencies from
+the productive extras in addition to the development dependencies. Install
+them with:
+
+.. code-block:: shell
+
+    poetry install --all-extras
+
+Then build the documentation with:
+
+.. code-block:: shell
+
+    poetry run nox -s docs:build
+
+Troubleshooting
+---------------
+
+If the documentation build fails because your virtual environment is out of
+sync, recreate it and rerun the build:
+
+.. code-block:: shell
+
+    poetry env remove --all
+    poetry install --all-extras
+    poetry run nox -s docs:build
+
+If you suspect stale generated HTML output, remove the build directory and run
+the docs build again:
+
+.. code-block:: shell
+
+    rm -r .html-documentation
+    poetry run nox -s docs:build
