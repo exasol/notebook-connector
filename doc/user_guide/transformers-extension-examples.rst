@@ -44,33 +44,6 @@ Each step can be skipped individually by passing the corresponding flag as
     # run_encapsulate_hf_token=True        – create the Hugging Face CONNECTION object
     # allow_override=True                  – overwrite existing language alias if present
 
-Uploading a Hugging Face model to BucketFS
-*******************************************
-
-UDFs cannot reach the internet at runtime, so models must be uploaded to
-BucketFS before they can be used.  ``upload_model`` downloads the specified
-model from the Hugging Face Hub (or reads it from a local ``cache_dir`` if
-already downloaded) and pushes all model files to BucketFS under the
-sub-directory configured in ``CKey.bfs_model_subdir`` (default: ``models``).
-
-Give each model its own ``cache_dir`` to avoid mixing files from different
-models in the same directory.
-
-.. code-block:: python
-
-    from exasol.nb_connector.transformers_extension_wrapper import upload_model
-
-    upload_model(
-        my_secrets,
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
-        cache_dir="/tmp/model_cache/all-MiniLM-L6-v2",
-    )
-
-.. note::
-   The Hugging Face token stored under ``CKey.huggingface_token`` is forwarded
-   automatically to the Hub client, so gated models are accessible without
-   extra configuration once the token is saved in the SCS.
-
 Deploying only UDF scripts
 ***************************
 
@@ -88,3 +61,56 @@ correct container.
     )
 
     deploy_scripts(my_secrets, language_alias=LANGUAGE_ALIAS)
+
+Uploading a Hugging Face Model to BucketFS
+******************************************
+
+Transformer UDFs read model files from BucketFS, so the model artifacts must
+be present there before the UDFs can use them.  The helper functions
+``upload_model`` and ``upload_model_from_cache`` in
+``exasol.nb_connector.transformers_extension_wrapper`` are intended to cover
+that step.
+
+``upload_model`` downloads a model into a local ``cache_dir`` by calling the
+Hugging Face client libraries and then forwards to
+``upload_model_from_cache``.
+
+At the moment, ``upload_model_from_cache`` is not implemented in this code
+base and raises ``NotImplementedError``.  So this section documents the role
+of these helpers, but not a complete working workflow in Notebook Connector
+itself.
+
+If you need a working end-to-end model-loading example today, use the bundled
+Transformers notebooks as the source of truth for the supported workflow.
+
+Running a UDF from SQL
+**********************
+
+The deployed Transformers Extension is consumed from SQL.  One example is the
+``TE_TEXT_GENERATION_UDF`` shown in the bundled notebook examples.  The query
+below assumes that the required model is already present in BucketFS and that
+``initialize_te_extension`` has already created the BucketFS ``CONNECTION``
+object stored in ``CKey.bfs_connection_name``.
+
+.. code-block:: python
+
+    from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+    from exasol.nb_connector.connections import open_pyexasol_connection
+    from exasol.nb_connector.language_container_activation import get_activation_sql
+
+    sql = f"""
+    SELECT {my_secrets.db_schema}.TE_TEXT_GENERATION_UDF(
+        NULL,
+        '{my_secrets.get(CKey.bfs_connection_name)}',
+        '{my_secrets.get(CKey.bfs_model_subdir)}',
+        'gpt2',
+        'Exasol can',
+        32,
+        True
+    )
+    """
+
+    with open_pyexasol_connection(my_secrets, compression=True) as conn:
+        conn.execute(get_activation_sql(my_secrets))
+        result = conn.execute(sql).fetchone()
+        print(result)

@@ -1,7 +1,8 @@
 Script Language Container (SLC) Examples
 ##########################################
 
-Script Language Containers (SLCs) are Docker-based Python environments that
+Script Language Containers (SLCs) are Linux container based Python
+environments that
 Exasol UDF scripts execute inside.  By building a custom SLC you can include
 any Python package your UDFs depend on without modifying the database server.
 The Notebook Connector automates the three-step process: register → build &
@@ -40,23 +41,15 @@ Step 2 – Build and upload the SLC
 
 Instantiate ``ScriptLanguageContainer`` with the same ``name`` used during
 ``create()``.  Calling ``deploy()`` builds the container image from the local
-clone, packages it as a tar archive, and streams the archive to BucketFS.
-It then registers the language alias in the database so the container is
-available for UDF execution.
-
-Pass an open database connection and an open BucketFS bucket; the helper
-functions from :doc:`database-connection-examples` and
-:doc:`bucketfs-examples` create them from the SCS automatically.
+clone, packages it as a tar archive, streams the archive to BucketFS, and
+stores the resulting language activation definition in the SCS.
 
 .. code-block:: python
 
-    from exasol.nb_connector.connections import open_pyexasol_connection, open_bucketfs_bucket
+    from exasol.nb_connector.slc import ScriptLanguageContainer
 
     slc = ScriptLanguageContainer(secrets=my_secrets, name="my_slc")
-    slc.deploy(
-        connection=open_pyexasol_connection(my_secrets),
-        bucketfs_bucket=open_bucketfs_bucket(my_secrets),
-    )
+    slc.deploy()
 
 Step 3 – Activate the language in the database
 ************************************************

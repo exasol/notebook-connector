@@ -60,7 +60,8 @@ so they are not accidentally exposed in logs or screenshots.
 ``ai-lab start`` launches a JupyterLab server and makes the bundled Exasol
 notebooks available under the directory specified by ``--notebook-dir``.
 The ``--port`` flag lets you pick a custom port if the default (8888) is
-already in use.
+already in use.  You do not pass the SCS file to ``ai-lab start`` itself;
+the notebooks opened inside JupyterLab work with the SCS separately.
 
 .. code-block:: shell
 

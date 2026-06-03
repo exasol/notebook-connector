@@ -60,6 +60,11 @@ exists but is not running), ``RUNNING`` (container process is alive),
 
 .. code-block:: python
 
+    from exasol.nb_connector.itde_manager import (
+        ItdeContainerStatus,
+        get_itde_status,
+    )
+
     status = get_itde_status(my_secrets)
     if status == ItdeContainerStatus.READY:
         print("Docker DB is up and reachable")
@@ -76,20 +81,25 @@ Docker process needs to be resumed.
 
 .. code-block:: python
 
+    from exasol.nb_connector.itde_manager import restart_itde
+
     restart_itde(my_secrets)
 
 Shutting down
 **************
 
-``take_itde_down`` stops the container and removes it together with all its
-Docker volumes and networks, freeing all disk space.  Pass ``stop_db=False``
-if you want to keep the container intact (e.g. to inspect logs) but still
-clean up the related SCS entries.
+``take_itde_down`` removes the ITDE connection settings from the SCS.  By
+default it also stops and removes the Docker container together with its
+volumes and networks, freeing the related disk space.  Pass
+``stop_db=False`` if the Docker-DB instance should remain intact, for example
+when it was provided externally or when you want to inspect it manually.
 
 .. code-block:: python
+
+    from exasol.nb_connector.itde_manager import take_itde_down
 
     # Full teardown: stop container, remove volumes and networks
     take_itde_down(my_secrets)
 
-    # Keep the Docker container but remove SCS connection entries
-    # take_itde_down(my_secrets, stop_db=False)
+    # Keep the Docker container but remove the ITDE connection entries from the SCS
+    take_itde_down(my_secrets, stop_db=False)

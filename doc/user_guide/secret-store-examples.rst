@@ -6,6 +6,9 @@ Notebook Connector.  It stores key-value pairs in an AES-encrypted SQLite
 database on disk.  You must create or open a ``Secrets`` instance before
 calling any other API.
 
+Unless stated otherwise, the snippets below work both in Jupyter notebooks and
+in regular Python files.
+
 Opening or creating a store
 ****************************
 
@@ -44,6 +47,8 @@ is absent, or you can supply a second argument as a default.
 
 .. code-block:: python
 
+    from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+
     my_secrets.save(CKey.db_host_name, "192.168.1.10")
     my_secrets.save(CKey.db_port,      "8563")
     my_secrets.save(CKey.db_user,      "sys")
@@ -53,14 +58,16 @@ is absent, or you can supply a second argument as a default.
     host   = my_secrets.get(CKey.db_host_name)           # returns None if absent
     schema = my_secrets.get(CKey.db_schema, "MY_SCHEMA") # with a default
 
-Iterating and removing
-***********************
+Iterating and Removing
+**********************
 
 ``my_secrets.items()`` returns all stored key-value pairs as an iterable,
 which is useful for debugging or exporting the configuration.
 ``my_secrets.remove(key)`` permanently deletes a single entry from the store.
 
 .. code-block:: python
+
+    from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 
     for key, value in my_secrets.items():
         print(key, "->", value)
@@ -78,6 +85,8 @@ SaaS-specific keys shown below.
 
 .. code-block:: python
 
+    from exasol.nb_connector.ai_lab_config import AILabConfig as CKey, StorageBackend
+
     # On-prem (default when key is absent)
     my_secrets.save(CKey.storage_backend, StorageBackend.onprem.name)
 
@@ -94,6 +103,7 @@ useful to branch logic in notebooks that need to work in both modes.
 .. code-block:: python
 
     from exasol.nb_connector.connections import get_backend
+
     print(get_backend(my_secrets))   # StorageBackend.onprem or StorageBackend.saas
 
 All supported configuration keys

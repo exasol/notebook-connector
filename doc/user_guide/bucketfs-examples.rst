@@ -5,7 +5,9 @@ BucketFS is Exasol's distributed file system that is accessible from inside
 UDF scripts.  You use it to store model files, JARs, configuration data, and
 any other large assets that UDFs need at runtime.  The Notebook Connector
 provides two APIs for BucketFS: a lower-level bucket API and a higher-level
-PathLike interface.
+`PathLike <https://exasol.github.io/bucketfs-python/main/api.html#exasol.bucketfs._path.PathLike>`_
+interface.  For the underlying BucketFS client API, see the
+`bucketfs-python API reference <https://exasol.github.io/bucketfs-python/main/api.html>`_.
 
 Configuration
 **************
@@ -33,11 +35,13 @@ them manually for a self-hosted on-premise Exasol installation.
 Uploading and accessing files via the bucket API
 *************************************************
 
-``open_bucketfs_bucket`` returns a bucket object from the `exasol-bucketfs
-<https://pypi.org/project/exasol-bucketfs>`_ library.  Call
+``open_bucketfs_bucket`` returns a bucket object from the
+`exasol-bucketfs <https://pypi.org/project/exasol-bucketfs>`_ library.  Call
 ``bucket.upload(target_path, file_object)`` to stream a local file into
 BucketFS.  The ``target_path`` is the path inside the bucket — it is relative
-to the bucket root.
+to the bucket root.  For more details on bucket objects and helper utilities
+such as ``exasol.bucketfs.as_string`` and ``exasol.bucketfs.as_file``, see the
+`bucketfs-python user guide <https://exasol.github.io/bucketfs-python/main/user_guide/user_guide.html>`_.
 
 ``get_udf_bucket_path`` returns the absolute path that Exasol UDFs use to
 read files from this bucket (e.g. ``/buckets/bfsdefault/default``).  Append
@@ -53,7 +57,7 @@ the relative ``target_path`` used during upload to build the full UDF path.
     with open("my_model.pkl", "rb") as f:
         bucket.upload("models/my_model.pkl", f)
 
-    # Print the path that UDFs use to reference this bucket
+    # Print the path that UDFs can use to access this bucket
     print(get_udf_bucket_path(my_secrets))
     # e.g.  /buckets/bfsdefault/default
 
@@ -64,7 +68,9 @@ PathLike interface
 ``/`` operator for path joining, similar to ``pathlib.Path``.  Use ``.write``
 to upload bytes and ``.read`` to download them.  This API is more Pythonic
 than the raw bucket API and is preferred when you need to compose paths
-programmatically.
+programmatically.  The
+`bucketfs-python PathLike docs <https://exasol.github.io/bucketfs-python/main/api.html#exasol.bucketfs._path.PathLike>`_
+cover the supported operations in more detail.
 
 .. code-block:: python
 

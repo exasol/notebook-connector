@@ -14,9 +14,10 @@ Step 1 – Download the extension JAR
 *************************************
 
 Use ``retrieve_jar`` to download the latest Cloud Storage Extension JAR from
-GitHub.  Specifying a ``storage_path`` keeps the file in a known location so
-you can inspect it or reuse it across sessions.  See
-:doc:`github-artifacts-examples` for more details on the download helpers.
+GitHub.  This is a small helper step inside the larger deployment workflow:
+resolve the latest release artifact for the extension and save it locally.
+Specifying a ``storage_path`` keeps the file in a known location so you can
+inspect it or reuse it across sessions.
 
 .. code-block:: python
 
@@ -31,6 +32,17 @@ you can inspect it or reuse it across sessions.  See
 
     jar_path = retrieve_jar(Project.CLOUD_STORAGE_EXTENSION, storage_path=pathlib.Path("/tmp"))
 
+If you need to inspect the exact version before downloading, call
+``get_latest_version_and_jar_url`` first:
+
+.. code-block:: python
+
+    from exasol.nb_connector.github import get_latest_version_and_jar_url
+
+    version, jar_url = get_latest_version_and_jar_url(Project.CLOUD_STORAGE_EXTENSION)
+    print(version)
+    print(jar_url)
+
 Step 2 – Upload the JAR to BucketFS
 *************************************
 
@@ -41,6 +53,8 @@ first argument is the name (path) inside the bucket — here we use
 ``jar_path.name`` to keep it at the bucket root.
 
 .. code-block:: python
+
+    from exasol.nb_connector.connections import open_bucketfs_bucket
 
     bucket = open_bucketfs_bucket(my_secrets)
     with open(jar_path, "rb") as f:
@@ -57,6 +71,8 @@ it knows where to find the JAR at UDF execution time.
 
 .. code-block:: python
 
+    from exasol.nb_connector.connections import get_udf_bucket_path
+
     udf_jar_path = get_udf_bucket_path(my_secrets) + "/" + jar_path.name
     # e.g. /buckets/bfsdefault/default/exasol-cloud-storage-extension-2.8.0.jar
 
@@ -70,6 +86,9 @@ above.  After this call completes, cloud storage can be used in SQL statements
 from any session that activates the schema.
 
 .. code-block:: python
+
+    from exasol.nb_connector.cloud_storage import setup_scripts
+    from exasol.nb_connector.connections import open_pyexasol_connection
 
     with open_pyexasol_connection(my_secrets, schema="MY_SCHEMA") as conn:
         setup_scripts(conn, schema_name="MY_SCHEMA", bucketfs_jar_path=udf_jar_path)
