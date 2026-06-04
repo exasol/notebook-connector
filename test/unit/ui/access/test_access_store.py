@@ -70,9 +70,7 @@ def test_access_store_legacy_relative_path_is_upgraded_to_absolute(
     assert file_name_field.value == legacy_relative_path
 
 
-def test_access_store_explicit_root_dir_overrides_notebook_dir(
-    tmp_path, monkeypatch
-):
+def test_access_store_explicit_root_dir_overrides_notebook_dir(tmp_path, monkeypatch):
     """
     Test that an explicit root_dir is preferred over NOTEBOOK_DIR for display and
     resolution.
@@ -102,9 +100,7 @@ def test_access_store_explicit_root_dir_overrides_notebook_dir(
     assert file_name_field.value == relative_file_path
 
 
-def test_access_store_relative_root_dir_is_resolved_to_absolute(
-    tmp_path, monkeypatch
-):
+def test_access_store_relative_root_dir_is_resolved_to_absolute(tmp_path, monkeypatch):
     """
     Test that a relative root_dir is resolved against cwd before the store path is
     joined and persisted.
@@ -155,9 +151,7 @@ def test_access_store_absolute_path_outside_base_is_displayed_absolute(
     assert file_name_field.value == str(outside_path)
 
 
-def test_access_store_relative_input_falls_back_to_cwd(
-    tmp_path, monkeypatch
-):
+def test_access_store_relative_input_falls_back_to_cwd(tmp_path, monkeypatch):
     """
     Test that relative input resolves against the current working directory when
     neither root_dir nor NOTEBOOK_DIR is available.
