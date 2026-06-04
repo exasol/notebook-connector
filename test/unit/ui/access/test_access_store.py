@@ -58,6 +58,7 @@ def test_access_store_legacy_relative_path_is_upgraded_to_absolute(
     file_name_field = ui.children[0].children[1].children[1]
     expected_absolute_path = str((tmp_path / legacy_relative_path).resolve())
     assert file_name_field.value == legacy_relative_path
+    assert test_scs_file.read_text().strip() == legacy_relative_path
 
     password_field = ui.children[0].children[2].children[1]
     password_field.value = "password"

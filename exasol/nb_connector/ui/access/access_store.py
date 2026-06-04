@@ -63,8 +63,6 @@ def set_sb_store_file(value):
 def get_access_store(root_dir: str | None = None) -> widgets.Widget:
     sb_store_file = get_sb_store_file()
     sb_store_file_ = _resolve_scs_file_path(root_dir, sb_store_file)
-    if not Path(sb_store_file).is_absolute():
-        set_sb_store_file(str(sb_store_file_))
     ui_look = config_styles()
 
     header_lbl = widgets.Label(
