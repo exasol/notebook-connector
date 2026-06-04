@@ -102,6 +102,39 @@ def test_access_store_explicit_root_dir_overrides_notebook_dir(
     assert file_name_field.value == relative_file_path
 
 
+def test_access_store_relative_root_dir_is_resolved_to_absolute(
+    tmp_path, monkeypatch
+):
+    """
+    Test that a relative root_dir is resolved against cwd before the store path is
+    joined and persisted.
+    """
+    notebooks_dir = tmp_path / "notebooks"
+    notebooks_dir.mkdir()
+    monkeypatch.chdir(notebooks_dir)
+    test_scs_file = tmp_path / "scs_file"
+    monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
+    monkeypatch.delenv("NOTEBOOK_DIR", raising=False)
+
+    relative_root_dir = ".."
+    relative_file_path = "relative-root.sqlite"
+    test_scs_file.write_text(relative_file_path)
+
+    ui = access_ui.get_access_store(relative_root_dir)
+    file_name_field = ui.children[0].children[1].children[1]
+    expected_absolute_path = str((tmp_path / relative_file_path).resolve())
+    assert file_name_field.value == relative_file_path
+
+    password_field = ui.children[0].children[2].children[1]
+    password_field.value = "password"
+    open_button = ui.children[1]
+    open_button.click()
+
+    assert test_scs_file.read_text().strip() == expected_absolute_path
+    assert access_ui.get_sb_store_file() == expected_absolute_path
+    assert file_name_field.value == relative_file_path
+
+
 def test_access_store_absolute_path_outside_base_is_displayed_absolute(
     tmp_path, monkeypatch
 ):

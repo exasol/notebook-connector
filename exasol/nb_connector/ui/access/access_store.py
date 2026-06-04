@@ -23,24 +23,34 @@ def get_scs_location_file_path() -> Path:
 
 def _get_scs_path_base(root_dir: str | None) -> Path:
     if root_dir is not None:
-        return Path(root_dir)
+        root_dir_path = Path(root_dir)
+        if root_dir_path.is_absolute():
+            return _normalize_path_lexically(root_dir_path)
+        return _normalize_path_lexically(Path.cwd() / root_dir_path)
 
     notebook_dir = os.environ.get("NOTEBOOK_DIR")
     if notebook_dir:
-        return Path(notebook_dir)
+        return _normalize_path_lexically(notebook_dir)
 
-    return Path.cwd()
+    return _normalize_path_lexically(Path.cwd())
+
+
+def _normalize_path_lexically(path: str | Path) -> Path:
+    # Normalize lexically without resolving symlinks or touching the filesystem, to avoid
+    # constructing paths from user-controlled input with Path.resolve().
+    return Path(os.path.normpath(os.fspath(path)))
 
 
 def _resolve_scs_file_path(root_dir: str | None, scs_file: str | Path) -> Path:
-    path = Path(scs_file)
-    if path.is_absolute():
-        return path.resolve()
-    return (_get_scs_path_base(root_dir) / path).resolve()
+    path = os.fspath(scs_file)
+    if os.path.isabs(path):
+        return _normalize_path_lexically(path)
+    base_dir = os.fspath(_get_scs_path_base(root_dir))
+    return _normalize_path_lexically(os.path.join(base_dir, path))
 
 
 def _display_scs_file_path(root_dir: str | None, scs_file: str | Path) -> str:
-    base_dir = _get_scs_path_base(root_dir).resolve()
+    base_dir = _normalize_path_lexically(_get_scs_path_base(root_dir))
     resolved_path = _resolve_scs_file_path(root_dir, scs_file)
     try:
         return str(resolved_path.relative_to(base_dir))
