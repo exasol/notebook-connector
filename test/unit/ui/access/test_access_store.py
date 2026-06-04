@@ -34,3 +34,30 @@ def test_access_store_ui_store_read_and_write(tmp_path, monkeypatch):
     ui_read = access_ui.get_access_store(str(tmp_path))
     stored_name_field = ui_read.children[0].children[1].children[1]
     assert stored_name_field.value == absolute_file_path
+
+
+def test_access_store_legacy_relative_path_is_upgraded_to_absolute(
+    tmp_path, monkeypatch
+):
+    """
+    Test that a legacy relative cache entry is resolved against root_dir and
+    rewritten in absolute form after the store is opened.
+    """
+    monkeypatch.chdir(tmp_path)
+    test_scs_file = tmp_path / "scs_file"
+    monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
+
+    legacy_relative_path = "legacy_config.sqlite"
+    test_scs_file.write_text(legacy_relative_path)
+
+    ui = access_ui.get_access_store(str(tmp_path))
+    file_name_field = ui.children[0].children[1].children[1]
+    expected_absolute_path = str((tmp_path / legacy_relative_path).resolve())
+    assert file_name_field.value == expected_absolute_path
+
+    password_field = ui.children[0].children[2].children[1]
+    password_field.value = "password"
+    open_button = ui.children[1]
+    open_button.click()
+
+    assert test_scs_file.read_text().strip() == expected_absolute_path

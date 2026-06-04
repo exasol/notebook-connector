@@ -20,6 +20,13 @@ def get_scs_location_file_path() -> Path:
     return Path.home() / ".cache" / "notebook-connector" / "scs_file"
 
 
+def _resolve_scs_file_path(root_dir: str, scs_file: str | Path) -> Path:
+    path = Path(scs_file)
+    if path.is_absolute():
+        return path.resolve()
+    return (Path(root_dir) / path).resolve()
+
+
 def get_sb_store_file():
     try:
         return get_scs_location_file_path().read_text().strip()
@@ -33,7 +40,7 @@ def set_sb_store_file(value):
 
 
 def get_access_store(root_dir: str = ".") -> widgets.Widget:
-    sb_store_file_ = get_sb_store_file()
+    sb_store_file_ = _resolve_scs_file_path(root_dir, get_sb_store_file())
     ui_look = config_styles()
 
     header_lbl = widgets.Label(
@@ -48,7 +55,9 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
         value="Password", style=ui_look.label_style, layout=ui_look.label_layout
     )
     file_txt = widgets.Text(
-        value=sb_store_file_, style=ui_look.input_style, layout=ui_look.input_layout
+        value=str(sb_store_file_),
+        style=ui_look.input_style,
+        layout=ui_look.input_layout,
     )
     password_txt = widgets.Password(
         style=ui_look.input_style, layout=ui_look.input_layout
@@ -58,10 +67,10 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
     )
 
     def open_or_create_config_store(btn):
-        sb_store_file = file_txt.value
+        sb_store_file = _resolve_scs_file_path(root_dir, file_txt.value)
         ipython = get_ipython()
         try:
-            ai_lab_config = Secrets(Path(root_dir) / sb_store_file, password_txt.value)
+            ai_lab_config = Secrets(sb_store_file, password_txt.value)
             ai_lab_config.connection()
         except InvalidPassword:
             display_popup(
@@ -71,7 +80,7 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
             open_btn.icon = "check"
             ipython.push({"ai_lab_config": ai_lab_config}, interactive=True)
         finally:
-            set_sb_store_file(sb_store_file)
+            set_sb_store_file(str(sb_store_file))
 
     def on_value_change(change):
         open_btn.icon = "pen"
