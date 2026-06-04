@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import ipywidgets as widgets
@@ -20,11 +21,31 @@ def get_scs_location_file_path() -> Path:
     return Path.home() / ".cache" / "notebook-connector" / "scs_file"
 
 
-def _resolve_scs_file_path(root_dir: str, scs_file: str | Path) -> Path:
+def _get_scs_path_base(root_dir: str | None) -> Path:
+    if root_dir is not None:
+        return Path(root_dir)
+
+    notebook_dir = os.environ.get("NOTEBOOK_DIR")
+    if notebook_dir:
+        return Path(notebook_dir)
+
+    return Path.cwd()
+
+
+def _resolve_scs_file_path(root_dir: str | None, scs_file: str | Path) -> Path:
     path = Path(scs_file)
     if path.is_absolute():
         return path.resolve()
-    return (Path(root_dir) / path).resolve()
+    return (_get_scs_path_base(root_dir) / path).resolve()
+
+
+def _display_scs_file_path(root_dir: str | None, scs_file: str | Path) -> str:
+    base_dir = _get_scs_path_base(root_dir).resolve()
+    resolved_path = _resolve_scs_file_path(root_dir, scs_file)
+    try:
+        return str(resolved_path.relative_to(base_dir))
+    except ValueError:
+        return str(resolved_path)
 
 
 def get_sb_store_file():
@@ -39,8 +60,11 @@ def set_sb_store_file(value):
     get_scs_location_file_path().write_text(value)
 
 
-def get_access_store(root_dir: str = ".") -> widgets.Widget:
-    sb_store_file_ = _resolve_scs_file_path(root_dir, get_sb_store_file())
+def get_access_store(root_dir: str | None = None) -> widgets.Widget:
+    sb_store_file = get_sb_store_file()
+    sb_store_file_ = _resolve_scs_file_path(root_dir, sb_store_file)
+    if not Path(sb_store_file).is_absolute():
+        set_sb_store_file(str(sb_store_file_))
     ui_look = config_styles()
 
     header_lbl = widgets.Label(
@@ -55,7 +79,7 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
         value="Password", style=ui_look.label_style, layout=ui_look.label_layout
     )
     file_txt = widgets.Text(
-        value=str(sb_store_file_),
+        value=_display_scs_file_path(root_dir, sb_store_file_),
         style=ui_look.input_style,
         layout=ui_look.input_layout,
     )
@@ -68,6 +92,7 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
 
     def open_or_create_config_store(btn):
         sb_store_file = _resolve_scs_file_path(root_dir, file_txt.value)
+        file_txt.value = _display_scs_file_path(root_dir, sb_store_file)
         ipython = get_ipython()
         try:
             ai_lab_config = Secrets(sb_store_file, password_txt.value)
