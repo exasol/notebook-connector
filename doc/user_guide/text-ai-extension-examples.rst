@@ -77,11 +77,18 @@ The ``Extraction`` class wraps one or more UDF calls.  Provide an
 *extractor* that defines which UDFs to invoke, for example
 ``NamedEntityExtractor`` for NER or one of the default extractors from the
 Text AI package.  More advanced workflows can compose multiple extractors into
-pipelines.
+pipelines, for example by feeding a ``SourceTableExtractor`` into a
+``StandardExtractor`` via ``PipelineExtractor``.  If the workflow should fan
+out into parallel branches after the source step, use ``BranchExtractor``.
 
 Text AI extraction is incremental: it processes only source rows for which no
 results have been written yet.  The output tables therefore act as persistent
 storage for prior extraction results and are re-used across runs.
+
+Depending on the extractor, TXAIE can create more than one table.  Besides a
+main output table, some workflows also create support and lookup tables that
+store normalized intermediate results.  This is the same table layout used in
+the bundled preprocessing notebooks.
 
 Calling ``extraction.run(my_secrets)`` opens a database connection, activates
 the Text AI language container for the session, and executes the extraction
@@ -100,3 +107,88 @@ SQL against the configured source and output tables.
 
     # Execute the extraction — results are written to the output table
     extraction.run(my_secrets)
+
+Pipeline extraction example
+***************************
+
+If you want a reusable preprocessing workflow rather than a single UDF call,
+compose multiple extractors into a ``PipelineExtractor`` and then wrap the
+pipeline in ``Extraction``.
+
+.. code-block:: python
+
+    from exasol.nb_connector.text_ai_extension_wrapper import Extraction
+    from exasol.ai.text.extraction.abstract_extraction import Defaults, Output
+    from exasol.ai.text.extractors.extractor import PipelineExtractor
+    from exasol.ai.text.extractors.source_table_extractor import (
+        NameSelector,
+        SchemaSource,
+        SourceTableExtractor,
+        TableSource,
+    )
+    from exasol.ai.text.extractors.standard_extractor import StandardExtractor
+
+    src_extractor = SourceTableExtractor(
+        source=TableSource(
+            source=SchemaSource("MY_SCHEMA"),
+            table_names=NameSelector(["CUSTOMER_SUPPORT_TICKETS"]),
+        )
+    )
+    std_extractor = StandardExtractor()
+
+    extraction = Extraction(
+        extractor=PipelineExtractor(steps=[src_extractor, std_extractor]),
+        output=Output(db_schema="MY_SCHEMA"),
+        defaults=Defaults(),
+    )
+
+    extraction.run(my_secrets)
+
+In this pattern, each pipeline step can create its own output and support
+tables.  Re-running the pipeline is incremental as long as the previous output
+tables are still present.
+
+Branch extraction example
+*************************
+
+If you want to run multiple extractor branches from the same source data,
+wrap them in a ``BranchExtractor`` and then use that as one of the steps in a
+pipeline.
+
+.. code-block:: python
+
+    from exasol.nb_connector.text_ai_extension_wrapper import Extraction
+    from exasol.ai.text.extraction.abstract_extraction import Defaults, Output
+    from exasol.ai.text.extractors.extractor import BranchExtractor, PipelineExtractor
+    from exasol.ai.text.extractors.named_entity_extractor import NamedEntityExtractor
+    from exasol.ai.text.extractors.source_table_extractor import (
+        NameSelector,
+        SchemaSource,
+        SourceTableExtractor,
+        TableSource,
+    )
+    from exasol.ai.text.extractors.topic_classifier_extractor import TopicClassifierExtractor
+
+    src_extractor = SourceTableExtractor(
+        source=TableSource(
+            source=SchemaSource("MY_SCHEMA"),
+            table_names=NameSelector(["CUSTOMER_SUPPORT_TICKETS"]),
+        )
+    )
+    branched_extractors = BranchExtractor(
+        steps=[
+            NamedEntityExtractor(),
+            TopicClassifierExtractor(),
+        ]
+    )
+
+    extraction = Extraction(
+        extractor=PipelineExtractor(steps=[src_extractor, branched_extractors]),
+        output=Output(db_schema="MY_SCHEMA"),
+        defaults=Defaults(),
+    )
+
+    extraction.run(my_secrets)
+
+Each branch writes its own derived results, while the shared source and audit
+tables still support incremental re-runs across the whole workflow.

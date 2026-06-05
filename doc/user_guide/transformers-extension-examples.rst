@@ -86,31 +86,77 @@ Transformers notebooks as the source of truth for the supported workflow.
 Running a UDF from SQL
 **********************
 
-The deployed Transformers Extension is consumed from SQL.  One example is the
-``TE_TEXT_GENERATION_UDF`` shown in the bundled notebook examples.  The query
-below assumes that the required model is already present in BucketFS and that
-``initialize_te_extension`` has already created the BucketFS ``CONNECTION``
-object stored in ``CKey.bfs_connection_name``.
+The deployed Transformers Extension is consumed from SQL.  Before running any
+TE UDF, activate the language container in the current session.  The Python
+helper ``get_activation_sql`` returns the required ``ALTER SESSION`` statement.
 
 .. code-block:: python
 
-    from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-    from exasol.nb_connector.connections import open_pyexasol_connection
     from exasol.nb_connector.language_container_activation import get_activation_sql
 
-    sql = f"""
-    SELECT {my_secrets.db_schema}.TE_TEXT_GENERATION_UDF(
+    print(get_activation_sql(my_secrets))
+
+Then run the SQL UDFs directly.  The examples below assume that the model is
+already available in BucketFS and that ``initialize_te_extension`` has already
+created the BucketFS ``CONNECTION`` object stored in
+``CKey.bfs_connection_name``.
+
+Text generation
+===============
+
+.. code-block:: sql
+
+    SELECT MY_SCHEMA.TE_TEXT_GENERATION_UDF(
         NULL,
-        '{my_secrets.get(CKey.bfs_connection_name)}',
-        '{my_secrets.get(CKey.bfs_model_subdir)}',
+        'TE_BFS_SYS',
+        'models',
         'gpt2',
         'Exasol can',
         32,
-        True
-    )
-    """
+        TRUE
+    );
 
-    with open_pyexasol_connection(my_secrets, compression=True) as conn:
-        conn.execute(get_activation_sql(my_secrets))
-        result = conn.execute(sql).fetchone()
-        print(result)
+Zero-shot text classification
+=============================
+
+.. code-block:: sql
+
+    WITH MODEL_OUTPUT AS (
+        SELECT MY_SCHEMA.TE_ZERO_SHOT_TEXT_CLASSIFICATION_UDF(
+            NULL,
+            'TE_BFS_SYS',
+            'models',
+            'facebook/bart-large-mnli',
+            'Notebook Connector simplifies Exasol AI workflows.',
+            'documentation,databases,networking',
+            'ALL'
+        )
+    )
+    SELECT label, score, error_message
+    FROM MODEL_OUTPUT
+    ORDER BY score DESC;
+
+Using text columns from a table
+===============================
+
+When the input texts already live in a database table, pass the text column
+instead of a string literal.  This is the normal batch-processing mode for TE
+UDFs.
+
+.. code-block:: sql
+
+    WITH MODEL_OUTPUT AS (
+        SELECT MY_SCHEMA.TE_ZERO_SHOT_TEXT_CLASSIFICATION_UDF(
+            NULL,
+            'TE_BFS_SYS',
+            'models',
+            'facebook/bart-large-mnli',
+            MY_TEXT_COLUMN,
+            'positive,negative,neutral',
+            'HIGHEST'
+        )
+        FROM MY_TEXT_TABLE
+    )
+    SELECT label, score, error_message
+    FROM MODEL_OUTPUT
+    ORDER BY score DESC;

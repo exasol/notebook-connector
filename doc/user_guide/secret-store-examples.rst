@@ -6,6 +6,11 @@ Notebook Connector.  It stores key-value pairs in an AES-encrypted SQLite
 database on disk.  You must create or open a ``Secrets`` instance before
 calling any other API.
 
+Use this page as the shared prerequisite reference for the Python API.  For
+task-specific workflows such as BucketFS, database connections, ITDE, or AI
+extensions, continue with the dedicated example pages after the SCS has been
+created and populated.
+
 Unless stated otherwise, the snippets below work both in Jupyter notebooks and
 in regular Python files.
 
