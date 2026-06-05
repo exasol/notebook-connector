@@ -94,7 +94,11 @@ def test_access_store_sets_ai_lab_config_in_ipython(tmp_path):
     nb = nbformat.v4.new_notebook()
     nb.cells = [
         nbformat.v4.new_code_cell(f"""
+            from pathlib import Path
+            import exasol.nb_connector.ui.access.access_store as access_ui
             from exasol.nb_connector.ui.access.access_store import get_access_store
+
+            access_ui.get_scs_location_file_path = lambda: Path("{store_dir}") / "scs_file"
             
             ui = get_access_store("{store_dir}")
             display(ui)
