@@ -15,7 +15,7 @@ def test_access_store_ui_store_read_and_write(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     test_scs_file = tmp_path / "scs_file"
     monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
-    monkeypatch.delenv("NOTEBOOK_DIR", raising=False)
+    monkeypatch.delenv("NOTEBOOKS", raising=False)
 
     if test_scs_file.exists():
         test_scs_file.unlink()
@@ -43,13 +43,13 @@ def test_access_store_legacy_relative_path_is_upgraded_to_absolute(
     tmp_path, monkeypatch
 ):
     """
-    Test that a legacy relative cache entry is resolved against NOTEBOOK_DIR and
+    Test that a legacy relative cache entry is resolved against NOTEBOOKS and
     rewritten in absolute form after the store is opened.
     """
     monkeypatch.chdir(tmp_path)
     test_scs_file = tmp_path / "scs_file"
     monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
-    monkeypatch.setenv("NOTEBOOK_DIR", str(tmp_path))
+    monkeypatch.setenv("NOTEBOOKS", str(tmp_path))
 
     legacy_relative_path = "legacy_config.sqlite"
     test_scs_file.write_text(legacy_relative_path)
@@ -72,13 +72,13 @@ def test_access_store_legacy_relative_path_is_upgraded_to_absolute(
 
 def test_access_store_explicit_root_dir_overrides_notebook_dir(tmp_path, monkeypatch):
     """
-    Test that an explicit root_dir is preferred over NOTEBOOK_DIR for display and
+    Test that an explicit root_dir is preferred over NOTEBOOKS for display and
     resolution.
     """
     monkeypatch.chdir(tmp_path)
     test_scs_file = tmp_path / "scs_file"
     monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
-    monkeypatch.setenv("NOTEBOOK_DIR", str(tmp_path / "notebook"))
+    monkeypatch.setenv("NOTEBOOKS", str(tmp_path / "notebook"))
 
     explicit_root_dir = tmp_path / "explicit-root"
     explicit_root_dir.mkdir()
@@ -110,7 +110,7 @@ def test_access_store_relative_root_dir_is_resolved_to_absolute(tmp_path, monkey
     monkeypatch.chdir(notebooks_dir)
     test_scs_file = tmp_path / "scs_file"
     monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
-    monkeypatch.delenv("NOTEBOOK_DIR", raising=False)
+    monkeypatch.delenv("NOTEBOOKS", raising=False)
 
     relative_root_dir = ".."
     relative_file_path = "relative-root.sqlite"
@@ -140,7 +140,7 @@ def test_access_store_absolute_path_outside_base_is_displayed_absolute(
     monkeypatch.chdir(tmp_path)
     test_scs_file = tmp_path / "scs_file"
     monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
-    monkeypatch.setenv("NOTEBOOK_DIR", str(tmp_path / "notebook"))
+    monkeypatch.setenv("NOTEBOOKS", str(tmp_path / "notebook"))
 
     outside_path = (tmp_path / "outside" / TEST_CONFIG_SQLITE).resolve()
     outside_path.parent.mkdir()
@@ -154,12 +154,12 @@ def test_access_store_absolute_path_outside_base_is_displayed_absolute(
 def test_access_store_relative_input_falls_back_to_cwd(tmp_path, monkeypatch):
     """
     Test that relative input resolves against the current working directory when
-    neither root_dir nor NOTEBOOK_DIR is available.
+    neither root_dir nor NOTEBOOKS is available.
     """
     monkeypatch.chdir(tmp_path)
     test_scs_file = tmp_path / "scs_file"
     monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
-    monkeypatch.delenv("NOTEBOOK_DIR", raising=False)
+    monkeypatch.delenv("NOTEBOOKS", raising=False)
 
     ui = access_ui.get_access_store()
     file_name_field = ui.children[0].children[1].children[1]
@@ -182,12 +182,12 @@ def test_access_store_relative_input_is_resolved_against_notebook_dir(
 ):
     """
     Test that a relative file path entered in the UI is resolved against
-    NOTEBOOK_DIR and stored as an absolute path.
+    NOTEBOOKS and stored as an absolute path.
     """
     monkeypatch.chdir(tmp_path)
     test_scs_file = tmp_path / "scs_file"
     monkeypatch.setattr(access_ui, "get_scs_location_file_path", lambda: test_scs_file)
-    monkeypatch.setenv("NOTEBOOK_DIR", str(tmp_path))
+    monkeypatch.setenv("NOTEBOOKS", str(tmp_path))
 
     ui = access_ui.get_access_store()
     file_name_field = ui.children[0].children[1].children[1]

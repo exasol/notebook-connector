@@ -28,9 +28,9 @@ def _get_scs_path_base(root_dir: str | None) -> Path:
             return _normalize_path_lexically(root_dir_path)
         return _normalize_path_lexically(Path.cwd() / root_dir_path)
 
-    notebook_dir = os.environ.get("NOTEBOOK_DIR")
-    if notebook_dir:
-        return _normalize_path_lexically(notebook_dir)
+    notebooks_dir = os.environ.get("NOTEBOOKS")
+    if notebooks_dir:
+        return _normalize_path_lexically(notebooks_dir)
 
     return _normalize_path_lexically(Path.cwd())
 
