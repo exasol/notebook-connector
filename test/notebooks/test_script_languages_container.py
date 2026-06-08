@@ -1,8 +1,9 @@
 import os
 import shutil
+import time
 from pathlib import Path
 from test.integration.ui.common.utils.notebook_test_utils import run_notebook
-import time
+
 import pytest
 
 
@@ -28,7 +29,7 @@ def test_script_languages_container(
         run_notebook("export_as_is.ipynb", store_file, store_password)
         run_notebook("customize.ipynb", store_file, store_password)
         if backend == "saas":
-            time.sleep(10*60)
+            time.sleep(10 * 60)
         run_notebook("test_slc.ipynb", store_file, store_password)
         run_notebook("advanced.ipynb", store_file, store_password)
         run_notebook(
