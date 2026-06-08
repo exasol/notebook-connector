@@ -11,6 +11,7 @@
 
 * #413: Fixed Luigi signal handling in notebook DockerDB startup and SLC build
 * #416: Fixed wrong access store search path in `first_steps.ipynb`
+* #417: Normalized access-store notebook paths and exported `NOTEBOOKS` from `ai-lab start`
 
 ## Refactorings
 
