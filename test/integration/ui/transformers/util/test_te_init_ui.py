@@ -19,8 +19,12 @@ def test_te_init_ui_save_token(tmp_path):
         nbformat.v4.new_code_cell(
             # loading the ai_lab_config via access_store_ui
             f"""
+            from pathlib import Path
             from IPython.display import display
+            import exasol.nb_connector.ui.access.access_store as access_ui
             from exasol.nb_connector.ui.access.access_store import get_access_store
+
+            access_ui.get_scs_location_file_path = lambda: Path("{store_dir}") / "scs_file"
             
             ui = get_access_store("{store_dir}")
             display(ui)
