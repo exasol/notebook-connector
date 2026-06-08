@@ -258,7 +258,9 @@ class ScriptLanguageContainer:
         return tls_params
 
     def _backend(self) -> StorageBackend:
-        storage_backend = self.secrets.get(CKey.storage_backend, StorageBackend.onprem.name)
+        storage_backend = self.secrets.get(
+            CKey.storage_backend, StorageBackend.onprem.name
+        )
         if storage_backend is None:
             return StorageBackend.onprem
         if isinstance(storage_backend, StorageBackend):

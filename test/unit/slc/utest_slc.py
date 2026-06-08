@@ -713,9 +713,7 @@ def test_generate_activation_key_for_saas(
         language_definition_builder.generate_definition_components.return_value = [
             Mock(alias="original_alias"),
         ]
-        language_definition_builder.generate_definition.return_value = (
-            "custom_slc_CUDA=localzmq+protobuf:///uploads/default/container/Strawberry-release-custom_slc_CUDA?lang=python#buckets/uploads/default/container/Strawberry-release-custom_slc_CUDA/exaudf/exaudfclient"
-        )
+        language_definition_builder.generate_definition.return_value = "custom_slc_CUDA=localzmq+protobuf:///uploads/default/container/Strawberry-release-custom_slc_CUDA?lang=python#buckets/uploads/default/container/Strawberry-release-custom_slc_CUDA/exaudf/exaudfclient"
         builder_mock = Mock(return_value=language_definition_builder)
         monkeypatch.setattr(
             script_language_container, "get_language_definition_builder", builder_mock
