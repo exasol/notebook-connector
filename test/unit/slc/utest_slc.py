@@ -26,6 +26,7 @@ from exasol.exaslpm.model.package_file_config import (
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.slc import (
     constants,
     script_language_container,
@@ -692,6 +693,56 @@ def test_generate_activation_key(
             assert slc.secrets.get(slc._alias_key) is None
 
 
+@pytest.mark.parametrize("add_to_secret_store", [True, False])
+def test_generate_activation_key_for_saas(
+    add_to_secret_store,
+    sample_slc_name,
+    slc_factory_create,
+    monkeypatch: MonkeyPatch,
+):
+    flavor = "Strawberry"
+
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        slc.secrets.save(CKey.saas_url, "https://mock-saas.exasol.com")
+        slc.secrets.save(CKey.saas_token, "pat")
+        slc.secrets.save(CKey.saas_account_id, "account-id")
+        slc.secrets.save(CKey.saas_database_name, "database-name")
+        slc.secrets.save(CKey.storage_backend, StorageBackend.saas.name)
+
+        language_definition_builder = Mock()
+        language_definition_builder.generate_definition_components.return_value = [
+            Mock(alias="original_alias"),
+        ]
+        language_definition_builder.generate_definition.return_value = (
+            "custom_slc_CUDA=localzmq+protobuf:///uploads/default/container/Strawberry-release-custom_slc_CUDA?lang=python#buckets/uploads/default/container/Strawberry-release-custom_slc_CUDA/exaudf/exaudfclient"
+        )
+        builder_mock = Mock(return_value=language_definition_builder)
+        monkeypatch.setattr(
+            script_language_container, "get_language_definition_builder", builder_mock
+        )
+
+        language_activation = slc.generate_activation_key(add_to_secret_store)
+        assert (
+            language_activation
+            == "custom_slc_CUDA=localzmq+protobuf:///uploads/default/container/Strawberry-release-custom_slc_CUDA?lang=python#buckets/uploads/default/container/Strawberry-release-custom_slc_CUDA/exaudf/exaudfclient"
+        )
+        builder_mock.assert_called_once_with(
+            flavor_path=str(slc._flavor_path_rel),
+            bucketfs_name="uploads",
+            bucket_name="default",
+            path_in_bucket=constants.PATH_IN_BUCKET,
+            container_name=f"{slc.flavor}-release-{slc.language_alias}",
+        )
+        language_definition_builder.add_custom_alias.assert_called_once_with(
+            "original_alias",
+            slc.language_alias,
+        )
+        if add_to_secret_store:
+            assert slc.secrets.get(slc._alias_key) == language_activation
+        else:
+            assert slc.secrets.get(slc._alias_key) is None
+
+
 def test_restore_public_package_file(
     sample_slc_name, slc_factory_create, git_access_mock
 ):
@@ -836,6 +887,57 @@ def test_deploy_uses_luigi_shutdown_handler_guard(
             release_name=slc.language_alias,
             output_directory=str(slc.workspace.output_path),
             compression_strategy=slc.compression_strategy,
+        )
+        language_definition_builder.add_custom_alias.assert_called_once_with(
+            "original_alias",
+            slc.language_alias,
+        )
+        assert slc.secrets.get(slc._alias_key) == "activation_sql"
+
+
+def test_deploy_uses_saas_parameters(
+    sample_slc_name,
+    slc_factory_create,
+    luigi_shutdown_handler_guard,
+    monkeypatch: MonkeyPatch,
+):
+    flavor = "Strawberry"
+    with slc_factory_create.context(slc_name=sample_slc_name, flavor=flavor) as slc:
+        slc.secrets.save(CKey.saas_url, "https://mock-saas.exasol.com")
+        slc.secrets.save(CKey.saas_token, "pat")
+        slc.secrets.save(CKey.saas_account_id, "account-id")
+        slc.secrets.save(CKey.saas_database_name, "database-name")
+        slc.secrets.save(CKey.storage_backend, StorageBackend.saas.name)
+
+        language_definition_builder = Mock()
+        language_definition_builder.generate_definition_components.return_value = [
+            Mock(alias="original_alias"),
+        ]
+        language_definition_builder.generate_definition.return_value = "activation_sql"
+        deploy_result = Mock(language_definition_builder=language_definition_builder)
+        deploy_mock = Mock(
+            return_value={
+                slc._flavor_path_rel: {"release": deploy_result},
+            }
+        )
+        monkeypatch.setattr(
+            script_language_container.exaslct_api, "deploy", deploy_mock
+        )
+
+        slc.deploy()
+
+        assert luigi_shutdown_handler_guard == ["enter", "exit"]
+        deploy_mock.assert_called_once_with(
+            flavor_path=(str(slc._flavor_path_rel),),
+            path_in_bucket=constants.PATH_IN_BUCKET,
+            release_name=slc.language_alias,
+            output_directory=str(slc.workspace.output_path),
+            compression_strategy=slc.compression_strategy,
+            saas_host="https://mock-saas.exasol.com",
+            saas_pat="pat",
+            saas_account_id="account-id",
+            saas_database_id=None,
+            saas_database_name="database-name",
         )
         language_definition_builder.add_custom_alias.assert_called_once_with(
             "original_alias",

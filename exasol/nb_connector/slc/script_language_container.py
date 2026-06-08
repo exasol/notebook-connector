@@ -27,6 +27,7 @@ from exasol_integration_test_docker_environment.lib.docker import (
 )
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.luigi_utils import (
     temporarily_disable_luigi_worker_shutdown_handler,
 )
@@ -239,46 +240,76 @@ class ScriptLanguageContainer:
                     compression_strategy=self.compression_strategy,
                 )
 
-    def _generate_bfs_params_from_secret_store(self):
-        bfs_params: dict[str, Any] = {
-            k: self.secrets.get(v)
-            for k, v in [
-                ("bucketfs_host", CKey.bfs_host_name),
-                ("bucketfs_port", CKey.bfs_port),
-                ("bucketfs_user", CKey.bfs_user),
-                ("bucketfs_password", CKey.bfs_password),
-                ("bucketfs_name", CKey.bfs_service),
-                ("bucket", CKey.bfs_bucket),
-            ]
-        }
+    def _generate_tls_params(self) -> dict[str, Any]:
+        tls_params: dict[str, Any] = {}
 
         bucketfs_use_https = optional_str_to_bool(self.secrets.get(CKey.bfs_encryption))
         if bucketfs_use_https is not None:
-            bfs_params["bucketfs_use_https"] = bucketfs_use_https
+            tls_params["bucketfs_use_https"] = bucketfs_use_https
+
         use_ssl_cert_validation = optional_str_to_bool(self.secrets.get(CKey.cert_vld))
         if use_ssl_cert_validation is not None:
-            bfs_params["use_ssl_cert_validation"] = use_ssl_cert_validation
+            tls_params["use_ssl_cert_validation"] = use_ssl_cert_validation
+
         ssl_cert_path = self.secrets.get(CKey.trusted_ca)
         if ssl_cert_path is not None:
-            bfs_params["ssl_cert_path"] = ssl_cert_path
-        return bfs_params
+            tls_params["ssl_cert_path"] = ssl_cert_path
+
+        return tls_params
+
+    def _backend(self) -> StorageBackend:
+        storage_backend = self.secrets.get(CKey.storage_backend, StorageBackend.onprem.name)
+        if storage_backend is None:
+            return StorageBackend.onprem
+        if isinstance(storage_backend, StorageBackend):
+            return storage_backend
+        return StorageBackend[storage_backend]
+
+    def _generate_deploy_params(self) -> dict[str, Any]:
+        deploy_params: dict[str, Any] = {
+            "path_in_bucket": constants.PATH_IN_BUCKET,
+            "release_name": self.language_alias,
+            "output_directory": str(self.workspace.output_path),
+            "compression_strategy": self.compression_strategy,
+        }
+        deploy_params.update(self._generate_tls_params())
+
+        if self._backend() == StorageBackend.saas:
+            deploy_params.update(
+                {
+                    "saas_host": self.secrets[CKey.saas_url],
+                    "saas_pat": self.secrets[CKey.saas_token],
+                    "saas_account_id": self.secrets[CKey.saas_account_id],
+                    "saas_database_id": self.secrets.get(CKey.saas_database_id),
+                    "saas_database_name": self.secrets.get(CKey.saas_database_name),
+                }
+            )
+            return deploy_params
+
+        deploy_params.update(
+            {
+                "bucketfs_host": self.secrets[CKey.bfs_host_name],
+                "bucketfs_port": self.secrets[CKey.bfs_port],
+                "bucketfs_user": self.secrets[CKey.bfs_user],
+                "bucketfs_password": self.secrets[CKey.bfs_password],
+                "bucketfs_name": self.secrets[CKey.bfs_service],
+                "bucket": self.secrets[CKey.bfs_bucket],
+            }
+        )
+        return deploy_params
 
     def deploy(self):
         """
         Deploys the current script-languages-container to the database and
         stores the activation string in the Secure Configuration Storage.
         """
-        bfs_params = self._generate_bfs_params_from_secret_store()
+        deploy_params = self._generate_deploy_params()
 
         with current_directory(self.checkout_dir):
             with temporarily_disable_luigi_worker_shutdown_handler():
                 result = exaslct_api.deploy(
                     flavor_path=(str(self._flavor_path_rel),),
-                    **bfs_params,
-                    path_in_bucket=constants.PATH_IN_BUCKET,
-                    release_name=self.language_alias,
-                    output_directory=str(self.workspace.output_path),
-                    compression_strategy=self.compression_strategy,
+                    **deploy_params,
                 )
             deploy_result = result[self._flavor_path_rel]["release"]
             builder = deploy_result.language_definition_builder
@@ -314,13 +345,18 @@ class ScriptLanguageContainer:
         but the script-language-container was uploaded to the BucketFS.
         Then it will register the Language activation for this SLC in the Secure Configuration Store.
         """
-        bfs_params = self._generate_bfs_params_from_secret_store()
+        if self._backend() == StorageBackend.saas:
+            bucketfs_name = "uploads"
+            bucket_name = "default"
+        else:
+            bucketfs_name = self.secrets[CKey.bfs_service]
+            bucket_name = self.secrets[CKey.bfs_bucket]
 
         with current_directory(self.checkout_dir):
             builder = get_language_definition_builder(
                 flavor_path=str(self._flavor_path_rel),
-                bucketfs_name=bfs_params["bucketfs_name"],
-                bucket_name=bfs_params["bucket"],
+                bucketfs_name=bucketfs_name,
+                bucket_name=bucket_name,
                 path_in_bucket=constants.PATH_IN_BUCKET,
                 container_name=f"{self.flavor}-release-{self.language_alias}",  # Currently this can't be retrieved from exaslct. Need to use a hard coded value here.
             )
