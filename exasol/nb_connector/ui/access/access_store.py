@@ -51,7 +51,9 @@ def _resolve_scs_file_path(root_dir: str | None, scs_file: str | Path) -> Path:
 
 def _display_scs_file_path(root_dir: str | None, scs_file: str | Path) -> str:
     base_dir = _normalize_path_lexically(_get_scs_path_base(root_dir))
-    resolved_path = _normalize_path_lexically(_resolve_scs_file_path(root_dir, scs_file))
+    resolved_path = _normalize_path_lexically(
+        _resolve_scs_file_path(root_dir, scs_file)
+    )
     try:
         return str(resolved_path.relative_to(base_dir))
     except ValueError:

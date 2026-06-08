@@ -120,9 +120,10 @@ def test_access_store_relative_root_dir_is_resolved_to_absolute(tmp_path, monkey
         relative_root_dir, relative_file_path
     )
     assert raw_resolved_path == notebooks_dir / ".." / relative_file_path
-    assert access_ui._normalize_path_lexically(raw_resolved_path) == (
-        tmp_path / relative_file_path
-    ).resolve()
+    assert (
+        access_ui._normalize_path_lexically(raw_resolved_path)
+        == (tmp_path / relative_file_path).resolve()
+    )
 
     ui = access_ui.get_access_store(relative_root_dir)
     file_name_field = ui.children[0].children[1].children[1]
