@@ -15,8 +15,8 @@ inside SQL queries at database scale.
   ``bfs_bucket``, ``bfs_user``, ``bfs_password``).
 * Optional: ``huggingface_token`` for gated / private models.
 
-Full one-shot setup
-********************
+Full One-Shot Setup
+*******************
 
 ``initialize_te_extension`` is the main entry point.  In a single call it:
 
@@ -44,8 +44,8 @@ Each step can be skipped individually by passing the corresponding flag as
     # run_encapsulate_hf_token=True        – create the Hugging Face CONNECTION object
     # allow_override=True                  – overwrite existing language alias if present
 
-Deploying only UDF scripts
-***************************
+Deploying Only UDF Scripts
+**************************
 
 If the SLC is already in BucketFS (e.g. you are updating the scripts after a
 code change) you can redeploy only the UDF scripts without re-uploading the
@@ -71,7 +71,7 @@ be present there before the UDFs can use them.
 For a working end-to-end model-loading workflow, use the bundled
 Transformers notebooks as the source of truth for the supported steps.
 
-Running a UDF from SQL
+Running a UDF From SQL
 **********************
 
 The deployed Transformers Extension is consumed from SQL.  Before running any
@@ -89,7 +89,7 @@ already available in BucketFS and that ``initialize_te_extension`` has already
 created the BucketFS ``CONNECTION`` object stored in
 ``CKey.bfs_connection_name``.
 
-Text generation
+Text Generation
 ===============
 
 .. code-block:: sql
@@ -104,7 +104,7 @@ Text generation
         TRUE
     );
 
-Fill-mask prediction
+Fill-Mask Prediction
 ====================
 
 .. code-block:: sql
@@ -123,7 +123,7 @@ Fill-mask prediction
     FROM MODEL_OUTPUT
     ORDER BY score DESC;
 
-Sequence classification
+Sequence Classification
 =======================
 
 Use ``TE_SEQUENCE_CLASSIFICATION_SINGLE_TEXT_UDF`` for one input text and
@@ -161,7 +161,7 @@ Use ``TE_SEQUENCE_CLASSIFICATION_SINGLE_TEXT_UDF`` for one input text and
     FROM MODEL_OUTPUT
     ORDER BY score DESC;
 
-Zero-shot text classification
+Zero-Shot Text Classification
 =============================
 
 .. code-block:: sql
@@ -181,7 +181,7 @@ Zero-shot text classification
     FROM MODEL_OUTPUT
     ORDER BY score DESC;
 
-Question answering
+Question Answering
 ==================
 
 .. code-block:: sql
@@ -201,7 +201,7 @@ Question answering
     FROM MODEL_OUTPUT
     ORDER BY score DESC;
 
-Token classification
+Token Classification
 ====================
 
 .. code-block:: sql
@@ -240,7 +240,7 @@ Translation
     SELECT translation_text, error_message
     FROM MODEL_OUTPUT;
 
-Model management
+Model Management
 ================
 
 Use ``TE_LIST_MODELS_UDF`` to inspect installed models and
@@ -262,7 +262,7 @@ Use ``TE_LIST_MODELS_UDF`` to inspect installed models and
         'text-classification'
     );
 
-Using text columns from a table
+Using Text Columns From a Table
 ===============================
 
 When the input texts already live in a database table, pass the text column

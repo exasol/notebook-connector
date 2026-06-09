@@ -10,14 +10,14 @@ See their dedicated pages for the full option reference:
 This page focuses on end-to-end ``ai-lab`` workflows.  For CLI examples that
 create, inspect, or validate SCS files directly, see :doc:`scs-cli`.
 
-Typical ai-lab workflow after configuration
-********************************************
+Typical ai-lab Workflow After Configuration
+*******************************************
 
 The following steps show how to start from an already configured environment,
 deploy the bundled notebooks into a local directory, and then launch
 JupyterLab.  Create or update the SCS separately via :doc:`scs-cli`.
 
-**Step 1 – Copy the bundled notebooks to a target directory**
+**Step 1 – Copy the Bundled Notebooks to a Target Directory**
 
 Use ``ai-lab deploy-notebooks`` when you want a local copy of the packaged
 notebooks in a directory that you manage yourself, without starting JupyterLab
@@ -28,7 +28,7 @@ JupyterLab environment and simply want to use the bundled notebooks there.
 
     ai-lab deploy-notebooks --target-dir ~/work/notebooks
 
-**Step 2 – Launch JupyterLab on the default port**
+**Step 2 – Launch JupyterLab on the Default Port**
 
 ``ai-lab start`` launches JupyterLab and copies the bundled notebooks into the
 notebook root directory if they are not present yet.
@@ -37,7 +37,7 @@ notebook root directory if they are not present yet.
 
     ai-lab start --notebook-dir ~/work/notebooks
 
-**Step 3 – Launch JupyterLab with remote access or a custom port**
+**Step 3 – Launch JupyterLab With Remote Access or a Custom Port**
 
 ``ai-lab start`` launches a JupyterLab server and makes the bundled Exasol
 notebooks available under the directory specified by ``--notebook-dir``.

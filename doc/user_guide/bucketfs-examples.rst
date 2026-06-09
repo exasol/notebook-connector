@@ -15,7 +15,10 @@ Configuration
 Before calling any BucketFS helper you must store the BucketFS connection
 parameters in the SCS.  When using ITDE (the local Docker database), these
 keys are populated automatically by ``bring_itde_up`` — you only need to set
-them manually for a self-hosted on-premise Exasol installation.
+them manually for a self-hosted on-premise Exasol installation.  The same
+helpers also work with Exasol SaaS when you store the SaaS settings
+(``storage_backend``, ``saas_url``, ``saas_account_id``, ``saas_token``, and
+``saas_database_id`` or ``saas_database_name``) in the SCS instead.
 
 ``bfs_host_name`` is optional; when absent it falls back to ``db_host_name``.
 ``bfs_encryption`` should be set to ``"True"`` in production environments.
@@ -32,7 +35,7 @@ them manually for a self-hosted on-premise Exasol installation.
     my_secrets.save(CKey.bfs_password,   "write")
     my_secrets.save(CKey.bfs_encryption, "False")
 
-Uploading and accessing files via the bucket API
+Uploading and Accessing Files via the Bucket API
 *************************************************
 
 ``open_bucketfs_bucket`` returns a bucket object from the
@@ -61,8 +64,8 @@ the relative ``target_path`` used during upload to build the full UDF path.
     print(get_udf_bucket_path(my_secrets))
     # e.g.  /buckets/bfsdefault/default
 
-PathLike interface
-*******************
+PathLike Interface
+******************
 
 ``open_bucketfs_location`` returns a ``PathLike`` object that supports the
 ``/`` operator for path joining, similar to ``pathlib.Path``.  Use ``.write``

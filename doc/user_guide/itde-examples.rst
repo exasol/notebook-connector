@@ -10,8 +10,8 @@ other Notebook Connector API works out of the box.
 
 **Required extra:** ``pip install "notebook-connector[docker-db]"``
 
-Starting the database
-**********************
+Starting the Database
+*********************
 
 Import all lifecycle functions from ``itde_manager``.  Before calling
 ``bring_itde_up`` you can optionally store the desired container memory
@@ -49,8 +49,8 @@ APIs — you do not need to configure anything manually.
    and ``cert_vld``.  All other connection helpers therefore work without any
    further manual configuration.
 
-Checking the status
-********************
+Checking the Status
+*******************
 
 ``get_itde_status`` returns an ``ItdeContainerStatus`` flag.  The possible
 values are ``ABSENT`` (container does not exist), ``STOPPED`` (container
@@ -71,8 +71,8 @@ exists but is not running), ``RUNNING`` (container process is alive),
     else:
         print(f"Current status: {status}")
 
-Restarting a stopped container
-*******************************
+Restarting a Stopped Container
+******************************
 
 If the container was stopped (e.g. after a system reboot) you can restart it
 with ``restart_itde``.  This is much faster than calling ``bring_itde_up``
@@ -85,8 +85,8 @@ Docker process needs to be resumed.
 
     restart_itde(my_secrets)
 
-Shutting down
-**************
+Shutting Down
+*************
 
 ``take_itde_down`` removes the ITDE connection settings from the SCS.  By
 default it also stops and removes the Docker container together with its

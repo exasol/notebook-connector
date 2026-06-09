@@ -14,8 +14,8 @@ created and populated.
 Unless stated otherwise, the snippets below work both in Jupyter notebooks and
 in regular Python files.
 
-Opening or creating a store
-****************************
+Opening or Creating a Store
+***************************
 
 Import ``Secrets`` from ``exasol.nb_connector.secret_store`` and provide a
 file path together with a master password.  If the file does not yet exist it
@@ -39,8 +39,8 @@ between on-premise and SaaS modes.
    when it was first created, otherwise
    :py:class:`~exasol.nb_connector.secret_store.InvalidPassword` is raised.
 
-Saving and reading values
-**************************
+Saving and Reading Values
+*************************
 
 All values are stored as strings. Use enum members from
 :py:class:`~exasol.nb_connector.ai_lab_config.AILabConfig` as keys.
@@ -79,8 +79,8 @@ which is useful for debugging or exporting the configuration.
 
     my_secrets.remove(CKey.db_password)
 
-Choosing the backend (on-prem vs. SaaS)
-*****************************************
+Choosing the Backend (On-Prem vs. SaaS)
+****************************************
 
 The ``storage_backend`` key tells every connection helper whether to use the
 on-premise database parameters or the SaaS account parameters.  Set it to
@@ -111,8 +111,8 @@ useful to branch logic in notebooks that need to work in both modes.
 
     print(get_backend(my_secrets))   # StorageBackend.onprem or StorageBackend.saas
 
-All supported configuration keys
-**********************************
+All Supported Configuration Keys
+********************************
 
 The table below lists every key understood by the Notebook Connector APIs.
 Keys that are not relevant to your setup (e.g. SaaS keys when using on-prem)
