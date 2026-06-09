@@ -9,7 +9,7 @@ The top-level ``ai-lab`` command exposes exactly two subcommands:
 * ``start`` starts JupyterLab and deploys the bundled notebooks into the
   notebook root directory if they are not present yet.
 * ``deploy-notebooks`` copies the bundled notebooks to a target directory
-  without starting JupyterLab.
+  without starting JupyterLab through Notebook Connector.
 
 Help
 ****
@@ -71,7 +71,9 @@ Command ``deploy-notebooks``
 ****************************
 
 Command ``deploy-notebooks`` copies the packaged notebooks to a target
-directory and reports how many files were copied or skipped.
+directory and reports how many files were copied or skipped.  Use it when you
+already manage your own JupyterLab environment and want to make the bundled
+notebooks available there.
 
 .. code-block:: shell
 

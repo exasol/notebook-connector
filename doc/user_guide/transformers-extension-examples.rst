@@ -66,22 +66,10 @@ Uploading a Hugging Face Model to BucketFS
 ******************************************
 
 Transformer UDFs read model files from BucketFS, so the model artifacts must
-be present there before the UDFs can use them.  The helper functions
-``upload_model`` and ``upload_model_from_cache`` in
-``exasol.nb_connector.transformers_extension_wrapper`` are intended to cover
-that step.
+be present there before the UDFs can use them.
 
-``upload_model`` downloads a model into a local ``cache_dir`` by calling the
-Hugging Face client libraries and then forwards to
-``upload_model_from_cache``.
-
-At the moment, ``upload_model_from_cache`` is not implemented in this code
-base and raises ``NotImplementedError``.  So this section documents the role
-of these helpers, but not a complete working workflow in Notebook Connector
-itself.
-
-If you need a working end-to-end model-loading example today, use the bundled
-Transformers notebooks as the source of truth for the supported workflow.
+For a working end-to-end model-loading workflow, use the bundled
+Transformers notebooks as the source of truth for the supported steps.
 
 Running a UDF from SQL
 **********************
@@ -116,6 +104,63 @@ Text generation
         TRUE
     );
 
+Fill-mask prediction
+====================
+
+.. code-block:: sql
+
+    WITH MODEL_OUTPUT AS (
+        SELECT MY_SCHEMA.TE_FILLING_MASK_UDF(
+            NULL,
+            'TE_BFS_SYS',
+            'models',
+            'bert-base-uncased',
+            'Exasol is a [MASK] database.',
+            5
+        )
+    )
+    SELECT filled_text, score, rank, error_message
+    FROM MODEL_OUTPUT
+    ORDER BY score DESC;
+
+Sequence classification
+=======================
+
+Use ``TE_SEQUENCE_CLASSIFICATION_SINGLE_TEXT_UDF`` for one input text and
+``TE_SEQUENCE_CLASSIFICATION_TEXT_PAIR_UDF`` when the model compares two texts.
+
+.. code-block:: sql
+
+    WITH MODEL_OUTPUT AS (
+        SELECT MY_SCHEMA.TE_SEQUENCE_CLASSIFICATION_SINGLE_TEXT_UDF(
+            NULL,
+            'TE_BFS_SYS',
+            'models',
+            'arpanghoshal/EkmanClassifier',
+            'Oh my God!',
+            'HIGHEST'
+        )
+    )
+    SELECT label, score, rank, error_message
+    FROM MODEL_OUTPUT;
+
+.. code-block:: sql
+
+    WITH MODEL_OUTPUT AS (
+        SELECT MY_SCHEMA.TE_SEQUENCE_CLASSIFICATION_TEXT_PAIR_UDF(
+            NULL,
+            'TE_BFS_SYS',
+            'models',
+            'arpanghoshal/EkmanClassifier',
+            'Oh my God!',
+            'I lost my purse.',
+            'ALL'
+        )
+    )
+    SELECT label, score, rank, error_message
+    FROM MODEL_OUTPUT
+    ORDER BY score DESC;
+
 Zero-shot text classification
 =============================
 
@@ -135,6 +180,87 @@ Zero-shot text classification
     SELECT label, score, error_message
     FROM MODEL_OUTPUT
     ORDER BY score DESC;
+
+Question answering
+==================
+
+.. code-block:: sql
+
+    WITH MODEL_OUTPUT AS (
+        SELECT MY_SCHEMA.TE_QUESTION_ANSWERING_UDF(
+            NULL,
+            'TE_BFS_SYS',
+            'models',
+            'distilbert-base-cased-distilled-squad',
+            'What does Notebook Connector simplify?',
+            'Notebook Connector simplifies Exasol AI workflows.',
+            5
+        )
+    )
+    SELECT answer, score, error_message
+    FROM MODEL_OUTPUT
+    ORDER BY score DESC;
+
+Token classification
+====================
+
+.. code-block:: sql
+
+    WITH MODEL_OUTPUT AS (
+        SELECT MY_SCHEMA.TE_TOKEN_CLASSIFICATION_UDF(
+            NULL,
+            'TE_BFS_SYS',
+            'models',
+            'dslim/bert-base-NER',
+            'Exasol is headquartered in Nuremberg.',
+            NULL
+        )
+    )
+    SELECT start_pos, end_pos, word, entity, error_message
+    FROM MODEL_OUTPUT
+    ORDER BY start_pos, end_pos;
+
+Translation
+===========
+
+.. code-block:: sql
+
+    WITH MODEL_OUTPUT AS (
+        SELECT MY_SCHEMA.TE_TRANSLATION_UDF(
+            NULL,
+            'TE_BFS_SYS',
+            'models',
+            't5-small',
+            'Hello world',
+            'en',
+            'de',
+            32
+        )
+    )
+    SELECT translation_text, error_message
+    FROM MODEL_OUTPUT;
+
+Model management
+================
+
+Use ``TE_LIST_MODELS_UDF`` to inspect installed models and
+``TE_DELETE_MODEL_UDF`` to remove a model from BucketFS.
+
+.. code-block:: sql
+
+    SELECT MY_SCHEMA.TE_LIST_MODELS_UDF(
+        'TE_BFS_SYS',
+        'models'
+    );
+
+.. code-block:: sql
+
+    SELECT MY_SCHEMA.TE_DELETE_MODEL_UDF(
+        'TE_BFS_SYS',
+        'models',
+        'arpanghoshal/EkmanClassifier',
+        'text-classification'
+    );
 
 Using text columns from a table
 ===============================

@@ -20,8 +20,9 @@ JupyterLab.  Create or update the SCS separately via :doc:`scs-cli`.
 **Step 1 – Copy the bundled notebooks to a target directory**
 
 Use ``ai-lab deploy-notebooks`` when you want a local copy of the packaged
-notebooks without starting JupyterLab immediately.  This is useful when you
-want to inspect or edit the notebooks first.
+notebooks in a directory that you manage yourself, without starting JupyterLab
+through Notebook Connector.  This is useful when you already run your own
+JupyterLab environment and simply want to use the bundled notebooks there.
 
 .. code-block:: shell
 
@@ -29,9 +30,8 @@ want to inspect or edit the notebooks first.
 
 **Step 2 – Launch JupyterLab on the default port**
 
-Once the SCS is already configured, ``ai-lab start`` launches JupyterLab and
-copies the bundled notebooks into the notebook root directory if they are not
-present yet.
+``ai-lab start`` launches JupyterLab and copies the bundled notebooks into the
+notebook root directory if they are not present yet.
 
 .. code-block:: shell
 
