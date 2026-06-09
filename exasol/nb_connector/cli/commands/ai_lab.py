@@ -19,6 +19,7 @@ Deploy the bundled notebooks to a local directory:
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess  # nosec: B404
 import sys
@@ -141,7 +142,9 @@ def start(port: int, ip: str, notebook_dir: Path | None, no_browser: bool) -> No
 
     click.echo(f"Starting JupyterLab on http://{ip}:{port} (notebook dir: {root})")
     try:
-        subprocess.run(cmd, check=True)  # nosec: B603
+        env = os.environ.copy()
+        env["NOTEBOOKS"] = str(root)
+        subprocess.run(cmd, check=True, env=env)  # nosec: B603
     except KeyboardInterrupt:
         click.echo("\nJupyterLab stopped")
 

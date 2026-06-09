@@ -32,6 +32,9 @@ from exasol.nb_connector.container_by_ip import (
     ContainerByIp,
     IPRetriever,
 )
+from exasol.nb_connector.luigi_utils import (
+    temporarily_disable_luigi_worker_shutdown_handler,
+)
 from exasol.nb_connector.secret_store import Secrets
 
 ENVIRONMENT_NAME = "DemoDb"
@@ -88,17 +91,18 @@ def bring_itde_up(conf: Secrets, env_info: EnvironmentInfo | None = None) -> Non
             )
             itde_accelerator = ("nvidia=all",)
 
-        env_info, _ = api.spawn_test_environment(
-            environment_name=ENVIRONMENT_NAME,
-            nameserver=(NAME_SERVER_ADDRESS,),
-            db_mem_size=mem_size,
-            db_disk_size=disk_size,
-            docker_db_image_version=db_version,
-            docker_environment_variable=docker_environment_variable,
-            accelerator=itde_accelerator,
-            additional_db_parameter=additional_db_parameter,
-            log_level=logging.getLevelName(logging.INFO),
-        )
+        with temporarily_disable_luigi_worker_shutdown_handler():
+            env_info, _ = api.spawn_test_environment(
+                environment_name=ENVIRONMENT_NAME,
+                nameserver=(NAME_SERVER_ADDRESS,),
+                db_mem_size=mem_size,
+                db_disk_size=disk_size,
+                docker_db_image_version=db_version,
+                docker_environment_variable=docker_environment_variable,
+                accelerator=itde_accelerator,
+                additional_db_parameter=additional_db_parameter,
+                log_level=logging.getLevelName(logging.INFO),
+            )
 
     db_info = env_info.database_info
     container_info = db_info.container_info

@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import ipywidgets as widgets
@@ -20,6 +21,45 @@ def get_scs_location_file_path() -> Path:
     return Path.home() / ".cache" / "notebook-connector" / "scs_file"
 
 
+def _get_scs_path_base(root_dir: str | None) -> Path:
+    if root_dir is not None:
+        root_dir_path = Path(root_dir)
+        if root_dir_path.is_absolute():
+            return root_dir_path
+        return Path.cwd() / root_dir_path
+
+    notebooks_dir = os.environ.get("NOTEBOOKS")
+    if notebooks_dir:
+        return Path(notebooks_dir)
+
+    return Path.cwd()
+
+
+def _normalize_path_lexically(path: str | Path) -> Path:
+    # Normalize lexically without resolving symlinks or touching the filesystem, to avoid
+    # constructing paths from user-controlled input with Path.resolve().
+    return Path(os.path.normpath(os.fspath(path)))
+
+
+def _resolve_scs_file_path(root_dir: str | None, scs_file: str | Path) -> Path:
+    path = os.fspath(scs_file)
+    if os.path.isabs(path):
+        return Path(path)
+    base_dir = _get_scs_path_base(root_dir)
+    return base_dir / path
+
+
+def _display_scs_file_path(root_dir: str | None, scs_file: str | Path) -> str:
+    base_dir = _normalize_path_lexically(_get_scs_path_base(root_dir))
+    resolved_path = _normalize_path_lexically(
+        _resolve_scs_file_path(root_dir, scs_file)
+    )
+    try:
+        return str(resolved_path.relative_to(base_dir))
+    except ValueError:
+        return str(resolved_path)
+
+
 def get_sb_store_file():
     try:
         return get_scs_location_file_path().read_text().strip()
@@ -32,8 +72,9 @@ def set_sb_store_file(value):
     get_scs_location_file_path().write_text(value)
 
 
-def get_access_store(root_dir: str = ".") -> widgets.Widget:
-    sb_store_file_ = get_sb_store_file()
+def get_access_store(root_dir: str | None = None) -> widgets.Widget:
+    sb_store_file = get_sb_store_file()
+    sb_store_file_ = _resolve_scs_file_path(root_dir, sb_store_file)
     ui_look = config_styles()
 
     header_lbl = widgets.Label(
@@ -48,7 +89,9 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
         value="Password", style=ui_look.label_style, layout=ui_look.label_layout
     )
     file_txt = widgets.Text(
-        value=sb_store_file_, style=ui_look.input_style, layout=ui_look.input_layout
+        value=_display_scs_file_path(root_dir, sb_store_file_),
+        style=ui_look.input_style,
+        layout=ui_look.input_layout,
     )
     password_txt = widgets.Password(
         style=ui_look.input_style, layout=ui_look.input_layout
@@ -58,10 +101,13 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
     )
 
     def open_or_create_config_store(btn):
-        sb_store_file = file_txt.value
+        sb_store_file = _normalize_path_lexically(
+            _resolve_scs_file_path(root_dir, file_txt.value)
+        )
+        file_txt.value = _display_scs_file_path(root_dir, sb_store_file)
         ipython = get_ipython()
         try:
-            ai_lab_config = Secrets(Path(root_dir) / sb_store_file, password_txt.value)
+            ai_lab_config = Secrets(sb_store_file, password_txt.value)
             ai_lab_config.connection()
         except InvalidPassword:
             display_popup(
@@ -71,7 +117,7 @@ def get_access_store(root_dir: str = ".") -> widgets.Widget:
             open_btn.icon = "check"
             ipython.push({"ai_lab_config": ai_lab_config}, interactive=True)
         finally:
-            set_sb_store_file(sb_store_file)
+            set_sb_store_file(str(sb_store_file))
 
     def on_value_change(change):
         open_btn.icon = "pen"

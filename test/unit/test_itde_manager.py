@@ -17,6 +17,7 @@ from exasol_integration_test_docker_environment.lib.models.data.environment_info
 )
 from exasol_integration_test_docker_environment.lib.test_environment.ports import Ports
 
+from exasol.nb_connector import itde_manager
 from exasol.nb_connector.ai_lab_config import Accelerator
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.itde_manager import (
@@ -34,6 +35,32 @@ TEST_NETWORK_NAME = "the_new_network"
 TEST_DB_HOST = "the_host"
 TEST_DB_PORT = 8888
 TEST_BFS_PORT = 6666
+
+
+@pytest.fixture(autouse=True)
+def no_docker_network_access(monkeypatch):
+    monkeypatch.setattr(
+        itde_manager, "_remove_current_container_from_db_network", lambda conf: None
+    )
+    monkeypatch.setattr(
+        itde_manager, "_add_current_container_to_db_network", lambda network_name: None
+    )
+    monkeypatch.setattr(
+        itde_manager, "remove_docker_container", lambda *args, **kwargs: None
+    )
+    monkeypatch.setattr(
+        itde_manager, "remove_docker_volumes", lambda *args, **kwargs: None
+    )
+    monkeypatch.setattr(
+        itde_manager, "remove_docker_networks", lambda *args, **kwargs: None
+    )
+
+
+@pytest.fixture
+def mock_spawn_env(monkeypatch):
+    spawn_mock = mock.Mock()
+    monkeypatch.setattr(itde_manager.api, "spawn_test_environment", spawn_mock)
+    return spawn_mock
 
 
 @pytest.fixture
@@ -55,7 +82,6 @@ def db_image_version(monkeypatch) -> Generator[str, None, None]:
     monkeypatch.delenv(TEST_DB_VERSION_ENV_VAR)
 
 
-@mock.patch("exasol_integration_test_docker_environment.lib.api.spawn_test_environment")
 def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
     mock_spawn_env.return_value = (env_info, None)
 
@@ -95,7 +121,6 @@ def test_bring_itde_up(mock_spawn_env, secrets, env_info, db_image_version):
     assert secrets.get(CKey.bfs_password) == "write"
 
 
-@mock.patch("exasol_integration_test_docker_environment.lib.api.spawn_test_environment")
 @pytest.mark.parametrize(
     "accelerator, expected_accelerator, expected_additional_db_parameter",
     [
@@ -140,16 +165,7 @@ def test_bring_itde_up_with_accelerator(
     ]
 
 
-@mock.patch(
-    "exasol_integration_test_docker_environment.lib.docker.container.utils.remove_docker_container"
-)
-@mock.patch(
-    "exasol_integration_test_docker_environment.lib.docker.volumes.utils.remove_docker_volumes"
-)
-@mock.patch(
-    "exasol_integration_test_docker_environment.lib.docker.networks.utils.remove_docker_networks"
-)
-def test_take_itde_down(mock_util1, mock_util2, mock_util3, secrets):
+def test_take_itde_down(secrets):
     secrets.save(CKey.itde_container, TEST_CONTAINER_NAME)
     secrets.save(CKey.itde_volume, TEST_VOLUME_NAME)
     secrets.save(CKey.itde_network, TEST_NETWORK_NAME)

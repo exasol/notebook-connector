@@ -7,6 +7,12 @@
 * #376: Fixed vulnerabilities by updating dependencies
 * #406: Fixed vulnerabilities by updating dependencies
 
+## Bug Fixes
+
+* #413: Fixed Luigi signal handling in notebook DockerDB startup and SLC build
+* #416: Fixed wrong access store search path in `first_steps.ipynb`
+* #417: Normalized access-store notebook paths and exported `NOTEBOOKS` from `ai-lab start`
+
 ## Refactorings
 
 * #379: Converted `ai-lab/te_init_ui.ipynb` to `py` and added unit and integration tests
