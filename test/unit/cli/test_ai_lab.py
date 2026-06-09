@@ -79,6 +79,7 @@ def test_start_success(mock_run, mock_check, mock_deploy, runner, notebooks_dir)
     mock_deploy.assert_called_once_with(notebooks_dir, overwrite=False)
     mock_run.assert_called_once()
     called_cmd = mock_run.call_args[0][0]
+    assert mock_run.call_args.kwargs["env"]["NOTEBOOKS"] == str(notebooks_dir)
     assert "lab" in called_cmd
     assert "--no-browser" in called_cmd
 
@@ -168,6 +169,7 @@ def test_start_without_notebook_dir_uses_current_working_dir(
     mock_cwd.assert_called_once()
     mock_deploy.assert_called_once_with(default_dir, overwrite=False)
     called_cmd = mock_run.call_args[0][0]
+    assert mock_run.call_args.kwargs["env"]["NOTEBOOKS"] == str(default_dir)
     assert f"--notebook-dir={default_dir}" in called_cmd
 
 

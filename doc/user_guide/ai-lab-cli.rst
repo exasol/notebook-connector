@@ -28,7 +28,8 @@ Command ``start``
 
 Command ``start`` launches JupyterLab by invoking ``python -m jupyter lab``.
 Before JupyterLab starts, Notebook Connector copies the bundled notebooks into
-the notebook root directory leaving existing files unchanged.
+the notebook root directory leaving existing files unchanged, and exports
+``NOTEBOOKS`` for the launched JupyterLab session.
 
 .. code-block:: shell
 
