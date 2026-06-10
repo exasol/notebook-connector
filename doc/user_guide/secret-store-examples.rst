@@ -1,5 +1,5 @@
 Secure Configuration Storage (SCS) Examples
-############################################
+###########################################
 
 ``Secrets`` is the central configuration object used by **every** API in the
 Notebook Connector.  It stores key-value pairs in an AES-encrypted SQLite
@@ -80,7 +80,7 @@ which is useful for debugging or exporting the configuration.
     my_secrets.remove(CKey.db_password)
 
 Choosing the Backend (On-Prem vs. SaaS)
-****************************************
+***************************************
 
 The ``storage_backend`` key tells every connection helper whether to use the
 on-premise database parameters or the SaaS account parameters.  Set it to

@@ -1,5 +1,5 @@
 Text AI Extension Examples
-###########################
+##########################
 
 The Text AI Extension provides ready-to-use UDFs for named-entity recognition,
 zero-shot classification, and semantic feature extraction, powered by
@@ -54,7 +54,9 @@ locally downloaded or otherwise available container archive with
 
 .. code-block:: python
 
-    from exasol.nb_connector.text_ai_extension_wrapper import initialize_text_ai_extension
+    from exasol.nb_connector.text_ai_extension_wrapper import (
+        initialize_text_ai_extension,
+    )
 
     # Full installation with latest version
     initialize_text_ai_extension(my_secrets)
@@ -97,7 +99,9 @@ SQL against the configured source and output tables.
 .. code-block:: python
 
     from exasol.nb_connector.text_ai_extension_wrapper import Extraction
-    from exasol.ai.text.extractors.named_entity_extractor import NamedEntityExtractor
+    from exasol.ai.text.extractors.named_entity_extractor import (
+        NamedEntityExtractor,
+    )
 
     # Configure the extractor and the output table
     extraction = Extraction(
@@ -108,7 +112,7 @@ SQL against the configured source and output tables.
     # Execute the extraction — results are written to the output table
     extraction.run(my_secrets)
 
-Pipeline extraction example
+Pipeline Extraction Example
 ***************************
 
 If you want a reusable preprocessing workflow rather than a single UDF call,
@@ -148,7 +152,7 @@ In this pattern, each pipeline step can create its own output and support
 tables.  Re-running the pipeline is incremental as long as the previous output
 tables are still present.
 
-Branch extraction example
+Branch Extraction Example
 *************************
 
 If you want to run multiple extractor branches from the same source data,
@@ -159,15 +163,22 @@ pipeline.
 
     from exasol.nb_connector.text_ai_extension_wrapper import Extraction
     from exasol.ai.text.extraction.abstract_extraction import Defaults, Output
-    from exasol.ai.text.extractors.extractor import BranchExtractor, PipelineExtractor
-    from exasol.ai.text.extractors.named_entity_extractor import NamedEntityExtractor
+    from exasol.ai.text.extractors.extractor import (
+        BranchExtractor,
+        PipelineExtractor,
+    )
+    from exasol.ai.text.extractors.named_entity_extractor import (
+        NamedEntityExtractor,
+    )
     from exasol.ai.text.extractors.source_table_extractor import (
         NameSelector,
         SchemaSource,
         SourceTableExtractor,
         TableSource,
     )
-    from exasol.ai.text.extractors.topic_classifier_extractor import TopicClassifierExtractor
+    from exasol.ai.text.extractors.topic_classifier_extractor import (
+        TopicClassifierExtractor,
+    )
 
     src_extractor = SourceTableExtractor(
         source=TableSource(

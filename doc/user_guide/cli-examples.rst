@@ -1,5 +1,5 @@
 Command Line Interface (CLI) Examples
-######################################
+#####################################
 
 The Notebook Connector ships two CLI tools: ``ai-lab`` and ``scs``.
 See their dedicated pages for the full option reference:

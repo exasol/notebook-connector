@@ -1,5 +1,5 @@
 Local Docker Database (ITDE) Examples
-######################################
+#####################################
 
 The *Integration Test Docker Environment* (ITDE) starts a fully functional
 Exasol database inside a Docker container.  It is the easiest way to get a

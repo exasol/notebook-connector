@@ -1,5 +1,5 @@
 BucketFS Examples
-##################
+#################
 
 BucketFS is Exasol's distributed file system that is accessible from inside
 UDF scripts.  You use it to store model files, JARs, configuration data, and
@@ -10,7 +10,7 @@ interface.  For the underlying BucketFS client API, see the
 `bucketfs-python API reference <https://exasol.github.io/bucketfs-python/main/api.html>`_.
 
 Configuration
-**************
+*************
 
 Before calling any BucketFS helper you must store the BucketFS connection
 parameters in the SCS.  When using ITDE (the local Docker database), these
@@ -36,7 +36,7 @@ helpers also work with Exasol SaaS when you store the SaaS settings
     my_secrets.save(CKey.bfs_encryption, "False")
 
 Uploading and Accessing Files via the Bucket API
-*************************************************
+************************************************
 
 ``open_bucketfs_bucket`` returns a bucket object from the
 `exasol-bucketfs <https://pypi.org/project/exasol-bucketfs>`_ library.  Call
@@ -52,7 +52,10 @@ the relative ``target_path`` used during upload to build the full UDF path.
 
 .. code-block:: python
 
-    from exasol.nb_connector.connections import open_bucketfs_bucket, get_udf_bucket_path
+    from exasol.nb_connector.connections import (
+        get_udf_bucket_path,
+        open_bucketfs_bucket,
+    )
 
     bucket = open_bucketfs_bucket(my_secrets)
 

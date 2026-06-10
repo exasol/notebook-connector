@@ -1,5 +1,5 @@
 Transformers Extension Examples
-################################
+###############################
 
 The Transformers Extension runs `Hugging Face <https://huggingface.co>`_
 transformer models as Exasol UDFs, letting you apply NLP models directly
@@ -67,6 +67,10 @@ Uploading a Hugging Face Model to BucketFS
 
 Transformer UDFs read model files from BucketFS, so the model artifacts must
 be present there before the UDFs can use them.
+
+Notebook Connector also exposes model-upload helper APIs in
+``exasol.nb_connector.transformers_extension_wrapper`` for this part of the
+workflow.
 
 For a working end-to-end model-loading workflow, use the bundled
 Transformers notebooks as the source of truth for the supported steps.
