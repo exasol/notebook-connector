@@ -28,6 +28,8 @@ def test_script_languages_container(
         run_notebook("configure_slc_repository.ipynb", store_file, store_password)
         run_notebook("export_as_is.ipynb", store_file, store_password)
         run_notebook("customize.ipynb", store_file, store_password)
+        # The sleep is needed because SaaS takes long for the synchronization of the SLC 
+        # and at the moment we don't have a better way to wait for it.
         if backend == "saas":
             time.sleep(10 * 60)
         run_notebook("test_slc.ipynb", store_file, store_password)
