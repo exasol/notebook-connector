@@ -1,5 +1,5 @@
 Database Connection Examples
-#############################
+############################
 
 All connection helpers accept a
 :py:class:`~exasol.nb_connector.secret_store.Secrets` object and derive every
@@ -15,7 +15,7 @@ contains at least ``db_host_name``, ``db_port``, ``db_user``, and
    apply ``db_schema`` automatically.
 
 pyexasol
-*********
+********
 
 ``open_pyexasol_connection`` wraps the `pyexasol
 <https://pypi.org/project/pyexasol>`_ driver and is the recommended choice for
@@ -40,7 +40,7 @@ and call ``conn.close()`` explicitly.
     conn.close()
 
 SQLAlchemy
-***********
+**********
 
 ``open_sqlalchemy_connection`` returns a standard ``sqlalchemy.Engine``.  It is
 the right choice when working with tools that expect SQLAlchemy, such as
@@ -59,7 +59,7 @@ the SCS is automatically set as the connection's default schema.
     print(df)
 
 Ibis
-*****
+****
 
 ``open_ibis_connection`` returns an `ibis
 <https://ibis-project.org>`_ connection backed by the Exasol dialect.  Ibis

@@ -199,10 +199,10 @@ Use ``configure docker-db`` for an Exasol Docker instance managed via ITDE.
    * - ``--accelerator``
      - Hardware acceleration. Default: ``none``.
 
-Typical workflows
+Typical Workflows
 =================
 
-On-premise workflow
+On-Premise Workflow
 -------------------
 
 The following steps show how to create an encrypted SCS file for an
@@ -226,7 +226,7 @@ optionally check network reachability before opening any notebooks.
     scs check --connect my_config.db
     scs show my_config.db
 
-SaaS workflow
+SaaS Workflow
 -------------
 
 For Exasol SaaS, the database host and credentials are derived from your
@@ -246,7 +246,7 @@ variable so it is never written to disk in plain text.
     scs check --connect my_saas_config.db
     scs show my_saas_config.db
 
-Local Docker database workflow
+Local Docker Database Workflow
 ------------------------------
 
 Use ``configure docker-db`` to store the desired ITDE sizing values in the

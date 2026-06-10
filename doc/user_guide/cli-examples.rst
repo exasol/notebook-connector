@@ -10,7 +10,7 @@ See their dedicated pages for the full option reference:
 This page focuses on end-to-end ``ai-lab`` workflows.  For CLI examples that
 create, inspect, or validate SCS files directly, see :doc:`scs-cli`.
 
-Typical ai-lab Workflow After Configuration
+Typical AI Lab Workflow After Configuration
 *******************************************
 
 The following steps show how to start from an already configured environment,

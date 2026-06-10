@@ -1,5 +1,5 @@
 Cloud Storage Extension Examples
-#################################
+################################
 
 The `cloud-storage-extension
 <https://github.com/exasol/cloud-storage-extension>`_ lets Exasol UDFs read
@@ -10,8 +10,8 @@ The setup involves four steps: download the extension JAR, upload it to
 BucketFS, compute the UDF-visible path to the JAR, and finally deploy the UDF
 scripts into the database schema.
 
-Step 1 – Download the extension JAR
-*************************************
+Step 1 – Download the Extension JAR
+***********************************
 
 Use ``retrieve_jar`` to download the latest Cloud Storage Extension JAR from
 GitHub.  This is a small helper step inside the larger deployment workflow:
@@ -44,7 +44,7 @@ If you need to inspect the exact version before downloading, call
     print(jar_url)
 
 Step 2 – Upload the JAR to BucketFS
-*************************************
+***********************************
 
 Open a BucketFS bucket using the credentials stored in the SCS and upload the
 JAR file.  The ``bucket.upload(name, file_object)`` call streams the file
@@ -60,8 +60,8 @@ first argument is the name (path) inside the bucket — here we use
     with open(jar_path, "rb") as f:
         bucket.upload(jar_path.name, f)
 
-Step 3 – Build the UDF-visible JAR path
-*****************************************
+Step 3 – Build the UDF-Visible JAR Path
+***************************************
 
 BucketFS files are mounted inside UDF containers under a fixed prefix.
 ``get_udf_bucket_path`` returns this prefix for the configured bucket
@@ -76,8 +76,8 @@ it knows where to find the JAR at UDF execution time.
     udf_jar_path = get_udf_bucket_path(my_secrets) + "/" + jar_path.name
     # e.g. /buckets/bfsdefault/default/exasol-cloud-storage-extension-2.8.0.jar
 
-Step 4 – Deploy the UDF scripts
-*********************************
+Step 4 – Deploy the UDF Scripts
+*******************************
 
 ``setup_scripts`` creates the ``IMPORT_PATH``, ``IMPORT_METADATA``,
 ``EXPORT_PATH``, and related UDF scripts in the given schema.  Pass the

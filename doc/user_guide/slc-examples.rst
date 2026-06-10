@@ -1,5 +1,5 @@
 Script Language Container (SLC) Examples
-##########################################
+########################################
 
 Script Language Containers (SLCs) are Linux container based Python
 environments that
@@ -10,8 +10,8 @@ upload → activate.
 
 **Required extra:** ``pip install "notebook-connector[slc]"``
 
-Step 1 – Register an SLC instance
-***********************************
+Step 1 – Register an SLC Instance
+*********************************
 
 Call ``ScriptLanguageContainer.create()`` once per SLC.  This method:
 
@@ -36,8 +36,8 @@ the ``flavor`` must match a directory name inside the cloned repository (e.g.
     )
     # The resulting language alias will be: CUSTOM_SLC_MY_SLC
 
-Step 2 – Build and upload the SLC
-***********************************
+Step 2 – Build and Upload the SLC
+*********************************
 
 Instantiate ``ScriptLanguageContainer`` with the same ``name`` used during
 ``create()``.  Calling ``deploy()`` builds the container image from the local
@@ -51,8 +51,8 @@ stores the resulting language activation definition in the SCS.
     slc = ScriptLanguageContainer(secrets=my_secrets, name="my_slc")
     slc.deploy()
 
-Step 3 – Activate the language in the database
-************************************************
+Step 3 – Activate the Language in the Database
+**********************************************
 
 After deployment you must activate the language alias in the current session
 before any UDF that uses it can run.  There are two ways:
