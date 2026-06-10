@@ -42,6 +42,9 @@ normal:
       - name: Cloud notebook (saas)
         test_file: test_cloud.py
         test_backend: saas
+      - name: SLC notebook (saas)
+        test_file: test_script_languages_container.py
+        test_backend: saas
       - name: sklearn notebook (saas)
         test_file: test_sklearn.py
         test_backend: saas
