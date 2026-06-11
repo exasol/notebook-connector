@@ -23,3 +23,7 @@
 * #408: Removed sagemaker related code and tests
 * #410: Updated Documentation for CLIs and Python APIs in notebook-connector
 * #414: Added examples and explanations for features in documentation
+
+## Features
+
+* #421: Enable SaaS SLC deploy
