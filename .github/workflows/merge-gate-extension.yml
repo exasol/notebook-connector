@@ -11,6 +11,7 @@ jobs:
     name: Performance
     uses: ./.github/workflows/performance-checks.yml
     permissions:
+      contents: read
 
   approve-notebook-tests:
     name: Run Jupyter Notebook Tests?
