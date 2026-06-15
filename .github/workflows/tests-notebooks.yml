@@ -61,6 +61,7 @@ jobs:
     runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
     permissions:
       contents: read
+    continue-on-error: ${{ inputs.status-filter == 'unstable' }}
     strategy:
       fail-fast: false
       matrix:

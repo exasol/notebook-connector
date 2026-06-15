@@ -45,7 +45,6 @@ jobs:
       - approve-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
     secrets: inherit
-    continue-on-error: true
     permissions:
       contents: read
     strategy:
