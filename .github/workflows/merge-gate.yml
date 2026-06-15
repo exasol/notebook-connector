@@ -1,13 +1,9 @@
+# Generated and maintained by the exasol-toolbox.
+# Last generated with exasol-toolbox version 8.2.0.
 name: Merge-Gate
 
 on:
   workflow_call:
-    inputs:
-      root-event:
-        description: GitHub event triggering the root workflow ci.yml
-        required: false
-        type: string
-        default: unknown
 
 jobs:
   run-fast-checks:
@@ -16,18 +12,25 @@ jobs:
     permissions:
       contents: read
 
+  run-fast-tests:
+    name: Fast Tests
+    uses: ./.github/workflows/fast-tests.yml
+    permissions:
+      contents: read
+
   fast-report:
     name: Fast Report
     needs:
       - run-fast-checks
+      - run-fast-tests
     uses: ./.github/workflows/report.yml
-    secrets: inherit
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     permissions:
       contents: read
 
   approve-run-slow-tests:
     name: Approve Running Slow Tests?
-    if: ${{ inputs.root-event != 'schedule' }}
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
@@ -70,14 +73,18 @@ jobs:
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
+    # If you need additional jobs to be part of the merge gate, add them below
     needs:
       - run-fast-checks
+      - run-fast-tests
       - run-slow-checks
+    # To prevent accidentally merges, this step is required. For more details
+    # see: https://github.com/exasol/python-toolbox/issues/563
     steps:
-      - name: Branch Protection - failure if any ancestor failed
-        if: ${{ contains(needs.*.result, 'failure') }}
+      - name: Branch Protection - failure if any ancestor failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
         run: |
           echo '${{ toJSON(needs) }}'
           exit 1
-      - name: Approve
-        run: echo "Merge Approved"
+      - name: branch protection
+        run: echo "All required checks passed. Merge allowed."
