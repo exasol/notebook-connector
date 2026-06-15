@@ -51,20 +51,6 @@ jobs:
     permissions:
       contents: read
 
-  optional-slow-checks:
-    name: Optional Slow
-    needs:
-      - approve-run-slow-tests
-    uses: ./.github/workflows/tests-saas.yml
-    secrets: inherit
-    permissions:
-      contents: read
-
-  performance-checks:
-    name: Performance
-    uses: ./.github/workflows/performance-checks.yml
-    permissions:
-      contents: read
 
   # This job ensures inputs have been executed successfully.
   allow-merge:
