@@ -1,13 +1,6 @@
 :octicon:`person` User Guide
 ############################
 
-.. toctree::
-   :maxdepth: 2
-   :hidden:
-
-   ai-lab-cli
-   scs-cli
-
 .. _install_nc:
 
 Installing the Notebook Connector (NC)
@@ -111,3 +104,36 @@ Method ``create()`` will then
 The constructor of class ``ScriptLanguageContainer`` verifies the SCS to
 contain the flavor and the SLC repository to be cloned to the local file
 system.
+
+
+CLI
+***
+
+Use this section for command reference and end-to-end command line workflows.
+
+.. toctree::
+   :maxdepth: 1
+
+   cli-examples
+   ai-lab-cli
+   scs-cli
+
+Python API
+**********
+
+Every API in this section reads its connection parameters from a
+:py:class:`~exasol.nb_connector.secret_store.Secrets` object (the *Secure
+Configuration Storage*, SCS), so setting up the SCS correctly is the first
+step for all subsequent examples.
+
+.. toctree::
+   :maxdepth: 1
+
+   secret-store-examples
+   database-connection-examples
+   bucketfs-examples
+   itde-examples
+   slc-examples
+   transformers-extension-examples
+   text-ai-extension-examples
+   cloud-storage-examples

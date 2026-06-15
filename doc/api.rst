@@ -105,7 +105,6 @@ exasol.nb_connector.transformers_extension_wrapper
 .. autofunction:: exasol.nb_connector.transformers_extension_wrapper.deploy_scripts
 .. autofunction:: exasol.nb_connector.transformers_extension_wrapper.initialize_te_extension
 .. autofunction:: exasol.nb_connector.transformers_extension_wrapper.upload_model
-.. autofunction:: exasol.nb_connector.transformers_extension_wrapper.upload_model_from_cache
 
 Functions and Classes in Other Packages
 ***************************************
