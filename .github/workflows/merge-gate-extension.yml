@@ -76,3 +76,4 @@ jobs:
       contents: read
     with:
       status-filter: stable
+      test-classification: gpu
