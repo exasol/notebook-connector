@@ -199,6 +199,67 @@ Use ``configure docker-db`` for an Exasol Docker instance managed via ITDE.
    * - ``--accelerator``
      - Hardware acceleration. Default: ``none``.
 
+Typical Workflows
+=================
+
+On-Premise Workflow
+-------------------
+
+The following steps show how to create an encrypted SCS file for an
+on-premise Exasol database, verify that all required values are present, and
+optionally check network reachability before opening any notebooks.
+
+.. code-block:: shell
+
+    export SCS_MASTER_PASSWORD="my-strong-password"
+
+    scs configure onprem my_config.db \
+        --db-host-name 192.168.1.10 \
+        --db-port 8563 \
+        --db-username sys \
+        --db-schema MY_SCHEMA \
+        --bucketfs-host 192.168.1.10 \
+        --bucketfs-port 2580 \
+        --bucketfs-name bfsdefault \
+        --bucket default
+
+    scs check --connect my_config.db
+    scs show my_config.db
+
+SaaS Workflow
+-------------
+
+For Exasol SaaS, the database host and credentials are derived from your
+account ID and personal access token (PAT).  Export the PAT as an environment
+variable so it is never written to disk in plain text.
+
+.. code-block:: shell
+
+    export SCS_MASTER_PASSWORD="my-strong-password"
+    export SCS_EXASOL_SAAS_TOKEN="<your-pat>"
+
+    scs configure saas my_saas_config.db \
+        --saas-account-id "<your-account-id>" \
+        --saas-database-name "my-database" \
+        --db-schema MY_SCHEMA
+
+    scs check --connect my_saas_config.db
+    scs show my_saas_config.db
+
+Local Docker Database Workflow
+------------------------------
+
+Use ``configure docker-db`` to store the desired ITDE sizing values in the
+SCS.  This command prepares the local setup but does not start the Docker
+database by itself.  Start the container later via the Python API described
+in :doc:`itde-examples`.
+
+.. code-block:: shell
+
+    scs configure docker-db my_docker_config.db \
+        --db-mem-size 4 \
+        --db-disk-size 10
+
 Incremental Configuration
 =========================
 
