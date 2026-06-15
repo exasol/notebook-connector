@@ -76,11 +76,3 @@ jobs:
       contents: read
     with:
       status-filter: stable
-
-  merge-gate-extension-success:
-    name: Rate
-    needs:
-      - performance-checks
-      - run-stable-gpu-notebook-tests
-      - run-stable-notebook-tests
-
