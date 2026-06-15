@@ -28,3 +28,11 @@ jobs:
     uses: ./.github/workflows/tests-ui.yml
     permissions:
       contents: read
+
+  optional-slow-checks:
+    name: Optional Slow
+    continue-on-error: true
+    uses: ./.github/workflows/tests-saas.yml
+    secrets: inherit
+    permissions:
+      contents: read
