@@ -1,6 +1,6 @@
 # Manual extension to merge-gate, not maintained by the exasol-toolbox.
 
-name: Merge-Gate
+name: Merge-Gate Extension
 
 on:
   workflow_call:
