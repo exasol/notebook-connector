@@ -4,7 +4,8 @@ from test.utils.secrets import sample_db_file
 
 import pytest
 from exasol.exaslpm.model.package_file_config import (
-    CondaPackage, PipPackage,
+    CondaPackage,
+    PipPackage,
 )
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
@@ -60,9 +61,11 @@ def test_append_custom_packages(
         ]
     )
 
+
 @pytest.fixture
 def custom_pip_packages() -> list[tuple[str, str]]:
     return [("exasol-transformers-extension", "3.0.0")]
+
 
 @pytest.mark.dependency(name="append_custom_pip_packages")
 def test_append_custom_pip_packages(
@@ -78,7 +81,8 @@ def test_append_custom_pip_packages(
 
 
 @pytest.mark.dependency(
-    name="upload_slc_with_new_packages", depends=["append_custom_packages", "append_custom_pip_packages"]
+    name="upload_slc_with_new_packages",
+    depends=["append_custom_packages", "append_custom_pip_packages"],
 )
 def test_upload_slc_with_new_packages(
     secrets_module: Secrets,
