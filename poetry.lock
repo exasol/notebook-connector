@@ -2004,14 +2004,14 @@ toml = ">=0.10.2,<0.11.0"
 
 [[package]]
 name = "exasol-integration-test-docker-environment"
-version = "6.2.0"
+version = "6.1.0"
 description = "Integration Test Docker Environment for Exasol"
 optional = false
 python-versions = "<3.15,>=3.10"
 groups = ["main", "dev"]
 files = [
-    {file = "exasol_integration_test_docker_environment-6.2.0-py3-none-any.whl", hash = "sha256:6bae833b3b304f2fdb5bbbda70438840583a086b9040f380a799e322718c34bc"},
-    {file = "exasol_integration_test_docker_environment-6.2.0.tar.gz", hash = "sha256:690960ce28768c371725a394d0b03c1f768cd656c3f3670bc75bce9d10c013f0"},
+    {file = "exasol_integration_test_docker_environment-6.1.0-py3-none-any.whl", hash = "sha256:3da3e8d74c3c6ca947730587f0f22996b834a20363ef3d6d186564866cd97864"},
+    {file = "exasol_integration_test_docker_environment-6.1.0.tar.gz", hash = "sha256:f0ecf2dd2db8af0688630543b76373fe154a8a147eaf6f76d8c5794a1bc04d00"},
 ]
 markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\""}
 
@@ -2100,21 +2100,21 @@ types-requests = ">=2.31.0.6,<3.0.0.0"
 
 [[package]]
 name = "exasol-script-languages-container-tool"
-version = "4.1.0"
+version = "4.0.3"
 description = "Script Languages Container Tool"
 optional = true
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
 markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\""
 files = [
-    {file = "exasol_script_languages_container_tool-4.1.0-py3-none-any.whl", hash = "sha256:67be6fe190144983b8e1c9f55e850364895b70d5aa770ee8c22411159bcf3d15"},
-    {file = "exasol_script_languages_container_tool-4.1.0.tar.gz", hash = "sha256:cca58883d576251ea4e5fc7b1eeaf134315cc76d91ada6c646f31c2fd8971bc9"},
+    {file = "exasol_script_languages_container_tool-4.0.3-py3-none-any.whl", hash = "sha256:0a9319203114743f1b80d7d74a0af4d8fb62461151c73ac6cc5f0b34b83544c6"},
+    {file = "exasol_script_languages_container_tool-4.0.3.tar.gz", hash = "sha256:2e2916106d1ecb1fea7b0ea6e1ef746cb56a5d4f80eb5a93e22dcb2901e32e87"},
 ]
 
 [package.dependencies]
 click = ">=8.2.1,<9"
 exasol-bucketfs = ">=2.1.0,<3"
-exasol-integration-test-docker-environment = ">=6.2.0,<7"
+exasol-integration-test-docker-environment = ">=6.1.0,<7"
 exasol-script-languages-package-management = ">=1.0.0,<2"
 jsonschema = ">=4.23.0,<5"
 networkx = ">=3.3.0,<4"
@@ -11210,4 +11210,4 @@ transformers = ["exasol-transformers-extension", "yaspin"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "53b74cba874ff8daa2ec2ff38033a59ec5882938b67a91474cbec33624b45b56"
+content-hash = "2c06e49d30fe3438f3509575856431ba364dab8bf1decced35617c9152a0c2bc"
