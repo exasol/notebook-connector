@@ -1,4 +1,4 @@
-# 3.0.0 - 2026-06-16
+# 3.0.0 - 2026-06-17
 
 ## Summary
 
@@ -9,6 +9,8 @@ This release fixes vulnerabilities by updating dependencies:
 | Dependency | Vulnerability | Affected | Fixed in |
 |------------|---------------|----------|----------|
 | black | CVE-2026-32274 | 25.12.0 | 26.3.1 |
+| bleach | GHSA-gj48-438w-jh9v | 6.3.0 | 6.4.0 |
+| bleach | GHSA-8rfp-98v4-mmr6 | 6.3.0 | 6.4.0 |
 | cryptography | PYSEC-2026-35 | 46.0.5 | 46.0.6 |
 | cryptography | PYSEC-2026-36 | 46.0.5 | 46.0.7 |
 | cryptography | PYSEC-2026-36 | 46.0.5 | 46.0.7 |
@@ -18,7 +20,7 @@ This release fixes vulnerabilities by updating dependencies:
 | gitpython | CVE-2026-42284 | 3.1.46 | 3.1.47 |
 | gitpython | CVE-2026-44244 | 3.1.46 | 3.1.49 |
 | gitpython | GHSA-mv93-w799-cj2w | 3.1.46 | 3.1.50 |
-| idna | CVE-2026-45409 | 3.11 | 3.15 |
+| idna | PYSEC-2026-215 | 3.11 | 3.15 |
 | jupyter-server | PYSEC-2026-67 | 2.17.0 | 2.18.0 |
 | jupyter-server | PYSEC-2026-68 | 2.17.0 | 2.18.0 |
 | jupyter-server | PYSEC-2026-69 | 2.17.0 | 2.18.0 |
@@ -110,13 +112,13 @@ This release fixes vulnerabilities by updating dependencies:
 
 ### `dev`
 
-* Updated dependency `exasol-toolbox:5.1.1` to `8.2.0`
+* Updated dependency `exasol-toolbox:5.1.1` to `9.0.0`
 * Added dependency `nbclient:0.11.0`
 * Added dependency `nbformat:5.10.4`
 * Updated dependency `notebook:7.5.5` to `7.5.7`
 * Added dependency `pytest-check-links:0.10.1`
 * Updated dependency `pytest-exasol-backend:1.4.0` to `1.4.1`
-* Updated dependency `pytest-ipywidgets:1.57.3` to `1.57.4`
+* Updated dependency `pytest-ipywidgets:1.57.3` to `1.57.5`
 * Added dependency `starlette:0.52.1`
 * Added dependency `testbook:0.4.2`
 * Added dependency `types-pyyaml:6.0.12.20260518`

@@ -92,14 +92,14 @@ files = [
 
 [[package]]
 name = "anyio"
-version = "4.13.0"
+version = "4.14.0"
 description = "High-level concurrency and networking framework on top of asyncio or Trio"
 optional = false
 python-versions = ">=3.10"
 groups = ["main", "dev"]
 files = [
-    {file = "anyio-4.13.0-py3-none-any.whl", hash = "sha256:08b310f9e24a9594186fd75b4f73f4a4152069e3853f1ed8bfbf58369f4ad708"},
-    {file = "anyio-4.13.0.tar.gz", hash = "sha256:334b70e641fd2221c1505b3890c69882fe4a2df910cba14d97019b90b24439dc"},
+    {file = "anyio-4.14.0-py3-none-any.whl", hash = "sha256:dd9b7a2a9799ed6552fde617b2c5df02b7fdd7d88392fc48101e51bae46164d9"},
+    {file = "anyio-4.14.0.tar.gz", hash = "sha256:b47c1f9ccf73e67021df785332508f99379c68fa7d0684e8e3492cb1d4b23f89"},
 ]
 
 [package.dependencies]
@@ -2004,14 +2004,14 @@ toml = ">=0.10.2,<0.11.0"
 
 [[package]]
 name = "exasol-integration-test-docker-environment"
-version = "6.1.0"
+version = "6.2.0"
 description = "Integration Test Docker Environment for Exasol"
 optional = false
 python-versions = "<3.15,>=3.10"
 groups = ["main", "dev"]
 files = [
-    {file = "exasol_integration_test_docker_environment-6.1.0-py3-none-any.whl", hash = "sha256:3da3e8d74c3c6ca947730587f0f22996b834a20363ef3d6d186564866cd97864"},
-    {file = "exasol_integration_test_docker_environment-6.1.0.tar.gz", hash = "sha256:f0ecf2dd2db8af0688630543b76373fe154a8a147eaf6f76d8c5794a1bc04d00"},
+    {file = "exasol_integration_test_docker_environment-6.2.0-py3-none-any.whl", hash = "sha256:6bae833b3b304f2fdb5bbbda70438840583a086b9040f380a799e322718c34bc"},
+    {file = "exasol_integration_test_docker_environment-6.2.0.tar.gz", hash = "sha256:690960ce28768c371725a394d0b03c1f768cd656c3f3670bc75bce9d10c013f0"},
 ]
 markers = {main = "extra == \"docker-db\" or extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\""}
 
@@ -2100,21 +2100,21 @@ types-requests = ">=2.31.0.6,<3.0.0.0"
 
 [[package]]
 name = "exasol-script-languages-container-tool"
-version = "4.0.3"
+version = "4.1.0"
 description = "Script Languages Container Tool"
 optional = true
 python-versions = "<3.14,>=3.10"
 groups = ["main"]
 markers = "extra == \"slc\" or extra == \"transformers\" or extra == \"text-ai\""
 files = [
-    {file = "exasol_script_languages_container_tool-4.0.3-py3-none-any.whl", hash = "sha256:0a9319203114743f1b80d7d74a0af4d8fb62461151c73ac6cc5f0b34b83544c6"},
-    {file = "exasol_script_languages_container_tool-4.0.3.tar.gz", hash = "sha256:2e2916106d1ecb1fea7b0ea6e1ef746cb56a5d4f80eb5a93e22dcb2901e32e87"},
+    {file = "exasol_script_languages_container_tool-4.1.0-py3-none-any.whl", hash = "sha256:67be6fe190144983b8e1c9f55e850364895b70d5aa770ee8c22411159bcf3d15"},
+    {file = "exasol_script_languages_container_tool-4.1.0.tar.gz", hash = "sha256:cca58883d576251ea4e5fc7b1eeaf134315cc76d91ada6c646f31c2fd8971bc9"},
 ]
 
 [package.dependencies]
 click = ">=8.2.1,<9"
 exasol-bucketfs = ">=2.1.0,<3"
-exasol-integration-test-docker-environment = ">=6.1.0,<7"
+exasol-integration-test-docker-environment = ">=6.2.0,<7"
 exasol-script-languages-package-management = ">=1.0.0,<2"
 jsonschema = ">=4.23.0,<5"
 networkx = ">=3.3.0,<4"
@@ -2168,14 +2168,14 @@ transformers = ">=4.48.0"
 
 [[package]]
 name = "exasol-toolbox"
-version = "8.2.0"
+version = "9.0.0"
 description = "Your one-stop solution for managing all standard tasks and core workflows of your Python project."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["dev"]
 files = [
-    {file = "exasol_toolbox-8.2.0-py3-none-any.whl", hash = "sha256:27fb716e04c76d25d347904490b077bbf92d1f40192a6ebdbeed87ba8d19f1dd"},
-    {file = "exasol_toolbox-8.2.0.tar.gz", hash = "sha256:a15cba09b1390a92ad28ae22449a16e3f7cd4612830ef6f4261f858d47d73256"},
+    {file = "exasol_toolbox-9.0.0-py3-none-any.whl", hash = "sha256:ffa73f36923470bdaae50137e810170b6100473c9df3b3b02566d3fbdb9e8e70"},
+    {file = "exasol_toolbox-9.0.0.tar.gz", hash = "sha256:9a5eb9d7514c57d5d1c6bfb4341d51a500906cf2c3f56078d264d88270d4cd18"},
 ]
 
 [package.dependencies]
@@ -2211,6 +2211,7 @@ sphinxcontrib-mermaid = ">=2.0.0,<3.0.0"
 structlog = ">=25.5.0,<26.0.0"
 twine = ">=6.1.0,<7"
 typer = {version = ">=0.7.0", extras = ["all"]}
+zizmor = ">=1.25.2,<2.0.0"
 
 [[package]]
 name = "exasol-transformers-extension"
@@ -2415,15 +2416,15 @@ markers = {main = "extra == \"jupyter\""}
 
 [[package]]
 name = "fsspec"
-version = "2026.4.0"
+version = "2026.6.0"
 description = "File-system specification"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"transformers\" or extra == \"text-ai\""
 files = [
-    {file = "fsspec-2026.4.0-py3-none-any.whl", hash = "sha256:11ef7bb35dab8a394fde6e608221d5cf3e8499401c249bebaeaad760a1a8dec2"},
-    {file = "fsspec-2026.4.0.tar.gz", hash = "sha256:301d8ac70ae90ef3ad05dcf94d6c3754a097f9b5fe4667d2787aa359ec7df7e4"},
+    {file = "fsspec-2026.6.0-py3-none-any.whl", hash = "sha256:02e0b71817df9b2169dc30a16832045764def1191b43dcff5bb85bdee212d2a1"},
+    {file = "fsspec-2026.6.0.tar.gz", hash = "sha256:f5bac145310fe30e16e1471bd6840b2d990d609e872251d7e674241822abf01a"},
 ]
 
 [package.extras]
@@ -2451,7 +2452,7 @@ smb = ["smbprotocol"]
 ssh = ["paramiko"]
 test = ["aiohttp (!=4.0.0a0,!=4.0.0a1)", "numpy", "pytest", "pytest-asyncio (!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytest-recording", "pytest-rerunfailures", "requests"]
 test-downstream = ["aiobotocore (>=2.5.4,<3.0.0)", "dask[dataframe,test]", "moto[server] (>4,<5)", "pytest-timeout", "xarray"]
-test-full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "backports-zstd ; python_version < \"3.14\"", "cloudpickle", "dask", "distributed", "dropbox", "dropboxdrivefs", "fastparquet", "fusepy", "gcsfs", "jinja2", "kerchunk", "libarchive-c", "lz4", "notebook", "numpy", "ocifs", "pandas (<3.0.0)", "panel", "paramiko", "pyarrow", "pyarrow (>=1)", "pyftpdlib", "pygit2", "pytest", "pytest-asyncio (!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytest-recording", "pytest-rerunfailures", "python-snappy", "requests", "smbprotocol", "tqdm", "urllib3", "zarr", "zstandard ; python_version < \"3.14\""]
+test-full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "backports-zstd ; python_version < \"3.14\"", "cloudpickle", "dask", "distributed", "dropbox", "dropboxdrivefs", "fastparquet", "fusepy", "gcsfs", "jinja2", "kerchunk", "libarchive-c", "lz4", "notebook", "numpy", "ocifs", "pandas (<3.0.0)", "panel", "paramiko", "pyarrow", "pyarrow (>=1)", "pyftpdlib", "pygit2", "pytest", "pytest-asyncio (!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytest-recording", "pytest-rerunfailures", "python-snappy", "requests", "smbprotocol", "tqdm", "urllib3", "zarr (<3.2.0)", "zstandard ; python_version < \"3.14\""]
 tqdm = ["tqdm"]
 
 [[package]]
@@ -7088,14 +7089,14 @@ pytest = ">=7,<10"
 
 [[package]]
 name = "pytest-ipywidgets"
-version = "1.57.4"
+version = "1.57.5"
 description = ""
 optional = false
 python-versions = ">=3.8"
 groups = ["dev"]
 files = [
-    {file = "pytest_ipywidgets-1.57.4-py3-none-any.whl", hash = "sha256:6d83e894e9a1a9ec734cdd577c3a936ba94ce09d066e3bdf6909f5431a7760b2"},
-    {file = "pytest_ipywidgets-1.57.4.tar.gz", hash = "sha256:b19ef4f28df4a6ffa40d0a8cc76c8e8fc7dfcfefcbf875c8c576ce8ee960c601"},
+    {file = "pytest_ipywidgets-1.57.5-py3-none-any.whl", hash = "sha256:7880d910f2a52ad9e33a03f1631b9b6073fe878c55679be14030b341a0f71df5"},
+    {file = "pytest_ipywidgets-1.57.5.tar.gz", hash = "sha256:e23b7c8673e6ae823f099a7399266d1b801dcae45b853b2e42bfa31b0f3a5bd0"},
 ]
 
 [package.dependencies]
@@ -7104,8 +7105,8 @@ pixelmatch = "*"
 playwright = "*"
 pytest = "*"
 pytest-playwright = "*"
-solara-server = {version = "1.57.4", extras = ["starlette"]}
-solara-ui = "1.57.4"
+solara-server = {version = "1.57.5", extras = ["starlette"]}
+solara-ui = "1.57.5"
 
 [package.extras]
 all = ["jupyterlab (<4)", "notebook (<7)", "voila"]
@@ -8686,15 +8687,15 @@ test = ["pytest (>=8)"]
 
 [[package]]
 name = "sentence-transformers"
-version = "5.5.1"
+version = "5.6.0"
 description = "Embeddings, Retrieval, and Reranking"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"text-ai\""
 files = [
-    {file = "sentence_transformers-5.5.1-py3-none-any.whl", hash = "sha256:4fe11d433badc5282d32f7fc08bc714216b7a5aca426f9df77a45a554756deb7"},
-    {file = "sentence_transformers-5.5.1.tar.gz", hash = "sha256:02b7740dfc60bdbbcb6061625f5d97a5c1a4e2d3baac5f9391b912bb5eae2290"},
+    {file = "sentence_transformers-5.6.0-py3-none-any.whl", hash = "sha256:d2075b5e687a1611005e20ab04a6846994d51adfcf39610aed066af3c0c0b81f"},
+    {file = "sentence_transformers-5.6.0.tar.gz", hash = "sha256:0e7164d051e416c1853ade7c274ff52af3f9da0f4be7f0b83d734c27699e1057"},
 ]
 
 [package.dependencies]
@@ -8941,14 +8942,14 @@ files = [
 
 [[package]]
 name = "solara-server"
-version = "1.57.4"
+version = "1.57.5"
 description = ""
 optional = false
 python-versions = ">=3.8"
 groups = ["dev"]
 files = [
-    {file = "solara_server-1.57.4-py3-none-any.whl", hash = "sha256:bb08ad9d46cea44d607405afb013c4a52a821671516c6292c6cd78fea343e2bd"},
-    {file = "solara_server-1.57.4.tar.gz", hash = "sha256:010127527bfed02c9ebf3120779164beeb103bfa2f15b42d0141fe71de63721e"},
+    {file = "solara_server-1.57.5-py3-none-any.whl", hash = "sha256:911d6e3e9a12a053ce0c9abb96551cfeb0406f193f56a98979754e9d413f803f"},
+    {file = "solara_server-1.57.5.tar.gz", hash = "sha256:9d6f8fb05c1c29839f31efebaf51ba02558db9756ff5dff193355461ebb8d62d"},
 ]
 
 [package.dependencies]
@@ -8972,14 +8973,14 @@ starlette = ["starlette", "uvicorn", "websockets"]
 
 [[package]]
 name = "solara-ui"
-version = "1.57.4"
+version = "1.57.5"
 description = ""
 optional = false
 python-versions = ">=3.8"
 groups = ["dev"]
 files = [
-    {file = "solara_ui-1.57.4-py3-none-any.whl", hash = "sha256:15bfafbcc1b4519dbfaa3adc1ead724ab895ee676513fc586613768bdeb41209"},
-    {file = "solara_ui-1.57.4.tar.gz", hash = "sha256:d7451f80936062af0e4d4171a4da3a9775f1112e9ea80e09fdfb84c5fda602b0"},
+    {file = "solara_ui-1.57.5-py3-none-any.whl", hash = "sha256:b2ee0d5a51125662c162d4dcae46a6d76d38952d980b9ae2d0d2895cd6077781"},
+    {file = "solara_ui-1.57.5.tar.gz", hash = "sha256:8096dbe645214f7caf36bf3d1c3b95e6c05a1a08ef4137fc1abbe69a5e90d8e4"},
 ]
 
 [package.dependencies]
@@ -10782,14 +10783,14 @@ standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.8.0)
 
 [[package]]
 name = "virtualenv"
-version = "21.5.0"
+version = "21.5.1"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.9"
 groups = ["main", "dev"]
 files = [
-    {file = "virtualenv-21.5.0-py3-none-any.whl", hash = "sha256:8f7c38605023688c89789f566959006af6d61c99eeeb9e58342eb780c5761e5e"},
-    {file = "virtualenv-21.5.0.tar.gz", hash = "sha256:98847aadf5e2037e0e4d2e19528eb3aca6f23906422e59a510bff231a6d32fce"},
+    {file = "virtualenv-21.5.1-py3-none-any.whl", hash = "sha256:55aa670b67bbfb991b03fda39bd3276d92c419d702376e98c5df1c9989a26783"},
+    {file = "virtualenv-21.5.1.tar.gz", hash = "sha256:dca3bf98275a59c652b69d68e73433e597d977c2da9198882479d1a7188009c8"},
 ]
 markers = {main = "extra == \"text-ai\""}
 
@@ -11194,6 +11195,27 @@ enabler = ["pytest-enabler (>=3.4)"]
 test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more_itertools", "pytest (>=6,!=8.1.*)", "pytest-ignore-flaky"]
 type = ["pytest-mypy (>=1.0.1) ; platform_python_implementation != \"PyPy\""]
 
+[[package]]
+name = "zizmor"
+version = "1.25.2"
+description = "Static analysis for GitHub Actions"
+optional = false
+python-versions = ">=3.10"
+groups = ["dev"]
+files = [
+    {file = "zizmor-1.25.2-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:17cc8cfd9d472e8b11945a869c198d25cfdf4a33f36fa7a1f9674099f5fb509d"},
+    {file = "zizmor-1.25.2-py3-none-macosx_11_0_arm64.whl", hash = "sha256:d3e301eb4465e2da77857cf01ab4ef0184cf3818e826800b270ab01ae7338977"},
+    {file = "zizmor-1.25.2-py3-none-manylinux_2_24_aarch64.whl", hash = "sha256:cf64374149b567c9373228b76c8e77a389b4071899f84b82c36ee50fab894e79"},
+    {file = "zizmor-1.25.2-py3-none-manylinux_2_28_armv7l.whl", hash = "sha256:0beba1601be08bd00c9277e6ed4b026e125b26b379d86d6d98eb708409b3050d"},
+    {file = "zizmor-1.25.2-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:c4246f1344d8dbeffc044d7bb11b131773a7db7eb57d9073c45942dfd3543a1f"},
+    {file = "zizmor-1.25.2-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:dbb1b5c85b8de8eaa0227c6620f06c8e4fbd0a4da2086e218bc225c0bef0923d"},
+    {file = "zizmor-1.25.2-py3-none-musllinux_1_2_armv7l.whl", hash = "sha256:d670a1e2f00b3cd56febd145bc1a0b2c4caf1cbe5dad8128721843fa877e2d2e"},
+    {file = "zizmor-1.25.2-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:b75c84d7387389f95edadbe859fb2aaf0a360c5b080932cc53e92ae1db6f09ef"},
+    {file = "zizmor-1.25.2-py3-none-win32.whl", hash = "sha256:aa9f4c43b499c55339c3ef2e885133c5017cd9a18d76d9335541203cfa5ae1e7"},
+    {file = "zizmor-1.25.2-py3-none-win_amd64.whl", hash = "sha256:af55bd9bd119ea8cbce2a7addc3922503019de32c1fe31106d70b3dc77d77908"},
+    {file = "zizmor-1.25.2.tar.gz", hash = "sha256:f26ffeb16659c8922c7b08203ca5a4f8bf5e1a7e8d190734961c40877cf778ea"},
+]
+
 [extras]
 bucketfs = ["exasol-bucketfs"]
 docker-db = ["exasol-integration-test-docker-environment", "ifaddr"]
@@ -11210,4 +11232,4 @@ transformers = ["exasol-transformers-extension", "yaspin"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "2c06e49d30fe3438f3509575856431ba364dab8bf1decced35617c9152a0c2bc"
+content-hash = "53b74cba874ff8daa2ec2ff38033a59ec5882938b67a91474cbec33624b45b56"
