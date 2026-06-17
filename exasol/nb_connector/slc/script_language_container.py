@@ -34,7 +34,10 @@ from exasol.nb_connector.luigi_utils import (
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.git_access import GitAccess
-from exasol.nb_connector.slc.package_file_editor import append_packages
+from exasol.nb_connector.slc.package_file_editor import (
+    append_packages,
+    ensure_pip_tools_in_package_file,
+)
 from exasol.nb_connector.slc.slc_compression_strategy import SlcCompressionStrategy
 from exasol.nb_connector.slc.slc_flavor import (
     SlcError,
@@ -375,6 +378,9 @@ class ScriptLanguageContainer:
         Note: This method is not idempotent: Multiple calls with the same
         package definitions will result in duplicated entries.
         """
+        ensure_pip_tools_in_package_file(
+            self.public_package_file, "flavor_customization"
+        )
         append_packages(
             self.public_package_file,
             PipPackage,

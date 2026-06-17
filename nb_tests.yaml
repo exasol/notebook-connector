@@ -75,9 +75,11 @@ gpu:
   runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
   additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
   stable:
-    tests:
-      - name: GPU notebook
-        test_file: test_gpu.py
-        test_backend: onprem
+     # GPU notebook tests are temporarily disabled due to an SLC issue being fixed separately.
+    tests: []
+#    tests:
+#      - name: GPU notebook
+#        test_file: test_gpu.py
+#        test_backend: onprem
   unstable:
     tests: []
