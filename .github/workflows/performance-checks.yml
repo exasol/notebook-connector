@@ -27,7 +27,7 @@ jobs:
         run: poetry run -- nox -s test:performance -- test/performance/benchmark.py
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v8
+        uses: actions/upload-artifact@v7
         with:
           name: performance_benchmark-results.json
           path: test/performance/_benchmark-results.json
