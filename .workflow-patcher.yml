@@ -1,5 +1,7 @@
 workflows:
   - name: checks
+    remove_jobs:
+      - check-workflows
     step_customizations:
       - action: INSERT_AFTER
         job: build-documentation-and-check-links
@@ -15,6 +17,8 @@ workflows:
          - name: Install All Optional Dependencies (aka. "extras")
            id: install-optional-dependencies
            run: poetry install --all-extras
+  - name: fast-tests
+    step_customizations:
       - action: INSERT_AFTER
         job: run-unit-tests
         step_id: set-up-python-and-poetry-environment

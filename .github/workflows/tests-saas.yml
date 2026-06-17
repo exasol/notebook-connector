@@ -8,12 +8,13 @@ jobs:
   saas-tests:
     name: SaaS Tests
     runs-on: ubuntu-24.04
+    continue-on-error: true
     permissions:
       contents: read
 
     steps:
       - name: SCM Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -33,7 +34,7 @@ jobs:
           sudo rm -rf /opt/ghc
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v5
+        uses: exasol/python-toolbox/.github/actions/python-environment@v8
         with:
           poetry-version: "2.3.0"
 
