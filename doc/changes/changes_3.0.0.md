@@ -93,10 +93,10 @@ This release fixes vulnerabilities by updating dependencies:
 ### `main`
 
 * Added dependency `click:8.4.1`
-* Updated dependency `exasol-integration-test-docker-environment:5.0.0` to `6.2.0`
+* Updated dependency `exasol-integration-test-docker-environment:5.0.0` to `6.1.0`
 * Updated dependency `exasol-saas-api:2.9.0` to `2.10.0`
 * Removed dependency `exasol-sagemaker-extension:0.11.7`
-* Updated dependency `exasol-script-languages-container-tool:3.6.1` to `4.1.0`
+* Updated dependency `exasol-script-languages-container-tool:3.6.1` to `4.0.3`
 * Updated dependency `exasol-text-ai-extension:0.2.1` to `0.3.0`
 * Updated dependency `gitpython:3.1.46` to `3.1.50`
 * Added dependency `ipyfilechooser:0.6.0`
