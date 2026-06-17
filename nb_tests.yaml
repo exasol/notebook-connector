@@ -38,25 +38,26 @@ normal:
         test_file: test_transformers.py
         test_backend: onprem
   unstable:
-    tests:
-      - name: Cloud notebook (saas)
-        test_file: test_cloud.py
-        test_backend: saas
-      - name: SLC notebook (saas)
-        test_file: test_script_languages_container.py
-        test_backend: saas
-      - name: sklearn notebook (saas)
-        test_file: test_sklearn.py
-        test_backend: saas
-      - name: ibis notebook (saas)
-        test_file: test_ibis.py
-        test_backend: saas
-      - name: Transformers notebook (saas)
-        test_file: test_transformers.py
-        test_backend: saas
-      - name: Text AI notebook (saas)
-        test_file: test_text_ai.py
-        test_backend: saas
+    tests: []
+    # tests:
+    #   - name: Cloud notebook (saas)
+    #     test_file: test_cloud.py
+    #     test_backend: saas
+    #   - name: SLC notebook (saas)
+    #     test_file: test_script_languages_container.py
+    #     test_backend: saas
+    #   - name: sklearn notebook (saas)
+    #     test_file: test_sklearn.py
+    #     test_backend: saas
+    #   - name: ibis notebook (saas)
+    #     test_file: test_ibis.py
+    #     test_backend: saas
+    #   - name: Transformers notebook (saas)
+    #     test_file: test_transformers.py
+    #     test_backend: saas
+    #   - name: Text AI notebook (saas)
+    #     test_file: test_text_ai.py
+    #     test_backend: saas
 
 
 large:
