@@ -76,13 +76,9 @@ jobs:
     name: Another
     runs-on: ubuntu-24.04
     needs: fetch-notebook-tests
-    strategy:
-      fail-fast: false
-      matrix:
-        nb_test: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
     steps:
       - name: another
-        run: echo Hello world
+        run: echo ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
 
   notebook-tests:
     name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
