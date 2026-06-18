@@ -72,20 +72,10 @@ jobs:
 #       runner: ${{ steps.set-runner.outputs.runner }}
 #       pytest_params: ${{ steps.set-pytest-params.outputs.pytest_params }}
 
-
-  another:
-    name: Another
-    runs-on: ubuntu-24.04
-    needs: fetch-notebook-tests
-    steps:
-      - name: another
-        run: echo "${{ needs.fetch-notebook-tests.outputs.tests }}"
-
   notebook-tests:
     name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
     needs: fetch-notebook-tests
-    # runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
-    runs-on: ubuntu-24.04
+    runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
     permissions:
       contents: read
     continue-on-error: ${{ inputs.status-filter == 'unstable' }}
