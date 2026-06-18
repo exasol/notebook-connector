@@ -74,7 +74,7 @@ jobs:
 
   notebook-tests:
     name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
-    # if: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
+    if: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
     needs: fetch-notebook-tests
     runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
     permissions:
