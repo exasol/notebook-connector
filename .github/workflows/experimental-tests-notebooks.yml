@@ -14,13 +14,6 @@ on:
 
 jobs:
 
-  another:
-    runs-on: ubuntu-24.04
-    name: Another
-    steps:
-      - name: another
-        run: echo Hello world
-
   fetch-notebook-tests:
     runs-on: ubuntu-24.04
     name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
@@ -78,6 +71,13 @@ jobs:
 #       runner: ${{ steps.set-runner.outputs.runner }}
 #       pytest_params: ${{ steps.set-pytest-params.outputs.pytest_params }}
 
+
+  another:
+    runs-on: ubuntu-24.04
+    name: Another
+    steps:
+      - name: another
+        run: echo Hello world
 
   notebook-tests:
     name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
