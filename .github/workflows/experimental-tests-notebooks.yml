@@ -14,7 +14,7 @@ on:
 
 jobs:
 
-  fetch2:
+  fetch-notebook-tests2:
     runs-on: ubuntu-24.04
     name: Creating test matrix for selector "selector"
     steps:
@@ -93,7 +93,7 @@ jobs:
 
   notebook-tests2:
     name: XXX ${{ matrix.nb_test.label }} (${{ matrix.nb_test.backend }})
-    needs: fetch2
+    needs: fetch-notebook-tests2
     runs-on: ${{ needs.fetch-notebook-tests2.outputs.runner }}
     permissions:
       contents: read
@@ -105,7 +105,7 @@ jobs:
     steps:
       - name: Sample
         run: echo --backend=${{ matrix.nb_test.backend }} \
-            ${{ needs.fetch-notebook-tests.outputs.pytest_params }} \
+            ${{ needs.fetch-notebook-tests2.outputs.pytest_params }} \
             test/notebooks/${{ matrix.nb_test.file }}
 
   notebook-tests:
