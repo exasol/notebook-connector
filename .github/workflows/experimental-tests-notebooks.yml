@@ -96,7 +96,7 @@ jobs:
 
   notebook-tests2:
     name: XXX ${{ matrix.nb_test.label }} (${{ matrix.nb_test.backend }})
-    needs: fetch-notebook-tests2
+    needs: fetch2
     runs-on: ${{ needs.fetch-notebook-tests2.outputs.runner }}
     permissions:
       contents: read
