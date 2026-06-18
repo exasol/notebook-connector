@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-24.04
     name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
     steps:
-      - name: set-tests
+      - id: set-tests
         run: |
           TESTS='{"tests":[' # ]
           TESTS="$TESTS"'{"name":"Notebook N1","test_file":"test_n1.py","test_backend":"onprem"},'
@@ -79,7 +79,7 @@ jobs:
     needs: fetch-notebook-tests
     steps:
       - name: another
-        run: echo "${{ needs.fetch-notebook-tests.outputs }}"
+        run: echo "${{ needs.fetch-notebook-tests.outputs.tests }}"
 
   notebook-tests:
     name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
