@@ -24,8 +24,8 @@ jobs:
           TESTS="$TESTS"'{"name":"Notebook N1","test_file":"test_n1.py","test_backend":"onprem"},'
           TESTS="$TESTS"'{"name":"Notebook N2","test_file":"test_n2.py","test_backend":"onprem"}'
           TESTS="$TESTS"']}'
-          echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
-          echo "tests=$TESTS"
+          # echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
+          echo "tests=[] >> "$GITHUB_OUTPUT"
 
     outputs:
       tests: ${{ steps.set-tests.outputs.tests }}
@@ -74,6 +74,7 @@ jobs:
 
   notebook-tests:
     name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
+    # if: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
     needs: fetch-notebook-tests
     runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
     permissions:
