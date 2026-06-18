@@ -11,13 +11,13 @@ jobs:
   #   uses: ./.github/workflows/checks.yml
   #   permissions:
   #     contents: read
-  # 
+  #
   # run-fast-tests:
   #   name: Fast Tests
   #   uses: ./.github/workflows/fast-tests.yml
   #   permissions:
   #     contents: read
-  # 
+  #
   # fast-report:
   #   name: Fast Report
   #   needs:
@@ -29,18 +29,18 @@ jobs:
   #   permissions:
   #     contents: read
 
-  approve-run-slow-tests:
-    name: Approve Running Slow Tests?
-    runs-on: "ubuntu-24.04"
-    permissions:
-      contents: read
-    # Even though the environment "manual-approval" will be created automatically,
-    # it still needs to be configured to require interactive review.
-    # See project settings on GitHub (Settings / Environments / manual-approval).
-    environment: manual-approval
-    steps:
-      - name: Tests
-        run: echo "Slow tests approved"
+  # approve-run-slow-tests:
+  #   name: Approve Running Slow Tests?
+  #   runs-on: "ubuntu-24.04"
+  #   permissions:
+  #     contents: read
+  #   # Even though the environment "manual-approval" will be created automatically,
+  #   # it still needs to be configured to require interactive review.
+  #   # See project settings on GitHub (Settings / Environments / manual-approval).
+  #   environment: manual-approval
+  #   steps:
+  #     - name: Tests
+  #       run: echo "Slow tests approved"
 
   run-slow-checks:
     name: Slow Checks
