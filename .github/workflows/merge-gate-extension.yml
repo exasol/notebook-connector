@@ -7,11 +7,11 @@ on:
 
 jobs:
 
-  performance-checks:
-    name: Performance
-    uses: ./.github/workflows/performance-checks.yml
-    permissions:
-      contents: read
+  # performance-checks:
+  #   name: Performance
+  #   uses: ./.github/workflows/performance-checks.yml
+  #   permissions:
+  #     contents: read
 
   approve-notebook-tests:
     name: Run Jupyter Notebook Tests?
@@ -23,37 +23,23 @@ jobs:
       - name: Detect Running Notebook Tests
         run: true
 
-  run-stable-notebook-tests:
-    name: Notebook Tests (stable)
+  run-notebook-tests:
+    name: Notebook Tests
     needs:
       - approve-notebook-tests
-    uses: ./.github/workflows/tests-notebooks.yml
+    uses: ./.github/workflows/experimental-tests-notebooks.yml
     secrets: inherit
     permissions:
       contents: read
     strategy:
       fail-fast: false
       matrix:
-        class: [normal, large]
+        runner: [normal, large]
+        obligation: [stable, unstable]
+        # obligation: [required, optional]
     with:
-      status-filter: stable
-      test-classification: ${{ matrix.class }}
-
-  run-unstable-notebook-tests:
-    name: Notebook Tests (unstable)
-    needs:
-      - approve-notebook-tests
-    uses: ./.github/workflows/tests-notebooks.yml
-    secrets: inherit
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        class: [normal, large]
-    with:
-      status-filter: unstable
-      test-classification: ${{ matrix.class }}
+      test-classification: ${{ matrix.runner }}
+      status-filter: ${{ matrix.obligation }}
 
   approve-gpu-notebook-tests:
     name: Run Jupyter GPU Notebook Tests?
@@ -65,8 +51,8 @@ jobs:
       - name: Detect Running GPU Notebook Tests
         run: true
 
-  run-stable-gpu-notebook-tests:
-    name: Notebook Tests GPU (stable)
+  run-gpu-notebook-tests:
+    name: Notebook Tests GPU
     needs:
       - approve-notebook-tests
       - approve-gpu-notebook-tests

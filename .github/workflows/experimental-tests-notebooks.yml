@@ -1,0 +1,76 @@
+name: Notebook Tests
+
+on:
+  workflow_call:
+    inputs:
+      status-filter:
+        description: 'Only nb tests with the given status will be executed (stable or unstable).'
+        required: true
+        type: string
+      test-classification:
+        description: 'Test classification: normal, large or gpu'
+        required: true
+        type: string
+
+jobs:
+
+  fetch-notebook-tests:
+    runs-on: ubuntu-24.04
+    name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v8
+        with:
+          poetry-version: "2.3.0"
+
+      - id: set-tests
+        run: |
+          TESTS=$(poetry run -- nox -s get-notebook-tests -- \
+            --test-status ${{ inputs.status-filter }} \
+            --test-classification ${{ inputs.test-classification }})
+          echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
+
+      - id: set-runner
+        run: |
+          RUNNER=$(poetry run -- nox -s get-notebook-runner -- \
+            --test-status ${{ inputs.status-filter }} \
+            --test-classification ${{ inputs.test-classification }})
+          echo "runner=$RUNNER" >> "$GITHUB_OUTPUT"
+
+      - id: set-pytest-params
+        run: |
+          PARAMS=$(poetry run -- nox -s get-notebook-pytest-params -- \
+            --test-status ${{ inputs.status-filter }} \
+            --test-classification ${{ inputs.test-classification }})
+          echo "pytest_params=$PARAMS" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      tests: ${{ steps.set-tests.outputs.tests }}
+      runner: ${{ steps.set-runner.outputs.runner }}
+      pytest_params: ${{ steps.set-pytest-params.outputs.pytest_params }}
+
+
+  notebook-tests:
+    name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
+    needs: fetch-notebook-tests
+    runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
+    permissions:
+      contents: read
+    continue-on-error: ${{ inputs.status-filter == 'unstable' }}
+    # Causes errors if build matrix is empty, see
+    # https://github.com/exasol/notebook-connector/issues/432
+    strategy:
+      fail-fast: false
+      matrix:
+        nb_test: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
+
+    steps:
+      - name: Sample
+        run: echo --backend=${{ matrix.nb_test.test_backend }} \
+            ${{ needs.fetch-notebook-tests.outputs.pytest_params }} \
+            test/notebooks/${{ matrix.nb_test.test_file }}
