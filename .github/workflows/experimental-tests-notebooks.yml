@@ -34,7 +34,7 @@ jobs:
 
     outputs:
       runner: ${{ steps.set-tests.outputs.tests.runner }}
-      pytest_params: ${{ steps.set-tests.outputs.tests.patest_params }}
+      pytest_params: ${{ steps.set-tests.outputs.tests.pytest_params }}
       tests: ${{ steps.set-tests.outputs.tests.entries }}
 
   fetch-notebook-tests:
