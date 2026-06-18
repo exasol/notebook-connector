@@ -22,8 +22,8 @@ jobs:
         run: |
           TESTS=$(
             echo -n '['
-            echo -n '{"label": "N1", "file": "test_n1.py", "backend": "onprem", "require_success": true }, '
-            echo -n '{"label": "N2", "file": "test_n2.py", "backend": "onprem", "require_success": false }'
+            echo -n '{"label": "N1", "file": "test_n1.py", "backend": "onprem", "runner": "ubuntu-24.04", "require_success": true }, '
+            echo -n '{"label": "N2", "file": "test_n2.py", "backend": "onprem", "runner": "ubuntu-22.04", "require_success": false }'
             echo -n ']'
           )
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
@@ -34,9 +34,10 @@ jobs:
       tests: ${{ steps.matrix.outputs.tests }}
 
   notebook-tests:
-    name: XXX ${{ matrix.nb_test.label }} (${{ matrix.nb_test.backend }})
+    name: ${{ matrix.nb_test.label }} (${{ matrix.nb_test.backend }})
     needs: fetch-notebook-tests
-    runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
+    # runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
+    runs-on: ${{ matrix.nb_test.runner }}
     permissions:
       contents: read
     continue-on-error: ${{ inputs.status-filter == 'unstable' }}
@@ -69,5 +70,4 @@ jobs:
               notebook: $notebook,
               require_success: $require_success,
               outcome: $outcome
-            }' \
-            > results/${{ matrix.nbtest.file }}.json
+            }' > results/${{ matrix.nbtest.file }}.json
