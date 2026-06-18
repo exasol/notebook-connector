@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: set-tests
         run: |
-          TESTS=$(jq -n '[{
+          TESTS=$(jq -n '[ {
              name: "Notebook N1",
              test_file: "test_n1.py",
              test_backend: "onprem"
@@ -28,13 +28,13 @@ jobs:
              name: "Notebook N2",
              test_file: "test_n2.py",
              test_backend: "onprem"
-             }]')
+             } ]' )
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
 
     outputs:
       tests: ${{ steps.set-tests.outputs.tests }}
       runner: large
-      pytest_params: []
+      pytest_params: ""
 
   xfetch-notebook-tests:
     runs-on: ubuntu-24.04
