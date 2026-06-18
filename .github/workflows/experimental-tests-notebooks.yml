@@ -14,7 +14,7 @@ on:
 
 jobs:
 
-  fetch-notebook-tests2:
+  fetch-notebook-tests:
     runs-on: ubuntu-24.04
     name: Creating test matrix for selector "selector"
     steps:
@@ -22,8 +22,8 @@ jobs:
         run: |
           TESTS=$(
             echo -n '['
-            echo -n '{"label": "N1", "file": "test_n1.py", "backend": "onprem", "require-success": true }, '
-            echo -n '{"label": "N2", "file": "test_n2.py", "backend": "onprem", "require-success": true }'
+            echo -n '{"label": "N1", "file": "test_n1.py", "backend": "onprem", "require_success": true }, '
+            echo -n '{"label": "N2", "file": "test_n2.py", "backend": "onprem", "require_success": true }'
             echo -n ']'
           )
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
@@ -33,105 +33,26 @@ jobs:
       pytest_params: "x"
       tests: ${{ steps.matrix.outputs.tests }}
 
-  fetch-notebook-tests:
-    if: false
-    runs-on: ubuntu-24.04
-    name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
-    steps:
-      - id: set-tests
-        run: |
-          TESTS='{"tests":[' # ]
-          TESTS="$TESTS"'{"name":"Notebook N1","test_file":"test_n1.py","test_backend":"onprem"},'
-          TESTS="$TESTS"'{"name":"Notebook N2","test_file":"test_n2.py","test_backend":"onprem"}'
-          TESTS="$TESTS"']}'
-          echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
-
-    outputs:
-      tests: ${{ steps.set-tests.outputs.tests }}
-      runner: "ubuntu-24.04"
-      pytest_params: "xx"
-
-#   fetch-notebook-tests:
-#     runs-on: ubuntu-24.04
-#     name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
-#     steps:
-#       - name: SCM Checkout
-#         uses: actions/checkout@v6
-#         with:
-#           fetch-depth: 0
-#
-#       - name: Setup Python & Poetry Environment
-#         uses: exasol/python-toolbox/.github/actions/python-environment@v8
-#         with:
-#           poetry-version: "2.3.0"
-#
-#       - id: set-tests
-#         run: |
-#           TESTS=$(poetry run -- nox -s get-notebook-tests -- \
-#             --test-status ${{ inputs.status-filter }} \
-#             --test-classification ${{ inputs.test-classification }})
-#           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
-#
-#       - id: set-runner
-#         run: |
-#           RUNNER=$(poetry run -- nox -s get-notebook-runner -- \
-#             --test-status ${{ inputs.status-filter }} \
-#             --test-classification ${{ inputs.test-classification }})
-#           echo "runner=$RUNNER" >> "$GITHUB_OUTPUT"
-#
-#       - id: set-pytest-params
-#         run: |
-#           PARAMS=$(poetry run -- nox -s get-notebook-pytest-params -- \
-#             --test-status ${{ inputs.status-filter }} \
-#             --test-classification ${{ inputs.test-classification }})
-#           echo "pytest_params=$PARAMS" >> "$GITHUB_OUTPUT"
-#
-#     outputs:
-#       tests: ${{ steps.set-tests.outputs.tests }}
-#       runner: ${{ steps.set-runner.outputs.runner }}
-#       pytest_params: ${{ steps.set-pytest-params.outputs.pytest_params }}
-
-  notebook-tests2:
-    name: XXX ${{ matrix.nb_test.label }} (${{ matrix.nb_test.backend }})
-    needs: fetch-notebook-tests2
-    runs-on: ${{ needs.fetch-notebook-tests2.outputs.runner }}
-    permissions:
-      contents: read
-    continue-on-error: ${{ inputs.status-filter == 'unstable' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        nb_test: ${{ fromJson(needs.fetch-notebook-tests2.outputs.tests) }}
-    steps:
-      - name: Sample
-        run: echo --backend=${{ matrix.nb_test.backend }} \
-            ${{ needs.fetch-notebook-tests2.outputs.pytest_params }} \
-            test/notebooks/${{ matrix.nb_test.file }}
-
   notebook-tests:
-    name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
-    if: false
-    # if: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
+    name: XXX ${{ matrix.nb_test.label }} (${{ matrix.nb_test.backend }})
     needs: fetch-notebook-tests
     runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
     permissions:
       contents: read
     continue-on-error: ${{ inputs.status-filter == 'unstable' }}
-    # Causes errors if build matrix is empty, see
-    # https://github.com/exasol/notebook-connector/issues/432
     strategy:
       fail-fast: false
       matrix:
-        nb_test: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
-
+        nb_test: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests) }}
     steps:
       - name: Sample
-        run: echo --backend=${{ matrix.nb_test.test_backend }} \
+        run: echo --backend=${{ matrix.nb_test.backend }} \
             ${{ needs.fetch-notebook-tests.outputs.pytest_params }} \
-            test/notebooks/${{ matrix.nb_test.test_file }}
+            test/notebooks/${{ matrix.nb_test.file }}
 
-      - name: Simulate pytest failure
-        if: ${{ inputs.test-classification }} == "unstable"
+      - id: test
+        name: Simulate pytest failure
+        if: ${{ ! matrix.nb_test.require_success }}
         run: |
           echo simulating test failure
           exit 1
@@ -141,12 +62,12 @@ jobs:
         run: |
           mkdir -p results
           jq -n \
-            --arg notebook "${{ matrix.notebook }}" \
-            --arg stability "${{ inputs.test-classification }}" \
+            --arg notebook "${{ matrix.nb_test.file }}" \
+            --arg require_success "${{ matrix.nb_test.require_success }}" \
             --arg outcome "${{ steps.test.outcome }}" \
             '{
               notebook: $notebook,
-              stability: $stability,
+              require_success: $require_success,
               outcome: $outcome
             }' \
-            > results/${{ matrix.notebook }}.json
+            > results/${{ matrix.nbtest.file }}.json

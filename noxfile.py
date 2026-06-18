@@ -189,7 +189,7 @@ def _notebook_test_matrix(selected: YamlObject) -> YamlObject:
             "label": label,
             "file": file,
             "backend": group.get("backend", "onprem"),
-            "require-success": group.get("require-success", True),
+            "require_success": group.get("require_success", True),
         }
 
     return [
@@ -199,7 +199,7 @@ def _notebook_test_matrix(selected: YamlObject) -> YamlObject:
     ]
     # return {
     #     "runner": selected["runner"],
-    #     "pytest_params": selected["additional-pytest-parameters"],
+    #     "pytest_params": selected["additional_pytest_parameters"],
     #     "entries": entries
     # }
 

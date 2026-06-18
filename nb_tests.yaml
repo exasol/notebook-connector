@@ -1,9 +1,9 @@
 notebooks-generic:
   runner: ubuntu-24.04
-  additional-pytest-parameters: "--itde-nameserver 8.8.8.8"
+  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
   groups:
     - backend: onprem
-      require-success: true
+      require_success: true
       files:
         - test_first_steps.py
         - test_sklearn.py
@@ -15,25 +15,25 @@ notebooks-generic:
         - test_cloud.py
         - test_transformers.py
     - backend: saas
-      require-success: false
+      require_success: false
       files:
         - test_transformers.py
 
 large-runner:
   # Use the larger CI runner for memory/disk headroom (especially ITDE notebook).
   runner: int-linux-x64-4core-ubuntu24.04-1
-  additional-pytest-parameters: "--itde-nameserver 8.8.8.8"
+  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
   groups:
-    - require-success: true
+    - require_success: true
       backend: onprem
       files:
         - test_text_ai.py
 
 gpu:
   runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
-  additional-pytest-parameters: "--itde-nameserver 8.8.8.8"
+  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
   groups:
-    - require-success: true
+    - require_success: true
       backend: onprem
       # GPU notebook tests are temporarily disabled due
       # to an SLC issue being fixed separately.
