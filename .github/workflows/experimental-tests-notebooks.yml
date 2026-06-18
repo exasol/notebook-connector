@@ -14,6 +14,13 @@ on:
 
 jobs:
 
+  another:
+    runs-on: ubuntu-24.04
+    name: Another
+    steps:
+      - name: another
+        run: echo Hello world
+
   fetch-notebook-tests:
     runs-on: ubuntu-24.04
     name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
