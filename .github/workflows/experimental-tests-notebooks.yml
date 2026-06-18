@@ -78,7 +78,7 @@ jobs:
     needs: fetch-notebook-tests
     steps:
       - name: another
-        run: echo ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
+        run: echo ${{ needs.fetch-notebook-tests.outputs.tests }}
 
   notebook-tests:
     name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
