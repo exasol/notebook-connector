@@ -20,15 +20,10 @@ jobs:
     steps:
       - name: set-tests
         run: |
-          TESTS=$(jq -n '{tests: [ {
-             name: "Notebook N1",
-             test_file: "test_n1.py",
-             test_backend: "onprem"
-             }, {
-             name: "Notebook N2",
-             test_file: "test_n2.py",
-             test_backend: "onprem"
-             } ]}' )
+          TESTS='{"tests":[' # ]
+          TESTS="$TESTS"'{"name":"Notebook N1","test_file":"test_n2.py","test_backend":"onprem"},'
+          TESTS="$TESTS"'{"name":"Notebook N1","test_file":"test_n2.py","test_backend":"onprem"}'
+          TESTS="$TESTS"']}'
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
 
     outputs:
