@@ -17,6 +17,21 @@ jobs:
   fetch-notebook-tests:
     runs-on: ubuntu-24.04
     name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
+    run: true
+    outputs:
+      tests:
+        - name: Notebook N1
+          test_file: test_n1.py
+          test_backend: onprem
+        - name: Notebook N2
+          test_file: test_n2.py
+          test_backend: onprem
+      runner: large
+      pytest_params: []
+
+  xfetch-notebook-tests:
+    runs-on: ubuntu-24.04
+    name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v6
