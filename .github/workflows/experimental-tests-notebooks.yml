@@ -33,9 +33,9 @@ jobs:
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
 
     outputs:
-      runner: ${{ steps.matrix.outputs.tests.runner }}
-      pytest_params: ${{ steps.matrix.outputs.tests.pytest_params }}
-      tests: ${{ steps.matrix.outputs.tests.entries }}
+      runner: ${{ fromJson(steps.matrix.outputs.tests).runner }}
+      pytest_params: ${{ fromJson(steps.matrix.outputs.tests).pytest_params }}
+      tests: ${{ fromJson(steps.matrix.outputs.tests).entries }}
 
   fetch-notebook-tests:
     if: false
