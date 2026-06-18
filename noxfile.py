@@ -192,16 +192,16 @@ def _notebook_test_matrix(selected: YamlObject) -> YamlObject:
             "require-success": group.get("require-success", True),
         }
 
-    entries = [
+    return [
         matrix_entry(group, file)
         for group in selected["groups"]
         for file in group["files"]
     ]
-    return {
-        "runner": selected["runner"],
-        "pytest_params": selected["additional-pytest-parameters"],
-        "entries": entries
-    }
+    # return {
+    #     "runner": selected["runner"],
+    #     "pytest_params": selected["additional-pytest-parameters"],
+    #     "entries": entries
+    # }
 
 
 @nox.session(name="get-notebook-tests", python=False)

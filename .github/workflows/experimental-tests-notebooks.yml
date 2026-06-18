@@ -21,21 +21,17 @@ jobs:
       - id: matrix
         run: |
           TESTS=$(
-            echo -n "{"
-            echo -n '"runner": "ubuntu-24.04", '
-            echo -n '"pytest_params": "--itde-nameserver 8.8.8.8", '
-            echo -n '"entries": ['
+            echo -n '['
             echo -n '{"label": "N1", "file": "test_n1.py", "backend": "onprem", "require-success": true }, '
             echo -n '{"label": "N2", "file": "test_n2.py", "backend": "onprem", "require-success": true }'
             echo -n ']'
-            echo -n "}"
           )
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
 
     outputs:
-      runner: ${{ fromJson(steps.matrix.outputs.tests).runner }}
-      pytest_params: ${{ fromJson(steps.matrix.outputs.tests).pytest_params }}
-      tests: ${{ fromJson(steps.matrix.outputs.tests).entries }}
+      runner: "ubuntu-24.04"
+      pytest_params: "x"
+      tests: ${{ steps.matrix.outputs.tests }}
 
   fetch-notebook-tests:
     if: false
