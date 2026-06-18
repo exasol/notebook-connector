@@ -188,6 +188,8 @@ def _notebook_test_matrix(selected: YamlObject) -> YamlObject:
         return {
             "label": label,
             "file": file,
+            "runner": group.get("runner", "ubuntu-24.04"),
+            "pytest_params": group.get("additional_pytest_parameters", ""),
             "backend": group.get("backend", "onprem"),
             "require_success": group.get("require_success", True),
         }

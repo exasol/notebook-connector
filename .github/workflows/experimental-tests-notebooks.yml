@@ -20,12 +20,18 @@ jobs:
     steps:
       - id: matrix
         run: |
-          TESTS=$(
-            echo -n '['
-            echo -n '{"label": "N1", "file": "test_n1.py", "backend": "onprem", "runner": "ubuntu-24.04", "require_success": true }, '
-            echo -n '{"label": "N2", "file": "test_n2.py", "backend": "onprem", "runner": "ubuntu-22.04", "require_success": false }'
-            echo -n ']'
+          TESTS=$(jq -cn '[
+            {label: "N1", "file": "test_n1.py", backend: "onprem", runner: "ubuntu-24.04", require_success: true },
+            {label: "N2", "file": "test_n2.py", backend: "onprem", runner: "ubuntu-22.04", require_success: false }
+            ]'
           )
+
+          # TESTS=$(
+          #   echo -n '['
+          #   echo -n '{"label": "N1", "file": "test_n1.py", "backend": "onprem", "runner": "ubuntu-24.04", "require_success": true }, '
+          #   echo -n '{"label": "N2", "file": "test_n2.py", "backend": "onprem", "runner": "ubuntu-22.04", "require_success": false }'
+          #   echo -n ']'
+          # )
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
 
     outputs:
