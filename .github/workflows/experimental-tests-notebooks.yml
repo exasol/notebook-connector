@@ -29,7 +29,7 @@ jobs:
     outputs:
       tests: ${{ steps.set-tests.outputs.tests }}
       runner: "ubuntu-24.04"
-      pytest_params: ""
+      pytest_params: "xx"
 
 #   fetch-notebook-tests:
 #     runs-on: ubuntu-24.04
@@ -75,7 +75,8 @@ jobs:
   notebook-tests:
     name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
     needs: fetch-notebook-tests
-    runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
+    # runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     continue-on-error: ${{ inputs.status-filter == 'unstable' }}
