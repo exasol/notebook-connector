@@ -17,7 +17,10 @@ jobs:
   fetch-notebook-tests:
     runs-on: ubuntu-24.04
     name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
-    run: "true"
+    steps:
+      - name: set-tests
+        run: true
+
     outputs:
       tests:
         - name: Notebook N1
