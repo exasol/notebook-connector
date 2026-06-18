@@ -23,6 +23,18 @@ nox.options.sessions = ["format:fix"]
 # Database helper
 # ---------------------------------------------------------------------------
 
+import json
+import re
+from enum import Enum
+from pathlib import Path
+from typing import (
+    Any,
+    List,
+    Set,
+)
+
+import yaml
+
 
 @nox.session(python=False)
 def start_database(session):
@@ -120,6 +132,17 @@ def _load_test_repository() -> TestRepository:
 
 
 def _parse_nb_args(session: nox.Session) -> Namespace:
+    parser = ArgumentParser(f"nox -s {session.name} <selector>")
+    parser.add_argument(
+        "selector",
+        type=str,
+        help="""One of the test groups contained as
+        top-level elements in file nb_tests.yaml."""
+    )
+    return parser.parse_args(session.posargs)
+
+
+def _parse_nb_args_old(session: nox.Session) -> Namespace:
     test_status_values = [ts.value for ts in TestStatus]
     test_classification_values = [tc.value for tc in TestClassification]
     usage = " ".join(
@@ -149,6 +172,49 @@ def _parse_nb_args(session: nox.Session) -> Namespace:
     return parser.parse_args(session.posargs)
 
 
+YamlObject = dict[str, Any]
+
+
+def _load_test_groups() -> list[YamlObject]:
+    path = PROJECT_CONFIG.root_path / "nb_tests.yaml"
+    return yaml.safe_load(path.read_text())
+
+
+def _notebook_test_matrix(selected: YamlObject) -> YamlObject:
+    pattern = re.compile(f"test_(.*)\.py")
+
+    def matrix_entry(group: YamlObject, file: str) -> YamlObject:
+        label = pattern.match(file).group(1).replace("_", " ").title()
+        return {
+            "label": label,
+            "file": file,
+            "backend": group.get("backend", "onprem"),
+            "require-success": group.get("require-success", True),
+        }
+
+    entries = [
+        matrix_entry(group, file)
+        for group in selected["groups"]
+        for file in group["files"]
+    ]
+    return {
+        "runner": selected["runner"],
+        "pytest_params": selected["additional-pytest-parameters"],
+        "entries": entries
+    }
+
+
+@nox.session(name="get-notebook-tests", python=False)
+def get_notebook_tests(session: nox.Session) -> None:
+    """
+    Collect notebook tests and print in Json format.
+    """
+    args = _parse_nb_args(session)
+    data = _load_test_groups()
+    m = _notebook_test_matrix(data[args.selector])
+    print(f'{json.dumps(m, indent=4)}')
+
+
 def _get_test_sets(classification: TestClassification) -> TestSets:
     test_repository = _load_test_repository()
     mapping = {
@@ -159,10 +225,9 @@ def _get_test_sets(classification: TestClassification) -> TestSets:
     return mapping[classification]
 
 
-@nox.session(name="get-notebook-tests", python=False)
-def get_notebook_tests(session: nox.Session) -> None:
+def old_get_notebook_tests(session: nox.Session) -> None:
     """Filters notebook tests for test-status and test-classification and prints as JSON."""
-    args = _parse_nb_args(session)
+    args = _parse_nb_args_old(session)
     nb_tests = _get_test_sets(args.test_classification)
     tests = (
         nb_tests.stable if args.test_status == TestStatus.stable else nb_tests.unstable
@@ -173,7 +238,7 @@ def get_notebook_tests(session: nox.Session) -> None:
 @nox.session(name="get-notebook-runner", python=False)
 def get_notebook_runner(session: nox.Session) -> None:
     """Print the GitHub runner to use for the given test classification."""
-    args = _parse_nb_args(session)
+    args = _parse_nb_args_old(session)
     nb_tests = _get_test_sets(args.test_classification)
     print(nb_tests.runner)
 
@@ -181,7 +246,7 @@ def get_notebook_runner(session: nox.Session) -> None:
 @nox.session(name="get-notebook-pytest-params", python=False)
 def get_notebook_pytest_params(session: nox.Session) -> None:
     """Print additional pytest parameters for the given test classification."""
-    args = _parse_nb_args(session)
+    args = _parse_nb_args_old(session)
     nb_tests = _get_test_sets(args.test_classification)
     if nb_tests.additional_pytest_parameters:
         print(nb_tests.additional_pytest_parameters)

@@ -14,6 +14,29 @@ on:
 
 jobs:
 
+  fetch2:
+    runs-on: ubuntu-24.04
+    name: Creating test matrix for selector "selector"
+    steps:
+      - id: matrix
+        run: |
+          TESTS=$(
+            echo -n "{"
+            echo -n '"runner": "ubuntu-24.04", '
+            echo -n '"pytest_params": "--itde-nameserver 8.8.8.8", '
+            echo -n '"entries": ['
+            echo -n '{"label": "N1", "file": "test_n1.py", "backend": "onprem", "require-success": true }, '
+            echo -n '{"label": "N2", "file": "test_n2.py", "backend": "onprem", "require-success": true }'
+            echo -n ']'
+            echo -n "}"
+          )
+          echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      runner: ${{ steps.set-tests.outputs.tests.runner }}
+      pytest_params: ${{ steps.set-tests.outputs.tests.patest_params }}
+      tests: ${{ steps.set-tests.outputs.tests.entries }}
+
   fetch-notebook-tests:
     runs-on: ubuntu-24.04
     name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
@@ -24,8 +47,7 @@ jobs:
           TESTS="$TESTS"'{"name":"Notebook N1","test_file":"test_n1.py","test_backend":"onprem"},'
           TESTS="$TESTS"'{"name":"Notebook N2","test_file":"test_n2.py","test_backend":"onprem"}'
           TESTS="$TESTS"']}'
-          # echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
-          echo "tests=[]" >> "$GITHUB_OUTPUT"
+          echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
 
     outputs:
       tests: ${{ steps.set-tests.outputs.tests }}
@@ -72,6 +94,23 @@ jobs:
 #       runner: ${{ steps.set-runner.outputs.runner }}
 #       pytest_params: ${{ steps.set-pytest-params.outputs.pytest_params }}
 
+  notebook-tests2:
+    name: XXX ${{ matrix.nb_test.label }} (${{ matrix.nb_test.backend }})
+    needs: fetch-notebook-tests2
+    runs-on: ${{ needs.fetch-notebook-tests2.outputs.runner }}
+    permissions:
+      contents: read
+    continue-on-error: ${{ inputs.status-filter == 'unstable' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        nb_test: ${{ fromJson(needs.fetch-notebook-tests2.outputs.tests) }}
+    steps:
+      - name: Sample
+        run: echo --backend=${{ matrix.nb_test.backend }} \
+            ${{ needs.fetch-notebook-tests.outputs.pytest_params }} \
+            test/notebooks/${{ matrix.nb_test.file }}
+
   notebook-tests:
     name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})
     if: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
@@ -92,3 +131,24 @@ jobs:
         run: echo --backend=${{ matrix.nb_test.test_backend }} \
             ${{ needs.fetch-notebook-tests.outputs.pytest_params }} \
             test/notebooks/${{ matrix.nb_test.test_file }}
+
+      - name: Simulate pytest failure
+        if: ${{ inputs.test-classification }} == "unstable"
+        run: |
+          echo simulating test failure
+          exit 1
+
+      - name: Save result
+        if: always()
+        run: |
+          mkdir -p results
+          jq -n \
+            --arg notebook "${{ matrix.notebook }}" \
+            --arg stability "${{ inputs.test-classification }}" \
+            --arg outcome "${{ steps.test.outcome }}" \
+            '{
+              notebook: $notebook,
+              stability: $stability,
+              outcome: $outcome
+            }' \
+            > results/${{ matrix.notebook }}.json

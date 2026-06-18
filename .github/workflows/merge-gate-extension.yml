@@ -39,7 +39,12 @@ jobs:
         # runner: [normal, large]
         # obligation: [stable, unstable]
         # obligation: [required, optional]
+        # require-success: [yes, no]
+        # ignore-failure: [yes, no]
     with:
+      # selector: notebooks-generic
+      #   - General onprem
+      #   - General saas
       test-classification: ${{ matrix.runner }}
       status-filter: ${{ matrix.obligation }}
 
