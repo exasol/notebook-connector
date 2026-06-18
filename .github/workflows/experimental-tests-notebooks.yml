@@ -74,6 +74,7 @@ jobs:
 
   another:
     runs-on: ubuntu-24.04
+    needs: fetch-notebook-tests
     name: Another
     steps:
       - name: another
