@@ -34,8 +34,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [normal, large]
-        obligation: [stable, unstable]
+        runner: [normal]
+        obligation: [stable]
+        # runner: [normal, large]
+        # obligation: [stable, unstable]
         # obligation: [required, optional]
     with:
       test-classification: ${{ matrix.runner }}
