@@ -25,7 +25,7 @@ jobs:
           TESTS="$TESTS"'{"name":"Notebook N2","test_file":"test_n2.py","test_backend":"onprem"}'
           TESTS="$TESTS"']}'
           # echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
-          echo "tests=[] >> "$GITHUB_OUTPUT"
+          echo "tests=[]" >> "$GITHUB_OUTPUT"
 
     outputs:
       tests: ${{ steps.set-tests.outputs.tests }}
