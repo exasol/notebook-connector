@@ -76,7 +76,7 @@ jobs:
           path: results/${{ matrix.el.file }}.json
 
   evaluate-tests:
-    name: Evaluate ${{}}
+    name: Evaluate Test Results
     runs-on: ubuntu-24.04
     if: always()
     needs: notebook-tests
