@@ -27,7 +27,7 @@ jobs:
     name: Notebook Tests
     needs:
       - approve-notebook-tests
-    uses: ./.github/workflows/experimental-tests-notebooks.yml
+    uses: ./.github/workflows/tests-notebooks.yml
     secrets: inherit
     permissions:
       contents: read

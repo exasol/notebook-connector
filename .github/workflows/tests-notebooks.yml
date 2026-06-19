@@ -3,12 +3,8 @@ name: Notebook Tests
 on:
   workflow_call:
     inputs:
-      status-filter:
-        description: 'Only nb tests with the given status will be executed (stable or unstable).'
-        required: true
-        type: string
-      test-classification:
-        description: 'Test classification: normal, large or gpu'
+      selector:
+        description: Selector which tests to include, e.g. notebooks-generic
         required: true
         type: string
 
@@ -16,7 +12,7 @@ jobs:
 
   fetch-notebook-tests:
     runs-on: ubuntu-24.04
-    name: Fetching ${{ inputs.status-filter }} ${{ inputs.test-classification }} notebook tests
+    name: Creating Test Matrix for Selector "${{ inputs.selector }}"
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v6
@@ -28,46 +24,25 @@ jobs:
         with:
           poetry-version: "2.3.0"
 
-      - id: set-tests
+      - id: matrix
         run: |
-          TESTS=$(poetry run -- nox -s get-notebook-tests -- \
-            --test-status ${{ inputs.status-filter }} \
-            --test-classification ${{ inputs.test-classification }})
-          echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
-
-      - id: set-runner
-        run: |
-          RUNNER=$(poetry run -- nox -s get-notebook-runner -- \
-            --test-status ${{ inputs.status-filter }} \
-            --test-classification ${{ inputs.test-classification }})
-          echo "runner=$RUNNER" >> "$GITHUB_OUTPUT"
-
-      - id: set-pytest-params
-        run: |
-          PARAMS=$(poetry run -- nox -s get-notebook-pytest-params -- \
-            --test-status ${{ inputs.status-filter }} \
-            --test-classification ${{ inputs.test-classification }})
-          echo "pytest_params=$PARAMS" >> "$GITHUB_OUTPUT"
+          JOBS=$(poetry run -- nox -s get-notebook-tests -- ${{ inputs.selector }})
+          echo "jobs=$JOBS" >> "$GITHUB_OUTPUT"
 
     outputs:
-      tests: ${{ steps.set-tests.outputs.tests }}
-      runner: ${{ steps.set-runner.outputs.runner }}
-      pytest_params: ${{ steps.set-pytest-params.outputs.pytest_params }}
-
+      jobs: ${{ steps.matrix.outputs.jobs }}
 
   notebook-tests:
-    name: ${{ matrix.nb_test.name }} (${{ matrix.nb_test.test_backend }})    
+    name: ${{ matrix.el.name }} (${{ matrix.el.backend }})
     needs: fetch-notebook-tests
-    runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
+    runs-on: ${{ matrix.el.runner }}
     permissions:
       contents: read
-    continue-on-error: ${{ inputs.status-filter == 'unstable' }}
-    # Causes errors if build matrix is empty, see 
-    # https://github.com/exasol/notebook-connector/issues/432
+    continue-on-error: ${{ ! matrix.el.require_success }}
     strategy:
       fail-fast: false
       matrix:
-        nb_test: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests).tests }}
+        el: ${{ fromJson(needs.fetch-notebook-tests.outputs.jobs) }}
 
     steps:
       - name: SCM Checkout
@@ -101,7 +76,8 @@ jobs:
         run: |
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      - name: Run Notebook Test
+      - id: test
+        name: Run Pytest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
@@ -113,6 +89,57 @@ jobs:
           NBTEST_USE_GPU: ${{ inputs.test-classification == 'gpu' && 'true' || 'false' }}
         run: |
           poetry run -- pytest -rA --setup-show \
-            --backend=${{ matrix.nb_test.test_backend }} \
-            ${{ needs.fetch-notebook-tests.outputs.pytest_params }} \
-            test/notebooks/${{ matrix.nb_test.test_file }}
+            --backend=${{ matrix.el.backend }} \
+            ${{ matrix.el.pytest_params }} \
+            test/notebooks/${{ matrix.el.file }}
+          # # if: ${{ matrix.require_success && steps.test.outcome != 'success' }}
+          # if [ "${{ matrix.el.require_success }}" != true ]; then
+          #   echo simulating test failure
+          #   exit 1
+          # fi
+
+      - name: Save Result
+        if: always()
+        run: |
+          mkdir -p results
+          jq -n '{
+            file: "${{ matrix.el.file }}",
+            require_success: ${{ matrix.el.require_success }},
+            backend: "${{ matrix.el.backend }}",
+            runner: "${{ matrix.el.runner }}",
+            outcome: "${{ steps.test.outcome }}"
+          }' > results/${{ matrix.el.file }}.json
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-result-${{ matrix.el.file }}
+          path: results/${{ matrix.el.file }}.json
+
+  evaluate-tests:
+    name: Evaluate Test Results
+    runs-on: ubuntu-24.04
+    if: always()
+    needs: notebook-tests
+    steps:
+      - name: Download Test Results
+        uses: actions/download-artifact@v8
+        with:
+          pattern: test-result-*
+          path: results
+          merge-multiple: true
+
+      - name: Verify Success of Mandatory Tests
+        run: |
+          FAILURES=$(
+            jq -s '[
+              .[] | select(.require_success and .outcome != "success")
+            ] ' results/*.json)
+          COUNT=$(echo "$FAILURES" | jq length)
+
+          if [ "$COUNT" -gt 0 ]; then
+            echo "$COUNT mandatory tests have failed:"
+            echo "$FAILURES" | jq .
+            exit 1
+          fi
