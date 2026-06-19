@@ -34,11 +34,10 @@ jobs:
   notebook-tests:
     name: ${{ matrix.el.label }} (${{ matrix.el.backend }})
     needs: fetch-notebook-tests
-    # runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
     runs-on: ${{ matrix.el.runner }}
     permissions:
       contents: read
-    continue-on-error: ${{ inputs.status-filter == 'unstable' }}
+    continue-on-error: ${{ ! matrix.el.require_success }}
     strategy:
       fail-fast: false
       matrix:
@@ -61,21 +60,13 @@ jobs:
         if: always()
         run: |
           mkdir -p results
-          echo calling jq -n...
           jq -n '{
             file: "${{ matrix.el.file }}",
-            require_success: "${{ matrix.el.require_success }}",
+            require_success: ${{ matrix.el.require_success }},
+            backend: ${{ matrix.el.backend }},
+            runner: ${{ matrix.el.runner }},
             outcome: "${{ steps.test.outcome }}"
-          }'
-          jq -n \
-            --arg file "${{ matrix.el.file }}" \
-            --arg require_success "${{ matrix.el.require_success }}" \
-            --arg outcome "${{ steps.test.outcome }}" \
-            '{
-              file: $file,
-              require_success: $require_success,
-              outcome: $outcome
-            }' > results/${{ matrix.el.file }}.json
+          }' > results/${{ matrix.el.file }}.json
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v7
@@ -84,8 +75,28 @@ jobs:
           name: test-result-${{ matrix.el.file }}
           path: results/${{ matrix.el.file }}.json
 
-  # evaluate-tests:
-  #   name: Evaluate ${{}}
-  #   if: always()
-  #   needs: notebook-tests
+  evaluate-tests:
+    name: Evaluate ${{}}
+    if: always()
+    needs: notebook-tests
+    steps:
+      - name: Download Test Results
+        uses: actions/download-artifact@v8
+        with:
+          pattern: test-result-*
+          path: results
+          merge-multiple: true
 
+      - name: Verify Success of Mandatory Tests
+        run: |
+          FAILURES=$(
+            jq -s '[
+              .[] | select(.require_success and .outcome != "success")
+            ] ' results/*.json)
+          COUNT=$(echo "$FAILURES" | jq length)
+
+          if [ "$COUNT" -gt 0 ]; then
+            echo "$COUNT mandatory tests have failed:"
+            echo "$FAILURES" | jq .
+            exit 1
+          fi
