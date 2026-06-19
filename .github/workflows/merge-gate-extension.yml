@@ -7,68 +7,52 @@ on:
 
 jobs:
 
-  # performance-checks:
-  #   name: Performance
-  #   uses: ./.github/workflows/performance-checks.yml
-  #   permissions:
-  #     contents: read
+  performance-checks:
+    name: Performance
+    uses: ./.github/workflows/performance-checks.yml
+    permissions:
+      contents: read
 
-  # approve-notebook-tests:
-  #   name: Run Jupyter Notebook Tests?
-  #   runs-on: "ubuntu-24.04"
-  #   permissions:
-  #     contents: read
-  #   environment: approve-notebook-tests
-  #   steps:
-  #     - name: Detect Running Notebook Tests
-  #       run: true
+  approve-notebook-tests:
+    name: Run Jupyter Notebook Tests?
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    environment: approve-notebook-tests
+    steps:
+      - name: Detect Running Notebook Tests
+        run: true
 
   run-notebook-tests:
     name: Notebook Tests
-    # needs:
-    #   - approve-notebook-tests
+    needs:
+      - approve-notebook-tests
     uses: ./.github/workflows/experimental-tests-notebooks.yml
     secrets: inherit
     permissions:
       contents: read
     with:
       selector: notebooks-generic
-    # strategy:
-    #   fail-fast: false
-    #   matrix:
-    #     runner: [normal]
-    #     obligation: [stable]
-    #     # runner: [normal, large]
-    #     # obligation: [stable, unstable]
-    #     # obligation: [required, optional]
-    #     # require-success: [yes, no]
-    #     # ignore-failure: [yes, no]
-    # with:
-    #   # selector: notebooks-generic
-    #   #   - General onprem
-    #   #   - General saas
-    #   test-classification: ${{ matrix.runner }}
-    #   status-filter: ${{ matrix.obligation }}
 
-  # approve-gpu-notebook-tests:
-  #   name: Run Jupyter GPU Notebook Tests?
-  #   runs-on: "ubuntu-24.04"
-  #   permissions:
-  #     contents: read
-  #   environment: approve-gpu-notebook-tests
-  #   steps:
-  #     - name: Detect Running GPU Notebook Tests
-  #       run: true
-  #
-  # run-gpu-notebook-tests:
-  #   name: Notebook Tests GPU
-  #   needs:
-  #     - approve-notebook-tests
-  #     - approve-gpu-notebook-tests
-  #   uses: ./.github/workflows/tests-notebooks.yml
-  #   secrets: inherit
-  #   permissions:
-  #     contents: read
-  #   with:
-  #     status-filter: stable
-  #     test-classification: gpu
+  approve-gpu-notebook-tests:
+    name: Run Jupyter GPU Notebook Tests?
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    environment: approve-gpu-notebook-tests
+    steps:
+      - name: Detect Running GPU Notebook Tests
+        run: true
+  
+  run-gpu-notebook-tests:
+    name: Notebook Tests GPU
+    needs:
+      - approve-notebook-tests
+      - approve-gpu-notebook-tests
+    uses: ./.github/workflows/tests-notebooks.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    with:
+      status-filter: stable
+      test-classification: gpu
