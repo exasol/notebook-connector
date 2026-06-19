@@ -12,7 +12,7 @@ jobs:
 
   fetch-notebook-tests:
     runs-on: ubuntu-24.04
-    name: Creating test matrix for selector "${{ inputs.selector }}"
+    name: Creating Test Matrix for Selector "${{ inputs.selector }}"
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v6

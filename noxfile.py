@@ -134,7 +134,7 @@ def get_notebook_tests(session: nox.Session) -> None:
     args = _parse_nb_args(session)
     data = _load_test_groups()
     m = list(_test_jobs(data[args.selector]))
-    print(f"{json.dumps(m, indent=4)}")
+    print(json.dumps(m))
 
 
 def rename(file: Path, prefix: str = "", suffix: str = ""):
