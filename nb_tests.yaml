@@ -1,42 +1,65 @@
+#
+# This file describes integration tests for Jupyter Notebooks.
+#
+# There are top-level test groups.
+#
+# * Each test group may contain "jobs" or nested children "groups".
+# * Each group may define attribute defaults for the contained jobs,
+#   e.g. "runner".
+# * Each nested group and each job can overide one or multiple of these
+#   attributes.
+#
+#
+# In the following example:
+# * the job for file test_a.py defines a custom name
+# * the job for file test_b.py overrides the group's default runner R1 by R2.
+#
+# top-level-group-a1:
+#   runner: R1
+#   jobs:
+#     - file: test_a.py
+#       name: "Special Label"
+#     - file: test_b.py
+#       runner: R2
+
 notebooks-generic:
   runner: ubuntu-24.04
-  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
+  pytest_params: '--itde-nameserver 8.8.8.8'
   groups:
     - backend: onprem
       require_success: true
-      files:
-        - test_first_steps.py
-        - test_sklearn.py
-        - test_pyexasol.py
-        - test_jupysql.py
-        - test_ibis.py
-        - test_script_languages_container.py
-        - test_useful_urls.py
-        - test_cloud.py
-        - test_transformers.py
+      jobs:
+        - file: test_first_steps.py
+        - file: test_sklearn.py
+        - file: test_pyexasol.py
+        - file: test_jupysql.py
+        - file: test_ibis.py
+        - file: test_script_languages_container.py
+        - file: test_useful_urls.py
+        - file: test_cloud.py
+        - file: test_transformers.py
     - backend: saas
       require_success: false
-      files:
-        - test_transformers.py
+      jobs:
+        - file: test_transformers.py
 
 large-runner:
   # Use the larger CI runner for memory/disk headroom (especially ITDE notebook).
   runner: int-linux-x64-4core-ubuntu24.04-1
-  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
-  groups:
-    - require_success: true
-      backend: onprem
-      files:
-        - test_text_ai.py
+  pytest_params: '--itde-nameserver 8.8.8.8'
+  # proposal for additional pytest_params: '--nb-test-db-mem-size="8"'
+  require_success: true
+  backend: onprem
+  jobs:
+    - file: test_text_ai.py
 
 gpu:
   runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
-  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
-  groups:
-    - require_success: true
-      backend: onprem
-      # GPU notebook tests are temporarily disabled due
-      # to an SLC issue being fixed separately.
-      files: []
-      # files:
-      # - test_gpu.py
+  pytest_params: '--itde-nameserver 8.8.8.8'
+  # proposal for additional pytest_params: '--nb-test-with-gpu'
+  require_success: true
+  backend: onprem
+  # GPU notebook tests are temporarily disabled due
+  # to an SLC issue being fixed separately.
+  # jobs:
+  # - file: test_gpu.py

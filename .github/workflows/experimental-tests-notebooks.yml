@@ -21,59 +21,71 @@ jobs:
       - id: matrix
         run: |
           TESTS=$(jq -cn '[
-            {label: "N1", "file": "test_n1.py", backend: "onprem", runner: "ubuntu-24.04", require_success: true },
-            {label: "N2", "file": "test_n2.py", backend: "onprem", runner: "ubuntu-22.04", require_success: false }
+            {label: "N1", "file": "test_n1.py", backend: "onprem", runner: "ubuntu-24.04", pytest_params: "", require_success: true },
+            {label: "N2", "file": "test_n2.py", backend: "onprem", runner: "ubuntu-22.04", pytest_params: "", require_success: false }
             ]'
           )
-
-          # TESTS=$(
-          #   echo -n '['
-          #   echo -n '{"label": "N1", "file": "test_n1.py", "backend": "onprem", "runner": "ubuntu-24.04", "require_success": true }, '
-          #   echo -n '{"label": "N2", "file": "test_n2.py", "backend": "onprem", "runner": "ubuntu-22.04", "require_success": false }'
-          #   echo -n ']'
-          # )
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
 
     outputs:
-      runner: "ubuntu-24.04"
       pytest_params: "x"
       tests: ${{ steps.matrix.outputs.tests }}
 
   notebook-tests:
-    name: ${{ matrix.nb_test.label }} (${{ matrix.nb_test.backend }})
+    name: ${{ matrix.el.label }} (${{ matrix.el.backend }})
     needs: fetch-notebook-tests
     # runs-on: ${{ needs.fetch-notebook-tests.outputs.runner }}
-    runs-on: ${{ matrix.nb_test.runner }}
+    runs-on: ${{ matrix.el.runner }}
     permissions:
       contents: read
     continue-on-error: ${{ inputs.status-filter == 'unstable' }}
     strategy:
       fail-fast: false
       matrix:
-        nb_test: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests) }}
+        el: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests) }}
     steps:
       - name: Sample
-        run: echo --backend=${{ matrix.nb_test.backend }} \
-            ${{ needs.fetch-notebook-tests.outputs.pytest_params }} \
-            test/notebooks/${{ matrix.nb_test.file }}
+        run: echo --backend=${{ matrix.el.backend }} \
+            ${{ matrix.el.pytest_params }} \
+            test/notebooks/${{ matrix.el.file }}
 
       - id: test
         name: Simulate pytest failure
-        if: ${{ ! matrix.nb_test.require_success }}
+        if: ${{ ! matrix.el.require_success }}
+        # if: ${{ matrix.require_success && steps.test.outcome != 'success' }}
         run: |
           echo simulating test failure
           exit 1
 
-      - name: Save result
+      - name: Save Result
         if: always()
         run: |
           mkdir -p results
+          echo calling jq -n...
+          jq -n '{
+            file: "${{ matrix.el.file }}",
+            require_success: "${{ matrix.el.require_success }}",
+            outcome: "${{ steps.test.outcome }}"
+          }'
           jq -n \
-            --arg notebook "${{ matrix.nb_test.file }}" \
-            --arg require_success "${{ matrix.nb_test.require_success }}" \
+            --arg file "${{ matrix.el.file }}" \
+            --arg require_success "${{ matrix.el.require_success }}" \
             --arg outcome "${{ steps.test.outcome }}" \
             '{
-              notebook: $notebook,
+              file: $file,
               require_success: $require_success,
               outcome: $outcome
-            }' > results/${{ matrix.nbtest.file }}.json
+            }' > results/${{ matrix.el.file }}.json
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-result-${{ matrix.el.file }}
+          path: results/${{ matrix.el.file }}.json
+
+  # evaluate-tests:
+  #   name: Evaluate ${{}}
+  #   if: always()
+  #   needs: notebook-tests
+

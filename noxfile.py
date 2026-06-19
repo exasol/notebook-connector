@@ -20,11 +20,13 @@ nox.options.sessions = ["format:fix"]
 
 
 # ---------------------------------------------------------------------------
-# Database helper
+# Database Helper
 # ---------------------------------------------------------------------------
+
 
 import json
 import re
+from collections.abc import Iterator
 from enum import Enum
 from pathlib import Path
 from typing import (
@@ -55,7 +57,7 @@ def start_database(session):
 
 
 # ---------------------------------------------------------------------------
-# JupyterLab development session
+# JupyterLab Development Session
 # ---------------------------------------------------------------------------
 
 
@@ -81,54 +83,8 @@ def jupyter(session: nox.Session) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Notebook test registry (stable / unstable)
+# Notebook Tests
 # ---------------------------------------------------------------------------
-
-
-class TestStatus(Enum):
-    stable = "stable"
-    unstable = "unstable"
-
-
-class TestClassification(Enum):
-    normal = "normal"
-    large = "large"
-    gpu = "gpu"
-
-
-class NBTestBackend(Enum):
-    onprem = "onprem"
-    saas = "saas"
-    empty = ""
-
-
-class NBTestDescription(BaseModel):
-    name: str
-    test_file: str
-    test_backend: NBTestBackend
-
-
-class TestList(BaseModel):
-    tests: list[NBTestDescription]
-
-
-class TestSets(BaseModel):
-    stable: TestList
-    unstable: TestList
-    runner: str
-    additional_pytest_parameters: str | None = None
-
-
-class TestRepository(BaseModel):
-    normal: TestSets
-    large: TestSets
-    gpu: TestSets
-
-
-def _load_test_repository() -> TestRepository:
-    yaml_file_path = PROJECT_CONFIG.root_path / "nb_tests.yaml"
-    with open(yaml_file_path) as f:
-        return TestRepository(**yaml.safe_load(f))
 
 
 def _parse_nb_args(session: nox.Session) -> Namespace:
@@ -137,42 +93,13 @@ def _parse_nb_args(session: nox.Session) -> Namespace:
         "selector",
         type=str,
         help="""One of the test groups contained as
-        top-level elements in file nb_tests.yaml."""
-    )
-    return parser.parse_args(session.posargs)
-
-
-def _parse_nb_args_old(session: nox.Session) -> Namespace:
-    test_status_values = [ts.value for ts in TestStatus]
-    test_classification_values = [tc.value for tc in TestClassification]
-    usage = " ".join(
-        [
-            "nox",
-            "-s",
-            session.name,
-            "--",
-            "--test-status",
-            "{" + ", ".join(test_status_values) + "}",
-            "[",
-            "--test-classification",
-            "{" + ", ".join(test_classification_values) + "}",
-            "]",
-        ]
-    )
-    parser = ArgumentParser(usage=usage)
-    parser.add_argument(
-        "--test-status", type=TestStatus, required=True, help="Test status"
-    )
-    parser.add_argument(
-        "--test-classification",
-        type=TestClassification,
-        default=TestClassification.normal,
-        help="Test classification",
+        top-level elements in file nb_tests.yaml.""",
     )
     return parser.parse_args(session.posargs)
 
 
 YamlObject = dict[str, Any]
+FILE_NAME_PATTERN = re.compile(f"test_(.*)\.py")
 
 
 def _load_test_groups() -> list[YamlObject]:
@@ -180,30 +107,23 @@ def _load_test_groups() -> list[YamlObject]:
     return yaml.safe_load(path.read_text())
 
 
-def _notebook_test_matrix(selected: YamlObject) -> YamlObject:
-    pattern = re.compile(f"test_(.*)\.py")
+def _test_jobs(group, group_atts: YamlObject | None = None) -> Iterator[YamlObject]:
+    def name(filename: str) -> str:
+        if m := FILE_NAME_PATTERN.match(filename):
+            return m.group(1).replace("_", " ").title()
+        return ""
 
-    def matrix_entry(group: YamlObject, file: str) -> YamlObject:
-        label = pattern.match(file).group(1).replace("_", " ").title()
-        return {
-            "label": label,
-            "file": file,
-            "runner": group.get("runner", "ubuntu-24.04"),
-            "pytest_params": group.get("additional_pytest_parameters", ""),
-            "backend": group.get("backend", "onprem"),
-            "require_success": group.get("require_success", True),
-        }
+    group_atts = (group_atts or {}) | {
+        k: v for k, v in group.items() if k not in ["groups", "jobs"]
+    }
+    for job in group.get("jobs", []):
+        atts = group_atts | job
+        if "name" not in atts:
+            atts["name"] = name(atts["file"])
+        yield atts
 
-    return [
-        matrix_entry(group, file)
-        for group in selected["groups"]
-        for file in group["files"]
-    ]
-    # return {
-    #     "runner": selected["runner"],
-    #     "pytest_params": selected["additional_pytest_parameters"],
-    #     "entries": entries
-    # }
+    for child in group.get("groups", []):
+        yield from _test_jobs(child, group_atts)
 
 
 @nox.session(name="get-notebook-tests", python=False)
@@ -213,45 +133,8 @@ def get_notebook_tests(session: nox.Session) -> None:
     """
     args = _parse_nb_args(session)
     data = _load_test_groups()
-    m = _notebook_test_matrix(data[args.selector])
-    print(f'{json.dumps(m, indent=4)}')
-
-
-def _get_test_sets(classification: TestClassification) -> TestSets:
-    test_repository = _load_test_repository()
-    mapping = {
-        TestClassification.normal: test_repository.normal,
-        TestClassification.large: test_repository.large,
-        TestClassification.gpu: test_repository.gpu,
-    }
-    return mapping[classification]
-
-
-def old_get_notebook_tests(session: nox.Session) -> None:
-    """Filters notebook tests for test-status and test-classification and prints as JSON."""
-    args = _parse_nb_args_old(session)
-    nb_tests = _get_test_sets(args.test_classification)
-    tests = (
-        nb_tests.stable if args.test_status == TestStatus.stable else nb_tests.unstable
-    )
-    print(tests.model_dump_json())
-
-
-@nox.session(name="get-notebook-runner", python=False)
-def get_notebook_runner(session: nox.Session) -> None:
-    """Print the GitHub runner to use for the given test classification."""
-    args = _parse_nb_args_old(session)
-    nb_tests = _get_test_sets(args.test_classification)
-    print(nb_tests.runner)
-
-
-@nox.session(name="get-notebook-pytest-params", python=False)
-def get_notebook_pytest_params(session: nox.Session) -> None:
-    """Print additional pytest parameters for the given test classification."""
-    args = _parse_nb_args_old(session)
-    nb_tests = _get_test_sets(args.test_classification)
-    if nb_tests.additional_pytest_parameters:
-        print(nb_tests.additional_pytest_parameters)
+    m = list(_test_jobs(data[args.selector]))
+    print(f"{json.dumps(m, indent=4)}")
 
 
 def rename(file: Path, prefix: str = "", suffix: str = ""):
@@ -260,7 +143,7 @@ def rename(file: Path, prefix: str = "", suffix: str = ""):
 
 
 # ---------------------------------------------------------------------------
-# Performance tests
+# Performance Tests
 # ---------------------------------------------------------------------------
 
 
@@ -281,7 +164,7 @@ def performance_test(session: nox.Session) -> None:
 
 
 # ---------------------------------------------------------------------------
-# UI tests
+# UI Tests
 # ---------------------------------------------------------------------------
 
 
