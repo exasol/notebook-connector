@@ -50,7 +50,7 @@ jobs:
             ${{ matrix.el.pytest_params }} \
             test/notebooks/${{ matrix.el.file }}
           # if: ${{ matrix.require_success && steps.test.outcome != 'success' }}
-          if [ ! "${{ matrix.el.require_success }}" ]; then
+          if [ "${{ matrix.el.require_success }}" != true ]; then
             echo simulating test failure
             exit 1
           fi
