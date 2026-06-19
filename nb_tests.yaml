@@ -43,17 +43,12 @@ notebooks-generic:
     - backend: saas
       require_success: false
       jobs:
+        - file: test_cloud.py
+        - file: test_script_languages_container.py
+        - file: test_sklearn.py
+        - file: test_ibis.py
         - file: test_transformers.py
-
-large-runner:
-  # Use the larger CI runner for memory/disk headroom (especially ITDE notebook).
-  runner: int-linux-x64-4core-ubuntu24.04-1
-  pytest_params: '--itde-nameserver 8.8.8.8'
-  # proposal for additional pytest_params: '--nb-test-db-mem-size="8"'
-  require_success: true
-  backend: onprem
-  jobs:
-    - file: test_text_ai.py
+        - file: test_text_ai.py
 
 gpu:
   runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
