@@ -2,15 +2,6 @@ name: Notebook Tests
 
 on:
   workflow_call:
-    # inputs:
-    #   status-filter:
-    #     description: 'Only nb tests with the given status will be executed (stable or unstable).'
-    #     required: true
-    #     type: string
-    #   test-classification:
-    #     description: 'Test classification: normal, large or gpu'
-    #     required: true
-    #     type: string
 
 jobs:
 
@@ -32,6 +23,7 @@ jobs:
       tests: ${{ steps.matrix.outputs.tests }}
 
   notebook-tests:
+    # if: ${{matrix.el.require_success
     name: ${{ matrix.el.label }} (${{ matrix.el.backend }})
     needs: fetch-notebook-tests
     runs-on: ${{ matrix.el.runner }}
