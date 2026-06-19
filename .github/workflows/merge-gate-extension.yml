@@ -43,7 +43,7 @@ jobs:
     steps:
       - name: Detect Running GPU Notebook Tests
         run: true
-  
+
   run-gpu-notebook-tests:
     name: Notebook Tests GPU
     needs:
@@ -54,5 +54,4 @@ jobs:
     permissions:
       contents: read
     with:
-      status-filter: stable
-      test-classification: gpu
+      selector: gpu

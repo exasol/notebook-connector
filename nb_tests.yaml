@@ -38,6 +38,8 @@ notebooks-generic:
         - file: test_useful_urls.py
         - file: test_cloud.py
         - file: test_transformers.py
+        - file: test_text_ai.py
+          runner: int-linux-x64-4core-ubuntu24.04-1
     - backend: saas
       require_success: false
       jobs:
