@@ -43,18 +43,17 @@ jobs:
       matrix:
         el: ${{ fromJson(needs.fetch-notebook-tests.outputs.tests) }}
     steps:
-      - name: Sample
-        run: echo --backend=${{ matrix.el.backend }} \
+      - id: test
+        name: Run Pytest
+        run: |
+          echo --backend=${{ matrix.el.backend }} \
             ${{ matrix.el.pytest_params }} \
             test/notebooks/${{ matrix.el.file }}
-
-      - id: test
-        name: Simulate pytest failure
-        if: ${{ ! matrix.el.require_success }}
-        # if: ${{ matrix.require_success && steps.test.outcome != 'success' }}
-        run: |
-          echo simulating test failure
-          exit 1
+          # if: ${{ matrix.require_success && steps.test.outcome != 'success' }}
+          if [ ! "${{ matrix.el.require_success }}" ]}; then
+            echo simulating test failure
+            exit 1
+          fi
 
       - name: Save Result
         if: always()
@@ -69,8 +68,8 @@ jobs:
           }' > results/${{ matrix.el.file }}.json
 
       - name: Upload Test Results
-        uses: actions/upload-artifact@v7
         if: always()
+        uses: actions/upload-artifact@v7
         with:
           name: test-result-${{ matrix.el.file }}
           path: results/${{ matrix.el.file }}.json
