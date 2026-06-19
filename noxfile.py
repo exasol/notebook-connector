@@ -2,7 +2,6 @@ from argparse import (
     ArgumentParser,
     Namespace,
 )
-from enum import Enum
 from pathlib import Path
 
 import nox
@@ -11,7 +10,6 @@ import yaml
 # imports all nox task provided by the toolbox
 # no-qa: disables ruff error
 from exasol.toolbox.nox.tasks import *  # noqa: F403
-from pydantic import BaseModel
 
 from noxconfig import PROJECT_CONFIG
 
@@ -27,12 +25,9 @@ nox.options.sessions = ["format:fix"]
 import json
 import re
 from collections.abc import Iterator
-from enum import Enum
 from pathlib import Path
 from typing import (
     Any,
-    List,
-    Set,
 )
 
 import yaml
@@ -99,7 +94,7 @@ def _parse_nb_args(session: nox.Session) -> Namespace:
 
 
 YamlObject = dict[str, Any]
-FILE_NAME_PATTERN = re.compile(f"test_(.*)\.py")
+FILE_NAME_PATTERN = re.compile(rf"test_(.*)\.py")
 
 
 def _load_test_groups() -> list[YamlObject]:
