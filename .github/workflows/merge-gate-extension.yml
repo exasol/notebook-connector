@@ -31,22 +31,22 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        runner: [normal]
-        obligation: [stable]
-        # runner: [normal, large]
-        # obligation: [stable, unstable]
-        # obligation: [required, optional]
-        # require-success: [yes, no]
-        # ignore-failure: [yes, no]
-    with:
-      # selector: notebooks-generic
-      #   - General onprem
-      #   - General saas
-      test-classification: ${{ matrix.runner }}
-      status-filter: ${{ matrix.obligation }}
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     runner: [normal]
+    #     obligation: [stable]
+    #     # runner: [normal, large]
+    #     # obligation: [stable, unstable]
+    #     # obligation: [required, optional]
+    #     # require-success: [yes, no]
+    #     # ignore-failure: [yes, no]
+    # with:
+    #   # selector: notebooks-generic
+    #   #   - General onprem
+    #   #   - General saas
+    #   test-classification: ${{ matrix.runner }}
+    #   status-filter: ${{ matrix.obligation }}
 
   approve-gpu-notebook-tests:
     name: Run Jupyter GPU Notebook Tests?
