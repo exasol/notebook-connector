@@ -28,11 +28,11 @@ jobs:
     needs:
       - approve-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
+    with:
+      selector: notebooks-generic
     secrets: inherit
     permissions:
       contents: read
-    with:
-      selector: notebooks-generic
 
   approve-gpu-notebook-tests:
     name: Run Jupyter GPU Notebook Tests?
@@ -50,8 +50,8 @@ jobs:
       - approve-notebook-tests
       - approve-gpu-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
+    with:
+      selector: gpu
     secrets: inherit
     permissions:
       contents: read
-    with:
-      selector: gpu
