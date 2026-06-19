@@ -2,27 +2,42 @@ name: Notebook Tests
 
 on:
   workflow_call:
+    input:
+      selector:
+        description: Selector which tests to include, e.g. notebooks-generic
+        required: true
+        type: string
 
 jobs:
 
   fetch-notebook-tests:
     runs-on: ubuntu-24.04
-    name: Creating test matrix for selector "selector"
+    name: Creating test matrix for selector "${{ inputs.selector }}"
     steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v8
+        with:
+          poetry-version: "2.3.0"
+
       - id: matrix
         run: |
-          JOBS=$(jq -cn '[
-            {label: "N1", "file": "test_n1.py", backend: "onprem", runner: "ubuntu-24.04", pytest_params: "", require_success: true },
-            {label: "N2", "file": "test_n2.py", backend: "onprem", runner: "ubuntu-22.04", pytest_params: "", require_success: false }
-            ]'
-          )
+          JOBS=$(poetry run -- nox -s get-notebook-tests -- ${{ inputs.selector }})
+          # JOBS=$(jq -cn '[
+          #   {label: "N1", "file": "test_n1.py", backend: "onprem", runner: "ubuntu-24.04", pytest_params: "", require_success: true },
+          #   {label: "N2", "file": "test_n2.py", backend: "onprem", runner: "ubuntu-22.04", pytest_params: "", require_success: false }
+          #   ]'
+          # )
           echo "jobs=$JOBS" >> "$GITHUB_OUTPUT"
 
     outputs:
       jobs: ${{ steps.matrix.outputs.jobs }}
 
   notebook-tests:
-    # if: ${{matrix.el.require_success
     name: ${{ matrix.el.label }} (${{ matrix.el.backend }})
     needs: fetch-notebook-tests
     runs-on: ${{ matrix.el.runner }}

@@ -31,6 +31,8 @@ jobs:
     secrets: inherit
     permissions:
       contents: read
+    with:
+      selector: notebooks-generic
     # strategy:
     #   fail-fast: false
     #   matrix:
@@ -57,7 +59,7 @@ jobs:
   #   steps:
   #     - name: Detect Running GPU Notebook Tests
   #       run: true
-  # 
+  #
   # run-gpu-notebook-tests:
   #   name: Notebook Tests GPU
   #   needs:
