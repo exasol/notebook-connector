@@ -16,7 +16,7 @@ jobs:
             {label: "N2", "file": "test_n2.py", backend: "onprem", runner: "ubuntu-22.04", pytest_params: "", require_success: false }
             ]'
           )
-          echo "jobs=$JOBS >> "$GITHUB_OUTPUT"
+          echo "jobs=$JOBS" >> "$GITHUB_OUTPUT"
 
     outputs:
       jobs: ${{ steps.matrix.outputs.jobs }}
