@@ -2,7 +2,7 @@ name: Notebook Tests
 
 on:
   workflow_call:
-    input:
+    inputs:
       selector:
         description: Selector which tests to include, e.g. notebooks-generic
         required: true
