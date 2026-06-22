@@ -63,7 +63,7 @@ transformers = [
 text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
 
 jupyter = [
-    "jupyterlab (>=4.2.5, <5)",
+    "jupyterlab (>=4.5.9, <5)",
     "pexpect (>=4.8.0, <5)",
 ]
 notebook-dependencies = [
