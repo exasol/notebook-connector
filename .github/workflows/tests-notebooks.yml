@@ -34,13 +34,13 @@ jobs:
 
   notebook-tests:
     name: >
-      ${{ matrix.el.name }} (${{ matrix.el.backend
-      }}${{ case(matrix.el.require_success, '', ', optional') }})
+      ${{ matrix.job.name }} (${{ matrix.job.backend
+      }}${{ case(matrix.job.require_success, '', ', optional') }})
     needs: fetch-notebook-tests
-    runs-on: ${{ matrix.el.runner }}
+    runs-on: ${{ matrix.job.runner }}
     permissions:
       contents: read
-    continue-on-error: ${{ ! matrix.el.require_success }}
+    continue-on-error: ${{ ! matrix.job.require_success }}
     strategy:
       fail-fast: false
       matrix:
