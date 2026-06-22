@@ -7,22 +7,34 @@ workflows:
         job: build-documentation-and-check-links
         step_id: set-up-python-and-poetry-environment
         content:
-         - name: Install All Optional Dependencies (aka. "extras")
-           id: install-optional-dependencies
-           run: poetry install --all-extras
+         - name: Set up Python & Poetry Environment
+           id: set-up-python-and-poetry-environment
+           uses: exasol/python-toolbox/.github/actions/python-environment@feature/699-all-extras
+           with:
+             python-version: "3.10"
+             poetry-version: "2.3.0"
+             all-extras: "true"
       - action: INSERT_AFTER
         job: lint-code
         step_id: set-up-python-and-poetry-environment
         content:
-         - name: Install All Optional Dependencies (aka. "extras")
-           id: install-optional-dependencies
-           run: poetry install --all-extras
+         - name: Set up Python & Poetry Environment
+           id: set-up-python-and-poetry-environment
+           uses: exasol/python-toolbox/.github/actions/python-environment@feature/699-all-extras
+           with:
+             python-version: "3.10"
+             poetry-version: "2.3.0"
+             all-extras: "true"
   - name: fast-tests
     step_customizations:
-      - action: INSERT_AFTER
+      - action: REPLACE
         job: run-unit-tests
         step_id: set-up-python-and-poetry-environment
         content:
-         - name: Install All Optional Dependencies (aka. "extras")
-           id: install-optional-dependencies
-           run: poetry install --all-extras
+         - name: Set up Python & Poetry Environment
+           id: set-up-python-and-poetry-environment
+           uses: exasol/python-toolbox/.github/actions/python-environment@feature/699-all-extras
+           with:
+             python-version: ${{ matrix.python-versions }}
+             poetry-version: "2.3.0"
+             all-extras: "true"
