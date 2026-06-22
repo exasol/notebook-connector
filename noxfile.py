@@ -160,10 +160,10 @@ def evaluate_notebook_tests_results(session: nox.Session) -> None:
     json_data = (json.loads(f.read_text()) for f in args.files)
     fails = [d for d in json_data if illegal_failure(d)]
     if fails:
-        session.log(f"{len(fails)} mandatory tests have failed:")
-        for d in fails:
-            print(json.dumps(d, indent=4))
-        exit(1)
+        session.error(
+            f"{len(fails)} mandatory tests have failed:\n\n"
+            + "\n\n".join(json.dumps(d, indent=4) for d in fails)
+        )
 
 
 # ---------------------------------------------------------------------------
