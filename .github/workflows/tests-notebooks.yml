@@ -33,7 +33,9 @@ jobs:
       jobs: ${{ steps.matrix.outputs.jobs }}
 
   notebook-tests:
-    name: ${{ matrix.el.name }} (${{ matrix.el.backend }})
+    name: >
+      ${{ matrix.el.name }} (${{ matrix.el.backend
+      }}${{ case(matrix.el.require_success, '', ', optional') }})
     needs: fetch-notebook-tests
     runs-on: ${{ matrix.el.runner }}
     permissions:
