@@ -12,7 +12,7 @@ jobs:
 
   fetch-notebook-tests:
     runs-on: ubuntu-24.04
-    name: Creating Test Matrix for Selector "${{ inputs.selector }}"
+    name: Build Matrix ${{ inputs.selector }}
     steps:
       - name: SCM Checkout
         uses: actions/checkout@v6
@@ -129,7 +129,7 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@v8
         with:
           poetry-version: "2.3.0"
-      
+
       - name: Download Test Results
         uses: actions/download-artifact@v8
         with:

@@ -132,7 +132,6 @@ def get_notebook_tests(session: nox.Session) -> None:
     print(json.dumps(m))
 
 
-
 def _parse_evaluate_nb_results_args(session: nox.Session) -> Namespace:
     parser = ArgumentParser(f"nox -s {session.name} [file, ...]")
     parser.add_argument(
@@ -150,10 +149,11 @@ def evaluate_notebook_tests_results(session: nox.Session) -> None:
     """
     Evaluate the results of the notebook tests.
     """
+
     def illegal_failure(data: YamlObject) -> bool:
         require_success = data.get("require_success", True)
         outcome = data.get("outcome", "failure")
-        failed = (outcome != "success")
+        failed = outcome != "success"
         return require_success and failed
 
     args = _parse_evaluate_nb_results_args(session)
@@ -164,6 +164,7 @@ def evaluate_notebook_tests_results(session: nox.Session) -> None:
         for d in fails:
             print(json.dumps(d, indent=4))
         exit(1)
+
 
 # ---------------------------------------------------------------------------
 # Performance Tests
