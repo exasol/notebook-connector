@@ -34,17 +34,16 @@ jobs:
 
   notebook-tests:
     name: >
-      ${{ matrix.el.name }} (${{ matrix.el.backend
-      }}${{ case(matrix.el.require_success, '', ', optional') }})
+      ${{ matrix.name }} (${{ matrix.backend
+      }}${{ case(matrix.require_success, '', ', optional') }})
     needs: fetch-notebook-tests
-    runs-on: ${{ matrix.el.runner }}
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
-    continue-on-error: ${{ ! matrix.el.require_success }}
+    continue-on-error: ${{ ! matrix.require_success }}
     strategy:
       fail-fast: false
-      matrix:
-        el: ${{ fromJson(needs.fetch-notebook-tests.outputs.jobs) }}
+      matrix: ${{ fromJson(needs.fetch-notebook-tests.outputs.jobs) }}
 
     steps:
       - name: SCM Checkout
@@ -91,28 +90,28 @@ jobs:
           NBTEST_USE_GPU: ${{ inputs.test-classification == 'gpu' && 'true' || 'false' }}
         run: |
           poetry run -- pytest -rA --setup-show \
-            --backend=${{ matrix.el.backend }} \
-            ${{ matrix.el.pytest_params }} \
-            test/notebooks/${{ matrix.el.file }}
+            --backend=${{ matrix.backend }} \
+            ${{ matrix.pytest_params }} \
+            test/notebooks/${{ matrix.file }}
 
       - name: Save Result
         if: always()
         run: |
           mkdir -p results
           jq -n '{
-            file: "${{ matrix.el.file }}",
-            require_success: ${{ matrix.el.require_success }},
-            backend: "${{ matrix.el.backend }}",
-            runner: "${{ matrix.el.runner }}",
+            file: "${{ matrix.file }}",
+            require_success: ${{ matrix.require_success }},
+            backend: "${{ matrix.backend }}",
+            runner: "${{ matrix.runner }}",
             outcome: "${{ steps.test.outcome }}"
-          }' > results/${{ matrix.el.file }}.json
+          }' > results/${{ matrix.file }}.json
 
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: test-result-${{ matrix.el.file }}
-          path: results/${{ matrix.el.file }}.json
+          name: test-result-${{ matrix.file }}
+          path: results/${{ matrix.file }}.json
 
   evaluate-tests:
     name: Evaluate Test Results
