@@ -139,15 +139,3 @@ jobs:
 
       - name: Verify Success of Mandatory Tests
         run: poetry run -- nox -s test:notebooks:evaluate-results -- results/*.json
-        # run: |
-        #   FAILURES=$(
-        #     jq -s '[
-        #       .[] | select(.require_success and .outcome != "success")
-        #     ] ' results/*.json)
-        #   COUNT=$(echo "$FAILURES" | jq length)
-        #
-        #   if [ "$COUNT" -gt 0 ]; then
-        #     echo "$COUNT mandatory tests have failed:"
-        #     echo "$FAILURES" | jq .
-        #     exit 1
-        #   fi
