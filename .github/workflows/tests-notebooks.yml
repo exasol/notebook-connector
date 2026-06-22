@@ -119,7 +119,7 @@ jobs:
             require_success: ${{ matrix.job.require_success }},
             backend: "${{ matrix.job.backend }}",
             runner: "${{ matrix.job.runner }}",
-            outcome: "${{ case( matrix.job.require_success, 'failure', 'success' ) }}"
+            outcome: "${{ case( matrix.job.require_success, 'success', 'failure' ) }}"
           }' > results/${{ matrix.job.file }}.json
 
       - name: Upload Test Results
