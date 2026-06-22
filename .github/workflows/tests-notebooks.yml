@@ -120,6 +120,16 @@ jobs:
     if: always()
     needs: notebook-tests
     steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v8
+        with:
+          poetry-version: "2.3.0"
+      
       - name: Download Test Results
         uses: actions/download-artifact@v8
         with:
@@ -128,15 +138,16 @@ jobs:
           merge-multiple: true
 
       - name: Verify Success of Mandatory Tests
-        run: |
-          FAILURES=$(
-            jq -s '[
-              .[] | select(.require_success and .outcome != "success")
-            ] ' results/*.json)
-          COUNT=$(echo "$FAILURES" | jq length)
-
-          if [ "$COUNT" -gt 0 ]; then
-            echo "$COUNT mandatory tests have failed:"
-            echo "$FAILURES" | jq .
-            exit 1
-          fi
+        run: poetry run -- nox -s test:notebooks:evaluate-results -- results/*.json
+        # run: |
+        #   FAILURES=$(
+        #     jq -s '[
+        #       .[] | select(.require_success and .outcome != "success")
+        #     ] ' results/*.json)
+        #   COUNT=$(echo "$FAILURES" | jq length)
+        #
+        #   if [ "$COUNT" -gt 0 ]; then
+        #     echo "$COUNT mandatory tests have failed:"
+        #     echo "$FAILURES" | jq .
+        #     exit 1
+        #   fi

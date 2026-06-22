@@ -132,14 +132,47 @@ def get_notebook_tests(session: nox.Session) -> None:
     print(json.dumps(m))
 
 
-def rename(file: Path, prefix: str = "", suffix: str = ""):
-    name = file.with_suffix("").name
-    return file.parent / f"{prefix}{name}{suffix}"
 
+def _parse_evaluate_nb_results_args(session: nox.Session) -> Namespace:
+    parser = ArgumentParser(f"nox -s {session.name} [file, ...]")
+    parser.add_argument(
+        "files",
+        type=Path,
+        nargs="*",
+        help="""Evalute results of notebook tests in the specified json
+        files.""",
+    )
+    return parser.parse_args(session.posargs)
+
+
+@nox.session(name="test:notebooks:evaluate-results", python=False)
+def evaluate_notebook_tests_results(session: nox.Session) -> None:
+    """
+    Evaluate the results of the notebook tests.
+    """
+    def illegal_failure(data: YamlObject) -> bool:
+        require_success = data.get("require_success", True)
+        outcome = data.get("outcome", "failure")
+        failed = (outcome != "success")
+        return require_success and failed
+
+    args = _parse_evaluate_nb_results_args(session)
+    json_data = (json.loads(f.read_text()) for f in args.files)
+    fails = [d for d in json_data if illegal_failure(d)]
+    if fails:
+        session.log(f"{len(fails)} mandatory tests have failed:")
+        for d in fails:
+            print(json.dumps(d, indent=4))
+        exit(1)
 
 # ---------------------------------------------------------------------------
 # Performance Tests
 # ---------------------------------------------------------------------------
+
+
+def rename(file: Path, prefix: str = "", suffix: str = ""):
+    name = file.with_suffix("").name
+    return file.parent / f"{prefix}{name}{suffix}"
 
 
 @nox.session(name="test:performance", python=False)
