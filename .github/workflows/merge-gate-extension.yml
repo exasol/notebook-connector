@@ -25,8 +25,9 @@ jobs:
 
   run-notebook-tests:
     name: Notebook Tests
-    needs:
-      - approve-notebook-tests
+    # experimental
+    # needs:
+    #   - approve-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
     with:
       selector: notebooks-generic

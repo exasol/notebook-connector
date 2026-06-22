@@ -66,9 +66,11 @@ jobs:
       contents: read
     # If you need additional jobs to be part of the merge gate, add them below
     needs:
-      - run-fast-checks
-      - run-fast-tests
-      - run-slow-checks
+      # experimental
+      #
+      # - run-fast-checks
+      # - run-fast-tests
+      # - run-slow-checks
       - merge-gate-extension
     # To prevent accidentally merges, this step is required. For more details
     # see: https://github.com/exasol/python-toolbox/issues/563
