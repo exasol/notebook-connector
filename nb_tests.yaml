@@ -18,7 +18,7 @@
 #   runner: R1
 #   jobs:
 #     - file: test_a.py
-#       name: "Special Label"
+#       name: "Special Name"
 #     - file: test_b.py
 #       runner: R2
 
