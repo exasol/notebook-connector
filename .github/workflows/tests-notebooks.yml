@@ -36,7 +36,6 @@ jobs:
     name: >
       ${{ matrix.job.name }} (${{ matrix.job.backend
       }}${{ case(matrix.job.require_success, '', ', optional') }})
-    if: ${{ needs.fetch-notebook-tests.outputs.jobs }}
     needs: fetch-notebook-tests
     runs-on: ${{ matrix.job.runner }}
     permissions:
