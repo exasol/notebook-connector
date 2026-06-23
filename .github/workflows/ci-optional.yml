@@ -21,9 +21,9 @@ jobs:
 
   run-optional-notebook-tests:
     name: Optional Notebook Tests
-    # experimental
-    # needs:
-    #   - approve-optional-notebook-tests
+    experimental
+    needs:
+      - approve-optional-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
     with:
       selector: optional

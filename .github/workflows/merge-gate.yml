@@ -6,12 +6,6 @@ on:
   workflow_call:
 
 jobs:
-  run-slow-checks:
-    runs-on: "ubuntu-24.04"
-    steps:
-      - name: step
-        run: true
-
   run-fast-checks:
     name: Fast Checks
     uses: ./.github/workflows/checks.yml
@@ -23,39 +17,39 @@ jobs:
     uses: ./.github/workflows/fast-tests.yml
     permissions:
       contents: read
-# 
-#   fast-report:
-#     name: Fast Report
-#     needs:
-#       - run-fast-checks
-#       - run-fast-tests
-#     uses: ./.github/workflows/report.yml
-#     secrets:
-#       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#     permissions:
-#       contents: read
-# 
-#   approve-run-slow-tests:
-#     name: Approve Running Slow Tests?
-#     runs-on: "ubuntu-24.04"
-#     permissions:
-#       contents: read
-#     # Even though the environment "manual-approval" will be created automatically,
-#     # it still needs to be configured to require interactive review.
-#     # See project settings on GitHub (Settings / Environments / manual-approval).
-#     environment: manual-approval
-#     steps:
-#       - name: Tests
-#         run: echo "Slow tests approved"
-# 
-#   run-slow-checks:
-#     name: Slow Checks
-#     needs:
-#       - approve-run-slow-tests
-#     uses: ./.github/workflows/slow-checks.yml
-#     secrets: inherit
-#     permissions:
-#       contents: read
+
+  fast-report:
+    name: Fast Report
+    needs:
+      - run-fast-checks
+      - run-fast-tests
+    uses: ./.github/workflows/report.yml
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    permissions:
+      contents: read
+
+  approve-run-slow-tests:
+    name: Approve Running Slow Tests?
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    # Even though the environment "manual-approval" will be created automatically,
+    # it still needs to be configured to require interactive review.
+    # See project settings on GitHub (Settings / Environments / manual-approval).
+    environment: manual-approval
+    steps:
+      - name: Tests
+        run: echo "Slow tests approved"
+
+  run-slow-checks:
+    name: Slow Checks
+    needs:
+      - approve-run-slow-tests
+    uses: ./.github/workflows/slow-checks.yml
+    secrets: inherit
+    permissions:
+      contents: read
 
   merge-gate-extension:
     uses: ./.github/workflows/merge-gate-extension.yml
