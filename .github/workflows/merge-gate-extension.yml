@@ -30,7 +30,7 @@ jobs:
     #   - approve-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
     with:
-      selector: notebooks-generic
+      selector: generic
     secrets: inherit
     permissions:
       contents: read

@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       selector:
-        description: Selector which tests to include, e.g. notebooks-generic
+        description: Selector which tests to include, e.g. "generic"
         required: true
         type: string
 
