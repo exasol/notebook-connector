@@ -11,11 +11,6 @@ jobs:
     steps:
       - name: step
         run: true
-  run-fast-tests:
-    runs-on: "ubuntu-24.04"
-    steps:
-      - name: step
-        run: true
   run-slow-checks:
     runs-on: "ubuntu-24.04"
     steps:
@@ -28,11 +23,11 @@ jobs:
 #     permissions:
 #       contents: read
 # 
-#   run-fast-tests:
-#     name: Fast Tests
-#     uses: ./.github/workflows/fast-tests.yml
-#     permissions:
-#       contents: read
+  run-fast-tests:
+    name: Fast Tests
+    uses: ./.github/workflows/fast-tests.yml
+    permissions:
+      contents: read
 # 
 #   fast-report:
 #     name: Fast Report
