@@ -6,23 +6,18 @@ on:
   workflow_call:
 
 jobs:
-  run-fast-checks:
-    runs-on: "ubuntu-24.04"
-    steps:
-      - name: step
-        run: true
   run-slow-checks:
     runs-on: "ubuntu-24.04"
     steps:
       - name: step
         run: true
 
-#   run-fast-checks:
-#     name: Fast Checks
-#     uses: ./.github/workflows/checks.yml
-#     permissions:
-#       contents: read
-# 
+  run-fast-checks:
+    name: Fast Checks
+    uses: ./.github/workflows/checks.yml
+    permissions:
+      contents: read
+
   run-fast-tests:
     name: Fast Tests
     uses: ./.github/workflows/fast-tests.yml
