@@ -25,33 +25,30 @@
 generic:
   runner: ubuntu-24.04
   pytest_params: '--itde-nameserver 8.8.8.8'
-  require_success: true
-  backend: onprem
-  jobs:
-    - file: test_first_steps.py
-    - file: test_sklearn.py
-    - file: test_pyexasol.py
-    - file: test_jupysql.py
-    - file: test_ibis.py
-    - file: test_script_languages_container.py
-    - file: test_useful_urls.py
-    - file: test_cloud.py
-    - file: test_transformers.py
-    - file: test_text_ai.py
-      runner: int-linux-x64-4core-ubuntu24.04-1
-
-optional:
-  runner: ubuntu-24.04
-  pytest_params: '--itde-nameserver 8.8.8.8'
-  backend: saas
-  require_success: false
-  jobs:
-    - file: test_cloud.py
-    - file: test_script_languages_container.py
-    - file: test_sklearn.py
-    - file: test_ibis.py
-    - file: test_transformers.py
-    - file: test_text_ai.py
+  groups:
+    - backend: onprem
+      require_success: true
+      jobs:
+        - file: test_first_steps.py
+        - file: test_sklearn.py
+        - file: test_pyexasol.py
+        - file: test_jupysql.py
+        - file: test_ibis.py
+        - file: test_script_languages_container.py
+        - file: test_useful_urls.py
+        - file: test_cloud.py
+        - file: test_transformers.py
+        - file: test_text_ai.py
+          runner: int-linux-x64-4core-ubuntu24.04-1
+    - backend: saas
+      require_success: false
+      jobs:
+        - file: test_cloud.py
+        - file: test_script_languages_container.py
+        - file: test_sklearn.py
+        - file: test_ibis.py
+        - file: test_transformers.py
+        - file: test_text_ai.py
 
 gpu:
   runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1

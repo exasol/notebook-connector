@@ -40,6 +40,7 @@ jobs:
     runs-on: ${{ matrix.job.runner }}
     permissions:
       contents: read
+    continue-on-error: ${{ ! matrix.job.require_success }}
     strategy:
       fail-fast: false
       matrix:
@@ -77,7 +78,8 @@ jobs:
         run: |
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      - name: Run Pytest
+      - id: test
+        name: Run Pytest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SAAS_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
@@ -92,3 +94,60 @@ jobs:
             --backend=${{ matrix.job.backend }} \
             ${{ matrix.job.pytest_params }} \
             test/notebooks/${{ matrix.job.file }}
+
+      - name: Save Result
+        if: always()
+        run: |
+          mkdir -p results
+          jq -n '{
+            file: "${{ matrix.job.file }}",
+            require_success: ${{ matrix.job.require_success }},
+            backend: "${{ matrix.job.backend }}",
+            runner: "${{ matrix.job.runner }}",
+            outcome: "${{ steps.test.outcome }}"
+          }' > results/${{ matrix.job.file }}.json
+
+      # experimental
+      - name: Save Result
+        if: always()
+        run: |
+          jq -n '{
+            file: "${{ matrix.job.file }}",
+            require_success: ${{ matrix.job.require_success }},
+            backend: "${{ matrix.job.backend }}",
+            runner: "${{ matrix.job.runner }}",
+            outcome: "${{ case( matrix.job.require_success, 'success', 'failure' ) }}"
+          }' > results/${{ matrix.job.file }}.json
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-result-${{ matrix.job.file }}
+          path: results/${{ matrix.job.file }}.json
+
+  evaluate-tests:
+    name: Evaluate Test Results
+    runs-on: ubuntu-24.04
+    if: always()
+    needs: notebook-tests
+    steps:
+      - name: SCM Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@v8
+        with:
+          poetry-version: "2.3.0"
+
+      - name: Download Test Results
+        uses: actions/download-artifact@v8
+        with:
+          pattern: test-result-*
+          path: results
+          merge-multiple: true
+
+      - name: Verify Success of Mandatory Tests
+        run: poetry run -- nox -s test:notebooks:evaluate-results -- results/*.json
