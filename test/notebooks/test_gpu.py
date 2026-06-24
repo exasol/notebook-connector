@@ -9,7 +9,6 @@ from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 import docker
 import exasol.bucketfs as bfs
 import pytest
-from exasol.pytest_backend import BACKEND_ONPREM
 from exasol.python_extension_common.deployment.extract_validator import ExtractValidator
 from exasol.slc.api import push as exaslct_push
 
@@ -88,9 +87,11 @@ def docker_login():
 
 
 @pytest.fixture()
-def finish_slc_repo_dir(use_saas, backend_setup, check_if_gpu_is_active, notebooks_root):
+def finish_slc_repo_dir(
+    use_saas, backend_setup, check_if_gpu_is_active, notebooks_root
+):
     yield
-    if ! use_saas:
+    if not use_saas:
         p = notebooks_root / "gpu_in_udf" / "slc_workspace"
         shutil.rmtree(p)
 

@@ -14,9 +14,6 @@ from pathlib import Path
 
 import nbformat
 import pytest
-from exasol.pytest_backend import (
-    BACKEND_SAAS,
-)
 from nbclient import NotebookClient
 
 from exasol.nb_connector.ai_lab_config import Accelerator
