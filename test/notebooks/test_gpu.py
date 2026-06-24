@@ -88,9 +88,9 @@ def docker_login():
 
 
 @pytest.fixture()
-def finish_slc_repo_dir(backend, backend_setup, check_if_gpu_is_active, notebooks_root):
+def finish_slc_repo_dir(use_saas, backend_setup, check_if_gpu_is_active, notebooks_root):
     yield
-    if backend == BACKEND_ONPREM:
+    if ! use_saas:
         p = notebooks_root / "gpu_in_udf" / "slc_workspace"
         shutil.rmtree(p)
 
@@ -104,7 +104,7 @@ def test_gpu_notebooks(
     notebooks_root,
 ) -> None:
     if use_saas:
-        pytest.skip()
+        pytest.skip(f"use_saas = {use_saas}")
     current_dir = Path.cwd()
     store_path, store_password = backend_setup
     store_file = str(store_path)
