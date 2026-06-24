@@ -91,6 +91,7 @@ def bring_itde_up(conf: Secrets, env_info: EnvironmentInfo | None = None) -> Non
             )
             itde_accelerator = ("nvidia=all",)
 
+        # experimental debugging - pleaes remove print statements!
         print(f"itde_accelerator = {itde_accelerator}")
         print(f"additional_db_parameter = {additional_db_parameter}")
         with temporarily_disable_luigi_worker_shutdown_handler():

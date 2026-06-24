@@ -100,7 +100,6 @@ jobs:
           NBTEST_USE_GPU: ${{ case(inputs.selector == 'gpu', 'true', 'false') }}
         run: |
           poetry run -- pytest -rA --setup-show \
-            --backend=${{ matrix.job.backend }} \
             ${{ matrix.job.pytest_params }} \
             test/notebooks/${{ matrix.job.file }}
         
