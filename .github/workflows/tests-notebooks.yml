@@ -56,6 +56,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Report GPU
+        if: ${{ inputs.selector == 'gpu' }}
+        run: |
+          nvidia-smi
+
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
         with:
@@ -98,7 +103,7 @@ jobs:
             --backend=${{ matrix.job.backend }} \
             ${{ matrix.job.pytest_params }} \
             test/notebooks/${{ matrix.job.file }}
-
+        
       - name: Save Result
         if: always()
         run: |

@@ -47,7 +47,7 @@ jobs:
   run-gpu-notebook-tests:
     name: Notebook Tests GPU
     needs:
-      - approve-notebook-tests
+    #  - approve-notebook-tests
       - approve-gpu-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
     with:

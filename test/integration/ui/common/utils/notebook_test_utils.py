@@ -143,8 +143,11 @@ def backend_setup(
     if backend == BACKEND_ONPREM:
         secrets.save(CKey.storage_backend, StorageBackend.onprem.name)
         secrets.save(CKey.use_itde, "yes")
+        value = os.getenv("NBTEST_USE_GPU", "false")
+        print(f'NBTEST_USE_GPU = {value}')
         if os.getenv("NBTEST_USE_GPU", "false") == "true":
             secrets.save(CKey.accelerator, Accelerator.nvidia.value)
+        print(f'secrets {CKey.accelerator} = {secrets.get(CKey.accelerator)}')
         if db_mem_size := os.getenv("NBTEST_MEMSIZE"):
             secrets.save(CKey.mem_size, db_mem_size)
         bring_itde_up(secrets, backend_aware_onprem_database)
