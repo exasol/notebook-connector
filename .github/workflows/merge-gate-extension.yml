@@ -34,25 +34,24 @@ jobs:
     permissions:
       contents: read
 
-#  approve-gpu-notebook-tests:
-#    name: Run Jupyter GPU Notebook Tests?
-#    runs-on: "ubuntu-24.04"
-#    permissions:
-#      contents: read
-#    environment: approve-gpu-notebook-tests
-#    steps:
-#      - name: Detect Running GPU Notebook Tests
-#        run: true
-#
-#  run-gpu-notebook-tests:
-#    name: Notebook Tests GPU
-#    needs:
-#      - approve-notebook-tests
-#      - approve-gpu-notebook-tests
-#    uses: ./.github/workflows/tests-notebooks.yml
-#    with:
-#      selector: gpu
-#    secrets: inherit
-#    permissions:
-#      contents: read
-#
+  approve-gpu-notebook-tests:
+    name: Run Jupyter GPU Notebook Tests?
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    environment: approve-gpu-notebook-tests
+    steps:
+      - name: Detect Running GPU Notebook Tests
+        run: true
+
+  run-gpu-notebook-tests:
+    name: Notebook Tests GPU
+    needs:
+      - approve-notebook-tests
+      - approve-gpu-notebook-tests
+    uses: ./.github/workflows/tests-notebooks.yml
+    with:
+      selector: gpu
+    secrets: inherit
+    permissions:
+      contents: read

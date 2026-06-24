@@ -53,10 +53,7 @@ generic:
 gpu:
   runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
   pytest_params: '--itde-nameserver 8.8.8.8'
-  # proposal for additional pytest_params: '--nb-test-with-gpu'
   require_success: true
   backend: onprem
-  # GPU notebook tests are temporarily disabled due
-  # to an SLC issue being fixed separately.
-  # jobs:
-  # - file: test_gpu.py
+  jobs:
+  - file: test_gpu.py

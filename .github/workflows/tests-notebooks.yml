@@ -27,6 +27,10 @@ jobs:
       - id: matrix
         run: |
           JOBS=$(poetry run -- nox -s get-notebook-tests -- ${{ inputs.selector }})
+          if [ "$JOBS" == "[]" ]; then
+              echo "List of jobs is empty!"
+              exit 1
+          fi
           echo "jobs=$JOBS" >> "$GITHUB_OUTPUT"
 
     outputs:
@@ -107,7 +111,6 @@ jobs:
             outcome: "${{ steps.test.outcome }}"
           }' > results/${{ matrix.job.file }}.json
 
-      # experimental
       - name: Save Result
         if: always()
         run: |
