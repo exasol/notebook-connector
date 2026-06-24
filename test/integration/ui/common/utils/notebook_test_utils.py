@@ -120,7 +120,7 @@ def set_log_level_for_libraries(level=logging.WARNING):
 
 @pytest.fixture(scope="session")
 def backend_setup(
-    backend,
+    use_saas,
     saas_host,
     saas_pat,
     saas_account_id,
@@ -139,7 +139,7 @@ def backend_setup(
     secrets = Secrets(store_path, master_password=store_password)
     secrets.save(CKey.db_schema, "NOTEBOOK_TESTS")
 
-    if backend == BACKEND_SAAS:
+    if use_saas:
         secrets.save(CKey.storage_backend, StorageBackend.saas.name)
         secrets.save(CKey.saas_url, saas_host)
         secrets.save(CKey.saas_token, saas_pat)
