@@ -15,7 +15,6 @@ from pathlib import Path
 import nbformat
 import pytest
 from exasol.pytest_backend import (
-    BACKEND_ONPREM,
     BACKEND_SAAS,
 )
 from nbclient import NotebookClient
