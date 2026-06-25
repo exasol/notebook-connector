@@ -2,8 +2,7 @@
 
 ## Summary
 
-This release reorganizes the test for Jupyter Notebooks, please see the Developer Guide for details.
-
 ## Refactorings
 
-* #433: Updated GitHub workflows
+* #433: Reorganized the tests for Jupyter Notebooks
+  * Please see the Developer Guide for details.
