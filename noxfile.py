@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from argparse import (
     ArgumentParser,
     Namespace,
@@ -33,6 +35,12 @@ from typing import (
 )
 
 import yaml
+from pydantic import (
+    BaseModel,
+    Field,
+    JsonValue,
+    validator,
+)
 
 
 @nox.session(python=False)
@@ -104,23 +112,52 @@ def _load_test_groups() -> list[YamlObject]:
     return yaml.safe_load(path.read_text())
 
 
-def _test_jobs(group, group_atts: YamlObject | None = None) -> Iterator[YamlObject]:
-    def name(filename: str) -> str:
-        if m := FILE_NAME_PATTERN.match(filename):
+class JobParams(BaseModel):
+    runner: str | None = Field(default=None)
+    pytest_params: str | None = Field(default=None)
+    backend: str | None = Field(default=None)
+    require_success: bool | None = Field(default=None)
+    extra_params: JsonValue | None = Field(default=None)
+
+
+class Job(JobParams):
+    file: str
+    name: str|None = Field(default=None)
+
+    @validator("name", always=True)
+    def get_address(cls, name: str|None, values: Dict[str, Any]) -> str | None:
+        filename = values.get("file")
+        if (
+            name is None and filename
+            and (m := FILE_NAME_PATTERN.match(filename))
+        ):
             return m.group(1).replace("_", " ").title()
-        return ""
+        return name
 
-    group_atts = (group_atts or {}) | {
-        k: v for k, v in group.items() if k not in ["groups", "jobs"]
-    }
-    for job in group.get("jobs", []):
-        atts = group_atts | job
-        if "name" not in atts:
-            atts["name"] = name(atts["file"])
-        yield atts
+    def inherit(self, parent: JobGroup) -> Job:
+        params = parent.model_dump() | self.model_dump(exclude_none=True)
+        return Job(**params)
 
-    for child in group.get("groups", []):
-        yield from _test_jobs(child, group_atts)
+
+class JobGroup(JobParams):
+    jobs: tuple[Job, ...] = Field(default=())
+    groups: tuple[JobGroup, ...] = Field(default=())
+
+    def inherit(self, parent: JobGroup) -> JobGroup:
+        params = parent.model_dump() | self.model_dump(exclude_none=True)
+        return JobGroup(**params)
+
+
+class JobList(BaseModel):
+    jobs: tuple[Job, ...]
+
+
+def _test_jobs(group: JobGroup, parent: JobGroup | None = None) -> Iterator[Job]:
+    current = group.inherit(parent) if parent else group
+    for job in current.jobs:
+        yield job.inherit(current)
+    for child in current.groups:
+        yield from _test_jobs(child, current)
 
 
 @nox.session(name="get-notebook-tests", python=False)
@@ -130,15 +167,9 @@ def get_notebook_tests(session: nox.Session) -> None:
     """
     args = _parse_nb_args(session)
     data = _load_test_groups()
-    jobs = list(_test_jobs(data[args.selector]))
-    if not jobs:
-        session.error(f'No jobs defined for selector "{args.selector}"')
-    with contextlib.ExitStack() as stack:
-        if path := os.getenv("GITHUB_OUTPUT"):
-            f = stack.enter_context(open(path, "wa"))
-        else:
-            f = None
-        print(f"jobs={json.dumps(jobs)}", file=f)
+    group = JobGroup.model_validate(data[args.selector])
+    jobs = JobList(jobs=tuple(_test_jobs(group)))
+    print(f"jobs={jobs.model_dump_json()}")
 
 
 def _parse_evaluate_nb_results_args(session: nox.Session) -> Namespace:
