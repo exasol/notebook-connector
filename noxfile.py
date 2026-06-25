@@ -135,10 +135,10 @@ def get_notebook_tests(session: nox.Session) -> None:
         session.error(f'No jobs defined for selector "{args.selector}"')
     with contextlib.ExitStack() as stack:
         if path := os.getenv("GITHUB_OUTPUT"):
-            f = stack.enter_context(open(path, "w"))
+            f = stack.enter_context(open(path, "wa"))
         else:
             f = None
-        print(json.dumps(jobs), file=f)
+        print(f"jobs={json.dumps(jobs)}", file=f)
 
 
 def _parse_evaluate_nb_results_args(session: nox.Session) -> Namespace:
