@@ -25,13 +25,7 @@ jobs:
           poetry-version: "2.3.0"
 
       - id: matrix
-        run: |
-          JOBS=$(poetry run -- nox -s get-notebook-tests -- ${{ inputs.selector }})
-          if [ "$JOBS" == "[]" ]; then
-              echo "List of jobs is empty!"
-              exit 1
-          fi
-          echo "jobs=$JOBS" >> "$GITHUB_OUTPUT"
+        run: poetry run -- nox -s get-notebook-tests -- ${{ inputs.selector }}
 
     outputs:
       jobs: ${{ steps.matrix.outputs.jobs }}
@@ -102,7 +96,7 @@ jobs:
           poetry run -- pytest -rA --setup-show \
             ${{ matrix.job.pytest_params }} \
             test/notebooks/${{ matrix.job.file }}
-        
+
       - name: Save Result
         if: always()
         run: |

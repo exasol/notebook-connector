@@ -22,7 +22,9 @@ nox.options.sessions = ["format:fix"]
 # ---------------------------------------------------------------------------
 
 
+import contextlib
 import json
+import os
 import re
 from collections.abc import Iterator
 from pathlib import Path
@@ -32,6 +34,7 @@ from typing import (
 
 import yaml
 
+import contextlib
 
 @nox.session(python=False)
 def start_database(session):
@@ -128,8 +131,15 @@ def get_notebook_tests(session: nox.Session) -> None:
     """
     args = _parse_nb_args(session)
     data = _load_test_groups()
-    m = list(_test_jobs(data[args.selector]))
-    print(json.dumps(m))
+    jobs = list(_test_jobs(data[args.selector]))
+    if not jobs:
+        session.error(f'No jobs defined for selector "{args.selector}"')
+    with contextlib.ExitStack() as stack:
+        if path := os.getenv("GITHUB_OUTPUT"):
+            f = stack.enter_context(open(path, "w"))
+        else:
+            f = None
+        print(json.dumps(jobs), file=f)
 
 
 def _parse_evaluate_nb_results_args(session: nox.Session) -> Namespace:
