@@ -27,9 +27,8 @@ jobs:
       - id: matrix
         run: poetry run -- nox -s get-notebook-tests -- ${{ inputs.selector }}
 
-    outputs: ${{ steps.matrix.outputs.jobs }}
-    # outputs: 
-      # jobs: ${{ steps.matrix.outputs.jobs }}
+    outputs:
+      jobs: ${{ steps.matrix.outputs.jobs }}
 
   notebook-tests:
     name: >
@@ -43,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        job: ${{ fromJson(needs.fetch-notebook-tests.outputs.jobs) }}
+        job: ${{ fromJson(needs.fetch-notebook-tests.outputs.jobs).jobs }}
 
     steps:
       - name: SCM Checkout
