@@ -24,9 +24,7 @@ nox.options.sessions = ["format:fix"]
 # ---------------------------------------------------------------------------
 
 
-import contextlib
 import json
-import os
 import re
 from collections.abc import Iterator
 from pathlib import Path
