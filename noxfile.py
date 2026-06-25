@@ -34,7 +34,6 @@ from typing import (
 
 import yaml
 
-import contextlib
 
 @nox.session(python=False)
 def start_database(session):
