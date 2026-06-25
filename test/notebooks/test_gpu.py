@@ -68,9 +68,11 @@ def _wait_for_slc_to_become_available(secrets: Secrets, slc: ScriptLanguageConta
 
 
 @pytest.fixture()
-def check_if_gpu_is_active():
-    if os.getenv("NBTEST_USE_GPU", "false") != "true":
-        pytest.skip()
+def check_if_gpu_is_active(request):
+    if (value := os.getenv("NBTEST_USE_GPU")) != "true":
+        pytest.skip(
+            f"Fixture {request.fixturename}(): env NBTEST_USE_GPU = {repr(value)}"
+        )
 
 
 @pytest.fixture()
