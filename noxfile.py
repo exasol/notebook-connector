@@ -24,7 +24,9 @@ nox.options.sessions = ["format:fix"]
 # ---------------------------------------------------------------------------
 
 
+import contextlib
 import json
+import os
 import re
 from collections.abc import Iterator
 from pathlib import Path
@@ -163,8 +165,16 @@ def get_notebook_tests(session: nox.Session) -> None:
     args = _parse_nb_args(session)
     data = _load_test_groups()
     group = JobGroup.model_validate(data[args.selector])
-    jobs = JobList(jobs=tuple(_test_jobs(group)))
-    print(f"jobs={jobs.model_dump_json()}")
+    jobs = tuple(_test_jobs(group))
+    if not jobs:
+        session.error(f'No jobs defined for selector "{args.selector}"')
+    job_list = JobList(jobs=jobs)
+    with contextlib.ExitStack() as stack:
+        if path := os.getenv("GITHUB_OUTPUT"):
+            f = stack.enter_context(open(path, "a"))
+        else:
+            f = None
+        print(f"jobs={job_list.model_dump_json()}", file=f)
 
 
 def _parse_evaluate_nb_results_args(session: nox.Session) -> Namespace:
