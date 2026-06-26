@@ -120,15 +120,12 @@ class JobParams(BaseModel):
 
 class Job(JobParams):
     file: str
-    name: str|None = Field(default=None)
+    name: str | None = Field(default=None)
 
     @validator("name", always=True)
-    def get_address(cls, name: str|None, values: Dict[str, Any]) -> str | None:
+    def get_address(cls, name: str | None, values: dict[str, Any]) -> str | None:
         filename = values.get("file")
-        if (
-            name is None and filename
-            and (m := FILE_NAME_PATTERN.match(filename))
-        ):
+        if name is None and filename and (m := FILE_NAME_PATTERN.match(filename)):
             return m.group(1).replace("_", " ").title()
         return name
 
