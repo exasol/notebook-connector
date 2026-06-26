@@ -92,17 +92,6 @@ def jupyter(session: nox.Session) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _parse_nb_args(session: nox.Session) -> Namespace:
-    parser = ArgumentParser(f"nox -s {session.name} <selector>")
-    parser.add_argument(
-        "selector",
-        type=str,
-        help="""One of the test groups contained as
-        top-level elements in file nb_tests.yaml.""",
-    )
-    return parser.parse_args(session.posargs)
-
-
 YamlObject = dict[str, Any]
 FILE_NAME_PATTERN = re.compile(rf"test_(.*)\.py")
 
@@ -162,7 +151,18 @@ def get_notebook_tests(session: nox.Session) -> None:
     """
     Collect notebook tests and print in Json format.
     """
-    args = _parse_nb_args(session)
+
+    def parse_args() -> Namespace:
+        parser = ArgumentParser(f"nox -s {session.name} <selector>")
+        parser.add_argument(
+            "selector",
+            type=str,
+            help="""One of the test groups contained as
+            top-level elements in file nb_tests.yaml.""",
+        )
+        return parser.parse_args(session.posargs)
+
+    args = parse_args()
     data = _load_test_groups()
     group = JobGroup.model_validate(data[args.selector])
     jobs = tuple(_test_jobs(group))
@@ -177,16 +177,41 @@ def get_notebook_tests(session: nox.Session) -> None:
         print(f"jobs={job_list.model_dump_json()}", file=f)
 
 
-def _parse_evaluate_nb_results_args(session: nox.Session) -> Namespace:
-    parser = ArgumentParser(f"nox -s {session.name} [file, ...]")
-    parser.add_argument(
-        "files",
-        type=Path,
-        nargs="*",
-        help="""Evalute results of notebook tests in the specified json
-        files.""",
-    )
-    return parser.parse_args(session.posargs)
+@nox.session(name="test:notebooks:write-outcome", python=False)
+def write_notebook_test_outcome(session: nox.Session) -> None:
+    """
+    Write the specs and the outcome of a single notebook test in Json
+    format to a file in the specified folder.
+    """
+
+    def parse_args() -> Namespace:
+        parser = ArgumentParser(f"nox -s {session.name}>")
+        parser.add_argument(
+            "--outcome",
+            type=str,
+            required=True,
+            help="Test specification in Json format",
+        )
+        parser.add_argument(
+            "--test",
+            type=str,
+            metavar="JSON-STRING",
+            required=True,
+            help="Test specification in Json format",
+        )
+        parser.add_argument(
+            "--output-folder",
+            type=Path,
+            required=True,
+            help="Write spec and outcome to a file in this folder.",
+        )
+        return parser.parse_args(session.posargs)
+
+    args = parse_args()
+    content = json.loads(args.test) | {"outcome": args.outcome}
+    file = (args.output_folder / content["file"]).with_suffix(".json")
+    file.parent.mkdir(exist_ok=True, parents=True)
+    file.write_text(json.dumps(content, indent=2))
 
 
 @nox.session(name="test:notebooks:evaluate-results", python=False)
@@ -195,13 +220,24 @@ def evaluate_notebook_tests_results(session: nox.Session) -> None:
     Evaluate the results of the notebook tests.
     """
 
+    def parse_args() -> Namespace:
+        parser = ArgumentParser(f"nox -s {session.name} [file, ...]")
+        parser.add_argument(
+            "files",
+            type=Path,
+            nargs="*",
+            help="""Evalute results of notebook tests in the specified json
+            files.""",
+        )
+        return parser.parse_args(session.posargs)
+
     def illegal_failure(data: YamlObject) -> bool:
         require_success = data.get("require_success", True)
         outcome = data.get("outcome", "failure")
         failed = outcome != "success"
         return require_success and failed
 
-    args = _parse_evaluate_nb_results_args(session)
+    args = parse_args()
     json_data = (json.loads(f.read_text()) for f in args.files)
     fails = [d for d in json_data if illegal_failure(d)]
     if fails:
