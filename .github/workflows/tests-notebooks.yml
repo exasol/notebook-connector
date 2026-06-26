@@ -101,10 +101,14 @@ jobs:
         if: always()
         env:
           RESULT: '${{ toJson(matrix.job) }}'
-        run: >
-          poetry run -- nox -s test:notebooks:write-outcome --
-            --outcome "${{ steps.test.outcome }}"
-            --test "$RESULT"
+        run: |
+          echo poetry run -- nox -s test:notebooks:write-outcome -- \
+            --outcome \"${{ steps.test.outcome }}\" \
+            --test \"$RESULT\" \
+            --output-folder results
+          poetry run -- nox -s test:notebooks:write-outcome -- \
+            --outcome "${{ steps.test.outcome }}" \
+            --test "$RESULT" \
             --output-folder results
 
       - name: Upload Test Results
