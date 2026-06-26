@@ -9,7 +9,6 @@ from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 import docker
 import exasol.bucketfs as bfs
 import pytest
-from exasol.pytest_backend import BACKEND_ONPREM
 from exasol.python_extension_common.deployment.extract_validator import ExtractValidator
 from exasol.slc.api import push as exaslct_push
 
@@ -69,9 +68,11 @@ def _wait_for_slc_to_become_available(secrets: Secrets, slc: ScriptLanguageConta
 
 
 @pytest.fixture()
-def check_if_gpu_is_active():
-    if os.getenv("NBTEST_USE_GPU", "false") != "true":
-        pytest.skip()
+def check_if_gpu_is_active(request):
+    if (value := os.getenv("NBTEST_USE_GPU")) != "true":
+        pytest.skip(
+            f"Fixture {request.fixturename}(): env NBTEST_USE_GPU = {repr(value)}"
+        )
 
 
 @pytest.fixture()
@@ -88,23 +89,25 @@ def docker_login():
 
 
 @pytest.fixture()
-def finish_slc_repo_dir(backend, backend_setup, check_if_gpu_is_active, notebooks_root):
+def finish_slc_repo_dir(
+    use_saas, backend_setup, check_if_gpu_is_active, notebooks_root
+):
     yield
-    if backend == BACKEND_ONPREM:
+    if not use_saas:
         p = notebooks_root / "gpu_in_udf" / "slc_workspace"
         shutil.rmtree(p)
 
 
 def test_gpu_notebooks(
-    backend,
+    use_saas,
     backend_setup,
     finish_slc_repo_dir,
     uploading_hack,
     docker_login,
     notebooks_root,
 ) -> None:
-    if backend != BACKEND_ONPREM:
-        pytest.skip()
+    if use_saas:
+        pytest.skip(f"use_saas = {use_saas}")
     current_dir = Path.cwd()
     store_path, store_password = backend_setup
     store_file = str(store_path)

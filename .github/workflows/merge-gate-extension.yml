@@ -23,37 +23,16 @@ jobs:
       - name: Detect Running Notebook Tests
         run: true
 
-  run-stable-notebook-tests:
-    name: Notebook Tests (stable)
+  run-notebook-tests:
+    name: Notebook Tests
     needs:
       - approve-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
+    with:
+      selector: generic
     secrets: inherit
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        class: [normal, large]
-    with:
-      status-filter: stable
-      test-classification: ${{ matrix.class }}
-
-  run-unstable-notebook-tests:
-    name: Notebook Tests (unstable)
-    needs:
-      - approve-notebook-tests
-    uses: ./.github/workflows/tests-notebooks.yml
-    secrets: inherit
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        class: [normal, large]
-    with:
-      status-filter: unstable
-      test-classification: ${{ matrix.class }}
 
   approve-gpu-notebook-tests:
     name: Run Jupyter GPU Notebook Tests?
@@ -65,15 +44,14 @@ jobs:
       - name: Detect Running GPU Notebook Tests
         run: true
 
-  run-stable-gpu-notebook-tests:
-    name: Notebook Tests GPU (stable)
+  run-gpu-notebook-tests:
+    name: Notebook Tests GPU
     needs:
       - approve-notebook-tests
       - approve-gpu-notebook-tests
     uses: ./.github/workflows/tests-notebooks.yml
+    with:
+      selector: gpu
     secrets: inherit
     permissions:
       contents: read
-    with:
-      status-filter: stable
-      test-classification: gpu

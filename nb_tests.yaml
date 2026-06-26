@@ -1,86 +1,60 @@
-# Notebook test registry for notebook-connector CI.
-# Read by the nox session "get-notebook-tests" in noxfile.py.
 #
-# stable   — tests that must pass for a PR to merge (reliable, well-understood failures)
-# unstable — tests that are allowed to fail without blocking a merge
-#            (flaky, SaaS-dependent, or work-in-progress)
+# This file describes integration tests for Jupyter Notebooks.
+#
+# There are top-level test groups.
+#
+# * Each test group may contain "jobs" or nested children "groups".
+# * Each group may define attribute defaults for the contained jobs,
+#   e.g. "runner".
+# * Each nested group and each job can overide one or multiple of these
+#   attributes.
+#
+#
+# In the following example:
+# * the job for file test_a.py defines a custom name
+# * the job for file test_b.py overrides the group's default runner R1 by R2.
+#
+# top-level-group-a1:
+#   runner: R1
+#   jobs:
+#     - file: test_a.py
+#       name: "Special Name"
+#     - file: test_b.py
+#       runner: R2
 
-normal:
+generic:
   runner: ubuntu-24.04
-  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
-  stable:
-    tests:
-      - name: First Steps notebook
-        test_file: test_first_steps.py
-        test_backend: onprem
-      - name: sklearn notebook
-        test_file: test_sklearn.py
-        test_backend: onprem
-      - name: pyexasol notebook
-        test_file: test_pyexasol.py
-        test_backend: onprem
-      - name: jupysql notebook
-        test_file: test_jupysql.py
-        test_backend: onprem
-      - name: ibis notebook
-        test_file: test_ibis.py
-        test_backend: onprem
-      - name: SLC notebook
-        test_file: test_script_languages_container.py
-        test_backend: onprem
-      - name: Useful URLs notebook
-        test_file: test_useful_urls.py
-        test_backend: ""
-      - name: Cloud notebook (onprem)
-        test_file: test_cloud.py
-        test_backend: onprem
-      - name: Transformers notebook (onprem)
-        test_file: test_transformers.py
-        test_backend: onprem
-  unstable:
-    tests: []
-    # tests:
-    #   - name: Cloud notebook (saas)
-    #     test_file: test_cloud.py
-    #     test_backend: saas
-    #   - name: SLC notebook (saas)
-    #     test_file: test_script_languages_container.py
-    #     test_backend: saas
-    #   - name: sklearn notebook (saas)
-    #     test_file: test_sklearn.py
-    #     test_backend: saas
-    #   - name: ibis notebook (saas)
-    #     test_file: test_ibis.py
-    #     test_backend: saas
-    #   - name: Transformers notebook (saas)
-    #     test_file: test_transformers.py
-    #     test_backend: saas
-    #   - name: Text AI notebook (saas)
-    #     test_file: test_text_ai.py
-    #     test_backend: saas
-
-
-large:
-  # Use the larger CI runner for memory/disk headroom (especially ITDE notebook).
-  runner: int-linux-x64-4core-ubuntu24.04-1
-  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
-  stable:
-    tests:
-      - name: Text AI notebook (onprem)
-        test_file: test_text_ai.py
-        test_backend: onprem
-  unstable:
-    tests: []
+  pytest_params: ''
+  groups:
+    - backend: onprem
+      require_success: true
+      jobs:
+        - file: test_first_steps.py
+        - file: test_sklearn.py
+        - file: test_pyexasol.py
+        - file: test_jupysql.py
+        - file: test_ibis.py
+        - file: test_script_languages_container.py
+        - file: test_useful_urls.py
+        - file: test_cloud.py
+        - file: test_transformers.py
+        - file: test_text_ai.py
+          runner: int-linux-x64-4core-ubuntu24.04-1
+    - backend: saas
+      pytest_params: '--backend=saas'
+      require_success: false
+      jobs:
+        - file: test_cloud.py
+        - file: test_script_languages_container.py
+        - file: test_sklearn.py
+        - file: test_ibis.py
+        - file: test_transformers.py
+        - file: test_text_ai.py
 
 gpu:
   runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
-  additional_pytest_parameters: "--itde-nameserver 8.8.8.8"
-  stable:
-     # GPU notebook tests are temporarily disabled due to an SLC issue being fixed separately.
-    tests: []
-#    tests:
-#      - name: GPU notebook
-#        test_file: test_gpu.py
-#        test_backend: onprem
-  unstable:
-    tests: []
+  pytest_params: ''
+  require_success: true
+  backend: onprem
+  jobs:
+  - file: test_gpu.py

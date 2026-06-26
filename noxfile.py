@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 from argparse import (
     ArgumentParser,
     Namespace,
 )
-from enum import Enum
 from pathlib import Path
 
 import nox
@@ -11,7 +12,6 @@ import yaml
 # imports all nox task provided by the toolbox
 # no-qa: disables ruff error
 from exasol.toolbox.nox.tasks import *  # noqa: F403
-from pydantic import BaseModel
 
 from noxconfig import PROJECT_CONFIG
 
@@ -20,8 +20,27 @@ nox.options.sessions = ["format:fix"]
 
 
 # ---------------------------------------------------------------------------
-# Database helper
+# Database Helper
 # ---------------------------------------------------------------------------
+
+
+import contextlib
+import json
+import os
+import re
+from collections.abc import Iterator
+from pathlib import Path
+from typing import (
+    Any,
+)
+
+import yaml
+from pydantic import (
+    BaseModel,
+    Field,
+    JsonValue,
+    validator,
+)
 
 
 @nox.session(python=False)
@@ -43,7 +62,7 @@ def start_database(session):
 
 
 # ---------------------------------------------------------------------------
-# JupyterLab development session
+# JupyterLab Development Session
 # ---------------------------------------------------------------------------
 
 
@@ -69,132 +88,173 @@ def jupyter(session: nox.Session) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Notebook test registry (stable / unstable)
+# Notebook Tests
 # ---------------------------------------------------------------------------
 
 
-class TestStatus(Enum):
-    stable = "stable"
-    unstable = "unstable"
+YamlObject = dict[str, Any]
+FILE_NAME_PATTERN = re.compile(rf"test_(.*)\.py")
 
 
-class TestClassification(Enum):
-    normal = "normal"
-    large = "large"
-    gpu = "gpu"
+def _load_test_groups() -> list[YamlObject]:
+    path = PROJECT_CONFIG.root_path / "nb_tests.yaml"
+    return yaml.safe_load(path.read_text())
 
 
-class NBTestBackend(Enum):
-    onprem = "onprem"
-    saas = "saas"
-    empty = ""
+class JobParams(BaseModel):
+    runner: str | None = Field(default=None)
+    pytest_params: str | None = Field(default=None)
+    backend: str | None = Field(default=None)
+    require_success: bool | None = Field(default=None)
+    extra_params: JsonValue | None = Field(default=None)
 
 
-class NBTestDescription(BaseModel):
-    name: str
-    test_file: str
-    test_backend: NBTestBackend
+class Job(JobParams):
+    file: str
+    name: str | None = Field(default=None)
+
+    @validator("name", always=True)
+    def get_address(cls, name: str | None, values: dict[str, Any]) -> str | None:
+        filename = values.get("file")
+        if name is None and filename and (m := FILE_NAME_PATTERN.match(filename)):
+            return m.group(1).replace("_", " ").title()
+        return name
+
+    def inherit(self, parent: JobGroup) -> Job:
+        params = parent.model_dump() | self.model_dump(exclude_none=True)
+        return Job(**params)
 
 
-class TestList(BaseModel):
-    tests: list[NBTestDescription]
+class JobGroup(JobParams):
+    jobs: tuple[Job, ...] = Field(default=())
+    groups: tuple[JobGroup, ...] = Field(default=())
+
+    def inherit(self, parent: JobGroup) -> JobGroup:
+        params = parent.model_dump() | self.model_dump(exclude_none=True)
+        return JobGroup(**params)
 
 
-class TestSets(BaseModel):
-    stable: TestList
-    unstable: TestList
-    runner: str
-    additional_pytest_parameters: str | None = None
+class JobList(BaseModel):
+    jobs: tuple[Job, ...]
 
 
-class TestRepository(BaseModel):
-    normal: TestSets
-    large: TestSets
-    gpu: TestSets
-
-
-def _load_test_repository() -> TestRepository:
-    yaml_file_path = PROJECT_CONFIG.root_path / "nb_tests.yaml"
-    with open(yaml_file_path) as f:
-        return TestRepository(**yaml.safe_load(f))
-
-
-def _parse_nb_args(session: nox.Session) -> Namespace:
-    test_status_values = [ts.value for ts in TestStatus]
-    test_classification_values = [tc.value for tc in TestClassification]
-    usage = " ".join(
-        [
-            "nox",
-            "-s",
-            session.name,
-            "--",
-            "--test-status",
-            "{" + ", ".join(test_status_values) + "}",
-            "[",
-            "--test-classification",
-            "{" + ", ".join(test_classification_values) + "}",
-            "]",
-        ]
-    )
-    parser = ArgumentParser(usage=usage)
-    parser.add_argument(
-        "--test-status", type=TestStatus, required=True, help="Test status"
-    )
-    parser.add_argument(
-        "--test-classification",
-        type=TestClassification,
-        default=TestClassification.normal,
-        help="Test classification",
-    )
-    return parser.parse_args(session.posargs)
-
-
-def _get_test_sets(classification: TestClassification) -> TestSets:
-    test_repository = _load_test_repository()
-    mapping = {
-        TestClassification.normal: test_repository.normal,
-        TestClassification.large: test_repository.large,
-        TestClassification.gpu: test_repository.gpu,
-    }
-    return mapping[classification]
+def _test_jobs(group: JobGroup, parent: JobGroup | None = None) -> Iterator[Job]:
+    current = group.inherit(parent) if parent else group
+    for job in current.jobs:
+        yield job.inherit(current)
+    for child in current.groups:
+        yield from _test_jobs(child, current)
 
 
 @nox.session(name="get-notebook-tests", python=False)
 def get_notebook_tests(session: nox.Session) -> None:
-    """Filters notebook tests for test-status and test-classification and prints as JSON."""
-    args = _parse_nb_args(session)
-    nb_tests = _get_test_sets(args.test_classification)
-    tests = (
-        nb_tests.stable if args.test_status == TestStatus.stable else nb_tests.unstable
-    )
-    print(tests.model_dump_json())
+    """
+    Collect notebook tests and print in Json format.
+    """
+
+    def parse_args() -> Namespace:
+        parser = ArgumentParser(f"nox -s {session.name} <selector>")
+        parser.add_argument(
+            "selector",
+            type=str,
+            help="""One of the test groups contained as
+            top-level elements in file nb_tests.yaml.""",
+        )
+        return parser.parse_args(session.posargs)
+
+    args = parse_args()
+    data = _load_test_groups()
+    group = JobGroup.model_validate(data[args.selector])
+    jobs = tuple(_test_jobs(group))
+    if not jobs:
+        session.error(f'No jobs defined for selector "{args.selector}"')
+    job_list = JobList(jobs=jobs)
+    with contextlib.ExitStack() as stack:
+        if path := os.getenv("GITHUB_OUTPUT"):
+            f = stack.enter_context(open(path, "a"))
+        else:
+            f = None
+        print(f"jobs={job_list.model_dump_json()}", file=f)
 
 
-@nox.session(name="get-notebook-runner", python=False)
-def get_notebook_runner(session: nox.Session) -> None:
-    """Print the GitHub runner to use for the given test classification."""
-    args = _parse_nb_args(session)
-    nb_tests = _get_test_sets(args.test_classification)
-    print(nb_tests.runner)
+@nox.session(name="test:notebooks:write-outcome", python=False)
+def write_notebook_test_outcome(session: nox.Session) -> None:
+    """
+    Write the specs and the outcome of a single notebook test in Json
+    format to a file in the specified folder.
+    """
+
+    def parse_args() -> Namespace:
+        parser = ArgumentParser(f"nox -s {session.name}>")
+        parser.add_argument(
+            "--outcome",
+            type=str,
+            required=True,
+            help="Test specification in Json format",
+        )
+        parser.add_argument(
+            "--test",
+            type=str,
+            metavar="JSON-STRING",
+            required=True,
+            help="Test specification in Json format",
+        )
+        parser.add_argument(
+            "--output-folder",
+            type=Path,
+            required=True,
+            help="Write spec and outcome to a file in this folder.",
+        )
+        return parser.parse_args(session.posargs)
+
+    args = parse_args()
+    content = json.loads(args.test) | {"outcome": args.outcome}
+    file = (args.output_folder / content["file"]).with_suffix(".json")
+    file.parent.mkdir(exist_ok=True, parents=True)
+    file.write_text(json.dumps(content, indent=2))
 
 
-@nox.session(name="get-notebook-pytest-params", python=False)
-def get_notebook_pytest_params(session: nox.Session) -> None:
-    """Print additional pytest parameters for the given test classification."""
-    args = _parse_nb_args(session)
-    nb_tests = _get_test_sets(args.test_classification)
-    if nb_tests.additional_pytest_parameters:
-        print(nb_tests.additional_pytest_parameters)
+@nox.session(name="test:notebooks:evaluate-results", python=False)
+def evaluate_notebook_tests_results(session: nox.Session) -> None:
+    """
+    Evaluate the results of the notebook tests.
+    """
+
+    def parse_args() -> Namespace:
+        parser = ArgumentParser(f"nox -s {session.name} [file, ...]")
+        parser.add_argument(
+            "files",
+            type=Path,
+            nargs="*",
+            help="""Evalute results of notebook tests in the specified json
+            files.""",
+        )
+        return parser.parse_args(session.posargs)
+
+    def illegal_failure(data: YamlObject) -> bool:
+        require_success = data.get("require_success", True)
+        outcome = data.get("outcome", "failure")
+        failed = outcome != "success"
+        return require_success and failed
+
+    args = parse_args()
+    json_data = (json.loads(f.read_text()) for f in args.files)
+    fails = [d for d in json_data if illegal_failure(d)]
+    if fails:
+        session.error(
+            f"{len(fails)} mandatory tests have failed:\n\n"
+            + "\n\n".join(json.dumps(d, indent=4) for d in fails)
+        )
+
+
+# ---------------------------------------------------------------------------
+# Performance Tests
+# ---------------------------------------------------------------------------
 
 
 def rename(file: Path, prefix: str = "", suffix: str = ""):
     name = file.with_suffix("").name
     return file.parent / f"{prefix}{name}{suffix}"
-
-
-# ---------------------------------------------------------------------------
-# Performance tests
-# ---------------------------------------------------------------------------
 
 
 @nox.session(name="test:performance", python=False)
@@ -214,7 +274,7 @@ def performance_test(session: nox.Session) -> None:
 
 
 # ---------------------------------------------------------------------------
-# UI tests
+# UI Tests
 # ---------------------------------------------------------------------------
 
 

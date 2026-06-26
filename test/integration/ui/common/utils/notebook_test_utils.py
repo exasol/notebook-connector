@@ -14,10 +14,6 @@ from pathlib import Path
 
 import nbformat
 import pytest
-from exasol.pytest_backend import (
-    BACKEND_ONPREM,
-    BACKEND_SAAS,
-)
 from nbclient import NotebookClient
 
 from exasol.nb_connector.ai_lab_config import Accelerator
@@ -121,7 +117,7 @@ def set_log_level_for_libraries(level=logging.WARNING):
 
 @pytest.fixture(scope="session")
 def backend_setup(
-    backend,
+    use_saas,
     saas_host,
     saas_pat,
     saas_account_id,
@@ -140,20 +136,7 @@ def backend_setup(
     secrets = Secrets(store_path, master_password=store_password)
     secrets.save(CKey.db_schema, "NOTEBOOK_TESTS")
 
-    if backend == BACKEND_ONPREM:
-        secrets.save(CKey.storage_backend, StorageBackend.onprem.name)
-        secrets.save(CKey.use_itde, "yes")
-        if os.getenv("NBTEST_USE_GPU", "false") == "true":
-            secrets.save(CKey.accelerator, Accelerator.nvidia.value)
-        if db_mem_size := os.getenv("NBTEST_MEMSIZE"):
-            secrets.save(CKey.mem_size, db_mem_size)
-        bring_itde_up(secrets, backend_aware_onprem_database)
-        try:
-            yield store_path, store_password
-        finally:
-            take_itde_down(secrets, False)
-
-    elif backend == BACKEND_SAAS:
+    if use_saas:
         secrets.save(CKey.storage_backend, StorageBackend.saas.name)
         secrets.save(CKey.saas_url, saas_host)
         secrets.save(CKey.saas_token, saas_pat)
@@ -164,7 +147,17 @@ def backend_setup(
         yield store_path, store_password
 
     else:
-        raise RuntimeError(f"Unknown backend {backend}")
+        secrets.save(CKey.storage_backend, StorageBackend.onprem.name)
+        secrets.save(CKey.use_itde, "yes")
+        if os.getenv("NBTEST_USE_GPU") == "true":
+            secrets.save(CKey.accelerator, Accelerator.nvidia.value)
+        if db_mem_size := os.getenv("NBTEST_MEMSIZE"):
+            secrets.save(CKey.mem_size, db_mem_size)
+        bring_itde_up(secrets, backend_aware_onprem_database)
+        try:
+            yield store_path, store_password
+        finally:
+            take_itde_down(secrets, False)
 
 
 @pytest.fixture
