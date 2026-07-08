@@ -2,6 +2,15 @@ name: Slow-Checks
 
 on:
   workflow_call:
+    secrets:
+      INTEGRATION_TEAM_SAAS_STAGING_HOST:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_PAT:
+        required: true
+      ZIP_PASSWORD:
+        required: true
 
 jobs:
 
@@ -16,6 +25,8 @@ jobs:
     uses: ./.github/workflows/tests-large-runner.yml
     permissions:
       contents: read
+    secrets:
+      ZIP_PASSWORD: ${{ secrets.ZIP_PASSWORD }}
 
   gpu-tests:
     name: GPU
@@ -32,6 +43,9 @@ jobs:
   optional-slow-checks:
     name: Optional Slow
     uses: ./.github/workflows/tests-saas.yml
-    secrets: inherit
+    secrets:
+      INTEGRATION_TEAM_SAAS_STAGING_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+      INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+      INTEGRATION_TEAM_SAAS_STAGING_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
     permissions:
       contents: read

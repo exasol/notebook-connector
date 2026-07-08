@@ -2,6 +2,9 @@ name: Large Runner
 
 on:
   workflow_call:
+    secrets:
+      ZIP_PASSWORD:
+        required: true
 
 jobs:
 
