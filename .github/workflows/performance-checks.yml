@@ -2,6 +2,10 @@ name: Performance-Checks
 
 on:
   workflow_call:
+    inputs:
+      python_version:
+        required: true
+        type: string
 
 jobs:
 
@@ -13,11 +17,13 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v8
+        uses: exasol/python-toolbox/.github/actions/python-environment@v10
         with:
-          python-version: "3.10"
+          python-version:  ${{ inputs.python_version }}
           poetry-version: "2.3.0"
 
       - name: Install Performance Dependency
@@ -31,3 +37,4 @@ jobs:
         with:
           name: performance_benchmark-results.json
           path: test/performance/_benchmark-results.json
+          overwrite: false

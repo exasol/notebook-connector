@@ -19,12 +19,26 @@ on:
         required: true
 
 jobs:
+  build-matrix:
+    name: Build Matrix
+    uses: ./.github/workflows/matrix.yml
+    with:
+      matrix_keys_json: '["minimum_python_version"]'
+    permissions:
+      contents: read
 
   performance-checks:
     name: Performance
+    needs:
+      - build-matrix
     uses: ./.github/workflows/performance-checks.yml
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    with:
+      python_version: ${{ matrix.minimum_python_version }}
 
   approve-notebook-tests:
     name: Run Jupyter Notebook Tests?
@@ -34,15 +48,20 @@ jobs:
     environment: approve-notebook-tests
     steps:
       - name: Detect Running Notebook Tests
-        run: true
+        run: echo "Jupyter Notebook Tests approved"
 
   run-notebook-tests:
     name: Notebook Tests
     needs:
       - approve-notebook-tests
+      - build-matrix
     uses: ./.github/workflows/tests-notebooks.yml
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     with:
       selector: generic
+      python_version: ${{ matrix.minimum_python_version }}
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -61,16 +80,21 @@ jobs:
     environment: approve-gpu-notebook-tests
     steps:
       - name: Detect Running GPU Notebook Tests
-        run: true
+        run: echo "Jupyter GPU Notebook Tests approved"
 
   run-gpu-notebook-tests:
     name: Notebook Tests GPU
     needs:
       - approve-notebook-tests
       - approve-gpu-notebook-tests
+      - build-matrix
     uses: ./.github/workflows/tests-notebooks.yml
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     with:
       selector: gpu
+      python_version: ${{ matrix.minimum_python_version }}
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
