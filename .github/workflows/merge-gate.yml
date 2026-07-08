@@ -1,9 +1,26 @@
 # Generated and maintained by the exasol-toolbox.
-# Last generated with exasol-toolbox version 8.2.0.
+# Last generated with exasol-toolbox version 10.2.1.
 name: Merge-Gate
 
 on:
   workflow_call:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_DEFAULT_REGION:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_HOST:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_PAT:
+        required: true
+      SONAR_TOKEN:
+        required: true
+      ZIP_PASSWORD:
+        required: true
 
 jobs:
   run-fast-checks:
@@ -47,13 +64,24 @@ jobs:
     needs:
       - approve-run-slow-tests
     uses: ./.github/workflows/slow-checks.yml
-    secrets: inherit
+    secrets:
+      INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+      INTEGRATION_TEAM_SAAS_STAGING_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+      INTEGRATION_TEAM_SAAS_STAGING_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
+      ZIP_PASSWORD: ${{ secrets.ZIP_PASSWORD }}
     permissions:
       contents: read
 
   merge-gate-extension:
+    name: Extension
     uses: ./.github/workflows/merge-gate-extension.yml
-    secrets: inherit
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+      INTEGRATION_TEAM_SAAS_STAGING_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+      INTEGRATION_TEAM_SAAS_STAGING_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
     permissions:
       contents: read
 
@@ -75,8 +103,10 @@ jobs:
     steps:
       - name: Branch Protection - failure if any ancestor failed or was cancelled
         if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
         run: |
-          echo '${{ toJSON(needs) }}'
+          echo "$NEEDS_JSON"
           exit 1
       - name: branch protection
         run: echo "All required checks passed. Merge allowed."

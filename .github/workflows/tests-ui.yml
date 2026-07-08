@@ -2,6 +2,10 @@ name: UI
 
 on:
   workflow_call:
+    inputs:
+      python_version:
+        required: true
+        type: string
 
 jobs:
 
@@ -16,12 +20,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          large-packages: false
+          persist-credentials: false
 
       - name: Free disk space by removing large directories
         run: |
@@ -31,14 +30,16 @@ jobs:
           sudo rm -rf /usr/local/share/chromium
           sudo rm -rf /usr/local/lib/node_modules
           sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/share/dotnet
+
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v8
+        uses: exasol/python-toolbox/.github/actions/python-environment@v10
         with:
+          python-version: ${{ inputs.python_version }}
           poetry-version: "2.3.0"
-
-      - name: Install All Optional Dependencies (aka. "extras")
-        run: poetry install --all-extras
+          all-extras: true
 
       - name: Allow unprivileged user namespaces
         run: |

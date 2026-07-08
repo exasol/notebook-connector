@@ -7,6 +7,23 @@ on:
         description: Selector which tests to include, e.g. "generic"
         required: true
         type: string
+      python_version:
+        required: true
+        type: string
+
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_DEFAULT_REGION:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_HOST:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_PAT:
+        required: true
 
 jobs:
 
@@ -18,14 +35,18 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v8
+        uses: exasol/python-toolbox/.github/actions/python-environment@v10
         with:
+          python-version: ${{ inputs.python_version }}
           poetry-version: "2.3.0"
 
       - id: matrix
-        run: poetry run -- nox -s get-notebook-tests -- ${{ inputs.selector }}
+        run: poetry run -- nox -s get-notebook-tests -- ${INPUTS_SELECTOR}
+        env:
+          INPUTS_SELECTOR: ${{ inputs.selector }}
 
     outputs:
       jobs: ${{ steps.matrix.outputs.jobs }}
@@ -49,18 +70,12 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Report GPU
         if: ${{ inputs.selector == 'gpu' }}
         run: |
           nvidia-smi
-
-      - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          large-packages: false
-          haskell: true
 
       - name: Free disk space by removing large directories
         run: |
@@ -68,14 +83,15 @@ jobs:
           sudo rm -rf /usr/local/share/powershell
           sudo rm -rf /usr/local/share/chromium
           sudo rm -rf /usr/local/lib/node_modules
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/share/dotnet
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v8
+        uses: exasol/python-toolbox/.github/actions/python-environment@v10
         with:
+          python-version: ${{ inputs.python_version }}
           poetry-version: "2.3.0"
-
-      - name: Install All Optional Dependencies (aka. "extras")
-        run: poetry install --all-extras
+          all-extras: true
 
       - name: Allow unprivileged user namespaces
         run: |
@@ -101,9 +117,10 @@ jobs:
         if: always()
         env:
           JOB: '${{ toJson(matrix.job) }}'
+          TEST_OUTCOME: ${{ steps.test.outcome }}
         run: |
           poetry run -- nox -s test:notebooks:write-outcome -- \
-            --outcome "${{ steps.test.outcome }}" \
+            --outcome "$TEST_OUTCOME" \
             --test "$JOB" \
             --output-folder results
 
@@ -124,10 +141,12 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@v8
+        uses: exasol/python-toolbox/.github/actions/python-environment@v10
         with:
+          python-version: ${{ inputs.python_version }}
           poetry-version: "2.3.0"
 
       - name: Download Test Results

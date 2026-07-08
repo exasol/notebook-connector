@@ -4,14 +4,41 @@ name: Merge-Gate Extension
 
 on:
   workflow_call:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_DEFAULT_REGION:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_HOST:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID:
+        required: true
+      INTEGRATION_TEAM_SAAS_STAGING_PAT:
+        required: true
 
 jobs:
+  build-matrix:
+    name: Build Matrix
+    uses: ./.github/workflows/matrix.yml
+    with:
+      matrix_keys_json: '["minimum_python_version"]'
+    permissions:
+      contents: read
 
   performance-checks:
     name: Performance
+    needs:
+      - build-matrix
     uses: ./.github/workflows/performance-checks.yml
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    with:
+      python_version: ${{ matrix.minimum_python_version }}
 
   approve-notebook-tests:
     name: Run Jupyter Notebook Tests?
@@ -21,16 +48,27 @@ jobs:
     environment: approve-notebook-tests
     steps:
       - name: Detect Running Notebook Tests
-        run: true
+        run: echo "Jupyter Notebook Tests approved"
 
   run-notebook-tests:
     name: Notebook Tests
     needs:
       - approve-notebook-tests
+      - build-matrix
     uses: ./.github/workflows/tests-notebooks.yml
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     with:
       selector: generic
-    secrets: inherit
+      python_version: ${{ matrix.minimum_python_version }}
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      INTEGRATION_TEAM_SAAS_STAGING_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+      INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+      INTEGRATION_TEAM_SAAS_STAGING_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
     permissions:
       contents: read
 
@@ -42,16 +80,27 @@ jobs:
     environment: approve-gpu-notebook-tests
     steps:
       - name: Detect Running GPU Notebook Tests
-        run: true
+        run: echo "Jupyter GPU Notebook Tests approved"
 
   run-gpu-notebook-tests:
     name: Notebook Tests GPU
     needs:
       - approve-notebook-tests
       - approve-gpu-notebook-tests
+      - build-matrix
     uses: ./.github/workflows/tests-notebooks.yml
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     with:
       selector: gpu
-    secrets: inherit
+      python_version: ${{ matrix.minimum_python_version }}
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      INTEGRATION_TEAM_SAAS_STAGING_HOST: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_HOST }}
+      INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID }}
+      INTEGRATION_TEAM_SAAS_STAGING_PAT: ${{ secrets.INTEGRATION_TEAM_SAAS_STAGING_PAT }}
     permissions:
       contents: read
