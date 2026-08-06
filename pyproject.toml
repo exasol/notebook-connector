@@ -57,10 +57,10 @@ slc = [
 ]
 ibis = [ "ibis-framework [exasol] (>=11, <12)" ]
 transformers = [
-    "exasol-transformers-extension (>=3.0.0, <4)",
+    "exasol-transformers-extension (>=5.0.0, <6)",
     "yaspin (>=3.1.0, <4)",
 ]
-text-ai = [ "exasol-text-ai-extension (>=0.1.0, <2.0.0)" ]
+text-ai = [ "exasol-text-ai-extension (>=0.4.1, <1.0.0)" ]
 
 jupyter = [
     "jupyterlab (>=4.2.5, <5)",
