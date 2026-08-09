@@ -53,7 +53,7 @@ docker-db = [
 slc = [
     # see https://github.com/exasol/notebook-connector/issues/425
     "exasol-script-languages-container-tool (==4.0.3)",
-    "GitPython (>=2.1.0)",
+    "GitPython (>=3.1.58)",
 ]
 ibis = [ "ibis-framework [exasol] (>=11, <12)" ]
 transformers = [
