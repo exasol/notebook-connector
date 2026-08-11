@@ -126,7 +126,6 @@ def initialize_te_extension(
             activation_key=ACTIVATION_KEY,
             path_in_bucket=PATH_IN_BUCKET_FOR_SLC,
             allow_override=allow_override,
-            udf_client_binary=LEGACY_UDF_CLIENT_BINARY,
         )
 
     ensure_bfs_connection(conf)
