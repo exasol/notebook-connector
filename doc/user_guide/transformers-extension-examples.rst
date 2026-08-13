@@ -98,7 +98,7 @@ Text Generation
 
 .. code-block:: sql
 
-    SELECT MY_SCHEMA.TE_TEXT_GENERATION_UDF(
+    SELECT MY_SCHEMA.AI_COMPLETE_EXTENDED(
         NULL,
         'TE_BFS_SYS',
         'models',
@@ -114,7 +114,7 @@ Fill-Mask Prediction
 .. code-block:: sql
 
     WITH MODEL_OUTPUT AS (
-        SELECT MY_SCHEMA.TE_FILLING_MASK_UDF(
+        SELECT MY_SCHEMA.AI_FILL_MASK_EXTENDED(
             NULL,
             'TE_BFS_SYS',
             'models',
@@ -130,13 +130,13 @@ Fill-Mask Prediction
 Sequence Classification
 =======================
 
-Use ``TE_SEQUENCE_CLASSIFICATION_SINGLE_TEXT_UDF`` for one input text and
-``TE_SEQUENCE_CLASSIFICATION_TEXT_PAIR_UDF`` when the model compares two texts.
+Use ``AI_CUSTOM_CLASSIFY_EXTENDED`` for one input text and
+``AI_ENTAILMENT_EXTENDED`` when the model compares two texts.
 
 .. code-block:: sql
 
     WITH MODEL_OUTPUT AS (
-        SELECT MY_SCHEMA.TE_SEQUENCE_CLASSIFICATION_SINGLE_TEXT_UDF(
+        SELECT MY_SCHEMA.AI_CUSTOM_CLASSIFY_EXTENDED(
             NULL,
             'TE_BFS_SYS',
             'models',
@@ -151,7 +151,7 @@ Use ``TE_SEQUENCE_CLASSIFICATION_SINGLE_TEXT_UDF`` for one input text and
 .. code-block:: sql
 
     WITH MODEL_OUTPUT AS (
-        SELECT MY_SCHEMA.TE_SEQUENCE_CLASSIFICATION_TEXT_PAIR_UDF(
+        SELECT MY_SCHEMA.AI_ENTAILMENT_EXTENDED(
             NULL,
             'TE_BFS_SYS',
             'models',
@@ -171,7 +171,7 @@ Zero-Shot Text Classification
 .. code-block:: sql
 
     WITH MODEL_OUTPUT AS (
-        SELECT MY_SCHEMA.TE_ZERO_SHOT_TEXT_CLASSIFICATION_UDF(
+        SELECT MY_SCHEMA.AI_CLASSIFY_EXTENDED(
             NULL,
             'TE_BFS_SYS',
             'models',
@@ -191,19 +191,17 @@ Question Answering
 .. code-block:: sql
 
     WITH MODEL_OUTPUT AS (
-        SELECT MY_SCHEMA.TE_QUESTION_ANSWERING_UDF(
+        SELECT MY_SCHEMA.AI_ANSWER_EXTENDED(
             NULL,
             'TE_BFS_SYS',
             'models',
             'distilbert-base-cased-distilled-squad',
             'What does Notebook Connector simplify?',
-            'Notebook Connector simplifies Exasol AI workflows.',
-            5
+            'Notebook Connector simplifies Exasol AI workflows.'
         )
     )
-    SELECT answer, score, error_message
-    FROM MODEL_OUTPUT
-    ORDER BY score DESC;
+    SELECT answer, error_message
+    FROM MODEL_OUTPUT;
 
 Token Classification
 ====================
@@ -211,7 +209,7 @@ Token Classification
 .. code-block:: sql
 
     WITH MODEL_OUTPUT AS (
-        SELECT MY_SCHEMA.TE_TOKEN_CLASSIFICATION_UDF(
+        SELECT MY_SCHEMA.AI_EXTRACT_EXTENDED(
             NULL,
             'TE_BFS_SYS',
             'models',
@@ -230,7 +228,7 @@ Translation
 .. code-block:: sql
 
     WITH MODEL_OUTPUT AS (
-        SELECT MY_SCHEMA.TE_TRANSLATION_UDF(
+        SELECT MY_SCHEMA.AI_TRANSLATE_EXTENDED(
             NULL,
             'TE_BFS_SYS',
             'models',
@@ -276,7 +274,7 @@ UDFs.
 .. code-block:: sql
 
     WITH MODEL_OUTPUT AS (
-        SELECT MY_SCHEMA.TE_ZERO_SHOT_TEXT_CLASSIFICATION_UDF(
+        SELECT MY_SCHEMA.AI_CLASSIFY_EXTENDED(
             NULL,
             'TE_BFS_SYS',
             'models',
