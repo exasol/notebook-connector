@@ -50,8 +50,7 @@ You can install selected dependencies using the following syntax
     pip install "notebook-connector [slc, docker-db]"
 
 You can also retrieve a list of all NC's dependency categories with the
-following command line, see `stackoverflow/64685527
-<https://stackoverflow.com/questions/64685527/pip-install-with-all-extras>`_:
+following command line:
 
 .. code-block:: shell
 
