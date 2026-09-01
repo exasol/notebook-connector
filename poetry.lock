@@ -2394,6 +2394,33 @@ torch = ">=2.8.0,<3"
 transformers = {version = ">=5.0.0,<6", extras = ["torch"]}
 
 [[package]]
+name = "exasol-transformers-extension"
+version = "5.1.0"
+description = "An Exasol extension for using state-of-the-art pretrained machine learning models via the Hugging Face Transformers API."
+optional = false
+python-versions = "<3.14,>=3.10.0"
+groups = ["main"]
+files = [
+    {file = "exasol_transformers_extension-5.1.0-py3-none-any.whl", hash = "sha256:35adfb88a13a56a73c8d71f6cd9ab1df4679c1a7df891bd1651564eb9f07caff"},
+    {file = "exasol_transformers_extension-5.1.0.tar.gz", hash = "sha256:e63e3b10d4ab7f86200e296354e0780432fdf9cbc5b425165f4463e8f75f61d4"},
+]
+
+[package.dependencies]
+bitsandbytes = ">=0.45.0"
+click = ">=8.0.4,<9"
+exasol-bucketfs = ">=1.0.0"
+exasol-python-extension-common = ">=0.9.0,<0.17.0"
+importlib-resources = ">=6.4.0,<7"
+Jinja2 = ">=3.1.6,<4"
+numpy = "<=1.26.4"
+pandas = ">=2.2.3,<3.0.0"
+pyexasol = ">=0.25.0,<2"
+sacremoses = ">=0.0.53"
+tenacity = ">=8.2.2,<9"
+torch = ">=2.8.0,<3"
+transformers = {version = ">=5.0.0,<6", extras = ["torch"]}
+
+[[package]]
 name = "exceptiongroup"
 version = "1.3.1"
 description = "Backport of PEP 654 (exception groups)"
@@ -3041,21 +3068,21 @@ tests = ["freezegun", "pytest (>=9)", "pytest-benchmark", "pytest-codspeed", "py
 
 [[package]]
 name = "ibis-framework"
-version = "11.0.0"
+version = "12.0.0"
 description = "The portable Python dataframe library"
 optional = true
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"ibis\""
 files = [
-    {file = "ibis_framework-11.0.0-py3-none-any.whl", hash = "sha256:92ff82a96f4eac7f86fa9b6a315e04b5a8f9ed3d186539d88f48e628363f2e72"},
-    {file = "ibis_framework-11.0.0.tar.gz", hash = "sha256:0249185eaabb800e224f448cc06ce8ba168df00b269e132d62629f462eca8842"},
+    {file = "ibis_framework-12.0.0-py3-none-any.whl", hash = "sha256:0bbd790f268da9cb87926d5eaad2b827a573927113c4ed3be5095efa89b9e512"},
+    {file = "ibis_framework-12.0.0.tar.gz", hash = "sha256:238624f2c14fdab8382ca2f4f667c3cdb81e29844cd5f8db8a325d0743767c61"},
 ]
 
 [package.dependencies]
 atpublic = ">=2.3"
 numpy = {version = ">=1.23.2,<3", optional = true, markers = "extra == \"exasol\""}
-pandas = {version = ">=1.5.3,<3", optional = true, markers = "extra == \"exasol\""}
+pandas = {version = ">=1.5.3,<4", optional = true, markers = "extra == \"exasol\""}
 parsy = ">=2"
 pyarrow = {version = ">=10.0.1", optional = true, markers = "extra == \"exasol\""}
 pyarrow-hotfix = {version = ">=0.4", optional = true, markers = "extra == \"exasol\""}
@@ -3068,30 +3095,32 @@ typing-extensions = ">=4.3.0"
 tzdata = ">=2022.7"
 
 [package.extras]
-athena = ["fsspec[s3]", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pyathena[arrow,pandas] (>=3.11.0)", "rich (>=12.4.4)"]
-bigquery = ["db-dtypes (>=0.3)", "google-cloud-bigquery (>=3)", "google-cloud-bigquery-storage (>=2)", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pandas-gbq (>=0.26.1)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pydata-google-auth (>=1.4.0)", "rich (>=12.4.4)"]
-clickhouse = ["clickhouse-connect[arrow,numpy,pandas] (>=0.5.23)", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
-databricks = ["databricks-sql-connector-core (>=4)", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
-datafusion = ["datafusion (>=0.6)", "numpy (>=1.23.2,<3)", "packaging (>=21.3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+athena = ["fsspec[s3]", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pyathena[arrow,pandas] (>=3.11.0)", "rich (>=12.4.4)"]
+bigquery = ["db-dtypes (>=0.3)", "google-cloud-bigquery (>=3)", "google-cloud-bigquery-storage (>=2)", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pandas-gbq (>=0.26.1)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pydata-google-auth (>=1.4.0)", "rich (>=12.4.4)"]
+clickhouse = ["clickhouse-connect[arrow,numpy,pandas] (>=0.5.23)", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+databricks = ["databricks-sql-connector (>=4)", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+datafusion = ["datafusion (>=0.6)", "numpy (>=1.23.2,<3)", "packaging (>=21.3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
 decompiler = ["black (>=22.1.0)"]
 deltalake = ["deltalake (>=0.9.0)"]
-druid = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pydruid (>=0.6.7)", "rich (>=12.4.4)"]
-duckdb = ["duckdb (>=0.10.3,!=1.3.0)", "numpy (>=1.23.2,<3)", "packaging (>=21.3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+druid = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pydruid (>=0.6.7)", "rich (>=12.4.4)"]
+duckdb = ["duckdb (>=0.10.3,!=1.3.0)", "numpy (>=1.23.2,<3)", "packaging (>=21.3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
 examples = ["pins[gcs] (>=0.8.3)"]
-exasol = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pyexasol (>=0.25.2)", "rich (>=12.4.4)"]
-flink = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+exasol = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pyexasol (>=0.25.2)", "rich (>=12.4.4)"]
+flink = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
 geospatial = ["geoarrow-types (>=0.2)", "geopandas (>=0.6)", "pyproj (>=3.3.0)", "shapely (>=2)"]
-impala = ["impyla (>=0.17)", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
-mssql = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pyodbc (>=4.0.39)", "rich (>=12.4.4)"]
-mysql = ["mysqlclient (>=2.2.4)", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
-oracle = ["numpy (>=1.23.2,<3)", "oracledb (>=1.3.1)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
-polars = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "polars (>=1)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
-postgres = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "psycopg (>=3.2.0)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
-pyspark = ["numpy (>=1.23.2,<3)", "packaging (>=21.3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pyspark (>=3.3.3,<4)", "rich (>=12.4.4)"]
-risingwave = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "psycopg2 (>=2.8.4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
-snowflake = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)", "snowflake-connector-python (>=3.0.2,!=3.3.0b1)"]
-sqlite = ["numpy (>=1.23.2,<3)", "packaging (>=21.3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "regex (>=2021.7.6)", "rich (>=12.4.4)"]
-trino = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<3)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)", "trino (>=0.321)"]
+impala = ["impyla (>=0.17)", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+materialize = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "psycopg (>=3.2.0)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+mssql = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pyodbc (>=4.0.39)", "rich (>=12.4.4)"]
+mysql = ["mysqlclient (>=2.2.4)", "numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+oracle = ["numpy (>=1.23.2,<3)", "oracledb (>=1.3.1)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+polars = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "polars (>=1)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+postgres = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "psycopg (>=3.2.0)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+pyspark = ["numpy (>=1.23.2,<3)", "packaging (>=21.3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "pyspark (>=3.5,<4.1)", "rich (>=12.4.4)"]
+risingwave = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "psycopg2 (>=2.8.4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)"]
+singlestoredb = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "parsimonious (>=0.11.0)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)", "singlestoredb (>=1.0)"]
+snowflake = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)", "snowflake-connector-python (>=3.0.2,!=3.3.0b1)"]
+sqlite = ["numpy (>=1.23.2,<3)", "packaging (>=21.3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "regex (>=2021.7.6)", "rich (>=12.4.4)"]
+trino = ["numpy (>=1.23.2,<3)", "pandas (>=1.5.3,<4)", "pyarrow (>=10.0.1)", "pyarrow-hotfix (>=0.4)", "rich (>=12.4.4)", "trino (>=0.321)"]
 visualization = ["graphviz (>=0.16)"]
 
 [[package]]
@@ -11811,4 +11840,4 @@ transformers = ["exasol-transformers-extension", "yaspin"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "15af8e355b0a620105aa03836f1f9f0b57ff1d7abd7d1825ad49f5b6a6d2f001"
+content-hash = "a3cfcd0e0c3e6dd5a0ad8c27db6887b9edbc9aedd8a0dafd43c1bcc226ec3317"
