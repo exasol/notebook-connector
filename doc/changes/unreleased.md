@@ -2,6 +2,10 @@
 
 ## Summary
 
+## Features
+
+* #464: Updated to transformers-extension 5.1.0 and added new udfs to notebooks
+
 ## Refactorings
 
 * #433: Reorganized the tests for Jupyter Notebooks
