@@ -15,7 +15,7 @@ on:
 jobs:
   build-matrix:
     name: Build Matrix
-    uses: ./.github/workflows/matrix.yml
+    uses: $/.github/workflows/matrix.yml
     with:
       matrix_keys_json: '["minimum_python_version"]'
     permissions:
@@ -25,7 +25,7 @@ jobs:
     name: Ordinary iTests
     needs:
       - build-matrix
-    uses: ./.github/workflows/tests-ordinary-integration.yml
+    uses: $/.github/workflows/tests-ordinary-integration.yml
     permissions:
       contents: read
     strategy:
@@ -38,7 +38,7 @@ jobs:
     name: Large Runner
     needs:
       - build-matrix
-    uses: ./.github/workflows/tests-large-runner.yml
+    uses: $/.github/workflows/tests-large-runner.yml
     permissions:
       contents: read
     secrets:
@@ -53,7 +53,7 @@ jobs:
     name: GPU
     needs:
       - build-matrix
-    uses: ./.github/workflows/tests-gpu.yml
+    uses: $/.github/workflows/tests-gpu.yml
     permissions:
       contents: read
     strategy:
@@ -66,7 +66,7 @@ jobs:
     name: UI
     needs:
       - build-matrix
-    uses: ./.github/workflows/tests-ui.yml
+    uses: $/.github/workflows/tests-ui.yml
     permissions:
       contents: read
     strategy:
@@ -77,7 +77,7 @@ jobs:
 
   optional-slow-checks:
     name: Optional Slow
-    uses: ./.github/workflows/tests-saas.yml
+    uses: $/.github/workflows/tests-saas.yml
     needs:
       - build-matrix
     secrets:
