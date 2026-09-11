@@ -11016,20 +11016,20 @@ files = [
 
 [[package]]
 name = "sqlglot"
-version = "30.18.0"
+version = "30.17.0"
 description = "An easily customizable SQL parser and transpiler"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "sqlglot-30.18.0-py3-none-any.whl", hash = "sha256:ee0f9a9f3e2193e763c326e52dfb377b96fdb4292f6305c3ff2d9a220e71c601"},
-    {file = "sqlglot-30.18.0.tar.gz", hash = "sha256:e57e1b205e341979d1df5b1212c1435c598a0437e4619e3f428b15d5bc3a5cc6"},
+    {file = "sqlglot-30.17.0-py3-none-any.whl", hash = "sha256:84435ac283a60173da31b5fd7d11a725037a1c3fd6ed1e21fb065de74ddb579f"},
+    {file = "sqlglot-30.17.0.tar.gz", hash = "sha256:2d6b8def93304fa300f4d20f48e3909e7f436fda56ca1fafd8975f6c561ef62c"},
 ]
 
 [package.extras]
-c = ["sqlglotc (==30.18.0) ; python_version >= \"3.10\""]
-dev = ["duckdb (>=0.6)", "mypy ; python_version < \"3.10\"", "pandas", "pandas-stubs", "pdoc", "pre-commit", "pyperf", "python-dateutil", "pytz", "ruff (==0.15.6)", "setuptools_scm", "sqlglot-mypy (>=2.3.0.post2) ; python_version >= \"3.10\"", "types-python-dateutil", "types-pytz", "typing_extensions"]
-rs = ["sqlglotc (==30.18.0) ; python_version >= \"3.10\"", "sqlglotrs (==0.13.0)"]
+c = ["sqlglotc (==30.17.0) ; python_version >= \"3.10\""]
+dev = ["duckdb (>=0.6)", "mypy ; python_version < \"3.10\"", "pandas", "pandas-stubs", "pdoc", "pre-commit", "pyperf", "python-dateutil", "pytz", "ruff (==0.15.6)", "setuptools_scm", "sqlglot-mypy (>=2.3.0.post1) ; python_version >= \"3.10\"", "types-python-dateutil", "types-pytz", "typing_extensions"]
+rs = ["sqlglotc (==30.17.0) ; python_version >= \"3.10\"", "sqlglotrs (==0.13.0)"]
 
 [[package]]
 name = "sqlparse"
@@ -12817,7 +12817,7 @@ files = [
 [extras]
 bucketfs = ["exasol-bucketfs"]
 docker-db = ["exasol-integration-test-docker-environment", "ifaddr"]
-ibis = ["ibis-framework"]
+ibis = ["ibis-framework", "sqlglot"]
 jupyter = ["jupyterlab", "pexpect"]
 notebook-dependencies = ["ipyfilechooser", "ipywidgets", "matplotlib", "scikit-learn", "stopwatch.py", "wordcloud"]
 pyexasol = ["pyexasol"]
@@ -12830,4 +12830,4 @@ transformers = ["exasol-transformers-extension", "yaspin"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "b7e224bfcfef531318913af37535fa297120e08adc864994f1107ea089db9be1"
+content-hash = "f2cc30526e56fcdf06819e03bfff31ad5aaeb9f26becc23f2531d74f3981cef4"

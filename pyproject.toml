@@ -56,7 +56,15 @@ slc = [
     "exasol-script-languages-container-tool (==4.0.3)",
     "GitPython (>=2.1.0)",
 ]
-ibis = [ "ibis-framework [exasol] (>=12, <13)" ]
+# sqlglot pinned because sqlglot.expressions.Drop(kind="VIEW", this=table).sql(dialect). changed in sqlglot 30.18.0.
+# so that call silently renders as bare DROP VIEW with no identifier (AI generated reasoning)
+# error occurs in
+# test/notebooks/test_ibis.py::test_quickstart cell:
+#------------------
+#flights = conn.table('US_FLIGHTS')
+#------------------
+
+ibis = [ "ibis-framework [exasol] (>=12, <13)", "sqlglot (<30.18.0)" ]
 transformers = [
     "exasol-transformers-extension (>=5.2.0, <6)",
     "yaspin (>=3.1.0, <4)",
