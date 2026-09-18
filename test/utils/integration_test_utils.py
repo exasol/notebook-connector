@@ -7,8 +7,6 @@ from collections.abc import (
 )
 from contextlib import contextmanager
 
-from pyexasol import ExaConnection
-
 from exasol.nb_connector.ai_lab_config import AILabConfig
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.itde_manager import (
@@ -17,6 +15,7 @@ from exasol.nb_connector.itde_manager import (
 )
 from exasol.nb_connector.language_container_activation import get_activation_sql
 from exasol.nb_connector.secret_store import Secrets
+from pyexasol import ExaConnection
 
 
 def _setup_itde_impl(secrets: Secrets) -> Iterator[None]:
