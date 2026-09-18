@@ -3,9 +3,9 @@ from unittest.mock import (
     create_autospec,
 )
 
+import pyexasol
 import pytest
 
-import pyexasol
 from exasol.nb_connector.cli.processing import processing
 
 

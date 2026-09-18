@@ -20,6 +20,11 @@ from exasol.ai.text.extractors.default_models import (
     DEFAULT_NAMED_ENTITY_MODEL,
     DEFAULT_NLI_MODEL,
 )
+from transformers import (
+    AutoModel,
+    AutoModelForSequenceClassification,
+    AutoModelForTokenClassification,
+)
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.bfs_connection import ensure_bfs_connection
@@ -50,11 +55,6 @@ from exasol.nb_connector.secret_store import Secrets
 # and ensures backwards compatibility.
 from exasol.nb_connector.transformers_extension_wrapper import (
     MODELS_CACHE_DIR,
-)
-from transformers import (
-    AutoModel,
-    AutoModelForSequenceClassification,
-    AutoModelForTokenClassification,
 )
 
 LANGUAGE_ALIAS = "PYTHON3_TXAIE"
