@@ -35,8 +35,8 @@ dependencies = [
 
 [project.optional-dependencies]
 
-sqlalchemy = [ "sqlalchemy-exasol (>=5.0.0, <6)" ]
-pyexasol = [ "pyexasol (>=0.26.0, <2)" ]
+sqlalchemy = [ "sqlalchemy-exasol (>=7.0.0, <8)" ]
+pyexasol = [ "pyexasol (>2.0.0, <3)" ]
 pyexasol-extra = [
     "polars (>=1.10.0, <2)",
     "pyarrow (>=21.0.0, <22.0.0)"
