@@ -12,12 +12,6 @@ on:
         type: string
 
     secrets:
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
-      AWS_DEFAULT_REGION:
-        required: true
       INTEGRATION_TEAM_SAAS_STAGING_HOST:
         required: true
       INTEGRATION_TEAM_SAAS_STAGING_ACCOUNT_ID:
