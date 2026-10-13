@@ -5,7 +5,6 @@ import unittest.mock
 import pytest
 
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.sklearn_version_check import sklearn_version_check
 
@@ -38,8 +37,7 @@ def test_sklearn_version_checker(mock_connect, filled_secrets):
     mock_connect.return_value = mock_connection
 
     with pytest.raises(RuntimeError) as exc_info:
-            sklearn_version_check(filled_secrets)
+        sklearn_version_check(filled_secrets)
     assert "AI Lab scikit-learn version" in str(exc_info.value)
 
     mock_connection.execute.assert_called()
-
