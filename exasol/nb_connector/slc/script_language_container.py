@@ -48,6 +48,9 @@ from exasol.nb_connector.slc.workspace import (
     current_directory,
 )
 from exasol.nb_connector.utils import optional_str_to_bool
+from exasol.nb_connector import __version__, __project_name__
+from exasol.telemetry import client as telemetry
+
 
 NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$", flags=re.IGNORECASE)
 
@@ -83,6 +86,7 @@ class ScriptLanguageContainer:
         secrets: Secrets,
         name: str,
     ):
+        telemetry.track(__project_name__, __version__, "initialize_slc")
         self.secrets = secrets
         self.name = name
         _verify_name(name)

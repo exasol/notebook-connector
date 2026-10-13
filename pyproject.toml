@@ -31,6 +31,7 @@ dependencies = [
   "click (>=8.0.0)",
   "psutil (>=7.2.2,<8.0.0)",
   "exasol-transformers-extension (>=5.0.0,<6.0.0)",
+  "exasol-telemetry-client (>=0.2.1,<0.3.0)",
 ]
 
 [project.optional-dependencies]

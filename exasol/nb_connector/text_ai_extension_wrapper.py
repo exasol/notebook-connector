@@ -46,6 +46,8 @@ from exasol.nb_connector.model_installation import (
     install_model,
 )
 from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector import __project_name__, __version__
+from exasol.telemetry import client as telemetry
 
 # Models downloaded from the Huggingface archive to a local drive will be
 # cached in directory MODELS_CACHE_DIR.
@@ -173,6 +175,7 @@ def initialize_text_ai_extension(
             allow_override=allow_override_language_alias,
         )
 
+    telemetry.track(__project_name__, __version__, "initialize_textai")
     print("Text AI: Updating Secure Configuration Storage")
     conf.save(CKey.txaie_models_cache_dir, MODELS_CACHE_DIR)
 
