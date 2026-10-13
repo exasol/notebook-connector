@@ -18,6 +18,9 @@ from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.utils import optional_str_to_bool
+from exasol.nb_connector import __version__, __project_name__
+
+from exasol.telemetry import client as telemetry
 
 
 def _optional_encryption(conf: Secrets, key: CKey = CKey.db_encryption) -> bool | None:
@@ -354,7 +357,7 @@ def open_ibis_connection(conf: Secrets, **kwargs):
     Unlike open_pyexasol_connection, this function sets the default schema if it's
     defined in the configuration.
     """
-
+    telemetry.track(__project_name__, __version__, "connect_ibis")
     conn_params = _get_pyexasol_connection_params(conf, **kwargs)
 
     dsn = conn_params.pop("dsn")

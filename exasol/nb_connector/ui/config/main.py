@@ -7,12 +7,16 @@ from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.config.onprem import get_onprem
 from exasol.nb_connector.ui.config.saas import get_saas
 from exasol.nb_connector.ui.docker.docker_db import docker_db_configuration
+from exasol.nb_connector import __version__, __project_name__
+
+from exasol.telemetry import client as telemetry
 
 
 def configure_db(conf: Secrets) -> widgets.Widget:
     """
     Creates a db configuration UI, depending on the choice of the database.
     """
+    telemetry.track(__project_name__, __version__, "configure_db")
     storage_backend = get_backend(conf)
     if storage_backend == StorageBackend.saas:
         return get_saas(conf)

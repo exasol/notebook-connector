@@ -1,5 +1,9 @@
 import pyexasol
 
+from exasol.nb_connector import __version__, __project_name__
+from exasol.telemetry import client as telemetry
+
+
 _SETUP_SQL = [
     "OPEN SCHEMA {schema!i}",
     """
@@ -42,6 +46,7 @@ def setup_scripts(
     :param bucketfs_jar_path: path to cloud-storage-extension jar in BucketFS
     :return:
     """
+    telemetry.track(__project_name__, __version__, "initialize_cse")
     for sql in _SETUP_SQL:
         db_connection.execute(
             sql,

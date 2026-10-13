@@ -19,6 +19,10 @@ from exasol.nb_connector.language_container_activation import (
 )
 from exasol.nb_connector.model_installation import ensure_model_subdir_config_value
 from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector import __version__, __project_name__
+
+from exasol.telemetry import client as telemetry
+
 
 LANGUAGE_ALIAS = "PYTHON3_TE"
 
@@ -108,6 +112,7 @@ def initialize_te_extension(
             language alias, an attempt to deploy the container will result
             in a RuntimeError.
     """
+    telemetry.track(__project_name__, __version__, "initialize_te")
 
     # Make the connection object names
     db_user = str(conf.get(CKey.db_user))
