@@ -1,4 +1,5 @@
 import pyexasol
+
 from exasol.nb_connector.connections import open_pyexasol_connection
 from exasol.nb_connector.secret_store import Secrets
 
