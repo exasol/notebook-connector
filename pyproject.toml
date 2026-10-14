@@ -1,7 +1,7 @@
 [project]
 name = "exasol-notebook-connector"
 version = "3.1.0"
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.11,<3.13"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [{ include = "exasol" }, ]
 authors = [
@@ -12,7 +12,6 @@ authors = [
 readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
