@@ -47,8 +47,8 @@ def dockerfile_content() -> str:
         FROM ubuntu:22.04
 
         RUN apt-get update
-        RUN apt-get install --yes --no-install-recommends python3 python3-pip git
-        RUN python3 -m pip install --upgrade pip
+        RUN apt-get install --yes --no-install-recommends python3.11 python3-pip git
+        RUN python3.11 -m pip install --upgrade pip
         """)
 
 
