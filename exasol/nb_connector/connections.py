@@ -9,11 +9,11 @@ from typing import (
 
 import exasol.bucketfs as bfs
 import exasol.saas.client.api_access as saas_api
+import ibis
+import pyexasol
 import sqlalchemy
 from sqlalchemy.engine.url import URL
 
-import ibis
-import pyexasol
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ai_lab_config import StorageBackend
 from exasol.nb_connector.secret_store import Secrets

@@ -1,6 +1,7 @@
 import textwrap
 
 import sklearn
+
 from exasol.nb_connector.connections import open_pyexasol_connection
 
 
