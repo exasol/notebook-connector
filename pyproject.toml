@@ -1,7 +1,7 @@
 [project]
 name = "exasol-notebook-connector"
-version = "3.0.0"
-requires-python = ">=3.10,<3.13"
+version = "3.1.0"
+requires-python = ">=3.11,<3.13"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [{ include = "exasol" }, ]
 authors = [
@@ -12,7 +12,6 @@ authors = [
 readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
@@ -35,8 +34,8 @@ dependencies = [
 
 [project.optional-dependencies]
 
-sqlalchemy = [ "sqlalchemy-exasol (>=5.0.0, <6)" ]
-pyexasol = [ "pyexasol (>=0.26.0, <2)" ]
+sqlalchemy = [ "sqlalchemy-exasol (>=7.0.0, <8)" ]
+pyexasol = [ "pyexasol (>2.0.0, <3)" ]
 pyexasol-extra = [
     "polars (>=1.10.0, <2)",
     "pyarrow (>=21.0.0, <22.0.0)"

@@ -22,8 +22,8 @@ jobs:
         id: set-up-python-and-poetry-environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v11
         with:
-          python-version: "3.10"
-          poetry-version: "2.3.0"
+          python-version: "3.11"
+          poetry-version: "2.5.1"
 
       - name: Install All Optional Dependencies (aka. "extras")
         id: install-optional-dependencies
@@ -53,8 +53,8 @@ jobs:
         id: set-up-python-and-poetry-environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v11
         with:
-          python-version: "3.10"
-          poetry-version: "2.3.0"
+          python-version: "3.11"
+          poetry-version: "2.5.1"
 
       - name: Check Changelog was Updated
         id: check-changelog-was-updated
@@ -68,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-versions: ["3.10", "3.11", "3.12"]
+        python-versions: ["3.11", "3.12"]
     steps:
       - name: Check out Repository
         id: check-out-repository
@@ -81,7 +81,7 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@v11
         with:
           python-version: ${{ matrix.python-versions }}
-          poetry-version: "2.3.0"
+          poetry-version: "2.5.1"
 
       - name: Install All Optional Dependencies (aka. "extras")
         id: install-optional-dependencies
@@ -108,7 +108,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-versions: ["3.10", "3.11", "3.12"]
+        python-versions: ["3.11", "3.12"]
 
     steps:
       - name: Check out Repository
@@ -122,7 +122,7 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@v11
         with:
           python-version: ${{ matrix.python-versions }}
-          poetry-version: "2.3.0"
+          poetry-version: "2.5.1"
 
       - name: Lint Typing
         id: lint-typing
@@ -136,7 +136,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-versions: ["3.10", "3.11", "3.12"]
+        python-versions: ["3.11", "3.12"]
 
     steps:
       - name: Check out Repository
@@ -150,7 +150,7 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@v11
         with:
           python-version: ${{ matrix.python-versions }}
-          poetry-version: "2.3.0"
+          poetry-version: "2.5.1"
 
       - name: Audit Security
         id: audit-security
@@ -181,8 +181,8 @@ jobs:
         id: set-up-python-and-poetry-environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v11
         with:
-          python-version: "3.10"
-          poetry-version: "2.3.0"
+          python-version: "3.11"
+          poetry-version: "2.5.1"
 
       - name: Check Format
         id: check-format
@@ -204,8 +204,8 @@ jobs:
         id: set-up-python-and-poetry-environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v11
         with:
-          python-version: "3.10"
-          poetry-version: "2.3.0"
+          python-version: "3.11"
+          poetry-version: "2.5.1"
 
       - name: Build Package
         id: build-package
@@ -227,8 +227,8 @@ jobs:
         id: set-up-python-and-poetry-environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v11
         with:
-          python-version: "3.10"
-          poetry-version: "2.3.0"
+          python-version: "3.11"
+          poetry-version: "2.5.1"
 
       - name: Check Workflows
         id: check-workflows
@@ -250,8 +250,8 @@ jobs:
         id: set-up-python-and-poetry-environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v11
         with:
-          python-version: "3.10"
-          poetry-version: "2.3.0"
+          python-version: "3.11"
+          poetry-version: "2.5.1"
 
       - name: Audit Workflows
         id: audit-workflows

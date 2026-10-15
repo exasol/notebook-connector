@@ -1,15 +1,19 @@
 from pathlib import Path
 
-from exasol.toolbox.config import BaseConfig
+from exasol.toolbox.config import (
+    BaseConfig,
+    DependencyManager,
+)
 
 PROJECT_CONFIG = BaseConfig(
     root_path=Path(__file__).parent,
     project_name="nb_connector",
+    # pinned to se if it resolves workflow:fix/check issues between local and remote
+    dependency_manager=DependencyManager(name="poetry", version="2.5.1"),
     # currently only python 3.13 is not supported due to
     # our dependencies do not support 3.13 yet.
     # ticket ca be found here: https://github.com/exasol/notebook-connector/issues/471
     python_versions=(
-        "3.10",
         "3.11",
         "3.12",
     ),
