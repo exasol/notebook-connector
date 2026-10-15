@@ -344,7 +344,7 @@ def docker_container(
             copy.copy("/tmp")
             extras = "docker-db,bucketfs,ibis,sqlalchemy"
             exit_code, output = container.exec_run(
-                f'python3 -m pip install "/tmp/{wheel_path.name}[{extras}]"'
+                f'python3.11 -m pip install "/tmp/{wheel_path.name}[{extras}]"'
                 f" --extra-index-url https://download.pytorch.org/whl/cpu"
             )
             assert exit_code == 0, output
