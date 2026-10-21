@@ -39,7 +39,7 @@ generic:
         - file: test_cloud.py
         - file: test_transformers.py
         - file: test_text_ai.py
-          runner: int-linux-x64-4core-ubuntu24.04-1
+          runner: int-linux-x64-4core-ubuntu26.04-1
     - backend: saas
       pytest_params: '--backend=saas'
       require_success: false
@@ -52,7 +52,7 @@ generic:
         - file: test_text_ai.py
 
 gpu:
-  runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
+  runner: int-linux-x64-4core-gpu-t4-ubuntu26.04-1
   pytest_params: ''
   require_success: true
   backend: onprem
