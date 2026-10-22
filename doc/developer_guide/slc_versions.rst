@@ -66,7 +66,7 @@ particular flavor to be present.
 In consequence, updating the SLCR version potentially may require updating the
 NC tests as well, e.g. the name of the flavor used in the tests.
 
-Then updating the name of the flavor, please look at
+When updating the name of the flavor, please look at:
 
 * The Jupyter notebooks in folder
   ``exasol/nb_connector/resources/notebooks/script_languages_container/``
