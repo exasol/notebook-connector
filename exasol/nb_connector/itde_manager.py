@@ -118,7 +118,7 @@ def bring_itde_up(conf: Secrets, env_info: EnvironmentInfo | None = None) -> Non
     conf.save(AILabConfig.db_host_name, db_info.host)
     conf.save(AILabConfig.bfs_host_name, db_info.host)
     conf.save(AILabConfig.db_port, str(db_info.ports.database))
-    conf.save(AILabConfig.bfs_port, str(db_info.ports.bucketfs))
+    conf.save(AILabConfig.bfs_port, str(db_info.ports.bucketfs_http))
 
     # Q. Can we draw any of the below constants from the ITDE configuration?
     conf.save(AILabConfig.db_user, "sys")

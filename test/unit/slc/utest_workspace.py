@@ -1,12 +1,8 @@
-from test.unit.slc.util import (
-    SlcSecretsMock,
-)
+from test.unit.slc.util import SlcSecretsMock
 
 import pytest
 
-from exasol.nb_connector.slc import (
-    constants,
-)
+from exasol.nb_connector.slc import constants
 from exasol.nb_connector.slc.workspace import (
     Workspace,
     current_directory,
