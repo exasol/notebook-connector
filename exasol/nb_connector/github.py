@@ -48,7 +48,9 @@ def get_latest_version_and_jar_url(project: Project) -> tuple[str, str]:
     url = f"https://api.github.com/repos/exasol/{project.value}/releases/latest"
     req = requests.get(url, timeout=10)
     if req.status_code != 200:
-        raise GithubReleaseError(f"{url} returned status code {req.status_code}.")
+        raise GithubReleaseError(
+            f"{url} returned status code {req.status_code}: {req.text[:200]}."
+        )
     release = req.json()
     if not (tag := release.get("tag_name")):
         raise GithubReleaseError(

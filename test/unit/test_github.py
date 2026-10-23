@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import pathlib
 from dataclasses import dataclass
@@ -32,21 +34,28 @@ MOCKED_RELEASES_RESULT = {
 class RequestsMocker:
     json: dict[str, Any]
     status_code: int = 200
+    text: str = ""
+    get_method: Mock = Mock()
 
     @property
     def mock_response(self) -> Mock:
-        mock = Mock(status_code=self.status_code, content=b"binary data")
+        mock = Mock(
+            status_code=self.status_code,
+            content=b"binary data",
+            text=self.text,
+        )
         mock.json = Mock(return_value=self.json)
         return mock
 
-    def mock(self, monkeypatch: MonkeyPatch) -> None:
-        get_method = Mock(return_value=self.mock_response)
-        monkeypatch.setattr(github.requests, "get", get_method)
+    def mock(self, monkeypatch: MonkeyPatch) -> RequestsMocker:
+        self.get_method.return_value=self.mock_response
+        monkeypatch.setattr(github.requests, "get", self.get_method)
+        return self
 
 
 @pytest.fixture
-def simulate_download_url(monkeypatch):
-    RequestsMocker(MOCKED_RELEASES_RESULT).mock(monkeypatch)
+def simulate_download_url(monkeypatch) -> RequestsMocker:
+    return RequestsMocker(MOCKED_RELEASES_RESULT).mock(monkeypatch)
 
 
 def test_jar_url_success(simulate_download_url) -> None:
@@ -60,10 +69,10 @@ def test_jar_url_success(simulate_download_url) -> None:
     "requests_mocker, expected",
     [
         pytest.param(
-            RequestsMocker({}, 500),
+            RequestsMocker({}, 403, "API rate limit exceeded"),
             "https://api.github.com/repos/exasol/"
-            "cloud-storage-extension/releases/latest returned status code 500.",
-            id="status_code_500",
+            "cloud-storage-extension/releases/latest returned status code 403: API rate limit exceeded.",
+            id="status_code_403",
         ),
         pytest.param(
             RequestsMocker({"name": "Release w/o tag"}),
@@ -134,3 +143,4 @@ def test_retrieve_jar(simulate_download_url, tmpdir, caplog):
     assert jar_path_sub.exists()
     assert jar_path != jar_path_sub
     assert "Fetching jar" in caplog.text
+    simulate_download_url.get_method.assert_called_with(CSE_MOCK_URL, stream=True, timeout=10)
