@@ -35,7 +35,7 @@ class RequestsMocker:
     json: dict[str, Any]
     status_code: int = 200
     text: str = ""
-    get_method: Mock = Mock()
+    get_method: Mock | None = None
 
     @property
     def mock_response(self) -> Mock:
@@ -48,7 +48,7 @@ class RequestsMocker:
         return mock
 
     def mock(self, monkeypatch: MonkeyPatch) -> RequestsMocker:
-        self.get_method.return_value = self.mock_response
+        self.get_method = Mock(return_value=self.mock_response)
         monkeypatch.setattr(github.requests, "get", self.get_method)
         return self
 
