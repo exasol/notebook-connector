@@ -32,8 +32,8 @@ from exasol.nb_connector.slc.script_language_container import (
 )
 
 DEFAULT_FLAVORS = {
-    PackageManager.PIP: "template-Exasol-all-python-3.10",
-    PackageManager.CONDA: "template-Exasol-all-python-3.10-conda",
+    PackageManager.PIP: "template-Exasol-all-python-3.12",
+    PackageManager.CONDA: "template-Exasol-all-python-3.12-conda",
 }
 
 OTHER_FLAVOR = "template-Exasol-all-r-4"

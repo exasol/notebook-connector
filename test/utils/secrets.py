@@ -34,6 +34,14 @@ class SecretsMock(Secrets):
             raise AttributeError(f'Unknown key "{key}"')
         return val
 
+    def __del__(self) -> None:
+        """
+        Avoids PytestUnraisableExceptionWarning: Exception ignored in:
+        Secrets.__del__() self.close(), with self._lock, AttributeError:
+        Unknown key "_lock"
+        """
+        pass
+
     def save(self, key: str | CKey, value: str) -> Secrets:
         key = _ensure_str(key)
         self._mock[key] = value
