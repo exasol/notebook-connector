@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import pathlib
 from dataclasses import dataclass
 from pathlib import Path
@@ -48,7 +49,7 @@ class RequestsMocker:
         return mock
 
     def mock(self, monkeypatch: MonkeyPatch) -> RequestsMocker:
-        self.get_method.return_value=self.mock_response
+        self.get_method.return_value = self.mock_response
         monkeypatch.setattr(github.requests, "get", self.get_method)
         return self
 
@@ -101,7 +102,7 @@ def test_jar_url_success(simulate_download_url) -> None:
 )
 def test_jar_url_failure(monkeypatch, requests_mocker, expected) -> None:
     requests_mocker.mock(monkeypatch)
-    with pytest.raises(github.GithubReleaseError, match=expected):
+    with pytest.raises(github.GithubReleaseError, match=re.escape(expected)):
         github.get_latest_version_and_jar_url(github.Project.CLOUD_STORAGE_EXTENSION)
 
 
@@ -143,4 +144,6 @@ def test_retrieve_jar(simulate_download_url, tmpdir, caplog):
     assert jar_path_sub.exists()
     assert jar_path != jar_path_sub
     assert "Fetching jar" in caplog.text
-    simulate_download_url.get_method.assert_called_with(CSE_MOCK_URL, stream=True, timeout=10)
+    simulate_download_url.get_method.assert_called_with(
+        CSE_MOCK_URL, stream=True, timeout=10
+    )
