@@ -1,15 +1,24 @@
+from __future__ import annotations
+
 import os
 import pathlib
-from unittest import mock
+import re
+from dataclasses import (
+    dataclass,
+    field,
+)
+from typing import Any
+from unittest.mock import Mock
 
 import pytest
-import requests
+from _pytest.monkeypatch import MonkeyPatch
 
 from exasol.nb_connector import github
 
 CSE_MOCK_URL = "https://github.com/some_path/exasol-cloud-storage-extension-2.7.8.jar"
 
 MOCKED_RELEASES_RESULT = {
+    "name": "Release 2.7.8",
     "tag_name": "2.7.8",
     "assets": [
         {
@@ -24,34 +33,82 @@ MOCKED_RELEASES_RESULT = {
 }
 
 
-def mocked_requests_get(*args, **_):
-    res = mock.create_autospec(requests.Response)
-    res.status_code = 404
-    url = args[0]
-    if url.endswith("/releases/latest"):
-        if github.Project.CLOUD_STORAGE_EXTENSION.value in url:
-            res.status_code = 200
-            res.json = mock.MagicMock(return_value=MOCKED_RELEASES_RESULT)
-        elif github.Project.KAFKA_CONNECTOR_EXTENSION.value in url:
-            # used to test error handling
-            res.status_code = 500
-    elif url == CSE_MOCK_URL:
-        res.status_code = 200
-        res.content = b"binary data"
-    return res
+@dataclass
+class RequestsMocker:
+    json: dict[str, Any]
+    status_code: int = 200
+    text: str = ""
+    get_method: Mock = field(default_factory=Mock)
+
+    @property
+    def mock_response(self) -> Mock:
+        mock = Mock(
+            status_code=self.status_code,
+            content=b"binary data",
+            text=self.text,
+        )
+        mock.json = Mock(return_value=self.json)
+        return mock
+
+    def mock(self, monkeypatch: MonkeyPatch) -> RequestsMocker:
+        self.get_method.return_value = self.mock_response
+        monkeypatch.setattr(github.requests, "get", self.get_method)
+        return self
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
-def test_get_latest_version_and_jar_url(_):
-    res = github.get_latest_version_and_jar_url(github.Project.CLOUD_STORAGE_EXTENSION)
-    assert res == ("2.7.8", CSE_MOCK_URL)
-
-    with pytest.raises(RuntimeError, match="Error sending request"):
-        github.get_latest_version_and_jar_url(github.Project.KAFKA_CONNECTOR_EXTENSION)
+@pytest.fixture
+def simulate_download_url(monkeypatch) -> RequestsMocker:
+    return RequestsMocker(MOCKED_RELEASES_RESULT).mock(monkeypatch)
 
 
-@mock.patch("requests.get", side_effect=mocked_requests_get)
-def test_retrieve_jar(_, tmpdir, caplog):
+def test_jar_url_success(simulate_download_url) -> None:
+    tag, url = github.get_latest_version_and_jar_url(
+        github.Project.CLOUD_STORAGE_EXTENSION
+    )
+    assert (tag, url) == ("2.7.8", CSE_MOCK_URL)
+
+
+@pytest.mark.parametrize(
+    "requests_mocker, expected",
+    [
+        pytest.param(
+            RequestsMocker({}, 403, "API rate limit exceeded"),
+            "https://api.github.com/repos/exasol/"
+            "cloud-storage-extension/releases/latest returned status code 403: API rate limit exceeded.",
+            id="status_code_403",
+        ),
+        pytest.param(
+            RequestsMocker({"name": "Release w/o tag"}),
+            f'The latest release "Release w/o tag" of cloud-storage-extension has no tag.',
+            id="no_tag",
+        ),
+        pytest.param(
+            RequestsMocker({"name": "Release 1.2.3", "tag_name": "1.2.3"}),
+            f'Could not find asset with suffix "1.2.3.jar" attached '
+            f'to the latest release "Release 1.2.3".',
+            id="no_assets",
+        ),
+        pytest.param(
+            RequestsMocker(
+                {
+                    "name": "Release 1.2.3",
+                    "tag_name": "1.2.3",
+                    "assets": [{"name": "other.jar"}],
+                }
+            ),
+            f'Could not find asset with suffix "1.2.3.jar" attached '
+            f'to the latest release "Release 1.2.3".',
+            id="no_asset_with_suffix",
+        ),
+    ],
+)
+def test_jar_url_failure(monkeypatch, requests_mocker, expected) -> None:
+    requests_mocker.mock(monkeypatch)
+    with pytest.raises(github.GithubReleaseError, match=re.escape(expected)):
+        github.get_latest_version_and_jar_url(github.Project.CLOUD_STORAGE_EXTENSION)
+
+
+def test_retrieve_jar(simulate_download_url, tmpdir, caplog):
     # need this as retrieve_jar works with current directory in some cases
     os.chdir(tmpdir)
 
@@ -89,3 +146,6 @@ def test_retrieve_jar(_, tmpdir, caplog):
     assert jar_path_sub.exists()
     assert jar_path != jar_path_sub
     assert "Fetching jar" in caplog.text
+    simulate_download_url.get_method.assert_called_with(
+        CSE_MOCK_URL, stream=True, timeout=10
+    )

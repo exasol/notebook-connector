@@ -11,6 +11,9 @@ import requests
 
 _logger = logging.getLogger(__name__)
 
+import logging
+from typing import Any
+
 
 class Project(enum.Enum):
     """
@@ -22,6 +25,17 @@ class Project(enum.Enum):
     KAFKA_CONNECTOR_EXTENSION = "kafka-connector-extension"
 
 
+def _release_name(release: dict[str, Any]) -> str:
+    value = release.get("name") or release.get("html_url", "(empty URL)")
+    return str(value)
+
+
+class GithubReleaseError(RuntimeError):
+    """
+    Signals an error when retrieving the URL of an artifact on GitHub.
+    """
+
+
 def get_latest_version_and_jar_url(project: Project) -> tuple[str, str]:
     """
     Retrieves the latest version of stable project release
@@ -30,26 +44,27 @@ def get_latest_version_and_jar_url(project: Project) -> tuple[str, str]:
     :param project: name of the project
     :return: tuple with version and url to retrieve the artefact.
     """
-    req = requests.get(
-        f"https://api.github.com/repos/exasol/{project.value}" f"/releases/latest",
-        timeout=10,
-    )
+    url = f"https://api.github.com/repos/exasol/{project.value}/releases/latest"
+    req = requests.get(url, timeout=10)
     if req.status_code != 200:
-        raise RuntimeError(
-            "Error sending request to the github, code: %d" % req.status_code
+        raise GithubReleaseError(
+            f"{url} returned status code {req.status_code}: {req.text[:200]}."
         )
-    data = req.json()
-    version = data.get("tag_name")
-    if version is None:
-        raise RuntimeError(
-            f"The latest version of {project.value} " f"has no tag, something is wrong"
+    release = req.json()
+    if not (tag := release.get("tag_name")):
+        raise GithubReleaseError(
+            f'The latest release "{_release_name(release)}" of {project.value} has no tag.'
         )
-    for asset in data.get("assets", []):
+    suffix = f"{tag}.jar"
+    for asset in release.get("assets", []):
         name = asset["name"]
-        if name.endswith(f"{version}.jar"):
+        if name.endswith(suffix):
             dl_url = asset["browser_download_url"]
-            return version, dl_url
-    raise RuntimeError("Could not find proper jar url for the latest release")
+            return tag, dl_url
+    raise GithubReleaseError(
+        f'Could not find asset with suffix "{suffix}" attached '
+        f'to the latest release "{_release_name(release)}".'
+    )
 
 
 def retrieve_jar(
