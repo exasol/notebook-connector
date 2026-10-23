@@ -3,7 +3,10 @@ from __future__ import annotations
 import os
 import pathlib
 import re
-from dataclasses import dataclass
+from dataclasses import (
+    dataclass,
+    field,
+)
 from typing import Any
 from unittest.mock import Mock
 
@@ -35,7 +38,7 @@ class RequestsMocker:
     json: dict[str, Any]
     status_code: int = 200
     text: str = ""
-    get_method: Mock | None = None
+    get_method: Mock = field(default_factory=Mock)
 
     @property
     def mock_response(self) -> Mock:
@@ -48,7 +51,7 @@ class RequestsMocker:
         return mock
 
     def mock(self, monkeypatch: MonkeyPatch) -> RequestsMocker:
-        self.get_method = Mock(return_value=self.mock_response)
+        self.get_method.return_value = self.mock_response
         monkeypatch.setattr(github.requests, "get", self.get_method)
         return self
 
