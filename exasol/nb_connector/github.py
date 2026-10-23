@@ -12,7 +12,6 @@ import requests
 _logger = logging.getLogger(__name__)
 
 import logging
-from pathlib import Path
 from typing import Any
 
 

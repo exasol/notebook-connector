@@ -105,10 +105,10 @@ def custom_packages() -> list[tuple[str, str, str]]:
 
 
 def _check_exported_slc_exists(expected_suffix: str, expected_path: Path) -> None:
-    tar = [f for f in expected_path.glob(f"*.{expected_suffix}")]
+    tar = [*expected_path.glob(f"*.{expected_suffix}")]
     assert len(tar) == 1
     assert tar[0].is_file()
-    tar_sum = [f for f in expected_path.glob(f"*.{expected_suffix}.sha512sum")]
+    tar_sum = [*expected_path.glob(f"*.{expected_suffix}.sha512sum")]
     assert len(tar_sum) == 1
     assert tar_sum[0].is_file()
 
