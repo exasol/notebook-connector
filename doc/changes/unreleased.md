@@ -11,3 +11,4 @@ The release also improves the error messages when locating Jar files in GitHub r
 * #425: Unpinned the dependencies to ITDE and SLCT
 * #387: Removes upper bound for dev dependency to starlette
 * #485: Improved error messages when locating Jar files in GitHub releases.
+* #488: Updated SLC dependencies
