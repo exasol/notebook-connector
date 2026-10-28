@@ -30,8 +30,8 @@ Example
 For the versions named in the table above
 
 * `SLCR version 9.1.0 <slcr_910_>`_ in the release letter, section
-  "_Script-Language-Container-Tool (Exaslct)_" states "_This release uses
-  version 1.0.0 of the container tool._"
+  *Script-Language-Container-Tool (Exaslct)* states "*This release uses
+  version 1.0.0 of the container tool.*"
 
 * When clicking on the commit `60492ad <slc_commit_>`_ and "Browse files", then
   SLCR's file `pyproject.toml <slc_pyproject_>`_ shows
