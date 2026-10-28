@@ -1,3 +1,5 @@
+.. _slc_version:
+
 Selecting the Versions for SLCT and SLCR
 ****************************************
 

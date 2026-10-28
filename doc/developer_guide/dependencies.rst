@@ -7,6 +7,7 @@ NC has dependencies in multiple different groups
 * Optional productive (aka. "extras")
 * Mandatory dev dependencies
 * Optional dev dependencies
+* Special dependencies
 
 Mandatory Productive Dependencies
 =================================
@@ -67,6 +68,25 @@ dependency to avoid interferences as reported in `project Pyexasol
 .. _pytest-benchmark: https://pytest-benchmark.readthedocs.io/en/latest/
 .. _pyexasol_benchmark:
    https://exasol.github.io/pyexasol/master/developer_guide.html#performance-tests
+
+Special Dependencies
+====================
+
+NC has special dependencies demoed in the related Jupyter notebooks:
+
+* *Exasol Cloud Storage Extension* (CSE)
+* The Script Language Container (SLC) and -Tool (SLCT)
+
+CSE is implemented in Java and Jupyter notebook `cloud_store_config.ipynb
+<cse-download_>`_, downloads the jar file from the latest release in GitHub
+repository `cloud-storage-extension <cse-repo_>`_.
+
+.. _cse-repo: https://github.com/exasol/cloud-storage-extension/
+.. _cse-download: https://github.com/exasol/notebook-connector/blob/main/exasol/nb_connector/resources/notebooks/cloud/cloud_store_config.ipynb
+
+For the SLC, the flavor name and the related version of SLCT, see
+:ref:`slc_version`.
+
 
 Building Documentation
 ======================
