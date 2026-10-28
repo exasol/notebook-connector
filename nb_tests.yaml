@@ -23,7 +23,7 @@
 #       runner: R2
 
 generic:
-  runner: ubuntu-24.04
+  runner: ubuntu-26.04
   pytest_params: ''
   groups:
     - backend: onprem
@@ -52,7 +52,7 @@ generic:
         - file: test_text_ai.py
 
 gpu:
-  runner: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
+  runner: int-linux-x64-4core-gpu-t4-ubuntu26.04-1
   pytest_params: ''
   require_success: true
   backend: onprem

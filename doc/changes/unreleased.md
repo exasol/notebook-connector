@@ -15,3 +15,4 @@ The release also improves the error messages when locating Jar files in GitHub r
 * #387: Removed upper bound for dev dependency to starlette
 * #485: Improved error messages when locating Jar files in GitHub releases.
 * #488: Updated SLC dependencies
+* #489: Updated Python toolbox and GitHub runners

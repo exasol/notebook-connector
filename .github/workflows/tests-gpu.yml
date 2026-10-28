@@ -11,7 +11,7 @@ jobs:
   gpu-tests:
     name: GPU Tests
     runs-on:
-      labels: int-linux-x64-4core-gpu-t4-ubuntu24.04-1
+      labels: int-linux-x64-4core-gpu-t4-ubuntu26.04-1
     permissions:
       contents: read
     steps:

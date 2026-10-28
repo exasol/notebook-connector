@@ -42,7 +42,7 @@ jobs:
 
   approve-notebook-tests:
     name: Run Jupyter Notebook Tests?
-    runs-on: "ubuntu-24.04"
+    runs-on: "ubuntu-26.04"
     permissions:
       contents: read
     environment: approve-notebook-tests
@@ -71,7 +71,7 @@ jobs:
 
   approve-gpu-notebook-tests:
     name: Run Jupyter GPU Notebook Tests?
-    runs-on: "ubuntu-24.04"
+    runs-on: "ubuntu-26.04"
     permissions:
       contents: read
     environment: approve-gpu-notebook-tests

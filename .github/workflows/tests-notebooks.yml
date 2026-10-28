@@ -22,7 +22,7 @@ on:
 jobs:
 
   fetch-notebook-tests:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: Build Matrix ${{ inputs.selector }}
     steps:
       - name: SCM Checkout
@@ -124,7 +124,7 @@ jobs:
 
   evaluate-tests:
     name: Evaluate Test Results
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: always()
     needs: notebook-tests
     steps:
