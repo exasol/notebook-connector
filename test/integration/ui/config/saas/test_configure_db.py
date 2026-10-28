@@ -1,3 +1,5 @@
+import pytest
+
 from test.integration.ui.common.utils.main_config_ui_utils import render_saas_ui
 from test.integration.ui.common.utils.ui_utils import (
     SAVE_BUTTON,
@@ -6,8 +8,6 @@ from test.integration.ui.common.utils.ui_utils import (
     expect_save_button_to_have_pencil_icon,
     fill_text,
 )
-
-import pytest
 
 
 def test_saas_main_config_ui_load(

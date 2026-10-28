@@ -1,5 +1,4 @@
 import re
-from test.unit.cli.scs_mock import ScsMock
 from typing import Any
 from unittest.mock import (
     Mock,
@@ -11,6 +10,7 @@ import pytest
 
 import exasol.nb_connector.cli.processing.bucketfs_access as bfs_access
 from exasol.nb_connector.cli.processing.option_set import ScsCliError
+from test.unit.cli.scs_mock import ScsMock
 
 
 @pytest.fixture

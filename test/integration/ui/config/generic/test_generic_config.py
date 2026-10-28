@@ -1,3 +1,9 @@
+import ipywidgets as widgets
+import pytest
+from IPython.display import display
+
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.ui.config.generic import get_config
 from test.integration.ui.common.utils.ui_utils import (
     SAVE_BUTTON,
     click_save,
@@ -6,13 +12,6 @@ from test.integration.ui.common.utils.ui_utils import (
     save_button,
     set_checkbox,
 )
-
-import ipywidgets as widgets
-import pytest
-from IPython.display import display
-
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.ui.config.generic import get_config
 
 
 @pytest.fixture

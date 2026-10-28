@@ -4,7 +4,6 @@ import os
 from collections.abc import Iterator
 from inspect import cleandoc
 from pathlib import Path
-from test.utils.secrets import sample_db_file
 from unittest.mock import Mock
 
 import click
@@ -14,6 +13,7 @@ from click.testing import CliRunner
 from exasol.nb_connector.cli import commands
 from exasol.nb_connector.cli.processing.backend_selector import BackendSelector
 from exasol.nb_connector.secret_store import Secrets
+from test.utils.secrets import sample_db_file
 
 
 def assert_error(result: click.testing.Result, message: str):

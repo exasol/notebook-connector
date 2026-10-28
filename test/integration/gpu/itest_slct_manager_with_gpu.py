@@ -1,6 +1,5 @@
 import textwrap
 from collections.abc import Iterator
-from test.utils.secrets import sample_db_file
 
 import pytest
 from exasol.exaslpm.model.package_file_config import (
@@ -18,6 +17,7 @@ from exasol.nb_connector.language_container_activation import (
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import ScriptLanguageContainer
+from test.utils.secrets import sample_db_file
 
 DEFAULT_GPU_FLAVOR = "template-Exasol-8-python-3.10-cuda-conda"
 """

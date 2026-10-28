@@ -1,3 +1,7 @@
+from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
+from exasol.nb_connector.connections import open_pyexasol_connection
+from exasol.nb_connector.secret_store import Secrets
+from exasol.nb_connector.transformers_extension_wrapper import initialize_te_extension
 from test.utils.integration_test_utils import (
     activate_languages,
     assert_connection_exists,
@@ -5,11 +9,6 @@ from test.utils.integration_test_utils import (
     get_script_counts,
     language_definition_context,
 )
-
-from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
-from exasol.nb_connector.connections import open_pyexasol_connection
-from exasol.nb_connector.secret_store import Secrets
-from exasol.nb_connector.transformers_extension_wrapper import initialize_te_extension
 
 
 def test_initialize_te_extension(secrets: Secrets, setup_itde):

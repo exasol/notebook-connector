@@ -1,7 +1,6 @@
-from test.integration.ui.common.utils.ui_utils import mock_conf
-
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.ui.config import onprem
+from test.integration.ui.common.utils.ui_utils import mock_conf
 
 
 def _capture_generic(monkeypatch, captured):

@@ -4,7 +4,6 @@ from datetime import (
     timedelta,
 )
 from pathlib import Path
-from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 
 import docker
 import exasol.bucketfs as bfs
@@ -18,6 +17,7 @@ from exasol.nb_connector.language_container_activation import (
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import ScriptLanguageContainer
 from exasol.nb_connector.slc.constants import PATH_IN_BUCKET
+from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 
 
 def _upload_docker_img_to_cache(slc: ScriptLanguageContainer):

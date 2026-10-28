@@ -1,4 +1,3 @@
-from test.utils.mock_cast import mock_cast
 from unittest.mock import (
     MagicMock,
     PropertyMock,
@@ -11,6 +10,7 @@ import pytest
 from docker.models.containers import Container
 
 from exasol.nb_connector.container_by_ip import ContainerByIp
+from test.utils.mock_cast import mock_cast
 
 
 def create_docker_client_mock(

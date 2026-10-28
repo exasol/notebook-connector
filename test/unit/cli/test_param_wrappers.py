@@ -1,7 +1,6 @@
 import getpass
 import itertools
 import os
-from test.unit.cli.scs_mock import ScsMock
 from typing import Any
 from unittest.mock import Mock
 
@@ -15,6 +14,7 @@ from exasol.nb_connector.cli.param_wrappers import (
     ScsParam,
     ScsSecretOption,
 )
+from test.unit.cli.scs_mock import ScsMock
 
 
 def select_atts(obj: Any, atts: dict[str, Any]) -> dict[str, Any]:

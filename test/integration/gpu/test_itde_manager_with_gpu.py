@@ -1,5 +1,4 @@
 from inspect import cleandoc
-from test.integration.ordinary.test_itde_manager import remove_itde
 
 from exasol.nb_connector.ai_lab_config import (
     Accelerator,
@@ -8,6 +7,7 @@ from exasol.nb_connector.ai_lab_config import (
 from exasol.nb_connector.itde_manager import (
     bring_itde_up,
 )
+from test.integration.ordinary.test_itde_manager import remove_itde
 
 DB_NETWORK_NAME = "db_network_DemoDb"
 

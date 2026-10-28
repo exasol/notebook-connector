@@ -2,9 +2,10 @@ import os
 import shutil
 import time
 from pathlib import Path
-from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 
 import pytest
+
+from test.integration.ui.common.utils.notebook_test_utils import run_notebook
 
 
 @pytest.fixture()

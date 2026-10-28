@@ -4,8 +4,6 @@ import textwrap
 from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from test.bucketfs_protocol import BucketFSProtocol
-from test.package_manager import PackageManager
 from threading import Thread
 
 import pytest
@@ -30,6 +28,8 @@ from exasol.nb_connector.slc.script_language_container import (
     ScriptLanguageContainer,
     constants,
 )
+from test.bucketfs_protocol import BucketFSProtocol
+from test.package_manager import PackageManager
 
 DEFAULT_FLAVORS = {
     PackageManager.PIP: "template-Exasol-all-python-3.12",

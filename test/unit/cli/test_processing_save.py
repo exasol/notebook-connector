@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from test.unit.cli.scs_mock import ScsPatcher
 
 import pytest
 
@@ -11,6 +10,7 @@ from exasol.nb_connector.cli.processing import processing
 from exasol.nb_connector.cli.processing.backend_selector import BackendSelector
 from exasol.nb_connector.connections import get_backend
 from exasol.nb_connector.secret_store import Secrets
+from test.unit.cli.scs_mock import ScsPatcher
 
 
 @pytest.fixture

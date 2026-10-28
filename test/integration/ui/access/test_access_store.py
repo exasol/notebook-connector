@@ -1,5 +1,4 @@
 from pathlib import Path
-from test.integration.ui.common.utils.ui_utils import CONF_STORE
 
 import nbformat
 from IPython.display import display
@@ -10,6 +9,7 @@ from exasol.nb_connector.ui.access.access_store import (
     DEFAULT_FILE_NAME,
     get_access_store,
 )
+from test.integration.ui.common.utils.ui_utils import CONF_STORE
 
 
 def fill_scs_password(password: str, page_session):

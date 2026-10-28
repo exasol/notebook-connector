@@ -6,10 +6,6 @@ from collections.abc import (
     Generator,
 )
 from pathlib import Path
-from test.unit.slc.util import (
-    SlcSecretsMock,
-    not_raises,
-)
 from unittest import mock
 from unittest.mock import (
     Mock,
@@ -41,6 +37,10 @@ from exasol.nb_connector.slc.slc_flavor import (
     SlcFlavor,
 )
 from exasol.nb_connector.slc.workspace import current_directory
+from test.unit.slc.util import (
+    SlcSecretsMock,
+    not_raises,
+)
 
 
 @pytest.fixture

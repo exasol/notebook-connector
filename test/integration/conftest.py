@@ -1,7 +1,8 @@
 from collections.abc import Iterator
-from test.utils.integration_test_utils import _setup_itde_impl
 
 import pytest
+
+from test.utils.integration_test_utils import _setup_itde_impl
 
 
 @pytest.fixture

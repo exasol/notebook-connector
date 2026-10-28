@@ -1,9 +1,5 @@
 from dataclasses import dataclass
 from pathlib import Path
-from test.unit.cli.scs_mock import (
-    ScsMock,
-    ScsPatcher,
-)
 
 import pytest
 
@@ -22,6 +18,10 @@ from exasol.nb_connector.cli.processing.option_set import (
     OptionSet,
     ScsCliError,
     get_option_set,
+)
+from test.unit.cli.scs_mock import (
+    ScsMock,
+    ScsPatcher,
 )
 
 
