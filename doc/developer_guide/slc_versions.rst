@@ -68,8 +68,12 @@ particular flavor to be present.
 In consequence, updating the SLCR version potentially may require updating the
 NC tests as well, e.g. the name of the flavor used in the tests.
 
-When updating the name of the flavor in file `configure_slc_repository.ipynb
-<slc_notebook_>`_, please look at:
+Each of the following files contains a reference to a flavor name
+
+* `configure_slc_repository.ipynb <slc_notebook_>`_
+* `gpu_in_udf/setup.ipynb <slc_notebook_>`_
+
+When updating the name of the flavor, please look at:
 
 * The Jupyter notebooks in folder
   ``exasol/nb_connector/resources/notebooks/script_languages_container/``
