@@ -1,5 +1,7 @@
+import json
 import os
 import shutil
+import textwrap
 from datetime import (
     timedelta,
 )
@@ -67,6 +69,78 @@ def _wait_for_slc_to_become_available(secrets: Secrets, slc: ScriptLanguageConta
     )
 
 
+def _assert_pytorch_has_single_package_manager(
+    secrets: Secrets, slc: ScriptLanguageContainer
+) -> None:
+    """Ensure PyTorch is not installed through both conda and pip in the SLC."""
+    udf = textwrap.dedent(f"""
+        CREATE OR REPLACE {slc.language_alias} SCALAR SCRIPT
+        check_pytorch_package_provenance()
+        RETURNS VARCHAR(2000000) AS
+        import json
+        import sys
+        from importlib.metadata import distributions
+        from pathlib import Path
+
+        def normalize_package_name(name):
+            return name.lower().replace("-", "").replace("_", "").replace(".", "")
+
+        def conda_pytorch_records():
+            records = []
+            for record_path in (Path(sys.prefix) / "conda-meta").glob("*.json"):
+                with record_path.open(encoding="utf-8") as record_file:
+                    record = json.load(record_file)
+                if record.get("name") == "pytorch":
+                    records.append({{
+                        "path": str(record_path),
+                        "version": record.get("version"),
+                    }})
+            return records
+
+        def pip_torch_distributions():
+            pip_distributions = []
+            for distribution in distributions():
+                name = distribution.metadata.get("Name", "")
+                if normalize_package_name(name) not in {{"torch", "pytorch"}}:
+                    continue
+                for distribution_file in distribution.files or []:
+                    if distribution_file.name != "INSTALLER":
+                        continue
+                    installer_path = distribution.locate_file(distribution_file)
+                    if installer_path.read_text(encoding="utf-8").strip() == "pip":
+                        pip_distributions.append({{
+                            "name": name,
+                            "version": distribution.version,
+                            "path": str(installer_path.parent),
+                        }})
+            return pip_distributions
+
+        def run(ctx):
+            return json.dumps({{
+                "conda_pytorch_records": conda_pytorch_records(),
+                "pip_torch_distributions": pip_torch_distributions(),
+            }})
+        /
+        """)
+    conn = open_pyexasol_connection_with_lang_definitions(
+        secrets, schema=secrets.db_schema, compression=True
+    )
+    try:
+        conn.execute(udf)
+        rows = conn.execute("SELECT check_pytorch_package_provenance()").fetchall()
+    finally:
+        conn.close()
+
+    assert len(rows) == 1
+    provenance = json.loads(rows[0][0])
+    conda_records = provenance["conda_pytorch_records"]
+    pip_distributions = provenance["pip_torch_distributions"]
+    assert not (conda_records and pip_distributions), (
+        "PyTorch is installed through both conda and pip in the GPU SLC: "
+        f"conda records={conda_records}, pip distributions={pip_distributions}"
+    )
+
+
 @pytest.fixture()
 def check_if_gpu_is_active(request):
     if (value := os.getenv("NBTEST_USE_GPU")) != "true":
@@ -121,6 +195,7 @@ def test_gpu_notebooks(
         secrets = Secrets(store_path, master_password=store_password)
         slc = ScriptLanguageContainer(secrets=secrets, name="gpu_slc")
         _wait_for_slc_to_become_available(secrets, slc)
+        _assert_pytorch_has_single_package_manager(secrets, slc)
         run_notebook("basic_udf_with_gpu.ipynb", store_file, store_password)
         run_notebook(
             "advanced_udf_with_gpu.ipynb",
