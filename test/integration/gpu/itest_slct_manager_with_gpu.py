@@ -64,7 +64,7 @@ def test_append_custom_packages(
 
 @pytest.fixture
 def custom_pip_packages() -> list[tuple[str, str]]:
-    return [("exasol-transformers-extension", "3.0.0")]
+    return [("exasol-transformers-extension", "5.2.1")]
 
 
 @pytest.mark.dependency(name="append_custom_pip_packages")
