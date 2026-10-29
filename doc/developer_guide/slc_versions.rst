@@ -77,8 +77,9 @@ When updating the name of the flavor, please look at:
 
 * The Jupyter notebooks in folder
   ``exasol/nb_connector/resources/notebooks/script_languages_container/``
-* The packages used in the SLC, e.g. in file ``gpu_in_udf/setup.ipynb`` as in
-  some cases these might depend on the flavor or in particular it's Python version
+* The versions of the packages and the CUDA toolkit used in the SLC, e.g. in
+  file ``gpu_in_udf/setup.ipynb`` as in some cases these might depend on the
+  flavor or in particular it's Python version
 * The integration tests in ``test/integration/ordinary/itest_slc.py``
 
 Not affected are usually the unit tests in ``test/unit/slc/utest_slc.py``.
