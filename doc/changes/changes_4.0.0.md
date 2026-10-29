@@ -8,6 +8,7 @@ This release
 * Uses Python 3.12 flavors instead of 3.10:
   * `template-Exasol-all-python-3.12` in the Script Language Container notebook [configure_slc_repository.ipynb](https://github.com/exasol/notebook-connector/blob/main/exasol/nb_connector/resources/notebooks/script_languages_container/configure_slc_repository.ipynb)
   * `template-Exasol-8-python-3.12-cuda-conda` in the GPU notebook [gpu_in_udf/setup.ipynb](https://github.com/exasol/notebook-connector/blob/main/exasol/nb_connector/resources/notebooks/gpu_in_udf/setup.ipynb)
+* Updates PyTorch to version 2.13.0 with CUDA 13.0 support in the GPU notebook.
 * Unpins the dependencies to ITDE and SLCT that were pinned in the context of ticket #424.
 
 The release also improves the error messages when locating Jar files in GitHub releases, which is used for the Cloud Storage notebook.
