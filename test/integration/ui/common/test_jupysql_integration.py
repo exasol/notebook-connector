@@ -1,5 +1,4 @@
 from pathlib import Path
-from test.integration.ui.common.utils.notebook_test_utils import print_notebook_output
 
 import nbformat
 import pytest
@@ -7,6 +6,7 @@ import pytest
 from exasol.nb_connector.ai_lab_config import AILabConfig as CKey
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.ui.common import jupysql
+from test.integration.ui.common.utils.notebook_test_utils import print_notebook_output
 
 
 def create_test_config(tmp_path, schema, user, password, cert_vld=None):

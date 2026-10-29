@@ -1,11 +1,11 @@
 from collections.abc import Iterator
-from test.bucketfs_protocol import BucketFSProtocol
-from test.package_manager import PackageManager
-from test.utils.secrets import sample_db_file
 
 import pytest
 
 from exasol.nb_connector.secret_store import Secrets
+from test.bucketfs_protocol import BucketFSProtocol
+from test.package_manager import PackageManager
+from test.utils.secrets import sample_db_file
 
 pytest_plugins = ["test.integration.ui.common.utils.notebook_test_utils"]
 

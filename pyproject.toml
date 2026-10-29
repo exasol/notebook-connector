@@ -1,6 +1,6 @@
 [project]
 name = "exasol-notebook-connector"
-version = "3.1.0"
+version = "4.0.0"
 requires-python = ">=3.11,<3.13"
 description = "Components, tools, APIs, and configurations in order to connect Jupyter notebooks to Exasol and various other systems."
 packages = [{ include = "exasol" }, ]
@@ -109,7 +109,7 @@ dev = [
     "pytest>=8.1",
     "pytest-mock>=3.7.0",
     "pytest_dependency>=0.6.0",
-    "exasol-toolbox>=11.0.0,<12",
+    "exasol-toolbox>=12.0.0,<13",
     "pytest-exasol-backend>=1.1.0,<2",
     "pytest-ipywidgets>=1.52.0,<2.0.0",
     "notebook>=7.4,<8",
@@ -160,7 +160,6 @@ fail_under = 15
 line-length = 88
 verbose = false
 include = "\\.pyi?$"
-target-version = ["py310"]
 
 
 [tool.isort]

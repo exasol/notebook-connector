@@ -1,7 +1,3 @@
-from test.utils.integration_test_utils import (
-    get_script_counts,
-)
-
 from exasol.nb_connector.bfs_utils import put_file
 from exasol.nb_connector.cloud_storage import setup_scripts
 from exasol.nb_connector.connections import (
@@ -13,6 +9,9 @@ from exasol.nb_connector.github import (
     retrieve_jar,
 )
 from exasol.nb_connector.secret_store import Secrets
+from test.utils.integration_test_utils import (
+    get_script_counts,
+)
 
 
 def test_cloud_storage_setup_scripts(secrets: Secrets, setup_itde):

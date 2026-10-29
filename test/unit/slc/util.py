@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import contextlib
-from test.utils.secrets import SecretsMock
 
 import pytest
 from exasol.slc.models.compression_strategy import CompressionStrategy
 
 from exasol.nb_connector.slc.slc_compression_strategy import SlcCompressionStrategy
 from exasol.nb_connector.slc.slc_flavor import SlcFlavor
+from test.utils.secrets import SecretsMock
 
 
 class SlcSecretsMock(SecretsMock):

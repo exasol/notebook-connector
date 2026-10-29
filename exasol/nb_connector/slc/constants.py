@@ -16,11 +16,12 @@ Configuration Storage with this key.
 FLAVORS_PATH_IN_SLC_REPO = Path("flavors")
 """Path to flavors within the script-languages-release repository"""
 
-SLC_RELEASE_TAG = "11.1.1"
+SLC_RELEASE_TAG = "12.0.1"
 """"
-Using the SLC_RELEASE 11.1.1 because we are limited to slc-tool 4.*. (see pyproject.toml)
-Check the developer guide (./doc/developer-guide.md) for more information.
-"""
+Please make sure the SLC_RELEASE_TAG matches the version of
+exasol-script-languages-container-tool in file pyproject.toml. See the
+developer guide (./doc/developer-guide.md) for more information.
+ """
 
 
 WORKSPACE_DIR = "slc_workspace"
@@ -32,5 +33,5 @@ GitHub URL which is used as base for the Script-Languages-Container.
 
 SLC_WORKSPACE_KEY_PREFIX = "slc_workspace_"
 """
-Key prefix of the key in secret store to save the workspace directory. 
+Key prefix of the key in secret store to save the workspace directory.
 """

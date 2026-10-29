@@ -1,6 +1,13 @@
 """UI tests for the Docker-DB controls in the main config screen."""
 
 from datetime import timedelta
+
+import pytest
+import solara
+
+import exasol.nb_connector.ui.docker as ui
+from exasol.nb_connector.ai_lab_config import AILabConfig
+from exasol.nb_connector.itde_manager import ItdeContainerStatus
 from test.integration.ui.common.utils.docker_itde_mock_util import patch_itde_manager
 from test.integration.ui.common.utils.ui_utils import (
     DOCKER_DB_CREATE_START_BUTTON,
@@ -13,13 +20,6 @@ from test.integration.ui.common.utils.ui_utils import (
     DOCKER_DB_STOPPED,
 )
 from test.utils.time_util import milliseconds
-
-import pytest
-import solara
-
-import exasol.nb_connector.ui.docker as ui
-from exasol.nb_connector.ai_lab_config import AILabConfig
-from exasol.nb_connector.itde_manager import ItdeContainerStatus
 
 
 @pytest.fixture

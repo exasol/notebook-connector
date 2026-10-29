@@ -1,3 +1,5 @@
+import pytest
+
 from test.integration.ui.common.utils.main_config_ui_utils import render_db_selection_ui
 from test.integration.ui.common.utils.ui_utils import (
     SELECT_BUTTON,
@@ -5,8 +7,6 @@ from test.integration.ui.common.utils.ui_utils import (
     expect_select_button_to_have_check_icon,
     expect_select_button_to_have_pencil_icon,
 )
-
-import pytest
 
 
 def test_default_db_selection_ui_load(

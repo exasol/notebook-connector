@@ -15,7 +15,7 @@ jobs:
   large-runner-tests:
     name: Text AI Tests
     runs-on:
-      labels: int-linux-x64-4core-ubuntu24.04-1
+      labels: int-linux-x64-4core-ubuntu26.04-1
     environment: text-ai-prerelease
     permissions:
       contents: read

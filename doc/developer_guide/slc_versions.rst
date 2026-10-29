@@ -1,3 +1,5 @@
+.. _slc_version:
+
 Selecting the Versions for SLCT and SLCR
 ****************************************
 
@@ -8,7 +10,7 @@ NC contains multiple dependencies including the following
 +=========================================================================================+================================================================+=======================================================+
 | ``script-languages-container-tool`` (SLCT)                                              | File `pyproject.toml <slct_dep_>`_                             | ``exasol-script-languages-container-tool = "^1.0.0"`` |
 +-----------------------------------------------------------------------------------------+----------------------------------------------------------------+-------------------------------------------------------+
-| A release of the Exasol Script Languages Containers ``script-languages-release`` (SLCR) | File `exasol/nb_connector/slct/constants.py <slc_constants_>`_ | ``SLC_RELEASE_TAG = "11.1.1"``                        |
+| A release of the Exasol Script Languages Containers ``script-languages-release`` (SLCR) | File `exasol/nb_connector/slct/constants.py <slc_constants_>`_ | ``SLC_RELEASE_TAG = "12.0.1"``                        |
 +-----------------------------------------------------------------------------------------+----------------------------------------------------------------+-------------------------------------------------------+
 
 .. _slct_dep: https://github.com/exasol/notebook-connector/blob/main/pyproject.toml
@@ -28,8 +30,8 @@ Example
 For the versions named in the table above
 
 * `SLCR version 9.1.0 <slcr_910_>`_ in the release letter, section
-  "_Script-Language-Container-Tool (Exaslct)_" states "_This release uses
-  version 1.0.0 of the container tool._"
+  *Script-Language-Container-Tool (Exaslct)* states "*This release uses
+  version 1.0.0 of the container tool.*"
 
 * When clicking on the commit `60492ad <slc_commit_>`_ and "Browse files", then
   SLCR's file `pyproject.toml <slc_pyproject_>`_ shows
@@ -66,10 +68,20 @@ particular flavor to be present.
 In consequence, updating the SLCR version potentially may require updating the
 NC tests as well, e.g. the name of the flavor used in the tests.
 
+Each of the following files contains a reference to a flavor name
+
+* `configure_slc_repository.ipynb <slc_notebook_>`_
+* `gpu_in_udf/setup.ipynb <slc_notebook_>`_
+
 When updating the name of the flavor, please look at:
 
 * The Jupyter notebooks in folder
   ``exasol/nb_connector/resources/notebooks/script_languages_container/``
+* The versions of the packages and the CUDA toolkit used in the SLC, e.g. in
+  file ``gpu_in_udf/setup.ipynb`` as in some cases these might depend on the
+  flavor or in particular it's Python version
 * The integration tests in ``test/integration/ordinary/itest_slc.py``
 
 Not affected are usually the unit tests in ``test/unit/slc/utest_slc.py``.
+
+.. _slc_notebook: https://github.com/exasol/notebook-connector/blob/main/exasol/nb_connector/resources/notebooks/script_languages_container/configure_slc_repository.ipynb

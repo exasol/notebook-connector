@@ -1,6 +1,5 @@
 import textwrap
 from collections.abc import Iterator
-from test.utils.secrets import sample_db_file
 
 import pytest
 from exasol.exaslpm.model.package_file_config import (
@@ -18,6 +17,7 @@ from exasol.nb_connector.language_container_activation import (
 )
 from exasol.nb_connector.secret_store import Secrets
 from exasol.nb_connector.slc import ScriptLanguageContainer
+from test.utils.secrets import sample_db_file
 
 DEFAULT_GPU_FLAVOR = "template-Exasol-8-python-3.10-cuda-conda"
 """
@@ -64,7 +64,7 @@ def test_append_custom_packages(
 
 @pytest.fixture
 def custom_pip_packages() -> list[tuple[str, str]]:
-    return [("exasol-transformers-extension", "3.0.0")]
+    return [("exasol-transformers-extension", "5.2.1")]
 
 
 @pytest.mark.dependency(name="append_custom_pip_packages")
